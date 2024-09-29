@@ -13,3 +13,12 @@ config_version=5
 config/name="The Last Fleet"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+data="*res://Scripts/AutoloadScripts/data.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080

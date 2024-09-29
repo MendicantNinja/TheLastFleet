@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="WeaponMount" load_steps=2 format=3 uid="uid://bsulm5ksx0f40"]
+
+[ext_resource type="Script" path="res://Resources/Resources/WeaponMounts/weapon_mount.gd" id="1_eeycj"]
+
+[resource]
+script = ExtResource("1_eeycj")
+weapon_mount_type = 0
+weapon_mount_size = 0
+is_fixed = false
+weapon_mount_name = ""

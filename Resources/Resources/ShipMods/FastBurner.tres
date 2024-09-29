@@ -1,0 +1,7 @@
+[gd_resource type="Resource" script_class="ShipMod" load_steps=2 format=3 uid="uid://dvj7lqng6ivc4"]
+
+[ext_resource type="Script" path="res://Resources/Resources/ShipMods/ship_mod.gd" id="1_n1leb"]
+
+[resource]
+script = ExtResource("1_n1leb")
+armament_points = 0

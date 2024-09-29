@@ -1,5 +1,7 @@
 extends Node
 
+class_name WeaponSlot
+# Used for serializing equipped weapons properly and knowing which weapon slot is which.
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
