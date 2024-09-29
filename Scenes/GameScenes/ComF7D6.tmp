@@ -58,6 +58,11 @@ texture = ExtResource("3_ousd4")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/TestObstacle"]
 shape = SubResource("CircleShape2D_mwokj")
 
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="NavigationRegion2D/TestObstacle"]
+avoidance_enabled = true
+avoidance_layers = 2
+avoidance_mask = 0
+
 [node name="PlayerShip" type="RigidBody2D" parent="."]
 position = Vector2(960, 540)
 rotation = -1.5708
@@ -85,10 +90,8 @@ target_desired_distance = 20.0
 avoidance_enabled = true
 radius = 200.0
 neighbor_distance = 1000.0
-time_horizon_agents = 10.0
 time_horizon_obstacles = 1.0
 avoidance_mask = 6
-avoidance_priority = 0.99
 debug_enabled = true
 debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
@@ -113,12 +116,13 @@ offset = Vector2(0, -50)
 shape = SubResource("CircleShape2D_63ky0")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="EnemyShip"]
+avoidance_enabled = true
 radius = 200.0
 neighbor_distance = 1000.0
-time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 avoidance_layers = 4
 avoidance_mask = 3
+avoidance_priority = 0.99
 
 [connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
 [connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavAgent_velocity_computed"]

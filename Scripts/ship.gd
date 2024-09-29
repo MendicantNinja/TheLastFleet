@@ -4,12 +4,12 @@ class_name Ship
 const SPEED = 2000.0
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 var acceleration: Vector2 = Vector2.ZERO
-var angular_acceleration: float = 0.0
+var avoidance_velocity: Vector2 = Vector2.ZERO
 var stop_ship: bool = false
 var manual_control: bool = false
 var ship_select: bool = false
 
-func _ready() -> void:
+func _ready(in_combat: bool = true) -> void:
 	pass
 
 # Any generic input event.
@@ -42,15 +42,20 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and not stop_ship:
 		var ship_position: Vector2 = transform.get_origin()
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
-		velocity = ship_position.direction_to(next_path_position) * SPEED * delta
+		var direction_to_path: Vector2 = ship_position.direction_to(next_path_position)
+		velocity = direction_to_path * SPEED * delta
+		
+		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
+		var look_at_x: Vector2 = transform_look_at.x
+		var look_at_y: Vector2 = transform_look_at.y
+		transform = transform.interpolate_with(transform_look_at, delta)
 	
 	acceleration += velocity - linear_velocity
-
-func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = mass * acceleration
 	if force.abs().floor() != Vector2.ZERO:
-		state.apply_central_force(force)
-	
+		apply_central_force(force)
+
+func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if stop_ship:
 		# decrease linear velocity to converge acceleration to zero, thus
 		# converging force to zero

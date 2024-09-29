@@ -58,14 +58,19 @@ texture = ExtResource("3_ousd4")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/TestObstacle"]
 shape = SubResource("CircleShape2D_mwokj")
 
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="NavigationRegion2D/TestObstacle"]
+avoidance_enabled = true
+avoidance_layers = 2
+avoidance_mask = 0
+
 [node name="PlayerShip" type="RigidBody2D" parent="."]
 position = Vector2(960, 540)
 rotation = -1.5708
 collision_mask = 2
 input_pickable = true
 gravity_scale = 0.0
+freeze_mode = 1
 continuous_cd = 1
-contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("2_u31ug")
 
@@ -76,17 +81,14 @@ scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
 offset = Vector2(0, -50)
 
-[node name="CollisionShape" type="CollisionShape2D" parent="PlayerShip"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerShip"]
+visible = false
 shape = SubResource("CircleShape2D_63ky0")
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="PlayerShip"]
 path_desired_distance = 50.0
 target_desired_distance = 20.0
 avoidance_enabled = true
-radius = 200.0
-neighbor_distance = 1000.0
-time_horizon_agents = 10.0
-time_horizon_obstacles = 1.0
 avoidance_mask = 6
 avoidance_priority = 0.99
 debug_enabled = true
@@ -94,31 +96,6 @@ debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
-
-[node name="EnemyShip" type="RigidBody2D" parent="."]
-position = Vector2(1400, 500)
-rotation = 3.14159
-gravity_scale = 0.0
-contact_monitor = true
-max_contacts_reported = 10
-
-[node name="ShipSprite" type="Sprite2D" parent="EnemyShip"]
-self_modulate = Color(1, 0, 0.266666, 1)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_1p2qq")
-offset = Vector2(0, -50)
-
-[node name="CollisionShape" type="CollisionShape2D" parent="EnemyShip"]
-shape = SubResource("CircleShape2D_63ky0")
-
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="EnemyShip"]
-radius = 200.0
-neighbor_distance = 1000.0
-time_horizon_agents = 5.0
-time_horizon_obstacles = 1.0
-avoidance_layers = 4
-avoidance_mask = 3
 
 [connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
 [connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavAgent_velocity_computed"]
