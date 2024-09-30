@@ -113,6 +113,7 @@ offset = Vector2(0, -50)
 shape = SubResource("CircleShape2D_63ky0")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="EnemyShip"]
+avoidance_enabled = true
 radius = 200.0
 neighbor_distance = 1000.0
 time_horizon_agents = 5.0
