@@ -82,10 +82,11 @@ shape = SubResource("CircleShape2D_63ky0")
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="PlayerShip"]
 path_desired_distance = 50.0
 target_desired_distance = 20.0
+path_max_distance = 50.0
 avoidance_enabled = true
 radius = 200.0
 neighbor_distance = 1000.0
-time_horizon_agents = 10.0
+time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 avoidance_mask = 6
 avoidance_priority = 0.99
@@ -114,12 +115,11 @@ shape = SubResource("CircleShape2D_63ky0")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="EnemyShip"]
 avoidance_enabled = true
-radius = 200.0
+radius = 100.0
 neighbor_distance = 1000.0
-time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 avoidance_layers = 4
 avoidance_mask = 3
 
 [connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
-[connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavAgent_velocity_computed"]
+[connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavigationAgent_velocity_computed"]
