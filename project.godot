@@ -14,6 +14,11 @@ config/name="The Last Fleet"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
+[debug]
+
+shapes/avoidance/agents_radius_color=Color(1, 1, 0, 0.580392)
+shapes/avoidance/obstacles_radius_color=Color(1, 0.501961, 0, 0.556863)
+
 [display]
 
 window/size/viewport_width=1920

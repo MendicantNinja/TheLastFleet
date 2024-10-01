@@ -61,7 +61,8 @@ shape = SubResource("CircleShape2D_mwokj")
 [node name="PlayerShip" type="RigidBody2D" parent="."]
 position = Vector2(960, 540)
 rotation = -1.5708
-collision_mask = 2
+collision_layer = 5
+collision_mask = 7
 input_pickable = true
 gravity_scale = 0.0
 continuous_cd = 1
@@ -99,6 +100,8 @@ debug_path_custom_line_width = 3.0
 [node name="EnemyShip" type="RigidBody2D" parent="."]
 position = Vector2(1400, 500)
 rotation = 3.14159
+collision_layer = 5
+collision_mask = 7
 gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 10
@@ -110,16 +113,18 @@ scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
 offset = Vector2(0, -50)
 
-[node name="CollisionShape" type="CollisionShape2D" parent="EnemyShip"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip"]
 shape = SubResource("CircleShape2D_63ky0")
 
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="EnemyShip"]
 avoidance_enabled = true
-radius = 100.0
+radius = 70.0
 neighbor_distance = 1000.0
 time_horizon_obstacles = 1.0
 avoidance_layers = 4
 avoidance_mask = 3
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="EnemyShip"]
 
 [connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
 [connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavigationAgent_velocity_computed"]
