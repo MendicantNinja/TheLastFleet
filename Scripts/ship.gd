@@ -79,6 +79,7 @@ func _physics_process(delta: float) -> void:
 		intermediate_pathing = true
 		final_target_position = target_position
 		target_position = Vector2(collider_center.x - navagent_radius/1.3, collider_center.y)
+		target_position = Vector2(collider_center.x - navagent_radius, collider_center.y)
 		ShipNavigationAgent.set_target_position(target_position)
 	
 	# Do this after finishing the intermediate pathing.
