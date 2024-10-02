@@ -6,6 +6,7 @@ const SPEED = 3000.0
 var acceleration: Vector2 = Vector2.ZERO
 var avoidance_velocity: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
+var navigation_path
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
@@ -62,13 +63,27 @@ func _physics_process(delta: float) -> void:
 	
 	# Do these two branch statements when first detecting a collision. 
 	if intermediate_pathing == false and target_position != Vector2.ZERO:
-		print("Raycast shootout")
+		#print("Raycast shootout")
+		navigation_path = ShipNavigationAgent.get_current_navigation_path()
 		var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 		var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_position, target_position, 1, [self])
 		raycast_result = space_state.intersect_ray(query)
 	
+	var normal_as_int: Vector2i = Vector2i.ZERO
+	if not raycast_result.is_empty():
+		var round_normal_x: int = roundi(raycast_result["normal"].x)
+		var round_normal_y: int = roundi(raycast_result["normal"].y)
+		normal_as_int = Vector2i(round_normal_x, round_normal_y)
+	
+	var valid_casts: Array = []
+	if normal_as_int != Vector2i.ZERO:
+		var flip_y = transform * Transform2D.FLIP_Y
+		var sweep_start_vector: Vector2 = transform.y.direction_to(transform.x)
+		var sweep_end_vector: Vector2 = flip_y.y.direction_to(transform.x)
+		pass
+	
 	if intermediate_pathing == false and not raycast_result.is_empty() and not ShipNavigationAgent.is_navigation_finished():
-		print("Raycast shootout calculate and set new intermediate path")
+		#print("Raycast shootout calculate and set new intermediate path")
 		var collider_instance: Node = instance_from_id(raycast_result["collider_id"])
 		#if collider_instance is 
 		var collider_navagent: NavigationAgent2D = collider_instance.find_child("ShipNavigationAgent")
@@ -78,20 +93,19 @@ func _physics_process(delta: float) -> void:
 		var navagent_radius: int = collider_navagent.radius
 		intermediate_pathing = true
 		final_target_position = target_position
-		target_position = Vector2(collider_center.x - navagent_radius/1.3, collider_center.y)
 		target_position = Vector2(collider_center.x - navagent_radius, collider_center.y)
 		ShipNavigationAgent.set_target_position(target_position)
 	
 	# Do this after finishing the intermediate pathing.
 	elif intermediate_pathing == true and ShipNavigationAgent.is_navigation_finished():
-		print("Intermediate pathing finished")
+		#print("Intermediate pathing finished")
 		target_position = final_target_position
 		ShipNavigationAgent.set_target_position(target_position)
 		intermediate_pathing = false
 	
 	# Normal Pathing
-	elif not ShipNavigationAgent.is_navigation_finished():
-		print("Pathing normally as navigation is not finished")
+	if not ShipNavigationAgent.is_navigation_finished():
+		#print("Pathing normally as navigation is not finished")
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
 		var direction_to_path: Vector2 = ship_position.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta

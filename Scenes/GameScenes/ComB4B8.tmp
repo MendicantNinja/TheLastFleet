@@ -61,7 +61,7 @@ shape = SubResource("CircleShape2D_mwokj")
 
 [node name="PlayerShip" type="RigidBody2D" parent="NavigationRegion2D"]
 position = Vector2(960, 540)
-rotation = 1.5708
+rotation = -1.5708
 collision_mask = 6
 input_pickable = true
 gravity_scale = 0.0
@@ -85,7 +85,7 @@ path_desired_distance = 50.0
 target_desired_distance = 20.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 70.0
+radius = 200.0
 neighbor_distance = 1000.0
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
@@ -121,7 +121,7 @@ path_desired_distance = 50.0
 target_desired_distance = 20.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 70.0
+radius = 200.0
 neighbor_distance = 1000.0
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
