@@ -74,33 +74,37 @@ func _physics_process(delta: float) -> void:
 			var collider_center: Vector2 = collider_instance.position
 			query = PhysicsRayQueryParameters2D.create(target_position, collider_center, 1, [self])
 			query_for_target = space_state.intersect_ray(query)
-		
 	
-	var valid_paths: Array = []
+	var sweep_end_vector: Vector2 = Vector2.ZERO
+	var sweep_start_vector: Vector2 = Vector2.ZERO
 	if not query_for_ship.is_empty():
+		# flip the direction of the raycast normal to make it face the collider
+		var target_direction: Vector2 = -1*query_for_target["normal"]
+		
+		# get the starting vectors needed for a clockwise sweep
+		sweep_end_vector = target_direction.rotated(PI/4)
+		sweep_start_vector = target_direction.rotated(-PI/4)
+		
+		# find the distance from the target position to the intersection and 
+		# add the nav agent radius for good measure
 		var collider_instance: Node = instance_from_id(query_for_ship["collider_id"])
 		var collider_navagent: NavigationAgent2D = collider_instance.find_child("ShipNavigationAgent")
 		if collider_navagent == null:
 			return
 		var navagent_radius: int = collider_navagent.radius
+		var intersection_position: Vector2 = query_for_ship["position"]
+		var sweep_radius: float = target_position.distance_to(intersection_position) + navagent_radius * 2
 		
-		# flips the normal to face to make it face the collider
-		var target_direction: Vector2 = -1*query_for_target["normal"]
-		# get the starting vector needed for a clockwise sweep in 15 degree increments
-		var sweep_start_vector: Vector2 = target_direction.rotated(-PI/4)
-		# get where the intersection occurs on the other side of the radius
-		var intersection_position: Vector2 = query_for_ship["position"] 
-		# find the distance from the target_position to the intersection and add the nav agent radius for good measure
-		# in theory this is supposed to be a flat constant "hypotenuse" but theres one more step im forgetting
-		var sweep_radius: float = target_position.distance_to(intersection_position) + navagent_radius
-		print(target_position)
-		print(rad_to_deg(target_direction.angle()))
-		print(rad_to_deg(sweep_start_vector.angle()))
-		print(sweep_start_vector)
-		# we have to adjust sweep_start_vector but im fucking up where the X needs to land, I think the Y is fine
-		sweep_start_vector = Vector2(sweep_start_vector.x * sweep_radius, sweep_start_vector.y * sweep_radius)
-		print(sweep_start_vector)
-		print(sweep_start_vector.rotated(PI/8))
+		# find the vectors required to offset the sweep start and end vectors
+		var offset_start_vector: Vector2 = Vector2(sweep_start_vector.x * sweep_radius, sweep_start_vector.y * sweep_radius)
+		var offset_end_vector: Vector2 = Vector2(sweep_end_vector.x * sweep_radius, sweep_end_vector.y * sweep_radius)
+		sweep_start_vector = Vector2(target_position.x + offset_start_vector.x, target_position.y + offset_start_vector.y)
+		sweep_end_vector = Vector2(target_position.x + offset_end_vector.x, target_position.y + offset_end_vector.y)
+	
+	# cast the rays, set the intermediate path, do the do, get the heck out
+	var valid_paths: Array = []
+	if sweep_start_vector != Vector2.ZERO and sweep_end_vector != Vector2.ZERO:
+		
 		pass
 	
 	if intermediate_pathing == false and not query_for_target.is_empty() and not ShipNavigationAgent.is_navigation_finished():

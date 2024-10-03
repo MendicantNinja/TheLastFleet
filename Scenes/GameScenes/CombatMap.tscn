@@ -10,11 +10,11 @@ polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3), PackedInt32Arr
 outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, 15, 1063, 1892, 1061, 1899, 0)])
 agent_radius = 50.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_mwokj"]
-radius = 80.0
-
 [sub_resource type="CircleShape2D" id="CircleShape2D_63ky0"]
 radius = 50.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_mwokj"]
+radius = 80.0
 
 [node name="Node2D" type="Node2D"]
 
@@ -46,22 +46,8 @@ texture = ExtResource("1_1p2qq")
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="NavigationRegion2D"]
-
-[node name="TestObstacle" type="StaticBody2D" parent="NavigationRegion2D"]
-position = Vector2(600, 700)
-collision_layer = 2
-collision_mask = 2
-
-[node name="TestSprite" type="Sprite2D" parent="NavigationRegion2D/TestObstacle"]
-texture = ExtResource("3_ousd4")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/TestObstacle"]
-shape = SubResource("CircleShape2D_mwokj")
-
 [node name="PlayerShip" type="RigidBody2D" parent="NavigationRegion2D"]
-position = Vector2(664, 499)
-rotation = -1.16937
+position = Vector2(800, 200)
 collision_mask = 6
 input_pickable = true
 gravity_scale = 0.0
@@ -131,6 +117,19 @@ debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="NavigationRegion2D"]
+
+[node name="TestObstacle" type="StaticBody2D" parent="NavigationRegion2D"]
+position = Vector2(600, 700)
+collision_layer = 2
+collision_mask = 2
+
+[node name="TestSprite" type="Sprite2D" parent="NavigationRegion2D/TestObstacle"]
+texture = ExtResource("3_ousd4")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/TestObstacle"]
+shape = SubResource("CircleShape2D_mwokj")
 
 [connection signal="input_event" from="NavigationRegion2D/PlayerShip" to="NavigationRegion2D/PlayerShip" method="_on_input_event"]
 [connection signal="velocity_computed" from="NavigationRegion2D/PlayerShip/ShipNavigationAgent" to="NavigationRegion2D/PlayerShip" method="_on_ShipNavigationAgent_velocity_computed"]
