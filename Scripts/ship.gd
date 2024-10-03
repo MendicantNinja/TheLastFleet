@@ -56,35 +56,56 @@ func _physics_process(delta: float) -> void:
 #shape: The shape index of the colliding shape.
 
 
-	var ship_position: Vector2 = transform.get_origin()
-	var raycast_result: Dictionary = {}
+	var ship_origin: Vector2 = transform.get_origin()
+	var query_for_target: Dictionary = {}
+	var query_for_ship: Dictionary = {}
 	var velocity = Vector2.ZERO
 	movement_delta = SPEED * delta
 	
 	# Do these two branch statements when first detecting a collision. 
 	if intermediate_pathing == false and target_position != Vector2.ZERO:
 		#print("Raycast shootout")
-		navigation_path = ShipNavigationAgent.get_current_navigation_path()
+		#navigation_path = ShipNavigationAgent.get_current_navigation_path()
 		var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 		var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_position, target_position, 1, [self])
-		raycast_result = space_state.intersect_ray(query)
+		query_for_ship = space_state.intersect_ray(query)
+		if not query_for_ship.is_empty():
+			var collider_instance: Node = instance_from_id(query_for_ship["collider_id"])
+			var collider_center: Vector2 = collider_instance.position
+			query = PhysicsRayQueryParameters2D.create(target_position, collider_center, 1, [self])
+			query_for_target = space_state.intersect_ray(query)
+		
 	
-	var normal_as_int: Vector2i = Vector2i.ZERO
-	if not raycast_result.is_empty():
-		var round_normal_x: int = roundi(raycast_result["normal"].x)
-		var round_normal_y: int = roundi(raycast_result["normal"].y)
-		normal_as_int = Vector2i(round_normal_x, round_normal_y)
-	
-	var valid_casts: Array = []
-	if normal_as_int != Vector2i.ZERO:
-		var flip_y = transform * Transform2D.FLIP_Y
-		var sweep_start_vector: Vector2 = transform.y.direction_to(transform.x)
-		var sweep_end_vector: Vector2 = flip_y.y.direction_to(transform.x)
+	var valid_paths: Array = []
+	if not query_for_ship.is_empty():
+		var collider_instance: Node = instance_from_id(query_for_ship["collider_id"])
+		var collider_navagent: NavigationAgent2D = collider_instance.find_child("ShipNavigationAgent")
+		if collider_navagent == null:
+			return
+		var navagent_radius: int = collider_navagent.radius
+		
+		# flips the normal to face to make it face the collider
+		var target_direction: Vector2 = -1*query_for_target["normal"]
+		# get the starting vector needed for a clockwise sweep in 15 degree increments
+		var sweep_start_vector: Vector2 = target_direction.rotated(-PI/4)
+		# get where the intersection occurs on the other side of the radius
+		var intersection_position: Vector2 = query_for_ship["position"] 
+		# find the distance from the target_position to the intersection and add the nav agent radius for good measure
+		# in theory this is supposed to be a flat constant "hypotenuse" but theres one more step im forgetting
+		var sweep_radius: float = target_position.distance_to(intersection_position) + navagent_radius
+		print(target_position)
+		print(rad_to_deg(target_direction.angle()))
+		print(rad_to_deg(sweep_start_vector.angle()))
+		print(sweep_start_vector)
+		# we have to adjust sweep_start_vector but im fucking up where the X needs to land, I think the Y is fine
+		sweep_start_vector = Vector2(sweep_start_vector.x * sweep_radius, sweep_start_vector.y * sweep_radius)
+		print(sweep_start_vector)
+		print(sweep_start_vector.rotated(PI/8))
 		pass
 	
-	if intermediate_pathing == false and not raycast_result.is_empty() and not ShipNavigationAgent.is_navigation_finished():
+	if intermediate_pathing == false and not query_for_target.is_empty() and not ShipNavigationAgent.is_navigation_finished():
 		#print("Raycast shootout calculate and set new intermediate path")
-		var collider_instance: Node = instance_from_id(raycast_result["collider_id"])
+		var collider_instance: Node = instance_from_id(query_for_target["collider_id"])
 		#if collider_instance is 
 		var collider_navagent: NavigationAgent2D = collider_instance.find_child("ShipNavigationAgent")
 		if collider_navagent == null:
@@ -107,7 +128,7 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished():
 		#print("Pathing normally as navigation is not finished")
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
-		var direction_to_path: Vector2 = ship_position.direction_to(next_path_position)
+		var direction_to_path: Vector2 = ship_origin.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
 		
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
