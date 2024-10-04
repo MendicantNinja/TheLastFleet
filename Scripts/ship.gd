@@ -77,6 +77,7 @@ func _physics_process(delta: float) -> void:
 	
 	var sweep_end_vector: Vector2 = Vector2.ZERO
 	var sweep_start_vector: Vector2 = Vector2.ZERO
+	var sweep_vectors: Array = []
 	if not query_for_ship.is_empty():
 		# flip the direction of the raycast normal to make it face the collider
 		var target_direction: Vector2 = -1*query_for_target["normal"]
@@ -98,14 +99,35 @@ func _physics_process(delta: float) -> void:
 		# find the vectors required to offset the sweep start and end vectors
 		var offset_start_vector: Vector2 = Vector2(sweep_start_vector.x * sweep_radius, sweep_start_vector.y * sweep_radius)
 		var offset_end_vector: Vector2 = Vector2(sweep_end_vector.x * sweep_radius, sweep_end_vector.y * sweep_radius)
+		
 		sweep_start_vector = Vector2(target_position.x + offset_start_vector.x, target_position.y + offset_start_vector.y)
 		sweep_end_vector = Vector2(target_position.x + offset_end_vector.x, target_position.y + offset_end_vector.y)
+		
+		# second verse same as the first
+		# we're manually incrementing the direction, all the math is the same
+		sweep_vectors.push_back(sweep_start_vector)
+		var new_sweep_direction: Vector2 = target_direction.rotated(-PI/4)
+		for i in range(7):
+			new_sweep_direction = new_sweep_direction.rotated(PI/16)
+			var offset_vector: Vector2 = Vector2(new_sweep_direction.x * sweep_radius, new_sweep_direction.y * sweep_radius)
+			var new_sweep_vector = Vector2(target_position.x + offset_vector.x, target_position.y + offset_vector.y)
+			sweep_vectors.push_back(new_sweep_vector)
+		sweep_vectors.push_back(sweep_end_vector)
 	
-	# cast the rays, set the intermediate path, do the do, get the heck out
+	# now we actually sweep each vector and detect for collisions
 	var valid_paths: Array = []
 	if sweep_start_vector != Vector2.ZERO and sweep_end_vector != Vector2.ZERO:
-		
-		pass
+		var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+		var query: PhysicsRayQueryParameters2D
+		var query_results: Dictionary = {}
+		for vector in sweep_vectors:
+			query = PhysicsRayQueryParameters2D.create(target_position, vector, 7, [self])
+			query_results = space_state.intersect_ray(query)
+			if query_results.is_empty():
+				valid_paths.push_back(vector)
+				print("valid vector: ", vector)
+			else:
+				print("invalid vector: ", vector)
 	
 	if intermediate_pathing == false and not query_for_target.is_empty() and not ShipNavigationAgent.is_navigation_finished():
 		#print("Raycast shootout calculate and set new intermediate path")
