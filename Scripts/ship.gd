@@ -42,20 +42,19 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
-
-#collider: The colliding object.
-#
-#collider_id: The colliding object's ID.
-#
-#normal: The object's surface normal at the intersection point, or Vector2(0, 0) if the ray starts inside the shape and PhysicsRayQueryParameters2D.hit_from_inside is true.
-#
-#position: The intersection point.
-#
-#rid: The intersecting object's RID.
-#
-#shape: The shape index of the colliding shape.
-
-
+	
+	#collider: The colliding object.
+	#
+	#collider_id: The colliding object's ID.
+	#
+	#normal: The object's surface normal at the intersection point, or Vector2(0, 0) if the ray starts inside the shape and PhysicsRayQueryParameters2D.hit_from_inside is true.
+	#
+	#position: The intersection point.
+	#
+	#rid: The intersecting object's RID.
+	#
+	#shape: The shape index of the colliding shape.
+	
 	var ship_origin: Vector2 = transform.get_origin()
 	var query_for_target: Dictionary = {}
 	var query_for_ship: Dictionary = {}
@@ -75,10 +74,11 @@ func _physics_process(delta: float) -> void:
 			query = PhysicsRayQueryParameters2D.create(target_position, collider_center, 1, [self])
 			query_for_target = space_state.intersect_ray(query)
 	
-	var sweep_end_vector: Vector2 = Vector2.ZERO
-	var sweep_start_vector: Vector2 = Vector2.ZERO
 	var sweep_vectors: Array = []
 	if not query_for_ship.is_empty():
+		var sweep_end_vector: Vector2 = Vector2.ZERO
+		var sweep_start_vector: Vector2 = Vector2.ZERO
+		
 		# flip the direction of the raycast normal to make it face the collider
 		var target_direction: Vector2 = -1*query_for_target["normal"]
 		
@@ -94,7 +94,7 @@ func _physics_process(delta: float) -> void:
 			return
 		var navagent_radius: int = collider_navagent.radius
 		var intersection_position: Vector2 = query_for_ship["position"]
-		var sweep_radius: float = target_position.distance_to(intersection_position) + navagent_radius * 2
+		var sweep_radius: float = target_position.distance_to(intersection_position)
 		
 		# find the vectors required to offset the sweep start and end vectors
 		var offset_start_vector: Vector2 = Vector2(sweep_start_vector.x * sweep_radius, sweep_start_vector.y * sweep_radius)
@@ -105,6 +105,7 @@ func _physics_process(delta: float) -> void:
 		
 		# second verse same as the first
 		# we're manually incrementing the direction, all the math is the same
+		print(target_position)
 		sweep_vectors.push_back(sweep_start_vector)
 		var new_sweep_direction: Vector2 = target_direction.rotated(-PI/4)
 		for i in range(7):
@@ -116,36 +117,34 @@ func _physics_process(delta: float) -> void:
 	
 	# now we actually sweep each vector and detect for collisions
 	var valid_paths: Array = []
-	if sweep_start_vector != Vector2.ZERO and sweep_end_vector != Vector2.ZERO:
+	if not sweep_vectors.is_empty():
 		var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 		var query: PhysicsRayQueryParameters2D
 		var query_results: Dictionary = {}
+		var skip_next_entry: bool = false
 		for vector in sweep_vectors:
+			if skip_next_entry:
+				skip_next_entry = false
+				continue
 			query = PhysicsRayQueryParameters2D.create(target_position, vector, 7, [self])
 			query_results = space_state.intersect_ray(query)
 			if query_results.is_empty():
 				valid_paths.push_back(vector)
-				print("valid vector: ", vector)
 			else:
-				print("invalid vector: ", vector)
+				valid_paths.pop_back()
+				skip_next_entry = true
+		if sweep_vectors.size() > 3:
+			sweep_vectors.pop_back()
+			sweep_vectors.pop_front()
 	
-	if intermediate_pathing == false and not query_for_target.is_empty() and not ShipNavigationAgent.is_navigation_finished():
-		#print("Raycast shootout calculate and set new intermediate path")
-		var collider_instance: Node = instance_from_id(query_for_target["collider_id"])
-		#if collider_instance is 
-		var collider_navagent: NavigationAgent2D = collider_instance.find_child("ShipNavigationAgent")
-		if collider_navagent == null:
-			return
-		var collider_center: Vector2 = collider_instance.position
-		var navagent_radius: int = collider_navagent.radius
+	if intermediate_pathing == false and not valid_paths.is_empty() and not ShipNavigationAgent.is_navigation_finished():
+		var valid_path_range: int = valid_paths.size() - 1
+		var random_entry: int = randi_range(0, valid_path_range)
 		intermediate_pathing = true
 		final_target_position = target_position
-		target_position = Vector2(collider_center.x - navagent_radius, collider_center.y)
-		ShipNavigationAgent.set_target_position(target_position)
-	
+		ShipNavigationAgent.set_target_position(valid_paths[random_entry])
 	# Do this after finishing the intermediate pathing.
 	elif intermediate_pathing == true and ShipNavigationAgent.is_navigation_finished():
-		#print("Intermediate pathing finished")
 		target_position = final_target_position
 		ShipNavigationAgent.set_target_position(target_position)
 		intermediate_pathing = false
@@ -159,7 +158,6 @@ func _physics_process(delta: float) -> void:
 		
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
 		transform = transform.interpolate_with(transform_look_at, delta)
-	
 	
 	acceleration += velocity - linear_velocity
 	
