@@ -15,6 +15,7 @@ var movement_delta: float = 0.0
 var ship_select: bool = false
 
 func _ready() -> void:
+	$ShipSprite.self_modulate = settings.player_color
 	pass
 
 # Any generic input event.

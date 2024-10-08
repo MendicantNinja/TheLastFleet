@@ -68,7 +68,7 @@ max_contacts_reported = 10
 script = ExtResource("2_u31ug")
 
 [node name="ShipSprite" type="Sprite2D" parent="NavigationRegion2D/PlayerShip"]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
+self_modulate = Color(0.373, 0.34, 1, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
@@ -104,7 +104,7 @@ max_contacts_reported = 10
 script = ExtResource("2_u31ug")
 
 [node name="ShipSprite" type="Sprite2D" parent="NavigationRegion2D/PlayerShip2"]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
+self_modulate = Color(1, 0.34, 0.351, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")

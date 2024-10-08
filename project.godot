@@ -11,17 +11,14 @@ config_version=5
 [application]
 
 config/name="The Last Fleet"
+run/main_scene="res://Scenes/CompositeGameObjects/Ships/GenericShip.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 data="*res://Scripts/AutoloadScripts/data.gd"
-
-[display]
-
-window/size/viewport_width=1920
-window/size/viewport_height=1080
+settings="*res://Scripts/AutoloadScripts/settings.gd"
 
 [debug]
 

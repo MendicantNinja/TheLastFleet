@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="Projectile" load_steps=2 format=3 uid="uid://bvca4sr1mbh03"]
+
+[ext_resource type="Script" path="res://Resources/Projectiles/projectile.gd" id="1_2eq8j"]
+
+[resource]
+script = ExtResource("1_2eq8j")

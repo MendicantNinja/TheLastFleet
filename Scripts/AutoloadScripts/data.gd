@@ -50,19 +50,19 @@ enum ship_type_enum {
 var ship_type_dictionary: Dictionary = {
 	#for copy pasting quickly ship_type_enum.RAPTOR : load(),
 	# Fighters
-	ship_type_enum.RAPTOR : load("res://ScriptsandResources/Resources/ShipHulls/Fighters/Raptor.tres"),
+	ship_type_enum.RAPTOR : load("res://Resources/ShipHulls/Fighters/Raptor.tres"),
 	
 	# Frigates
-	ship_type_enum.ISSUS: load("res://ScriptsandResources/Resources/ShipHulls/Frigates/Issus.tres"),
+	ship_type_enum.ISSUS: load("res://Resources/ShipHulls/Frigates/Issus.tres"),
 	
 	# Destroyers
-	ship_type_enum.LION : load("res://ScriptsandResources/Resources/ShipHulls/Destroyers/Lion.tres"),
+	ship_type_enum.LION : load("res://Resources/ShipHulls/Destroyers/Lion.tres"),
 	
 	# Cruisers
-	ship_type_enum.MARATHON: load("res://ScriptsandResources/Resources/ShipHulls/Cruisers/Marathon.tres"),
+	ship_type_enum.MARATHON: load("res://Resources/ShipHulls/Cruisers/Marathon.tres"),
 	
 	# Capitals
-	ship_type_enum.ASTRAL: load("res://ScriptsandResources/Resources/ShipHulls/Capitals/Astral.tres")
+	ship_type_enum.ASTRAL: load("res://Resources/ShipHulls/Capitals/Astral.tres")
 }
 
 # Ship size
@@ -85,7 +85,7 @@ enum ship_system_enum {
 }
 var ship_system_dictionary: Dictionary = {
 	#for copy pasting quickly ship_type_enum.RAPTOR : load(),
-	ship_system_enum.STEALTH : load("res://ScriptsandResources/Resources/ShipSystems/Stealth.tres"),
+	ship_system_enum.STEALTH : load("res://Resources/ShipSystems/Stealth.tres"),
 	}
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
@@ -96,6 +96,23 @@ var ship_system_dictionary: Dictionary = {
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 																										 
+enum weapon_enum {
+	RAILGUN
+}
+
+
+var weapon_dictionary: Dictionary = {
+	weapon_enum.RAILGUN: load("res://Resources/Weapons/Railgun.tres"),
+	}
+
+enum weapon_mount_enum {
+	SMALL_BALLISTIC
+}
+
+var weapon_mount_dictionary: Dictionary = {
+	weapon_mount_enum.SMALL_BALLISTIC: load("res://Resources/WeaponMounts/SmallBallistic.tres")
+}
+
 enum weapon_mount_type_enum {
 	BALLISTIC,
 	ENERGY,

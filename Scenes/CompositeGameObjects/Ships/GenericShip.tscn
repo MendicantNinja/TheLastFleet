@@ -1,0 +1,44 @@
+[gd_scene load_steps=5 format=3 uid="uid://bfokrgjlf5hdt"]
+
+[ext_resource type="Script" path="res://Scripts/ship.gd" id="1_eculh"]
+[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_1hks8"]
+[ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_btxus"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vtaph"]
+radius = 54.626
+
+[node name="GenericShip" type="RigidBody2D"]
+script = ExtResource("1_eculh")
+
+[node name="ShipSprite" type="Sprite2D" parent="."]
+position = Vector2(931, 594)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("2_1hks8")
+offset = Vector2(0, -50)
+
+[node name="CollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2(931, 594)
+rotation = -1.5708
+shape = SubResource("CircleShape2D_vtaph")
+
+[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
+path_desired_distance = 50.0
+target_desired_distance = 20.0
+path_max_distance = 50.0
+avoidance_enabled = true
+radius = 200.0
+neighbor_distance = 1000.0
+time_horizon_agents = 5.0
+time_horizon_obstacles = 1.0
+max_speed = 1000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
+debug_path_custom_point_size = 13.0
+debug_path_custom_line_width = 3.0
+
+[node name="WeaponSlot" parent="." instance=ExtResource("3_btxus")]
+position = Vector2(867, 594)
+
+[node name="WeaponSlot2" parent="." instance=ExtResource("3_btxus")]
+position = Vector2(995, 594)

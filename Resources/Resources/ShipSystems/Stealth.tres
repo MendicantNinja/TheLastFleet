@@ -1,9 +1,0 @@
-[gd_resource type="Resource" script_class="Stealth" load_steps=2 format=3 uid="uid://bfswbqlravvqg"]
-
-[ext_resource type="Script" path="res://Resources/Resources/ShipSystems/stealth.gd" id="1_p8i15"]
-
-[resource]
-script = ExtResource("1_p8i15")
-flux_cost = 500
-flux_dissiptation_allowed = false
-duration = 90
