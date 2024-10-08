@@ -1,7 +1,7 @@
 extends Node2D
 class_name WeaponSlot
 
-var assigned_ship: Ship
+@export var assigned_ship: Ship
 @export var weapon: Weapon
 @export var weapon_mount: WeaponMount
 # Used for serializing equipped weapons properly and knowing which weapon slot is which.
