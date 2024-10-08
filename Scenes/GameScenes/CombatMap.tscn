@@ -1,48 +1,48 @@
-[gd_scene load_steps=7 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=6 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
-[ext_resource type="Script" path="res://Scripts/ship.gd" id="2_u31ug"]
+[ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
+[ext_resource type="PackedScene" uid="uid://by1g6emke1cfw" path="res://Scenes/tmp_ship.tscn" id="3_p58kq"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(1848.66, 49.9219, 1842.32, 1011.05, 64.8516, 1012.94, 62.1406, 47.0703)
+vertices = PackedVector2Array(9947.13, 48.9922, 9973.86, 9797, 47.0781, 9797, 61.9219, 47.0078)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, 15, 1063, 1892, 1061, 1899, 0)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, -3, 9847, 10024, 9847, 9997, -1)])
 agent_radius = 50.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_le3lb"]
 radius = 100.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
-radius = 70.0
+[node name="CombatMap" type="Node2D"]
+script = ExtResource("1_x40el")
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_1kl7e"]
-radius = 70.0
-
-[node name="Node2D" type="Node2D"]
+[node name="Camera2D" type="Camera2D" parent="."]
+limit_left = 0
+limit_top = 0
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 self_modulate = Color(1, 0, 0.266666, 1)
-position = Vector2(469, 1485)
+position = Vector2(-469, 1485)
 rotation = 3.14159
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
 
 [node name="Sprite2D2" type="Sprite2D" parent="."]
 self_modulate = Color(0, 0.116667, 1, 1)
-position = Vector2(504, 2424)
+position = Vector2(-504, 2424)
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("1_1p2qq")
 
 [node name="Sprite2D3" type="Sprite2D" parent="."]
 self_modulate = Color(0.933333, 0, 1, 1)
-position = Vector2(1561, 1584)
+position = Vector2(-1561, 1584)
 rotation = 3.14159
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("1_1p2qq")
 
 [node name="Sprite2D4" type="Sprite2D" parent="."]
 self_modulate = Color(0, 1, 0.8, 1)
-position = Vector2(1638, 2762)
+position = Vector2(-1638, 2762)
 texture = ExtResource("1_1p2qq")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
@@ -94,99 +94,5 @@ priority = 1
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip/Area2D"]
 shape = SubResource("CircleShape2D_le3lb")
 
-[node name="PlayerShip" type="RigidBody2D" parent="."]
-position = Vector2(600, 350)
-collision_mask = 7
-input_pickable = true
-gravity_scale = 0.0
-continuous_cd = 1
-contact_monitor = true
-max_contacts_reported = 10
-script = ExtResource("2_u31ug")
-
-[node name="ShipSprite" type="Sprite2D" parent="PlayerShip"]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_1p2qq")
-offset = Vector2(0, -50)
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerShip"]
-polygon = PackedVector2Array(58, 0, -45, -53, -45, 53)
-
-[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="PlayerShip"]
-path_desired_distance = 50.0
-target_desired_distance = 100.0
-path_max_distance = 50.0
-avoidance_enabled = true
-radius = 70.0
-time_horizon_agents = 5.0
-time_horizon_obstacles = 1.0
-max_speed = 1000.0
-debug_enabled = true
-debug_use_custom = true
-debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
-debug_path_custom_point_size = 13.0
-debug_path_custom_line_width = 3.0
-
-[node name="NavigationTimer" type="Timer" parent="PlayerShip"]
-wait_time = 3.0
-
-[node name="Area2D" type="Area2D" parent="PlayerShip"]
-collision_mask = 7
-priority = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerShip/Area2D"]
-shape = SubResource("CircleShape2D_4lqs1")
-
-[node name="PlayerShip2" type="RigidBody2D" parent="."]
-position = Vector2(1200, 600)
-collision_mask = 7
-input_pickable = true
-gravity_scale = 0.0
-continuous_cd = 1
-contact_monitor = true
-max_contacts_reported = 10
-script = ExtResource("2_u31ug")
-
-[node name="ShipSprite" type="Sprite2D" parent="PlayerShip2"]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_1p2qq")
-offset = Vector2(0, -50)
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="PlayerShip2"]
-polygon = PackedVector2Array(58, 0, -45, -53, -45, 53)
-
-[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="PlayerShip2"]
-path_desired_distance = 50.0
-target_desired_distance = 100.0
-path_max_distance = 50.0
-avoidance_enabled = true
-radius = 70.0
-time_horizon_agents = 5.0
-time_horizon_obstacles = 1.0
-max_speed = 1000.0
-debug_enabled = true
-debug_use_custom = true
-debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
-debug_path_custom_point_size = 13.0
-debug_path_custom_line_width = 3.0
-
-[node name="NavigationTimer" type="Timer" parent="PlayerShip2"]
-wait_time = 3.0
-
-[node name="Area2D" type="Area2D" parent="PlayerShip2"]
-collision_mask = 7
-priority = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerShip2/Area2D"]
-shape = SubResource("CircleShape2D_1kl7e")
-
-[connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
-[connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavigationAgent_velocity_computed"]
-[connection signal="timeout" from="PlayerShip/NavigationTimer" to="PlayerShip" method="_on_NavigationTimer_timeout"]
-[connection signal="input_event" from="PlayerShip2" to="PlayerShip2" method="_on_input_event"]
-[connection signal="velocity_computed" from="PlayerShip2/ShipNavigationAgent" to="PlayerShip2" method="_on_ShipNavigationAgent_velocity_computed"]
-[connection signal="timeout" from="PlayerShip2/NavigationTimer" to="PlayerShip2" method="_on_NavigationTimer_timeout"]
+[node name="PlayerShip" parent="." instance=ExtResource("3_p58kq")]
+position = Vector2(200, 350)

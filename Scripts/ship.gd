@@ -23,7 +23,7 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			intermediate_pathing = false
-			target_position = event.global_position
+			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			ship_select = false # deselect ship by right clicking anywhere
