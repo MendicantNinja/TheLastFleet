@@ -1,19 +1,19 @@
 [gd_scene load_steps=5 format=3 uid="uid://bfokrgjlf5hdt"]
 
-[ext_resource type="Script" path="res://Scripts/ship.gd" id="1_eculh"]
-[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_1hks8"]
-[ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_btxus"]
+[ext_resource type="Script" path="res://Scripts/ship.gd" id="1_gmsdh"]
+[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_7e0um"]
+[ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_o1deo"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vtaph"]
 radius = 54.626
 
 [node name="GenericShip" type="RigidBody2D"]
-script = ExtResource("1_eculh")
+script = ExtResource("1_gmsdh")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 position = Vector2(931, 594)
 scale = Vector2(0.3, 0.3)
-texture = ExtResource("2_1hks8")
+texture = ExtResource("2_7e0um")
 offset = Vector2(0, -50)
 
 [node name="CollisionShape" type="CollisionShape2D" parent="."]
@@ -37,8 +37,8 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="WeaponSlot" parent="." instance=ExtResource("3_btxus")]
+[node name="WeaponSlot" parent="." instance=ExtResource("3_o1deo")]
 position = Vector2(867, 594)
 
-[node name="WeaponSlot2" parent="." instance=ExtResource("3_btxus")]
+[node name="WeaponSlot2" parent="." instance=ExtResource("3_o1deo")]
 position = Vector2(995, 594)
