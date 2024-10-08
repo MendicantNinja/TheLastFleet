@@ -51,6 +51,7 @@ navigation_polygon = SubResource("NavigationPolygon_ooheh")
 [node name="TestObstacle" type="StaticBody2D" parent="NavigationRegion2D"]
 position = Vector2(600, 700)
 collision_layer = 2
+collision_mask = 2
 
 [node name="TestSprite" type="Sprite2D" parent="NavigationRegion2D/TestObstacle"]
 texture = ExtResource("3_ousd4")
@@ -58,44 +59,80 @@ texture = ExtResource("3_ousd4")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NavigationRegion2D/TestObstacle"]
 shape = SubResource("CircleShape2D_mwokj")
 
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="NavigationRegion2D/TestObstacle"]
-avoidance_enabled = true
-avoidance_layers = 2
-avoidance_mask = 0
-
-[node name="PlayerShip" type="RigidBody2D" parent="."]
+[node name="PlayerShip" type="RigidBody2D" parent="NavigationRegion2D"]
 position = Vector2(960, 540)
-rotation = -1.5708
-collision_mask = 2
+rotation = -2.35619
+collision_mask = 6
 input_pickable = true
 gravity_scale = 0.0
-freeze_mode = 1
 continuous_cd = 1
+contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("2_u31ug")
 
-[node name="ShipSprite" type="Sprite2D" parent="PlayerShip"]
-self_modulate = Color(1, 0, 0.266666, 1)
+[node name="ShipSprite" type="Sprite2D" parent="NavigationRegion2D/PlayerShip"]
+self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
 offset = Vector2(0, -50)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlayerShip"]
-visible = false
+[node name="CollisionShape" type="CollisionShape2D" parent="NavigationRegion2D/PlayerShip"]
 shape = SubResource("CircleShape2D_63ky0")
 
-[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="PlayerShip"]
+[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="NavigationRegion2D/PlayerShip"]
 path_desired_distance = 50.0
 target_desired_distance = 20.0
+path_max_distance = 50.0
 avoidance_enabled = true
-avoidance_mask = 6
-avoidance_priority = 0.99
+radius = 70.0
+neighbor_distance = 1000.0
+time_horizon_agents = 5.0
+time_horizon_obstacles = 1.0
+max_speed = 1000.0
 debug_enabled = true
 debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[connection signal="input_event" from="PlayerShip" to="PlayerShip" method="_on_input_event"]
-[connection signal="velocity_computed" from="PlayerShip/ShipNavigationAgent" to="PlayerShip" method="_on_ShipNavAgent_velocity_computed"]
+[node name="PlayerShip2" type="RigidBody2D" parent="NavigationRegion2D"]
+position = Vector2(966, 375)
+rotation = -1.5708
+input_pickable = true
+gravity_scale = 0.0
+continuous_cd = 1
+contact_monitor = true
+max_contacts_reported = 10
+script = ExtResource("2_u31ug")
+
+[node name="ShipSprite" type="Sprite2D" parent="NavigationRegion2D/PlayerShip2"]
+self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
+rotation = 1.5708
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("1_1p2qq")
+offset = Vector2(0, -50)
+
+[node name="CollisionShape" type="CollisionShape2D" parent="NavigationRegion2D/PlayerShip2"]
+shape = SubResource("CircleShape2D_63ky0")
+
+[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="NavigationRegion2D/PlayerShip2"]
+path_desired_distance = 50.0
+target_desired_distance = 20.0
+path_max_distance = 50.0
+avoidance_enabled = true
+radius = 70.0
+neighbor_distance = 1000.0
+time_horizon_agents = 5.0
+time_horizon_obstacles = 1.0
+max_speed = 1000.0
+debug_enabled = true
+debug_use_custom = true
+debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
+debug_path_custom_point_size = 13.0
+debug_path_custom_line_width = 3.0
+
+[connection signal="input_event" from="NavigationRegion2D/PlayerShip" to="NavigationRegion2D/PlayerShip" method="_on_input_event"]
+[connection signal="velocity_computed" from="NavigationRegion2D/PlayerShip/ShipNavigationAgent" to="NavigationRegion2D/PlayerShip" method="_on_ShipNavigationAgent_velocity_computed"]
+[connection signal="input_event" from="NavigationRegion2D/PlayerShip2" to="NavigationRegion2D/PlayerShip2" method="_on_input_event"]
+[connection signal="velocity_computed" from="NavigationRegion2D/PlayerShip2/ShipNavigationAgent" to="NavigationRegion2D/PlayerShip2" method="_on_ShipNavigationAgent_velocity_computed"]
