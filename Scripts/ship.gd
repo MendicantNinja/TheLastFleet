@@ -5,6 +5,7 @@ const SPEED = 3000.0
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
 @onready var ShipCollisionShape = $Area2D/CollisionShape2D
+var ship_stats: ShipStats
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 
