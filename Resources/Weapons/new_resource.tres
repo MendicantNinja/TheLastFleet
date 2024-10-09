@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=3 format=3 uid="uid://decl67uodhbw6"]
+
+[ext_resource type="Texture2D" uid="uid://bxuqhr406b5a4" path="res://Art/WeaponArt/weapon.png" id="1_jjdsm"]
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="2_i3vkd"]
+
+[resource]
+script = ExtResource("2_i3vkd")
+weapon_name = "Ratsmacker"
+weapon_size = 0
+image = ExtResource("1_jjdsm")
+damage_type = 0
+armament_points = 0
+damage_per_shot = 0
+fire_rate = 0.0
+burst_size = 0
+burst_delay = 0.0
+range = 1000.0
+beam = false
+accuracy = 1.0
+spread = 0.0
+turn_rate = 10.0
+flux_per_shot = 0
+projectile_speed = 10.0
+projectile_lifetime = 100.0
+dps = 0
+flux_per_second = 0
