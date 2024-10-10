@@ -7,7 +7,7 @@ class_name ShipHull
 
 # Core Ship Attributes
 @export var ship_type_name: String = "" # Name of the ship (e.g, "Raptor"). Fighters are named after birds of prey.
-@export var ship_description: String = ""
+@export_multiline var ship_description: String = ""
 @export var ship_type: data.ship_type_enum # Specific type of the ship (e.g., RAPTOR)
 @export var ship_size: data.ship_size_enum  # The size of ship (e.g., FIGHTER, FRIGATE, DESTROYER)
 @export var ship_tech: data.tech_enum # The tech level or classification of the ship (E.G. HIGH-TECH, MEDIUM-TECH, LOW-TECH

@@ -44,9 +44,11 @@ position = Vector2(0, -64)
 [node name="WeaponSlot2" parent="." instance=ExtResource("3_o1deo")]
 position = Vector2(0, 64)
 
+[node name="NavigationTimer" type="Timer" parent="."]
+
 [node name="Area2D" type="Area2D" parent="."]
 collision_mask = 7
 priority = 1
 
-[node name="CollisionShape" type="CollisionShape2D" parent="Area2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_vtaph")

@@ -46,6 +46,9 @@ enum ship_type_enum {
 	
 	
 	#Motherships
+	
+	# DEBUG / TEST SHIPS
+	TEST,
 }
 var ship_type_dictionary: Dictionary = {
 	#for copy pasting quickly ship_type_enum.RAPTOR : load(),
@@ -62,7 +65,10 @@ var ship_type_dictionary: Dictionary = {
 	ship_type_enum.MARATHON: load("res://Resources/ShipHulls/Cruisers/Marathon.tres"),
 	
 	# Capitals
-	ship_type_enum.ASTRAL: load("res://Resources/ShipHulls/Capitals/Astral.tres")
+	ship_type_enum.ASTRAL: load("res://Resources/ShipHulls/Capitals/Astral.tres"),
+	
+	# Test
+	ship_type_enum.TEST: load("res://Resources/ShipHulls/TestHull.tres"),
 }
 
 # Ship size

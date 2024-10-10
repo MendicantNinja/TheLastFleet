@@ -1,24 +1,32 @@
 extends RigidBody2D
 class_name Ship
 
-const SPEED = 3000.0
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
 @onready var ShipCollisionShape = $Area2D/CollisionShape2D
+@onready var ShipSprite = $ShipSprite
 var ship_stats: ShipStats
-var acceleration: Vector2 = Vector2.ZERO
-var target_position: Vector2 = Vector2.ZERO
+var speed: float = 0.0
+var hull_integrity: float = 0.0
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
 var intermediate_pathing: bool = false
-
+var acceleration: Vector2 = Vector2.ZERO
+var test: float = 0.0
+var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
 var ship_select: bool = false
 
 func _ready() -> void:
+	ship_stats = ShipStats.new()
+	ship_stats.create_ship(data.ship_type_enum.TEST)
+	speed = ship_stats.top_speed
+	
+	var ship_hull = ship_stats.ship_hull
+	ShipSprite.texture = ship_hull.ship_sprite
+	
 	$ShipSprite.self_modulate = settings.player_color
-	pass
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
@@ -47,7 +55,7 @@ func _physics_process(delta: float) -> void:
 	
 	var ship_origin: Vector2 = transform.get_origin()
 	var velocity = Vector2.ZERO
-	movement_delta = SPEED * delta
+	movement_delta = speed * delta
 	
 	var ship_query: Dictionary = {}
 	ship_query = collision_raycast(global_position, target_position, 7)
@@ -81,23 +89,28 @@ func _physics_process(delta: float) -> void:
 	var motion_cast_result: PackedFloat32Array = []
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
+		ShipNavigationAgent.set_max_speed(movement_delta)
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
 		var direction_to_path: Vector2 = ship_origin.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
-		ShipNavigationAgent.set_max_speed(movement_delta)
+		
+		var normalize_velocity: Vector2 = linear_velocity / velocity
+		var ease_x: float = linear_velocity.x * ease(normalize_velocity.x, ship_stats.acceleration)
+		var ease_y: float = linear_velocity.y * ease(normalize_velocity.y, ship_stats.acceleration)
+		velocity += Vector2(ease_x, ease_y)
 		
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
-		transform = transform.interpolate_with(transform_look_at, delta)
+		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
 	
 	acceleration += velocity - linear_velocity
 	# decrease linear velocity to converge acceleration to zero, thus
 	# converging force to zero
-	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta)
+	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
 	# kind of infuriating i cant move this to _integrate_forces (like i should) but im not really
 	# interested in touching this code anymore
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	var force: Vector2 = mass * acceleration
+	var force: Vector2 = acceleration
 	if force.abs().floor() != Vector2.ZERO:
 		apply_central_force(force)
 	
