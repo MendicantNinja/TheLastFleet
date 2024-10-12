@@ -11,7 +11,7 @@ class_name ShipHull
 @export var ship_type: data.ship_type_enum # Specific type of the ship (e.g., RAPTOR)
 @export var ship_size: data.ship_size_enum  # The size of ship (e.g., FIGHTER, FRIGATE, DESTROYER)
 @export var ship_tech: data.tech_enum # The tech level or classification of the ship (E.G. HIGH-TECH, MEDIUM-TECH, LOW-TECH
-
+@export var ship_packed_scene: PackedScene # I wonder if this will cause recursion issues?
 # Ship Systems
 @export var ship_system: data.ship_system_enum = data.ship_system_enum.NONE          # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
 @export var weapon_mounts: Array[WeaponMount] = []               # Array of weapon mounts (e.g., types of hardpoints, turrets)

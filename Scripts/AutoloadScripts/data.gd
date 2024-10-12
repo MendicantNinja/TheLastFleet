@@ -40,7 +40,7 @@ enum ship_type_enum {
 	MARATHON, # Also the name of a famous battle! :D
 	INFINITY, 
 	
-	# Capitals (Suggestion: strong adjectives. Because capital ships do things. )
+	# Capitals (Suggestion: strong adjectives. Because capital ships do things.)
 	ASTRAL,
 	MALEVOLENT,
 	
@@ -103,12 +103,14 @@ var ship_system_dictionary: Dictionary = {
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 																										 
 enum weapon_enum {
-	RAILGUN
+	RAILGUN,
+	EMPTY
 }
 
 
 var weapon_dictionary: Dictionary = {
 	weapon_enum.RAILGUN: load("res://Resources/Weapons/Railgun.tres"),
+	weapon_enum.EMPTY: preload("res://Resources/Weapons/EmptySlot.tres")
 	}
 
 enum weapon_mount_enum {

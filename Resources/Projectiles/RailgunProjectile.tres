@@ -1,8 +1,0 @@
-[gd_resource type="Resource" script_class="Projectile" load_steps=3 format=3 uid="uid://cso8ai3pnxulr"]
-
-[ext_resource type="Script" path="res://Resources/Projectiles/projectile.gd" id="1_0xx6y"]
-[ext_resource type="Resource" uid="uid://cn4qxnv5ko6qy" path="res://Resources/Weapons/Railgun.tres" id="2_8blpp"]
-
-[resource]
-script = ExtResource("1_0xx6y")
-weapon = ExtResource("2_8blpp")

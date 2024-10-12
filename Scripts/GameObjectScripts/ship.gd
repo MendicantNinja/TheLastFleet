@@ -5,9 +5,18 @@ class_name Ship
 @onready var NavigationTimer = $NavigationTimer
 @onready var ShipCollisionShape = $Area2D/CollisionShape2D
 @onready var ShipSprite = $ShipSprite
+
+@onready var all_weapons: Array[WeaponSlot]
+
+#Temporary variables
+@onready var WeaponSlot0 = $WeaponSlot0
+@onready var WeaponSlot1 = $WeaponSlot1
+
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
+
+# Used for targeting and weapons.
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
@@ -19,14 +28,31 @@ var movement_delta: float = 0.0
 var ship_select: bool = false
 
 func _ready() -> void:
-	ship_stats = ShipStats.new()
-	ship_stats.create_ship(data.ship_type_enum.TEST)
+	ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
 	
 	var ship_hull = ship_stats.ship_hull
 	ShipSprite.texture = ship_hull.ship_sprite
 	
 	$ShipSprite.self_modulate = settings.player_color
+	
+	#Assigns weapon slots based on what's in the ship scene.
+	for child in get_children():
+		if child is WeaponSlot:
+			all_weapons.append(child)
+	for i in range(all_weapons.size()):
+		# Temporary hack to test weapons so that the mounts aren't empty.
+		#MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be null and cause errors.
+		all_weapons[i].weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
+		# In the future, weapons will automatically be assigned from the already existing weapons in ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so everything is a railgun.
+
+#ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
+#`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
+ #888   8 `88b.    8   888   .d88'  888       8       888      
+ #888   8   `88b.  8   888ooo88P'   888       8       888      
+ #888   8     `88b.8   888          888       8       888      
+ #888   8       `888   888          `88.    .8'       888      
+#o888o o8o        `8  o888o           `YbodP'        o888o    
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
@@ -37,9 +63,11 @@ func _input(event: InputEvent) -> void:
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			ship_select = false # deselect ship by right clicking anywhere
-	
-	if event is InputEventKey:
-		pass
+	elif event is InputEventKey:
+		if (event.keycode == KEY_F and event.is_pressed()):
+			fire_weapon_slot(all_weapons[0])
+		if (event.keycode == KEY_Q and event.is_pressed()):
+			fire_weapon_system(all_weapons)
 
 # When the player interacts with the ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -49,6 +77,29 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			ship_select = false # deselect ship
 
+#oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
+ #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
+  #`888.   .8888.   .8'    888             .8"888.      888   .d88' 888      888  8 `88b.    8  Y88bo.      
+   #`888  .8'`888. .8'     888oooo8       .8' `888.     888ooo88P'  888      888  8   `88b.  8   `"Y8888o.  
+	#`888.8'  `888.8'      888    "      .88ooo8888.    888         888      888  8     `88b.8       `"Y88b 
+	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
+	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
+
+func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		fire_weapon_slot(weapon_slot)
+
+func fire_weapon_slot(weapon_slot: WeaponSlot ) -> void:
+	weapon_slot.fire()
+
+#ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
+#`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
+ #8 `88b.    8      .8"888.       `888.   .8'    888  888               .8"888.          888       888  888      888  8 `88b.    8  
+ #8   `88b.  8     .8' `888.       `888. .8'     888  888              .8' `888.         888       888  888      888  8   `88b.  8  
+ #8     `88b.8    .88ooo8888.       `888.8'      888  888     ooooo   .88ooo8888.        888       888  888      888  8     `88b.8  
+ #8       `888   .8'     `888.       `888'       888  `88.    .88'   .8'     `888.       888       888  `88b    d88'  8       `888  
+#o8o        `8  o88o     o8888o       `8'       o888o  `Y8bood8P'   o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  
+																																   
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return

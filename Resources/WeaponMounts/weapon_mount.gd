@@ -13,8 +13,8 @@ var weapon_mount_name: String
 @export var image: Texture2D = preload("res://Art/WeaponArt/weapon_mount.png")
 
 
-@export var firing_arc: int = 45 # up to 360, 0 is north/upwards.
-@export var is_fixed: bool = false 
+@export var firing_arc: int = 360 # up to 360
+@export var is_fixed: bool = false # no moving the turret allowed
 
 # Override the get_property_list function
 func _get_property_list() -> Array:

@@ -1,17 +1,52 @@
 extends Node2D
 class_name WeaponSlot
 
-@export var assigned_ship: Ship
-@export var weapon: Weapon
-@export var weapon_mount: WeaponMount
-# Used for serializing equipped weapons properly and knowing which weapon slot is which.
+# Nodes
 @onready var weapon_mount_image: Sprite2D = $WeaponMountSprite 
 @onready var weapon_image: Sprite2D = $WeaponMountSprite/WeaponSprite
-# Called when the node enters the scene tree for the first time.
+
+# Important Stuff
+#@export var assigned_ship: Ship
+@export var weapon: Weapon:
+	set(value):
+		weapon = value
+		if weapon_image != null:
+			weapon_image.texture = value.image
+		else:
+			return
+@export var weapon_mount: WeaponMount:
+	set(value):
+		weapon_mount = value
+		if weapon_mount_image != null:
+			weapon_mount_image.texture = value.image
+		else:
+			return
+
+# Bools and toggles
+@onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
+
+
+
+# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
+func fire() -> void:
+	if weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+		#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
+			#weapon.create_projectile()
+		var projectile: Area2D = weapon.create_projectile().instantiate()
+		projectile.assign_stats(weapon)
+		projectile.global_position = self.global_position + Vector2(0, 0) # Should come out of the edge/front of the weapon.
+		projectile.global_rotation = self.global_rotation
+		$"../..".add_child(projectile)
+		# FOR YELYMANE: Shoot the target! Impart velocity! Add random spread based on accuracy. Etc. 
+		
+# Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
+func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
+	weapon_mount = p_weapon_mount
+	weapon = p_weapon
+
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
-	if weapon_image.texture != null:
-		weapon_image.texture = weapon.image
+	weapon_image.texture = weapon.image
 	set_weapon_size_and_color()
 	pass
 	

@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
-[ext_resource type="PackedScene" uid="uid://by1g6emke1cfw" path="res://Scenes/tmp_ship.tscn" id="3_p58kq"]
+[ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(9947.13, 48.9922, 9973.86, 9797, 47.0781, 9797, 61.9219, 47.0078)
@@ -48,8 +48,14 @@ texture = ExtResource("1_1p2qq")
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
+[node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(369, 700)
+
+[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(940, 745)
+
 [node name="EnemyShip" type="RigidBody2D" parent="."]
-position = Vector2(1300, 200)
+position = Vector2(681, 386)
 rotation = -1.5708
 collision_layer = 4
 collision_mask = 7
@@ -60,7 +66,7 @@ contact_monitor = true
 max_contacts_reported = 10
 
 [node name="ShipSprite" type="Sprite2D" parent="EnemyShip"]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
+self_modulate = Color(1, 0.04, 0.0559998, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_1p2qq")
@@ -93,6 +99,3 @@ priority = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip/Area2D"]
 shape = SubResource("CircleShape2D_le3lb")
-
-[node name="PlayerShip" parent="." instance=ExtResource("3_p58kq")]
-position = Vector2(200, 350)

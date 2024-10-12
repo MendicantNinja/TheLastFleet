@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=2 format=3 uid="uid://bg4bkltdik2mb"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="2_pilrw"]
+
+[resource]
+script = ExtResource("2_pilrw")
+weapon_name = "Empty"
+weapon_size = 0
+projectile_speed = 10.0
+damage_type = 0
+armament_points = 0
+damage_per_shot = 0
+fire_rate = 1.0
+burst_size = 1
+burst_delay = 0.0
+range = 1000.0
+beam = false
+accuracy = 1.0
+spread = 0.0
+turn_rate = 10.0
+flux_per_shot = 0
+dps = 0
+flux_per_second = 0

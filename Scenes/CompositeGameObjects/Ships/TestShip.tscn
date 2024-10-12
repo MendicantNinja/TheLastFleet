@@ -1,12 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://by1g6emke1cfw"]
+[gd_scene load_steps=5 format=3 uid="uid://cw88yegmucgbv"]
 
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_htvtf"]
-[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_wjry0"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
+[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
+[ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
-radius = 70.0
+radius = 100.0
 
-[node name="PlayerShip" type="RigidBody2D"]
+[node name="TestShip" type="RigidBody2D"]
 rotation = -1.5708
 collision_mask = 7
 input_pickable = true
@@ -14,17 +15,30 @@ gravity_scale = 0.0
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
-script = ExtResource("1_htvtf")
+script = ExtResource("1_sc1ei")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
-texture = ExtResource("2_wjry0")
+texture = ExtResource("2_13ai0")
 offset = Vector2(0, -50)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(58, 0, -45, -53, -45, 53)
+polygon = PackedVector2Array(59, 0.000213579, -44.9998, -51.0002, -45.0002, 51.9998)
+
+[node name="Area2D" type="Area2D" parent="."]
+collision_mask = 7
+priority = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+shape = SubResource("CircleShape2D_4lqs1")
+
+[node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
+position = Vector2(-25, -18)
+
+[node name="WeaponSlot1" parent="." instance=ExtResource("3_b8p4t")]
+position = Vector2(-25, 18)
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
 path_desired_distance = 50.0
@@ -43,13 +57,6 @@ debug_path_custom_line_width = 3.0
 
 [node name="NavigationTimer" type="Timer" parent="."]
 wait_time = 3.0
-
-[node name="Area2D" type="Area2D" parent="."]
-collision_mask = 7
-priority = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-shape = SubResource("CircleShape2D_4lqs1")
 
 [connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]

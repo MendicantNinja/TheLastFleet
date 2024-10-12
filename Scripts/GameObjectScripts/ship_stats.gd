@@ -4,9 +4,8 @@ class_name ShipStats
 # This class contains the unique modified stats of a ship based on player modifications calculated on update.
 # For all intents and purposes, ship_stats is what makes an individual, unique ship in a fleet for serialization.
 
-
 # Called on ship.new() implicitly.
-func create_ship(ship_type: data.ship_type_enum) -> void:
+func _init(ship_type: data.ship_type_enum) -> void:
 	ship_hull = data.ship_type_dictionary.get(ship_type)
 	initialize()
 	update()
@@ -21,13 +20,17 @@ func new_ship_name(p_ship_name: String = "Shippington") -> void:
 func random_ship_name() -> String:
 	return "LolSoRandom"
 
-# Called once on creation. This function assigns certain variables like ship_system that don't need updated after assignment.
+# Called once on creation. This function assigns certain variables like ship_system that don't need automatically updated ever again after initial assignment.
 func initialize() -> void:
 	new_ship_name()
-	ship_system = data.ship_system_dictionary.get(ship_system)
-	pass
+	ship_system = data.ship_system_dictionary.get(ship_hull.ship_system)
+	
+	# Assign empty weapon slots based on the ship hulls mounts.
+	weapon_slots.resize(ship_hull.weapon_mounts.size())
+	for i in range(ship_hull.weapon_mounts.size()):
+		weapon_slots[i] = WeaponSlot.new(ship_hull.weapon_mounts[i])
 
-# Updates stats. Internal function not called on it's own. Should be called with a co-function whenever there is potentially a stat change (a new hull mod).
+# Updates stats. Internal function not called outside of this script. Should be called with a co-function whenever there is potentially a stat change (a new hull mod).
 func update() -> void:
 	# Defensive Stats
 	hull_integrity = ship_hull.hull_integrity + bonus_hull_integrity
@@ -63,55 +66,7 @@ func update() -> void:
 	repair_rate = ship_hull.repair_rate + bonus_repair_rate
 	pass
 
-# Ship Systems
-@export var ship_name: String = "Shippington" # The name of this specific ship in the fleet.
-@export var ship_hull: ShipHull 
-@export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
-@export var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
-@export var ship_mods: Array[ShipMod] = []                       # List of hullmods including base_mods
-@export var fighters: Array[FighterWing] = []
-
-# Weapon Systems and Mounts
-
-# Defensive Stats
-@export var hull_integrity: int                    # Ship's total hit points (health)
-@export var armor: int                        # Ship's armor rating (used for damage mitigation)
-
-@export var shield_efficiency: float          # How effective the shields are at blocking damage
-@export var flux: int                         # Total flux the ship can buildup before overloading
-@export var flux_dissipation: int             # Rate at which flux is dissipated (flux/sec)
-
-# Movement Stats
-@export var top_speed: int                    # Max speed of the ship in combat
-@export var acceleration: float               # How fast the ship accelerates
-@export var deceleration: float               # How fast the ship slows down
-@export var turn_rate: float                  # How fast the ship can rotate
-@export var mass: float                       # Ship's mass (affects collision and inertia)
-
-# Combat Readiness, Supplies, Fuel, Crew
-@export var deployment_points: int            # How many deployment points the ship costs in combat
-@export var base_cr: float = 65              # The base combat readiness of the ship
-@export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat
-@export var cr_deployment_cost: float         # Combat readiness cost for deploying in battle
-
-@export var cargo_capacity: int               # Maximum cargo capacity of the ship
-@export var supplies_per_month: float         # Supplies used per month for maintenance
-@export var supplies_per_deployment: float    # Supplies used for combat deployment
-
-@export var fuel_capacity: int                # Maximum fuel the ship can carry
-@export var fuel_usage_per_lightyear: float   # Fuel used per lightyear of travel
-
-@export var crew_capacity: int                # Maximum crew the ship can hold
-@export var skeleton_crew: int                # Minimum crew needed to operate the ship
-@export var fighter_bays: int = 0              # Number of fighter bays for carrier-type ships
-
-# Miscellaneous Stats
-@export var sensor_strength: int            # Strength of the ship's sensors
-@export var sensor_profile: int             # How easily the ship is detected by sensors
-@export var repair_rate: float                # How fast the ship can repair damage outside of combat
-
-# Ship Mod Stats and Bonus Calculations
-#NOTE: When modifying a variable or adding a new one. Ensure that ship_hull.gd, ship_stats.gd (and all the other instances of that variable), and ship_mod.gd are updated or reflect this change.
+# Ship Mod Functionality
 func add_mod(p_ship_mod: ShipMod) -> void:
 	# Add the mod to the ship_mods array
 	ship_mods.append(p_ship_mod)
@@ -192,6 +147,70 @@ func update_mods() -> void:
 		bonus_sensor_profile += ship_hull.sensor_profile * mod.sensor_profile_multiplier + mod.bonus_sensor_profile
 		bonus_repair_rate += ship_hull.repair_rate * mod.repair_rate_multiplier + mod.bonus_repair_rate
 	update()
+
+# Ship Weapon Mounting and Addition.
+func add_weapon(weapon_to_add: Weapon, weapon_slot_index: int) -> void:
+	if weapon_slot_index > ship_hull.weapon_mounts.size()-1 or weapon_slot_index < 0:
+		push_error("Cannot add weapon to this weapon slot, the weapon slot does not exist or the index is incorrect.")
+		return
+	weapon_slots[weapon_slot_index].weapon = weapon_to_add
+
+func remove_weapon(weapon_slot_index: int) -> void:
+	if weapon_slot_index > ship_hull.weapon_mounts.size()-1 or weapon_slot_index < 0:
+		push_error("Cannot remove weapon from this weapon slot, the weapon slot does not exist or the index is incorrect.")
+		return
+	weapon_slots[weapon_slot_index].weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)
+	
+#func swap_weapon(weapon_to_index: Weapon, weapon_from_index: int) -> void:
+# Ship Systems
+@export var ship_name: String = "Shippington" # The name of this specific ship in the fleet.
+@export var ship_hull: ShipHull 
+@export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
+@export var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
+@export var ship_mods: Array[ShipMod] = []                       # List of hullmods including base_mods
+@export var fighters: Array[FighterWing] = []
+
+# Weapon Systems and Mounts
+
+# Defensive Stats
+@export var hull_integrity: int                    # Ship's total hit points (health)
+@export var armor: int                        # Ship's armor rating (used for damage mitigation)
+
+@export var shield_efficiency: float          # How effective the shields are at blocking damage
+@export var flux: int                         # Total flux the ship can buildup before overloading
+@export var flux_dissipation: int             # Rate at which flux is dissipated (flux/sec)
+
+# Movement Stats
+@export var top_speed: int                    # Max speed of the ship in combat
+@export var acceleration: float               # How fast the ship accelerates
+@export var deceleration: float               # How fast the ship slows down
+@export var turn_rate: float                  # How fast the ship can rotate
+@export var mass: float                       # Ship's mass (affects collision and inertia)
+
+# Combat Readiness, Supplies, Fuel, Crew
+@export var deployment_points: int            # How many deployment points the ship costs in combat
+@export var base_cr: float = 65              # The base combat readiness of the ship
+@export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat
+@export var cr_deployment_cost: float         # Combat readiness cost for deploying in battle
+
+@export var cargo_capacity: int               # Maximum cargo capacity of the ship
+@export var supplies_per_month: float         # Supplies used per month for maintenance
+@export var supplies_per_deployment: float    # Supplies used for combat deployment
+
+@export var fuel_capacity: int                # Maximum fuel the ship can carry
+@export var fuel_usage_per_lightyear: float   # Fuel used per lightyear of travel
+
+@export var crew_capacity: int                # Maximum crew the ship can hold
+@export var skeleton_crew: int                # Minimum crew needed to operate the ship
+@export var fighter_bays: int = 0              # Number of fighter bays for carrier-type ships
+
+# Miscellaneous Stats
+@export var sensor_strength: int            # Strength of the ship's sensors
+@export var sensor_profile: int             # How easily the ship is detected by sensors
+@export var repair_rate: float                # How fast the ship can repair damage outside of combat
+
+# Ship Mod Stats and Bonus Calculations
+#NOTE: When modifying a variable or adding a new one. Ensure that ship_hull.gd, ship_stats.gd (and all the other instances of that variable), and ship_mod.gd are updated or reflect this change.
 
 #Ship-Mod unique stats not found in ship_hull
 @export var bonus_range: int = 0
