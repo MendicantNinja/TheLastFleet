@@ -5,11 +5,13 @@
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="3_d4mge"]
 
 [node name="WeaponSlot" type="Node2D"]
-rotation = 1.5708
+rotation = -1.5708
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")
 weapon_mount = ExtResource("3_d4mge")
 
 [node name="WeaponMountSprite" type="Sprite2D" parent="."]
+rotation = 1.5708
 
 [node name="WeaponSprite" type="Sprite2D" parent="WeaponMountSprite"]
+rotation = 1.5708

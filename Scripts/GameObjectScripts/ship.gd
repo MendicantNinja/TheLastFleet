@@ -9,6 +9,9 @@ class_name Ship
 @onready var all_weapons: Array[WeaponSlot]
 
 #Temporary variables
+# Should group weapon slots in the near future instead of this, even though call_group() broke in 4.3 stable.
+# Might mean something silly like another Node2D that functionally groups
+# all weapon slots as child nodes. We could then call that node "WeaponSystem" or whatever.
 @onready var WeaponSlot0 = $WeaponSlot0
 @onready var WeaponSlot1 = $WeaponSlot1
 
@@ -22,7 +25,6 @@ var hull_integrity: float = 0.0
 var final_target_position: Vector2 = Vector2.ZERO
 var intermediate_pathing: bool = false
 var acceleration: Vector2 = Vector2.ZERO
-var test: float = 0.0
 var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
 var ship_select: bool = false
@@ -42,9 +44,13 @@ func _ready() -> void:
 			all_weapons.append(child)
 	for i in range(all_weapons.size()):
 		# Temporary hack to test weapons so that the mounts aren't empty.
-		#MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be null and cause errors.
+		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
+		# assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be 
+		# null and cause errors.
 		all_weapons[i].weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
-		# In the future, weapons will automatically be assigned from the already existing weapons in ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so everything is a railgun.
+		# In the future, weapons will automatically be assigned from the already existing weapons in 
+		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
+		# everything is a railgun.
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -68,6 +74,9 @@ func _input(event: InputEvent) -> void:
 			fire_weapon_slot(all_weapons[0])
 		if (event.keycode == KEY_Q and event.is_pressed()):
 			fire_weapon_system(all_weapons)
+	elif event is InputEventMouseMotion:
+		if ship_select:
+			face_weapons(all_weapons, get_global_mouse_position())
 
 # When the player interacts with the ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -91,6 +100,16 @@ func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
 
 func fire_weapon_slot(weapon_slot: WeaponSlot ) -> void:
 	weapon_slot.fire()
+
+func face_weapons(weapon_system: Array[WeaponSlot], mouse_position: Vector2) -> void:
+	for weapon_slot in weapon_system:
+		var weapon_transform: Transform2D = weapon_slot.global_transform
+		var weapon_scale: Vector2 = weapon_slot.scale
+		var transform_look_at: Transform2D = weapon_transform.looking_at(mouse_position)
+		var local_origin: Vector2 = weapon_slot.transform.origin
+		transform_look_at.origin = local_origin
+		transform_look_at = transform_look_at.scaled_local(weapon_scale)
+		weapon_slot.transform = weapon_slot.transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
 
 #ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 #`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 

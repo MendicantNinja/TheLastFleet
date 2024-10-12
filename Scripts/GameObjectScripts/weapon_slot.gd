@@ -25,9 +25,8 @@ class_name WeaponSlot
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
 
-
-
-# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
+# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. 
+# Firing speed is tied to delta in ship.gd.
 func fire() -> void:
 	if weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
