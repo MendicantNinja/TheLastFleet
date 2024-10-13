@@ -5,7 +5,7 @@ class_name Ship
 @onready var NavigationTimer = $NavigationTimer
 @onready var ShipCollisionShape = $Area2D/CollisionShape2D
 @onready var ShipSprite = $ShipSprite
-
+@onready var CollisionShape = $CollisionPolygon2D
 @onready var all_weapons: Array[WeaponSlot]
 
 #Temporary variables
@@ -35,8 +35,8 @@ func _ready() -> void:
 	
 	var ship_hull = ship_stats.ship_hull
 	ShipSprite.texture = ship_hull.ship_sprite
-	
-	$ShipSprite.self_modulate = settings.player_color
+	hull_integrity = ship_hull.hull_integrity
+	ShipSprite.self_modulate = settings.player_color
 	
 	#Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
@@ -70,13 +70,10 @@ func _input(event: InputEvent) -> void:
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			ship_select = false # deselect ship by right clicking anywhere
 	elif event is InputEventKey:
-		if (event.keycode == KEY_F and event.is_pressed()):
+		if (event.keycode == KEY_F and event.is_pressed()) and ship_select:
 			fire_weapon_slot(all_weapons[0])
-		if (event.keycode == KEY_Q and event.is_pressed()):
+		if (event.keycode == KEY_Q and event.is_pressed()) and ship_select:
 			fire_weapon_system(all_weapons)
-	elif event is InputEventMouseMotion:
-		if ship_select:
-			face_weapons(all_weapons, get_global_mouse_position())
 
 # When the player interacts with the ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -99,7 +96,8 @@ func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
 		fire_weapon_slot(weapon_slot)
 
 func fire_weapon_slot(weapon_slot: WeaponSlot ) -> void:
-	weapon_slot.fire()
+	var ship_id = get_rid().get_id()
+	weapon_slot.fire(ship_id)
 
 func face_weapons(weapon_system: Array[WeaponSlot], mouse_position: Vector2) -> void:
 	for weapon_slot in weapon_system:
@@ -129,6 +127,9 @@ func _physics_process(delta: float) -> void:
 	
 	var ship_query: Dictionary = {}
 	ship_query = collision_raycast(global_position, target_position, 7)
+	
+	if ship_select:
+		face_weapons(all_weapons, get_global_mouse_position())
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():

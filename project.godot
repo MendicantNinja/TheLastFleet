@@ -61,6 +61,7 @@ D={
 2d_physics/layer_1="PlayerShip"
 2d_physics/layer_2="Obstacle"
 2d_physics/layer_3="EnemyShip"
+2d_physics/layer_4="Projectile"
 avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"

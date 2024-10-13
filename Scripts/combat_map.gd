@@ -13,3 +13,6 @@ func _unhandled_input(event) -> void:
 		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
 			if Camera.get_zoom() > Vector2(0.1, 0.1):
 				Camera.zoom -= Vector2(0.1, 0.1)
+
+func change_zoom(zoom_value: Vector2):
+	pass
