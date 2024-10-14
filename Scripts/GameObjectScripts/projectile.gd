@@ -37,15 +37,12 @@ func _on_Projectile_collision(body) -> void:
 	if projectile_damage == 0:
 		push_error("No weapon detected for projectile scene. res://Scenes/CompositeGameObjects/Projectiles/RailgunProjectile.tscn")
 		return
-	# Yelymane's code here.
 	
 	var body_layer: int = body.collision_layer
-	if body_layer == 2:
-		return # obstacle layer
+	if body_layer == 2: # obstacle layer
+		return 
 	
 	if "hull_integrity" in body:
-		print("%s hull integrity before collision: %s" % [body.name, body.hull_integrity])
 		body.hull_integrity -= projectile_damage
-		print("%s hull integrity after collision: %s" % [body.name, body.hull_integrity])
 	
 	queue_free()

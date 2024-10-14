@@ -1,18 +1,14 @@
-[gd_scene load_steps=7 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=5 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="4_1aluj"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(9947.13, 48.9922, 9973.86, 9797, 47.0781, 9797, 61.9219, 47.0078)
+vertices = PackedVector2Array(9947.13, 48.9609, 9973.86, 9796.98, 8.14844, 9794.01, 37.8438, 41.0313)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, -3, 9847, 10024, 9847, 9997, -1)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-12, -9, -42, 9844, 10024, 9847, 9997, -1)])
 agent_radius = 50.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_le3lb"]
-radius = 100.0
 
 [node name="CombatMap" type="Node2D"]
 script = ExtResource("1_x40el")
@@ -49,61 +45,15 @@ texture = ExtResource("1_1p2qq")
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
+[node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(1000, 700)
+collision_layer = 1
+
+[node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(1200, 745)
+collision_layer = 1
+
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(369, 700)
-
-[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(940, 745)
-
-[node name="EnemyShip" type="RigidBody2D" parent="."]
-position = Vector2(681, 386)
-rotation = -1.5708
+position = Vector2(200, 200)
 collision_layer = 4
-collision_mask = 15
-gravity_scale = 0.0
-continuous_cd = 1
-contact_monitor = true
-max_contacts_reported = 10
-script = ExtResource("4_1aluj")
-
-[node name="ShipSprite" type="Sprite2D" parent="EnemyShip"]
-self_modulate = Color(1, 0.04, 0.0559998, 1)
-rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_1p2qq")
-offset = Vector2(0, -50)
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="EnemyShip"]
-polygon = PackedVector2Array(58, 0, -45, -53, -45, 53)
-
-[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="EnemyShip"]
-path_desired_distance = 50.0
-target_desired_distance = 20.0
-path_max_distance = 50.0
-avoidance_enabled = true
-radius = 70.0
-neighbor_distance = 1000.0
-time_horizon_agents = 5.0
-time_horizon_obstacles = 1.0
-max_speed = 1000.0
-debug_enabled = true
-debug_use_custom = true
-debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
-debug_path_custom_point_size = 13.0
-debug_path_custom_line_width = 3.0
-
-[node name="Area2D" type="Area2D" parent="EnemyShip"]
-collision_layer = 4
-collision_mask = 7
 input_pickable = false
-priority = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip/Area2D"]
-shape = SubResource("CircleShape2D_le3lb")
-
-[node name="NavigationTimer" type="Timer" parent="EnemyShip"]
-wait_time = 3.0
-
-[node name="WeaponSlot0" type="Node2D" parent="EnemyShip"]
-
-[node name="WeaponSlot1" type="Node2D" parent="EnemyShip"]

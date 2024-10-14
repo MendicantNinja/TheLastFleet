@@ -4,6 +4,8 @@ class_name WeaponSlot
 # Nodes
 @onready var weapon_mount_image: Sprite2D = $WeaponMountSprite 
 @onready var weapon_image: Sprite2D = $WeaponMountSprite/WeaponSprite
+@onready var effective_range_shape: CollisionShape2D = $EffectiveRange/EffectiveRangeShape
+@onready var effective_range: Area2D = $EffectiveRange
 
 # Important Stuff
 #@export var assigned_ship: Ship
@@ -34,9 +36,9 @@ func fire(ship_id: int) -> void:
 		projectile.assign_stats(weapon, ship_id)
 		projectile.global_position = global_position + Vector2(0, 0) # Should come out of the edge/front of the weapon.
 		projectile.global_rotation = rotation
+		# Add random spread based on accuracy. Etc. 
 		get_tree().root.add_child(projectile)
-		# FOR YELYMANE: Shoot the target! Impart velocity! Add random spread based on accuracy. Etc. 
-		
+
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
 	weapon_mount = p_weapon_mount
@@ -45,7 +47,16 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
-	set_weapon_size_and_color()
+	
+	var new_shape: Shape2D = CircleShape2D.new()
+	new_shape.radius = weapon.range
+	effective_range_shape.shape = new_shape
+	
+	set_weapon_size_and_color() 
+
+func detection_parameters(layer: int, mask: int) -> void:
+	#effective_range.collision_layer = layer
+	effective_range.collision_mask = mask
 
 func set_weapon_size_and_color():
 	weapon_mount_image.modulate = settings.player_color
