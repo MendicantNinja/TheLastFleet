@@ -56,6 +56,7 @@ class_name ShipMod
 @export var bonus_mass: float = 0.0
 
 # Logistics
+@export var bonus_drive_field: int = 0
 @export var bonus_deployment_points: int = 0
 @export var bonus_base_cr: float = 0.0
 @export var bonus_cr_recovery_rate: float = 0.0

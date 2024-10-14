@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 data="*res://Scripts/AutoloadScripts/data.gd"
 settings="*res://Scripts/AutoloadScripts/settings.gd"
+game_state="*res://Scripts/AutoloadScripts/game_state.gd"
 
 [debug]
 

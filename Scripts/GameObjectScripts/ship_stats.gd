@@ -1,4 +1,4 @@
-extends Node
+extends Resource
 class_name ShipStats
 
 # This class contains the unique modified stats of a ship based on player modifications calculated on update.
@@ -33,6 +33,7 @@ func initialize() -> void:
 # Updates stats. Internal function not called outside of this script. Should be called with a co-function whenever there is potentially a stat change (a new hull mod).
 func update() -> void:
 	# Defensive Stats
+	drive_field = ship_hull.drive_field + bonus_drive_field
 	hull_integrity = ship_hull.hull_integrity + bonus_hull_integrity
 	armor = ship_hull.armor + bonus_armor
 	shield_efficiency = ship_hull.shield_efficiency + bonus_shield_efficiency
@@ -72,8 +73,8 @@ func add_mod(p_ship_mod: ShipMod) -> void:
 	ship_mods.append(p_ship_mod)
 	update_mods()
 	
-func remove_mod(p_index) -> void:
-	ship_mods.remove_at(p_index)
+func remove_mod(ship_index: int) -> void:
+	ship_mods.remove_at(ship_index)
 	update_mods()
 	
 func update_mods() -> void:
@@ -129,6 +130,7 @@ func update_mods() -> void:
 		bonus_mass += ship_hull.mass * mod.mass_multiplier + mod.bonus_mass
 
 		# Combat Readiness, Supplies, Fuel, Crew
+		bonus_drive_field += mod.bonus_drive_field
 		bonus_deployment_points += int(ship_hull.deployment_points * mod.deployment_points_multiplier) + mod.bonus_deployment_points
 		bonus_base_cr += ship_hull.base_cr * mod.base_cr_multiplier + mod.bonus_base_cr
 		bonus_cr_recovery_rate += ship_hull.cr_recovery_rate * mod.cr_recovery_rate_multiplier + mod.bonus_cr_recovery_rate
@@ -166,7 +168,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var ship_name: String = "Shippington" # The name of this specific ship in the fleet.
 @export var ship_hull: ShipHull 
 @export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
-@export var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
+@export_storage var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
 @export var ship_mods: Array[ShipMod] = []                       # List of hullmods including base_mods
 @export var fighters: Array[FighterWing] = []
 
@@ -188,6 +190,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var mass: float                       # Ship's mass (affects collision and inertia)
 
 # Combat Readiness, Supplies, Fuel, Crew
+@export var drive_field: int
 @export var deployment_points: int            # How many deployment points the ship costs in combat
 @export var base_cr: float = 65              # The base combat readiness of the ship
 @export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat
@@ -227,6 +230,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var bonus_turn_rate: float = 0.0
 @export var bonus_mass: float = 0.0
 
+@export var bonus_drive_field: int = 0
 @export var bonus_deployment_points: int = 0
 @export var bonus_base_cr: float = 0.0
 @export var bonus_cr_recovery_rate: float = 0.0

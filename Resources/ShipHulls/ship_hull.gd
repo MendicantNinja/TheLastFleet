@@ -44,6 +44,7 @@ class_name ShipHull
 @export var mass: float                       # Ship's mass (affects collision and inertia)
 
 # Combat Readiness, Supplies, Fuel, Crew
+@export var drive_field: int = 10
 @export var deployment_points: int            # How many deployment points the ship costs in combat
 @export var base_cr: float = 65              # The base combat readiness of the ship
 @export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat

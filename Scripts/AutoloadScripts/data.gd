@@ -143,3 +143,40 @@ enum weapon_damage_enum {
 	ENERGY,
 	#UNIVERSAL
 }
+
+#oooooooooooo ooooo        oooooooooooo oooooooooooo ooooooooooooo  .oooooo..o 
+#`888'     `8 `888'        `888'     `8 `888'     `8 8'   888   `8 d8P'    `Y8 
+ #888          888          888          888              888      Y88bo.      
+ #888oooo8     888          888oooo8     888oooo8         888       `"Y8888o.  
+ #888    "     888          888    "     888    "         888           `"Y88b 
+ #888          888       o  888       o  888       o      888      oo     .d8P 
+#o888o        o888ooooood8 o888ooooood8 o888ooooood8     o888o     8""88888P'   
+  
+enum item_enum {
+	# Logistical/Usable Items
+	SUPPLIES,
+	FUEL,
+	CREW,
+	RESEARCH, 
+	
+	# Solely Commercial Items
+	DRUGS,
+	
+	# Weapons 
+	RAILGUN,
+	
+	# Fighters
+	RAPTOR,
+	
+}
+#var item_dictionary: Dictionary = {
+	#weapon_enum.RAILGUN: load("res://Resources/Weapons/Railgun.tres"),
+	#weapon_enum.EMPTY: preload("res://Resources/Weapons/EmptySlot.tres")
+	#}
+
+enum faction_enum {
+	PLAYER,
+	CHORAVEX,
+	ZEALOTS,
+	PIRATES, 
+}
