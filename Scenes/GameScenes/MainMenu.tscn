@@ -1,4 +1,12 @@
-[gd_scene format=3 uid="uid://825w50grrkcp"]
+[gd_scene load_steps=8 format=3 uid="uid://825w50grrkcp"]
+
+[ext_resource type="Script" path="res://Scenes/GameScenes/MainMenu.gd" id="1_a5rc2"]
+[ext_resource type="Texture2D" uid="uid://csdxgp2fvxt77" path="res://Art/MenuArt/scanlines.png" id="1_ilt4a"]
+[ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="3_x54xu"]
+[ext_resource type="Theme" uid="uid://didj7odtya3rd" path="res://ThemesandFonts/Themes/MainMenuButtonTheme.tres" id="4_dnp8m"]
+[ext_resource type="Script" path="res://Scripts/GUIScripts/NewGame.gd" id="4_k0np7"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="6_4abs8"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -7,3 +15,126 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+focus_mode = 2
+script = ExtResource("1_a5rc2")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = ExtResource("1_ilt4a")
+
+[node name="CustomTitleImage" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -300.0
+offset_right = 300.0
+offset_bottom = 280.0
+grow_horizontal = 2
+texture = ExtResource("1_k1n24")
+
+[node name="ListContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -20.0
+offset_right = 40.0
+offset_bottom = 20.0
+grow_vertical = 2
+
+[node name="NewGameButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("4_k0np7")
+
+[node name="OnHoverGlowSheen" type="TextureRect" parent="ListContainer/NewGameButton"]
+visible = false
+self_modulate = Color(0.6, 0.6, 0.6, 1)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("3_x54xu")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/NewGameButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "NEW GAME"
+scroll_active = false
+
+[node name="LoadGameButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/LoadGameButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "NEW GAME"
+scroll_active = false
+
+[node name="SettingsButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/SettingsButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "NEW GAME"
+scroll_active = false
+
+[node name="CreditsButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/CreditsButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "NEW GAME"
+scroll_active = false
+
+[node name="LinksandIcons(Discord, Reddit, etc)" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+
+[node name="IconBackGround" type="TextureRect" parent="LinksandIcons(Discord, Reddit, etc)"]
+layout_mode = 2
+texture = ExtResource("3_x54xu")
+
+[node name="GUINoisePlayer" type="AudioStreamPlayer" parent="."]
