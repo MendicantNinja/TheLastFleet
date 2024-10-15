@@ -1,11 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=7 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="2_r4t6u"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(9947.13, 48.9922, 9973.86, 9797, 47.0781, 9797, 61.9219, 47.0078)
+vertices = PackedVector2Array(9973.86, 9797, 47.0313, 9797, 52.9688, 49, 9947.14, 49)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, -3, 9847, 10024, 9847, 9997, -1)])
 agent_radius = 50.0
@@ -15,6 +16,43 @@ radius = 100.0
 
 [node name="CombatMap" type="Node2D"]
 script = ExtResource("1_x40el")
+
+[node name="FleetDeploymentPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+z_index = 5
+offset_left = 342.0
+offset_top = 363.0
+offset_right = 1368.0
+offset_bottom = 847.0
+
+[node name="FleetDeployment" type="ItemList" parent="FleetDeploymentPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -510.0
+offset_right = 514.0
+offset_bottom = 389.0
+grow_horizontal = 2
+select_mode = 1
+allow_reselect = true
+allow_search = false
+max_columns = 10
+fixed_icon_size = Vector2i(32, 32)
+script = ExtResource("2_r4t6u")
+
+[node name="Deploy" type="TextureButton" parent="FleetDeploymentPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Cancel(G)" type="TextureButton" parent="FleetDeploymentPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
 limit_left = 0

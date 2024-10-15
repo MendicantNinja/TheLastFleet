@@ -131,7 +131,7 @@ func update_mods() -> void:
 
 		# Combat Readiness, Supplies, Fuel, Crew
 		bonus_drive_field += mod.bonus_drive_field
-		bonus_deployment_points += int(ship_hull.deployment_points * mod.deployment_points_multiplier) + mod.bonus_deployment_points
+		bonus_deployment_points += snapped(ship_hull.deployment_points * mod.deployment_points_multiplier + mod.bonus_deployment_points, 0.01)
 		bonus_base_cr += ship_hull.base_cr * mod.base_cr_multiplier + mod.bonus_base_cr
 		bonus_cr_recovery_rate += ship_hull.cr_recovery_rate * mod.cr_recovery_rate_multiplier + mod.bonus_cr_recovery_rate
 		bonus_cr_deployment_cost += ship_hull.cr_deployment_cost * mod.cr_deployment_cost_multiplier + mod.bonus_cr_deployment_cost
@@ -191,9 +191,9 @@ func remove_weapon(weapon_slot_index: int) -> void:
 
 # Combat Readiness, Supplies, Fuel, Crew
 @export var drive_field: int
-@export var deployment_points: int            # How many deployment points the ship costs in combat
+@export var deployment_points: float           # How many deployment points the ship costs in combat
 @export var base_cr: float = 65              # The base combat readiness of the ship
-@export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat
+@export var cr_recovery_rate: float = 2       # Rate at which combat readiness is restored post-combat
 @export var cr_deployment_cost: float         # Combat readiness cost for deploying in battle
 
 @export var cargo_capacity: int               # Maximum cargo capacity of the ship
@@ -231,7 +231,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var bonus_mass: float = 0.0
 
 @export var bonus_drive_field: int = 0
-@export var bonus_deployment_points: int = 0
+@export var bonus_deployment_points: float = 0.0
 @export var bonus_base_cr: float = 0.0
 @export var bonus_cr_recovery_rate: float = 0.0
 @export var bonus_cr_deployment_cost: float = 0.0

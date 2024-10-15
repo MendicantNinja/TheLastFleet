@@ -45,7 +45,7 @@ class_name ShipHull
 
 # Combat Readiness, Supplies, Fuel, Crew
 @export var drive_field: int = 10
-@export var deployment_points: int            # How many deployment points the ship costs in combat
+@export var deployment_points: float = 1.00           # How many deployment points the ship costs in combat
 @export var base_cr: float = 65              # The base combat readiness of the ship
 @export var cr_recovery_rate: float = 2           # Rate at which combat readiness is restored post-combat
 @export var cr_deployment_cost: float         # Combat readiness cost for deploying in battle
