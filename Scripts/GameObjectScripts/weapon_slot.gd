@@ -26,6 +26,14 @@ class_name WeaponSlot
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
+var auto_aim: bool = false
+var auto_fire: bool = false
+var is_friendly: bool = false
+
+var killcast: RayCast2D = null
+var track_ship: int = 0
+var focus_aim: Vector2 = Vector2.ZERO
+var face_direction: Transform2D = Transform2D()
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -54,9 +62,20 @@ func _ready():
 	
 	set_weapon_size_and_color() 
 
-func detection_parameters(layer: int, mask: int) -> void:
-	#effective_range.collision_layer = layer
+func detection_parameters(mask: int) -> void:
 	effective_range.collision_mask = mask
+
+func set_auto_aim() -> void:
+	if auto_aim == false:
+		auto_aim = true
+	else:
+		auto_aim = false
+
+func set_auto_fire() -> void:
+	if auto_fire == false:
+		auto_fire = true
+	else:
+		auto_fire = false
 
 func set_weapon_size_and_color():
 	weapon_mount_image.modulate = settings.player_color
@@ -73,7 +92,6 @@ func set_weapon_size_and_color():
 		_:
 			print("Unknown weapon size.")
 	
-	
 	#match weapon_mount.weapon_mount_type:
 		#data.weapon_mount_type_enum.BALLISTIC:
 			#weapon_mount_image.self_modulate = Color8(255, 100, 20, 255)
@@ -88,6 +106,33 @@ func set_weapon_size_and_color():
 		#_:
 			#print("Unknown weapon type.")
 
+func update_target_parameters(friendly_value: bool, ship_id: int, ship_position: Vector2) -> void:
+	if track_ship == ship_id:
+		return
+	
+	var create_raycast: RayCast2D = RayCast2D.new()
+	create_raycast.collide_with_bodies = false
+	create_raycast.collide_with_areas = true
+	create_raycast.collision_mask = 7
+	create_raycast.target_position = ship_position
+	killcast = create_raycast
+	
+	track_ship = ship_id
+	is_friendly = friendly_value
+	focus_aim = ship_position
+
+func face_weapon(target_position: Vector2) -> Transform2D:
+	var weapon_transform: Transform2D = global_transform
+	var weapon_scale: Vector2 = scale
+	var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
+	var local_origin: Vector2 = transform.origin
+	transform_look_at.origin = local_origin
+	transform_look_at = transform_look_at.scaled_local(weapon_scale)
+	return transform_look_at
+
+func _physics_process(delta) -> void:
+	if killcast:
+		transform = transform.interpolate_with(face_weapon(killcast.target_position), 0.5)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(9947.13, 48.9609, 9973.86, 9796.98, 8.14844, 9794.01, 37.8438, 41.0313)
+vertices = PackedVector2Array(9947.13, 48.9531, 9973.86, 9796.98, 8.14063, 9794.01, 36.8516, 39.0391)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-12, -9, -42, 9844, 10024, 9847, 9997, -1)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-13, -11, -42, 9844, 10024, 9847, 9997, -1)])
 agent_radius = 50.0
 
 [node name="CombatMap" type="Node2D"]
@@ -46,14 +46,19 @@ texture = ExtResource("1_1p2qq")
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
 [node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(1000, 700)
+position = Vector2(300, 600)
 collision_layer = 1
 
 [node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(1200, 745)
+position = Vector2(900, 500)
 collision_layer = 1
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
 position = Vector2(200, 200)
+collision_layer = 4
+input_pickable = false
+
+[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(600, 200)
 collision_layer = 4
 input_pickable = false

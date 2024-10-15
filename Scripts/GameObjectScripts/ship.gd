@@ -18,8 +18,10 @@ class_name Ship
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
+var is_friendly: bool = false
 
 # Used for targeting and weapons.
+var available_targets: Dictionary = {}
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
@@ -27,11 +29,7 @@ var intermediate_pathing: bool = false
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
-var focus_attack: Vector2 = Vector2.ZERO
 var ship_select: bool = false
-var is_friendly: bool = false
-var auto_aim: bool = false
-var auto_fire: bool = false
 
 func _ready() -> void:
 	ship_stats = ShipStats.new(data.ship_type_enum.TEST)
@@ -52,8 +50,9 @@ func _ready() -> void:
 	for child in get_children():
 		if child is WeaponSlot:
 			all_weapons.append(child)
-			child.detection_parameters(collision_layer, collision_mask)
-			child.effective_range.body_entered.connect(_on_EffectiveRange_entered.bind(child))
+			child.detection_parameters(collision_mask)
+			child.effective_range.body_entered.connect(_on_EffectiveRange_body_entered.bind(child))
+			child.effective_range.body_exited.connect(_on_EffectiveRange_body_entered.bind(child))
 	for i in range(all_weapons.size()):
 		# Temporary hack to test weapons so that the mounts aren't empty.
 		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
@@ -78,7 +77,6 @@ func _input(event: InputEvent) -> void:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
-			print(target_position)
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			ship_select = false # deselect ship by right clicking anywhere
@@ -87,16 +85,10 @@ func _input(event: InputEvent) -> void:
 			fire_weapon_slot(all_weapons[0])
 		elif (event.keycode == KEY_Q and event.is_pressed()) and ship_select:
 			fire_weapon_system(all_weapons)
-		elif event.keycode == KEY_C and event.pressed and ship_select and not auto_aim:
-			auto_aim = true
-		elif event.keycode == KEY_C and event.pressed and ship_select and auto_aim:
-			auto_aim = false
-		elif event.keycode == KEY_V and event.pressed and ship_select and not auto_fire:
-			auto_aim = true
-			auto_fire = true
-		elif event.keycode == KEY_V and event.pressed and ship_select and auto_fire:
-			auto_aim = false
-			auto_fire = false
+		elif event.keycode == KEY_C and event.pressed and ship_select:
+			update_auto_aim(all_weapons)
+		elif event.keycode == KEY_V and event.pressed and ship_select:
+			update_auto_fire(all_weapons)
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -122,31 +114,47 @@ func fire_weapon_slot(weapon_slot: WeaponSlot ) -> void:
 	var ship_id = get_rid().get_id()
 	weapon_slot.fire(ship_id)
 
-func face_weapon(weapon_slot: WeaponSlot, target_position: Vector2) -> void:
-	var weapon_transform: Transform2D = weapon_slot.global_transform
-	var weapon_scale: Vector2 = weapon_slot.scale
-	var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
-	var local_origin: Vector2 = weapon_slot.transform.origin
-	transform_look_at.origin = local_origin
-	transform_look_at = transform_look_at.scaled_local(weapon_scale)
-	weapon_slot.transform = weapon_slot.transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
+func update_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		weapon_slot.set_auto_aim()
 
-func _on_EffectiveRange_entered(body: Node2D, weapon_slot: WeaponSlot) -> void:
-	if body.get_collision_layer_value(2) or body.get_collision_layer_value(4): # obstacle and projectile layers, respectively
-		return
-	if is_friendly and body.is_friendly:
-		return
-	if body == self:
+func update_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		weapon_slot.set_auto_aim()
+
+#func face_weapon(weapon_slot: WeaponSlot, target_position: Vector2) -> void:
+	#var weapon_transform: Transform2D = weapon_slot.global_transform
+	#var weapon_scale: Vector2 = weapon_slot.scale
+	#var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
+	#var local_origin: Vector2 = weapon_slot.transform.origin
+	#transform_look_at.origin = local_origin
+	#transform_look_at = transform_look_at.scaled_local(weapon_scale)
+	#weapon_slot.transform = weapon_slot.transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
+
+func _on_EffectiveRange_body_entered(body: Node2D, weapon_slot: WeaponSlot) -> void:
+	if body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
+		return # ignore obstacle and projectile layers, respectively
+	if is_friendly and body.is_friendly: 
+		return # ignore friendly ships (player)
+	if body == self: 
+		return # ignore any overlap with other weapon slots
+	if body.get_collision_layer() == collision_layer:
 		return
 	
-	if auto_aim or auto_fire:
-		print("we on one")
-		face_weapon(weapon_slot, body.global_position)
+	var raycast_query: Dictionary = collision_raycast(weapon_slot.global_position, body.global_position, 7, false, true)
+	var collider_id: int = raycast_query["collider_id"]
+	if raycast_query.is_empty():
+		return # ignore if no ship is within line of sight (yet)
+	if raycast_query["collider"].get_collision_layer_value(2):
+		return # ignore if an obstacle is in the way
+	if not available_targets.has(raycast_query["collider_id"]):
+		available_targets[raycast_query["collider_id"]] = body.ship_stats
 	
-	if auto_fire:
-		fire_weapon_slot(weapon_slot)
+	weapon_slot.update_target_parameters(is_friendly, collider_id, body.global_position)
 
-
+func _on_EffectiveRange_body_exited(body: Node2D) -> void:
+	
+	pass
 #ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 #`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
  #8 `88b.    8      .8"888.       `888.   .8'    888  888               .8"888.          888       888  888      888  8 `88b.    8  
@@ -164,17 +172,17 @@ func _physics_process(delta: float) -> void:
 	movement_delta = speed * delta
 	
 	var ship_query: Dictionary = {}
+	if not ShipNavigationAgent.is_navigation_finished():
+		ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	
-	ship_query = collision_raycast(global_position, target_position, 7)
-	
-	#if ship_select:
+	#if ship_select and manual_control:
 		#face_weapons(all_weapons, get_global_mouse_position())
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():
 		var collider_instance: Node = instance_from_id(ship_query["collider_id"])
 		var collider_center: Vector2 = collider_instance.global_position
-		var target_query: Dictionary = collision_raycast(target_position, collider_center, 7)
+		var target_query: Dictionary = collision_raycast(target_position, collider_center, 7, true, false)
 		var start_angle: float = -PI/4
 		var increment_angle: float = PI/16
 		var sweep_range: int = 8
@@ -227,15 +235,17 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# its time-independent hence why its a one-shot
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
-func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int) -> Dictionary:
+func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
 	var results: Dictionary = {}
-	if intermediate_pathing == false and ShipNavigationAgent.is_navigation_finished():
-		return results
+	# If there are bizarre pathing issues, this may be part of the reason why. Review _physics_process for
+	# any potential edge case issues.
+	#if intermediate_pathing == false and ShipNavigationAgent.is_navigation_finished():
+	#	return results
 	
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(from, to, collision_bitmask, [self])
-	query.collide_with_areas = true
-	query.collide_with_bodies = false
+	query.collide_with_areas = test_area
+	query.collide_with_bodies = test_body
 	results = space_state.intersect_ray(query)
 	return results
 
@@ -287,7 +297,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 			skip_next_entry = false
 			continue
 		
-		var raycast_results: Dictionary = collision_raycast(local_target_pos, vector, 7)
+		var raycast_results: Dictionary = collision_raycast(local_target_pos, vector, 7, true, false)
 		if raycast_results.is_empty():
 			valid_paths.push_back(vector)
 		else:  
@@ -308,12 +318,12 @@ func _on_NavigationTimer_timeout() -> void:
 	
 	var target_query: Dictionary = {}
 	var ship_query: Dictionary = {}
-	ship_query = collision_raycast(global_position, target_position, 7)
+	ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():
 		var collider_instance: Node = instance_from_id(ship_query["collider_id"])
 		var collider_center: Vector2 = collider_instance.global_position
-		target_query = collision_raycast(target_position, collider_center, 7)
+		target_query = collision_raycast(target_position, collider_center, 7, true, false)
 		var start_angle: float = -PI/8
 		var increment_angle: float = PI/64
 		var sweep_range: int = 16

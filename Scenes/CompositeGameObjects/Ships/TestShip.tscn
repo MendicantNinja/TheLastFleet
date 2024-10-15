@@ -35,6 +35,7 @@ priority = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("CircleShape2D_4lqs1")
+debug_color = Color(0, 0.6, 0.7, 0.42)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
 position = Vector2(-25, -18)
