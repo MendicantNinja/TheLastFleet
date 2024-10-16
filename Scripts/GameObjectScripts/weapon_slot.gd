@@ -29,11 +29,14 @@ class_name WeaponSlot
 var auto_aim: bool = false
 var auto_fire: bool = false
 var is_friendly: bool = false
+var target_engaged: bool = false
 
+var owner_rid: RID
+var targets_acquired: Dictionary = {}
 var killcast: RayCast2D = null
-var track_ship: int = 0
+var target_ship_id: int = 0
+var any_ship_id: int = 0
 var focus_aim: Vector2 = Vector2.ZERO
-var face_direction: Transform2D = Transform2D()
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -60,10 +63,16 @@ func _ready():
 	new_shape.radius = weapon.range
 	effective_range_shape.shape = new_shape
 	
+	effective_range.body_entered.connect(_on_EffectiveRange_entered)
+	effective_range.body_exited.connect(_on_EffectiveRange_exited)
 	set_weapon_size_and_color() 
 
-func detection_parameters(mask: int) -> void:
+func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
 	effective_range.collision_mask = mask
+	is_friendly = friendly_value
+	owner_rid = owner_value
+	if not is_friendly:
+		auto_aim = true
 
 func set_auto_aim() -> void:
 	if auto_aim == false:
@@ -82,13 +91,13 @@ func set_weapon_size_and_color():
 	#weapon_image.self_modulate = settings.player_color
 	match weapon_mount.weapon_mount_size:
 		data.size_enum.SMALL:
-			self.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
+			weapon_mount_image.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
 		data.size_enum.MEDIUM:
-			self.scale = Vector2(.4, .4)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(.4, .4)#/assigned_ship.scale
 		data.size_enum.LARGE:
-			self.scale = Vector2(.7, .7)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(.7, .7)#/assigned_ship.scale
 		data.size_enum.SPINAL:
-			self.scale = Vector2(1, 1)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(1, 1)#/assigned_ship.scale
 		_:
 			print("Unknown weapon size.")
 	
@@ -106,23 +115,79 @@ func set_weapon_size_and_color():
 		#_:
 			#print("Unknown weapon type.")
 
-func update_target_parameters(friendly_value: bool, ship_id: int, ship_position: Vector2) -> void:
-	if track_ship == ship_id:
+func _on_EffectiveRange_entered(body) -> void:
+	if body.get_rid() == owner_rid: 
+		return # ignore any overlap with other weapon slots
+	elif is_friendly == body.is_friendly:
+		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
+	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
+		return # ignore obstacle and projectile layers, respectively
+	
+	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_transform.origin, body.global_position, 7, [self, owner_rid])
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	var raycast_query: Dictionary = space_state.intersect_ray(query)
+	if raycast_query.is_empty():
+		return # ignore if nothing is detected by the query
+	if raycast_query["collider"].get_collision_layer_value(2):
+		return # ignore if an obstacle is in the way
+	
+	var collider_id: int = raycast_query["rid"].get_id()
+	if not targets_acquired.has(collider_id):
+		targets_acquired[collider_id] = "lol"
+	
+	if not killcast:
+		killcast = create_killcast()
+		add_child(killcast)
+	
+	if killcast and collider_id == target_ship_id:
+		focus_aim = body.global_position
+		target_engaged = true
+	elif killcast and not target_engaged and any_ship_id == 0:
+		focus_aim = body.global_position
+		any_ship_id = collider_id
+
+func _on_EffectiveRange_exited(body) -> void:
+	var ship_id: int = body.get_rid().get_id()
+	if targets_acquired.has(ship_id):
+		targets_acquired.erase(ship_id)
+	
+	if ship_id == any_ship_id:
+		any_ship_id = 0
+	elif ship_id == target_ship_id:
+		target_engaged = false
+	
+	if killcast and targets_acquired.is_empty():
+		killcast.queue_free()
+		killcast = null
+		focus_aim = Vector2.ZERO
+	elif killcast:
+		# do something related to acquiring another target (if possible)
+		pass
+
+# Called down from ship.gd for whenever the player targets a specific ship.
+func update_target_parameters(ship_id: int, ship_position: Vector2) -> void:
+	if target_ship_id == ship_id:
 		return
 	
-	var create_raycast: RayCast2D = RayCast2D.new()
-	create_raycast.collide_with_bodies = false
-	create_raycast.collide_with_areas = true
-	create_raycast.collision_mask = 7
-	create_raycast.target_position = ship_position
-	killcast = create_raycast
-	
-	track_ship = ship_id
-	is_friendly = friendly_value
 	focus_aim = ship_position
+	target_ship_id = ship_id
+	
+	if not killcast:
+		killcast = create_killcast()
+		add_child(killcast)
+
+func create_killcast() -> RayCast2D:
+	var new_killcast: RayCast2D = RayCast2D.new()
+	new_killcast.collide_with_bodies = true
+	new_killcast.collide_with_areas = false
+	new_killcast.collision_mask = 7
+	return new_killcast
 
 func face_weapon(target_position: Vector2) -> Transform2D:
-	var weapon_transform: Transform2D = global_transform
+	var weapon_transform: Transform2D = transform
+	#var dot_product = weapon_transform.y.dot()
 	var weapon_scale: Vector2 = scale
 	var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
 	var local_origin: Vector2 = transform.origin
@@ -131,9 +196,9 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	return transform_look_at
 
 func _physics_process(delta) -> void:
-	if killcast:
-		transform = transform.interpolate_with(face_weapon(killcast.target_position), 0.5)
+	if killcast and auto_aim:
+		transform = transform.interpolate_with(face_weapon(focus_aim), delta)
+		killcast.target_position.y = abs(focus_aim.length()) * weapon_mount_image.scale.x
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
+func update_killcast() -> void:
 	pass

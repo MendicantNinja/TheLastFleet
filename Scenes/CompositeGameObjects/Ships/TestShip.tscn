@@ -5,10 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
-radius = 70.0
+radius = 0.01
 
 [node name="TestShip" type="RigidBody2D"]
-rotation = -1.5708
 collision_layer = 0
 collision_mask = 15
 input_pickable = true
@@ -28,12 +27,12 @@ offset = Vector2(0, -50)
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(59, 0.000213579, -44.9998, -51.0002, -45.0002, 51.9998)
 
-[node name="Area2D" type="Area2D" parent="."]
+[node name="RepathArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 0
 priority = 1
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
+[node name="RepathShape" type="CollisionShape2D" parent="RepathArea"]
 shape = SubResource("CircleShape2D_4lqs1")
 debug_color = Color(0, 0.6, 0.7, 0.42)
 

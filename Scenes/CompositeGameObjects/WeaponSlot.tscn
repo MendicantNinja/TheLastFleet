@@ -7,16 +7,14 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_82o22"]
 
 [node name="WeaponSlot" type="Node2D"]
-rotation = -1.5708
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")
 weapon_mount = ExtResource("3_d4mge")
 
 [node name="WeaponMountSprite" type="Sprite2D" parent="."]
-rotation = 1.5708
+rotation = 3.14159
 
 [node name="WeaponSprite" type="Sprite2D" parent="WeaponMountSprite"]
-rotation = 1.5708
 
 [node name="EffectiveRange" type="Area2D" parent="."]
 collision_layer = 0

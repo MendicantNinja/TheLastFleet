@@ -3,10 +3,9 @@ class_name Ship
 
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
-@onready var ShipCollisionShape = $Area2D/CollisionShape2D
-@onready var RepathArea = $Area2D
+@onready var RepathArea = $RepathArea
+@onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
-@onready var CollisionShape = $CollisionPolygon2D
 @onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
@@ -21,7 +20,6 @@ var hull_integrity: float = 0.0
 var is_friendly: bool = false
 
 # Used for targeting and weapons.
-var available_targets: Dictionary = {}
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
@@ -40,19 +38,25 @@ func _ready() -> void:
 	hull_integrity = ship_hull.hull_integrity
 	ShipSprite.self_modulate = settings.player_color
 	
+	var repath_shape: Shape2D = CircleShape2D.new()
+	repath_shape.radius = ShipNavigationAgent.radius
+	RepathShape.shape = repath_shape
 	RepathArea.collision_layer = collision_layer
 	RepathArea.collision_mask = collision_mask
 	
 	if collision_layer == 1: # simplifies some things but definitely not a permanent solution
 		is_friendly = true
+		rotation -= PI/2
+	else:
+		rotation += PI/2
 	
 	#Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:
 			all_weapons.append(child)
-			child.detection_parameters(collision_mask)
-			child.effective_range.body_entered.connect(_on_EffectiveRange_body_entered.bind(child))
-			child.effective_range.body_exited.connect(_on_EffectiveRange_body_entered.bind(child))
+			child.detection_parameters(collision_mask, is_friendly, get_rid())
+			#child.effective_range.body_entered.connect(_on_EffectiveRange_body_entered.bind(child))
+			#child.effective_range.body_exited.connect(_on_EffectiveRange_body_entered.bind(child))
 	for i in range(all_weapons.size()):
 		# Temporary hack to test weapons so that the mounts aren't empty.
 		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
@@ -122,39 +126,28 @@ func update_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.set_auto_aim()
 
-#func face_weapon(weapon_slot: WeaponSlot, target_position: Vector2) -> void:
-	#var weapon_transform: Transform2D = weapon_slot.global_transform
-	#var weapon_scale: Vector2 = weapon_slot.scale
-	#var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
-	#var local_origin: Vector2 = weapon_slot.transform.origin
-	#transform_look_at.origin = local_origin
-	#transform_look_at = transform_look_at.scaled_local(weapon_scale)
-	#weapon_slot.transform = weapon_slot.transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
+#func _on_EffectiveRange_body_entered(body: Node2D, weapon_slot: WeaponSlot) -> void:
+	#if body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
+		#return # ignore obstacle and projectile layers, respectively
+	#if is_friendly and body.is_friendly: 
+		#return # ignore friendly ships (player)
+	#if body == self: 
+		#return # ignore any overlap with other weapon slots
+	#if body.get_collision_layer() == collision_layer:
+		#return
+	#var raycast_query: Dictionary = collision_raycast(weapon_slot.global_position, body.global_position, 7, false, true)
+	#var collider_id: int = raycast_query["collider_id"]
+	#if raycast_query.is_empty():
+		#return # ignore if no ship is within line of sight (yet)
+	#if raycast_query["collider"].get_collision_layer_value(2):
+		#return # ignore if an obstacle is in the way
+	#if collider_id == weapon_slot.target_ship_id or collider_id == weapon_slot.any_ship_id:
+		#return
+	#print("%s acquired %s" % [name, body.name])
+	#weapon_slot.update_target_parameters(collider_id, body.global_position)
 
-func _on_EffectiveRange_body_entered(body: Node2D, weapon_slot: WeaponSlot) -> void:
-	if body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
-		return # ignore obstacle and projectile layers, respectively
-	if is_friendly and body.is_friendly: 
-		return # ignore friendly ships (player)
-	if body == self: 
-		return # ignore any overlap with other weapon slots
-	if body.get_collision_layer() == collision_layer:
-		return
-	
-	var raycast_query: Dictionary = collision_raycast(weapon_slot.global_position, body.global_position, 7, false, true)
-	var collider_id: int = raycast_query["collider_id"]
-	if raycast_query.is_empty():
-		return # ignore if no ship is within line of sight (yet)
-	if raycast_query["collider"].get_collision_layer_value(2):
-		return # ignore if an obstacle is in the way
-	if not available_targets.has(raycast_query["collider_id"]):
-		available_targets[raycast_query["collider_id"]] = body.ship_stats
-	
-	weapon_slot.update_target_parameters(is_friendly, collider_id, body.global_position)
-
-func _on_EffectiveRange_body_exited(body: Node2D) -> void:
-	
-	pass
+#func _on_EffectiveRange_body_exited(body: Node2D) -> void:
+	#pass
 #ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 #`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
  #8 `88b.    8      .8"888.       `888.   .8'    888  888               .8"888.          888       888  888      888  8 `88b.    8  

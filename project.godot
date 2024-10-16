@@ -23,15 +23,16 @@ settings="*res://Scripts/AutoloadScripts/settings.gd"
 [debug]
 
 shapes/navigation/edge_connection_color=Color(1, 0, 1, 0.427451)
-shapes/navigation/geometry_edge_color=Color(0.501961, 1, 1, 0.305882)
+shapes/navigation/geometry_edge_color=Color(0.501961, 1, 1, 0.301961)
+shapes/navigation/geometry_face_color=Color(0.501961, 1, 1, 0.254902)
 shapes/navigation/link_connection_color=Color(1, 0.501961, 1, 0.470588)
 shapes/navigation/agent_path_color=Color(1, 0, 0, 0.54902)
 shapes/avoidance/agents_radius_color=Color(1, 1, 0, 0.301961)
 shapes/avoidance/obstacles_radius_color=Color(1, 0.501961, 0, 0.376471)
 shapes/avoidance/obstacles_static_edge_pushin_color=Color(1, 0, 0, 0.635294)
-shapes/collision/shape_color=Color(0, 0.6, 0.701961, 0.192157)
-shapes/collision/contact_color=Color(1, 0.2, 0.101961, 0.54902)
-shapes/paths/geometry_color=Color(0.101961, 1, 0.701961, 0.223529)
+shapes/collision/shape_color=Color(1, 1, 0, 1)
+shapes/collision/contact_color=Color(1, 0.2, 0.101961, 1)
+shapes/paths/geometry_color=Color(0.101961, 1, 0.701961, 0.188235)
 
 [display]
 

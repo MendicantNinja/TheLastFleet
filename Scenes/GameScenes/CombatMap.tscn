@@ -46,19 +46,19 @@ texture = ExtResource("1_1p2qq")
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
 [node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(300, 600)
+position = Vector2(300, 900)
 collision_layer = 1
 
 [node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(900, 500)
+position = Vector2(1200, 200)
 collision_layer = 1
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(200, 200)
+position = Vector2(300, 500)
 collision_layer = 4
 input_pickable = false
 
 [node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(600, 200)
+position = Vector2(1200, 700)
 collision_layer = 4
 input_pickable = false
