@@ -2,10 +2,11 @@ extends Node2D
 class_name WeaponSlot
 
 # Nodes
-@onready var weapon_mount_image: Sprite2D = $WeaponMountSprite 
-@onready var weapon_image: Sprite2D = $WeaponMountSprite/WeaponSprite
+@onready var weapon_mount_image: Sprite2D = $WeaponNode/WeaponMountSprite
+@onready var weapon_image: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
 @onready var effective_range_shape: CollisionShape2D = $EffectiveRange/EffectiveRangeShape
 @onready var effective_range: Area2D = $EffectiveRange
+@onready var weapon_node: Node2D = $WeaponNode
 
 # Important Stuff
 #@export var assigned_ship: Ship
@@ -62,7 +63,6 @@ func _ready():
 	var new_shape: Shape2D = CircleShape2D.new()
 	new_shape.radius = weapon.range
 	effective_range_shape.shape = new_shape
-	
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
 	set_weapon_size_and_color() 
@@ -147,6 +147,18 @@ func _on_EffectiveRange_entered(body) -> void:
 	elif killcast and not target_engaged and any_ship_id == 0:
 		focus_aim = body.global_position
 		any_ship_id = collider_id
+	var normal = raycast_query["normal"]
+	var killcast_direction = Vector2(1, 0)
+	killcast.target_position = killcast_direction * 50
+	var parent_name = get_parent().name
+	print()
+	print("%s %s global transform:\n%s" % [parent_name, name, global_transform])
+	print("%s %s transform:\n%s" % [parent_name, name, transform])
+	print("%s raycast global transform:\n%s" % [parent_name, killcast.global_transform])
+	print("%s raycast transform:\n%s" % [parent_name, killcast.transform])
+	print("focus aim:\n", focus_aim)
+	# SOLVE WHERE FOCUS AIM ACTUALLY IS RELATIVE TO THE ORIGIN OF THE WEAPON SLOT
+	# UNTIL THEN, SUCK EGGS
 
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: int = body.get_rid().get_id()
@@ -186,19 +198,17 @@ func create_killcast() -> RayCast2D:
 	return new_killcast
 
 func face_weapon(target_position: Vector2) -> Transform2D:
-	var weapon_transform: Transform2D = transform
-	#var dot_product = weapon_transform.y.dot()
-	var weapon_scale: Vector2 = scale
-	var transform_look_at: Transform2D = weapon_transform.looking_at(target_position)
-	var local_origin: Vector2 = transform.origin
-	transform_look_at.origin = local_origin
-	transform_look_at = transform_look_at.scaled_local(weapon_scale)
-	return transform_look_at
+	var weapon_local_transform: Transform2D = weapon_node.transform
+	var weapon_global_transform: Transform2D = weapon_node.global_transform
+	var weapon_scale: Vector2 = weapon_node.scale
+	var local_transform_look_at: Transform2D = weapon_local_transform.looking_at(target_position)
+	var global_look_at: Transform2D = weapon_global_transform.looking_at(target_position)
+	global_look_at.origin = weapon_local_transform.origin
+	return global_look_at
 
 func _physics_process(delta) -> void:
 	if killcast and auto_aim:
-		transform = transform.interpolate_with(face_weapon(focus_aim), delta)
-		killcast.target_position.y = abs(focus_aim.length()) * weapon_mount_image.scale.x
+		pass
 
 func update_killcast() -> void:
 	pass
