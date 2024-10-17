@@ -1,11 +1,21 @@
 extends Node2D
 
 @onready var Camera = $Camera2D
-@onready var FleetDeployment = %FleetDeployment
-
+@onready var FleetDeploymentPanel = %FleetDeploymentPanel
+@onready var FleetDeploymentList = %FleetDeploymentList
+@onready var All = %All
+@onready var Deploy = %Deploy
+@onready var Cancel = %Cancel
 
 func _ready() -> void:
-	FleetDeployment.setup_deployment_screen()
+	FleetDeploymentList.setup_deployment_screen()
+	#settings.swizzle(FleetDeploymentList)
+	settings.swizzle(FleetDeploymentPanel)
+	settings.swizzle(All)
+	settings.swizzle(Deploy)
+	settings.swizzle(Cancel)
+
+
 
 func _unhandled_input(event) -> void:
 	if event is InputEventMouseButton:
@@ -17,7 +27,7 @@ func _unhandled_input(event) -> void:
 				Camera.zoom -= Vector2(0.1, 0.1)
 	elif event is InputEventKey:
 		if (event.keycode == KEY_G and event.is_pressed()):
-			if FleetDeployment.visible == false:
-				FleetDeployment.visible == true
-			elif FleetDeployment.visible == true:
-				FleetDeployment.visible == false
+			if FleetDeploymentPanel.visible == false:
+				FleetDeploymentPanel.visible = true
+			elif FleetDeploymentPanel.visible == true:
+				FleetDeploymentPanel.visible = false

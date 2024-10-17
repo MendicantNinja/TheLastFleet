@@ -35,7 +35,7 @@ func move_ship(to_index: int, from_index: int) -> void:
 func add_item(item: ItemSlot) -> void:
 	fleet_stats.inventory.append(item)
 
-func remove_item(item_index: int, number_of_items: float) -> void:
+func remove_item(item_index: int) -> void:
 	fleet_stats.inventory.remove_at(item_index)
 
 func move_item(to_index: int, from_index: int) -> void:

@@ -27,13 +27,13 @@ var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
 var ship_select: bool = false
 
-# Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data.
-func _init(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
+# Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready.
+func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
 
 func _ready() -> void:
-	#if ship_stats == null:
-		#ship_stats = ShipStats.new(data.ship_type_enum.TEST)
+	if ship_stats == null:
+		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
 	
 	var ship_hull = ship_stats.ship_hull

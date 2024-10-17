@@ -65,3 +65,7 @@ D={
 avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.165656, 0.165656, 0.165656, 1)

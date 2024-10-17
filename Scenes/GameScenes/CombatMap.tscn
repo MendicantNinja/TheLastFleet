@@ -1,9 +1,15 @@
-[gd_scene load_steps=7 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=11 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="2_r4t6u"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ensw7"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_la3a5"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
+bg_color = Color(0, 0, 0, 0.588235)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(9973.86, 9797, 47.0313, 9797, 52.9688, 49, 9947.14, 49)
@@ -19,40 +25,126 @@ script = ExtResource("1_x40el")
 
 [node name="FleetDeploymentPanel" type="Panel" parent="."]
 unique_name_in_owner = true
-z_index = 5
-offset_left = 342.0
-offset_top = 363.0
-offset_right = 1368.0
-offset_bottom = 847.0
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = 443.0
+offset_top = 300.0
+offset_right = 1469.0
+offset_bottom = 784.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_lpbtk")
 
-[node name="FleetDeployment" type="ItemList" parent="FleetDeploymentPanel"]
+[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeploymentPanel"]
 unique_name_in_owner = true
 layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -510.0
-offset_right = 514.0
-offset_bottom = 389.0
-grow_horizontal = 2
-select_mode = 1
-allow_reselect = true
-allow_search = false
-max_columns = 10
-fixed_icon_size = Vector2i(32, 32)
+offset_left = 14.0
+offset_top = 5.0
+offset_right = 1010.0
+offset_bottom = 376.0
+theme_override_constants/h_separation = 30
+columns = 10
 script = ExtResource("2_r4t6u")
 
-[node name="Deploy" type="TextureButton" parent="FleetDeploymentPanel"]
-unique_name_in_owner = true
+[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeploymentPanel"]
 layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 80.0
+offset_top = 378.0
+offset_right = 1836.0
+offset_bottom = 478.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/separation = 128
 
-[node name="Cancel(G)" type="TextureButton" parent="FleetDeploymentPanel"]
+[node name="Deploy" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
 unique_name_in_owner = true
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("4_ensw7")
+texture_hover = ExtResource("5_la3a5")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/Deploy"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_lpbtk")
+bbcode_enabled = true
+text = "[center]Deploy"
+scroll_active = false
+
+[node name="All" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("4_ensw7")
+texture_hover = ExtResource("5_la3a5")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/All"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_lpbtk")
+bbcode_enabled = true
+text = "[center]All"
+scroll_active = false
+
+[node name="Cancel" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("4_ensw7")
+texture_hover = ExtResource("5_la3a5")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/Cancel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_lpbtk")
+bbcode_enabled = true
+text = "[center]Cancel (G)"
+scroll_active = false
+
+[node name="BlackenBackground" type="Panel" parent="FleetDeploymentPanel"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 limit_left = 0
@@ -84,6 +176,7 @@ position = Vector2(-1638, 2762)
 texture = ExtResource("1_1p2qq")
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+position = Vector2(42, -1)
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
