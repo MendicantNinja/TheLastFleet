@@ -56,9 +56,7 @@ collision_layer = 1
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
 position = Vector2(300, 500)
 collision_layer = 4
-input_pickable = false
 
 [node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
 position = Vector2(1200, 700)
 collision_layer = 4
-input_pickable = false

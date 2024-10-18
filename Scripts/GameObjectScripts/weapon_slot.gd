@@ -141,24 +141,8 @@ func _on_EffectiveRange_entered(body) -> void:
 		killcast = create_killcast()
 		add_child(killcast)
 	
-	if killcast and collider_id == target_ship_id:
-		focus_aim = body.global_position
-		target_engaged = true
-	elif killcast and not target_engaged and any_ship_id == 0:
-		focus_aim = body.global_position
-		any_ship_id = collider_id
-	var normal = raycast_query["normal"]
-	var killcast_direction = Vector2(1, 0)
-	killcast.target_position = killcast_direction * 50
-	var parent_name = get_parent().name
-	print()
-	print("%s %s global transform:\n%s" % [parent_name, name, global_transform])
-	print("%s %s transform:\n%s" % [parent_name, name, transform])
-	print("%s raycast global transform:\n%s" % [parent_name, killcast.global_transform])
-	print("%s raycast transform:\n%s" % [parent_name, killcast.transform])
-	print("focus aim:\n", focus_aim)
-	# SOLVE WHERE FOCUS AIM ACTUALLY IS RELATIVE TO THE ORIGIN OF THE WEAPON SLOT
-	# UNTIL THEN, SUCK EGGS
+	focus_aim = to_local(body.global_position)
+	killcast.target_position = focus_aim
 
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: int = body.get_rid().get_id()
@@ -198,17 +182,19 @@ func create_killcast() -> RayCast2D:
 	return new_killcast
 
 func face_weapon(target_position: Vector2) -> Transform2D:
-	var weapon_local_transform: Transform2D = weapon_node.transform
-	var weapon_global_transform: Transform2D = weapon_node.global_transform
-	var weapon_scale: Vector2 = weapon_node.scale
-	var local_transform_look_at: Transform2D = weapon_local_transform.looking_at(target_position)
-	var global_look_at: Transform2D = weapon_global_transform.looking_at(target_position)
-	global_look_at.origin = weapon_local_transform.origin
-	return global_look_at
+	var new_transform = weapon_node.transform.looking_at(focus_aim)
+	var scale_transform = weapon_node.scale
+	new_transform = new_transform.scaled(weapon_node.scale)
+	return new_transform
 
 func _physics_process(delta) -> void:
 	if killcast and auto_aim:
-		pass
+		weapon_node.transform = face_weapon(killcast.target_position)
+		update_killcast()
 
 func update_killcast() -> void:
-	pass
+	var collider = killcast.get_collider()
+	if not collider:
+		return
+	focus_aim = to_local(collider.global_position)
+	killcast.target_position = focus_aim

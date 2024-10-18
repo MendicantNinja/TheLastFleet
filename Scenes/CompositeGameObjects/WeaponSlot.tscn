@@ -14,10 +14,8 @@ weapon_mount = ExtResource("3_d4mge")
 [node name="WeaponNode" type="Node2D" parent="."]
 
 [node name="WeaponMountSprite" type="Sprite2D" parent="WeaponNode"]
-visible = false
 
 [node name="WeaponSprite" type="Sprite2D" parent="WeaponNode/WeaponMountSprite"]
-visible = false
 rotation = 1.5708
 
 [node name="EffectiveRange" type="Area2D" parent="."]
