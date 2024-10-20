@@ -60,6 +60,5 @@ debug_path_custom_line_width = 3.0
 [node name="NavigationTimer" type="Timer" parent="."]
 wait_time = 3.0
 
-[connection signal="input_event" from="." to="." method="_on_input_event"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

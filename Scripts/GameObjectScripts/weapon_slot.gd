@@ -29,15 +29,18 @@ class_name WeaponSlot
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
 var auto_aim: bool = false
 var auto_fire: bool = false
+var can_fire: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
 
-var owner_rid: RID
 var targets_acquired: Dictionary = {}
 var killcast: RayCast2D = null
 var target_ship_id: int = 0
 var any_ship_id: int = 0
 var focus_aim: Vector2 = Vector2.ZERO
+var arc_in_radians: float = 0.0
+var default_direction: Transform2D
+var owner_rid: RID
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -46,9 +49,7 @@ func fire(ship_id: int) -> void:
 			#weapon.create_projectile()
 		var projectile: Area2D = weapon.create_projectile().instantiate()
 		projectile.assign_stats(weapon, ship_id)
-		projectile.global_position = global_position + Vector2(0, 0) # Should come out of the edge/front of the weapon.
-		projectile.global_rotation = rotation
-		# Add random spread based on accuracy. Etc. 
+		projectile.global_transform = weapon_node.global_transform
 		get_tree().root.add_child(projectile)
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
@@ -59,13 +60,21 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
+	z_index = 1
 	
+	if position.y > 0:
+		weapon_node.transform = weapon_node.transform.rotated(PI/2)
+	elif position.y < 0:
+		weapon_node.transform = weapon_node.transform.rotated(-PI/2)
+	default_direction = weapon_node.transform
+	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2)
+
 	var new_shape: Shape2D = CircleShape2D.new()
 	new_shape.radius = weapon.range
 	effective_range_shape.shape = new_shape
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
-	set_weapon_size_and_color() 
+	set_weapon_size_and_color()
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
 	effective_range.collision_mask = mask
@@ -141,7 +150,15 @@ func _on_EffectiveRange_entered(body) -> void:
 		killcast = create_killcast()
 		add_child(killcast)
 	
-	focus_aim = to_local(body.global_position)
+	var ship_id = body.get_rid().get_id()
+	if killcast and target_ship_id == 0:
+		focus_aim = to_local(body.global_position)
+		any_ship_id = ship_id
+	elif killcast and target_ship_id == ship_id:
+		target_engaged = true
+		focus_aim = to_local(body.global_position)
+	
+	targets_acquired[ship_id] = body.hull_integrity
 	killcast.target_position = focus_aim
 
 func _on_EffectiveRange_exited(body) -> void:
@@ -185,12 +202,21 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	var new_transform = weapon_node.transform.looking_at(focus_aim)
 	var scale_transform = weapon_node.scale
 	new_transform = new_transform.scaled(weapon_node.scale)
+	var dot_product = default_direction.x.dot(new_transform.x)
+	var angle_to_node = acos(dot_product)
+	can_fire = true
+	if angle_to_node > arc_in_radians:
+		can_fire = false
+		return default_direction
 	return new_transform
 
 func _physics_process(delta) -> void:
-	if killcast and auto_aim:
-		weapon_node.transform = face_weapon(killcast.target_position)
+	if killcast:
 		update_killcast()
+	if killcast and (auto_aim or auto_fire):
+		weapon_node.transform = face_weapon(killcast.target_position)
+	if killcast and auto_fire and can_fire:
+		fire(owner_rid.get_id())
 
 func update_killcast() -> void:
 	var collider = killcast.get_collider()

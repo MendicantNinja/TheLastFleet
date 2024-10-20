@@ -1,21 +1,20 @@
-[gd_scene load_steps=5 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=6 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
+[ext_resource type="PackedScene" uid="uid://bc321u3k51r4u" path="res://Scenes/UtilityScenes/CombatCamera.tscn" id="2_cjso1"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(9947.13, 48.9531, 9973.86, 9796.98, 8.14063, 9794.01, 36.8516, 39.0391)
+vertices = PackedVector2Array(4960.07, 43.9531, 4967.92, 4973, 26.1094, 4973, 36.8906, 39.0391)
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(-13, -11, -42, 9844, 10024, 9847, 9997, -1)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-13, -11, -24, 5023, 5018, 5023, 5010, -6)])
 agent_radius = 50.0
 
 [node name="CombatMap" type="Node2D"]
 script = ExtResource("1_x40el")
 
-[node name="Camera2D" type="Camera2D" parent="."]
-limit_left = 0
-limit_top = 0
+[node name="CombatCamera" parent="." instance=ExtResource("2_cjso1")]
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 self_modulate = Color(1, 0, 0.266666, 1)
@@ -50,7 +49,7 @@ position = Vector2(300, 900)
 collision_layer = 1
 
 [node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(1200, 200)
+position = Vector2(3000, 200)
 collision_layer = 1
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
@@ -58,5 +57,5 @@ position = Vector2(300, 500)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(1200, 700)
+position = Vector2(3000, 700)
 collision_layer = 4

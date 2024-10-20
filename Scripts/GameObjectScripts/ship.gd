@@ -20,6 +20,7 @@ var hull_integrity: float = 0.0
 var is_friendly: bool = false
 
 # Used for targeting and weapons.
+var mouse_hover: bool = false
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
@@ -66,6 +67,8 @@ func _ready() -> void:
 		# In the future, weapons will automatically be assigned from the already existing weapons in 
 		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
 		# everything is a railgun.
+	
+	self.input_event.connect(_on_input_event)
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -124,27 +127,7 @@ func update_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 
 func update_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
-		weapon_slot.set_auto_aim()
-
-#func _on_EffectiveRange_body_entered(body: Node2D, weapon_slot: WeaponSlot) -> void:
-	#if body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
-		#return # ignore obstacle and projectile layers, respectively
-	#if is_friendly and body.is_friendly: 
-		#return # ignore friendly ships (player)
-	#if body == self: 
-		#return # ignore any overlap with other weapon slots
-	#if body.get_collision_layer() == collision_layer:
-		#return
-	#var raycast_query: Dictionary = collision_raycast(weapon_slot.global_position, body.global_position, 7, false, true)
-	#var collider_id: int = raycast_query["collider_id"]
-	#if raycast_query.is_empty():
-		#return # ignore if no ship is within line of sight (yet)
-	#if raycast_query["collider"].get_collision_layer_value(2):
-		#return # ignore if an obstacle is in the way
-	#if collider_id == weapon_slot.target_ship_id or collider_id == weapon_slot.any_ship_id:
-		#return
-	#print("%s acquired %s" % [name, body.name])
-	#weapon_slot.update_target_parameters(collider_id, body.global_position)
+		weapon_slot.set_auto_fire()
 
 #func _on_EffectiveRange_body_exited(body: Node2D) -> void:
 	#pass
