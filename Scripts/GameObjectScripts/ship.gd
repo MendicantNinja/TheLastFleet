@@ -30,6 +30,9 @@ var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
 var ship_select: bool = false
 
+# Custom signals.
+signal ship_targeted(ship_id)
+
 func _ready() -> void:
 	ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
@@ -46,9 +49,11 @@ func _ready() -> void:
 	RepathArea.collision_mask = collision_mask
 	
 	if collision_layer == 1: # simplifies some things but definitely not a permanent solution
+		add_to_group("friendly")
 		is_friendly = true
 		rotation -= PI/2
 	else:
+		add_to_group("enemy")
 		rotation += PI/2
 	
 	#Assigns weapon slots based on what's in the ship scene.
@@ -69,6 +74,9 @@ func _ready() -> void:
 		# everything is a railgun.
 	
 	self.input_event.connect(_on_input_event)
+	self.mouse_entered.connect(_on_mouse_entered)
+	self.mouse_exited.connect(_on_mouse_exited)
+	
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -80,30 +88,40 @@ func _ready() -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton and is_friendly:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			ship_select = false # deselect ship by right clicking anywhere
-	elif event is InputEventKey:
-		if (event.keycode == KEY_F and event.is_pressed()) and ship_select:
+	elif event is InputEventKey and is_friendly:
+		if (event.keycode == KEY_F and event.pressed) and ship_select:
 			fire_weapon_slot(all_weapons[0])
-		elif (event.keycode == KEY_Q and event.is_pressed()) and ship_select:
+		elif (event.keycode == KEY_Q and event.pressed) and ship_select:
 			fire_weapon_system(all_weapons)
-		elif event.keycode == KEY_C and event.pressed and ship_select:
+		elif (event.keycode == KEY_C and event.pressed) and ship_select:
 			update_auto_aim(all_weapons)
-		elif event.keycode == KEY_V and event.pressed and ship_select:
+		elif (event.keycode == KEY_V and event.pressed) and ship_select:
 			update_auto_fire(all_weapons)
+	elif event is InputEventKey and not is_friendly: # for non-player/enemy ships
+		if (event.keycode == KEY_R and event.pressed) and mouse_hover:
+			var target_ship_id = get_rid()
+			emit_signal("ship_targeted", get_rid())
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	if event is InputEventMouseButton:
+	if event is InputEventMouseButton and is_friendly:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:
 			ship_select = true # select ship
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			ship_select = false # deselect ship
+
+func _on_mouse_entered() -> void:
+	mouse_hover = true
+
+func _on_mouse_exited() -> void:
+	mouse_hover = false
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -112,6 +130,13 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 	#`888.8'  `888.8'      888    "      .88ooo8888.    888         888      888  8     `88b.8       `"Y88b 
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
+
+func _on_ship_targeted(ship_id: RID) -> void:
+	if not ship_select:
+		return
+	
+	for weapon in all_weapons:
+		weapon.set_target_ship(ship_id)
 
 func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:

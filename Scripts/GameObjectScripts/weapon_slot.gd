@@ -33,24 +33,25 @@ var can_fire: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
 
-var targets_acquired: Dictionary = {}
+var available_targets: Dictionary = {}
 var killcast: RayCast2D = null
-var target_ship_id: int = 0
-var any_ship_id: int = 0
-var focus_aim: Vector2 = Vector2.ZERO
+var target_ship_position: Vector2 = Vector2.ZERO
+var target_ship_id: RID
+var current_target_id: RID
 var arc_in_radians: float = 0.0
 var default_direction: Transform2D
 var owner_rid: RID
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
-	if weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
-		#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
-			#weapon.create_projectile()
-		var projectile: Area2D = weapon.create_projectile().instantiate()
-		projectile.assign_stats(weapon, ship_id)
-		projectile.global_transform = weapon_node.global_transform
-		get_tree().root.add_child(projectile)
+	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+		return
+	#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
+		#weapon.create_projectile()
+	var projectile: Area2D = weapon.create_projectile().instantiate()
+	projectile.assign_stats(weapon, ship_id)
+	projectile.global_transform = weapon_node.global_transform
+	get_tree().root.add_child(projectile)
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
@@ -67,7 +68,7 @@ func _ready():
 	elif position.y < 0:
 		weapon_node.transform = weapon_node.transform.rotated(-PI/2)
 	default_direction = weapon_node.transform
-	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2)
+	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
 
 	var new_shape: Shape2D = CircleShape2D.new()
 	new_shape.radius = weapon.range
@@ -94,6 +95,9 @@ func set_auto_fire() -> void:
 		auto_fire = true
 	else:
 		auto_fire = false
+
+func set_target_ship(ship_id: RID) -> void:
+	target_ship_id = ship_id
 
 func set_weapon_size_and_color():
 	weapon_mount_image.modulate = settings.player_color
@@ -142,55 +146,39 @@ func _on_EffectiveRange_entered(body) -> void:
 	if raycast_query["collider"].get_collision_layer_value(2):
 		return # ignore if an obstacle is in the way
 	
-	var collider_id: int = raycast_query["rid"].get_id()
-	if not targets_acquired.has(collider_id):
-		targets_acquired[collider_id] = "lol"
-	
 	if not killcast:
 		killcast = create_killcast()
 		add_child(killcast)
 	
-	var ship_id = body.get_rid().get_id()
-	if killcast and target_ship_id == 0:
-		focus_aim = to_local(body.global_position)
-		any_ship_id = ship_id
+	var ship_id = body.get_rid()
+	if killcast and not target_engaged and current_target_id == RID():
+		killcast.target_position = to_local(body.global_position)
+		current_target_id = ship_id
 	elif killcast and target_ship_id == ship_id:
+		killcast.target_position = to_local(body.global_position)
 		target_engaged = true
-		focus_aim = to_local(body.global_position)
+	killcast.force_raycast_update()
 	
-	targets_acquired[ship_id] = body.hull_integrity
-	killcast.target_position = focus_aim
+	if not available_targets.has(ship_id):
+		available_targets[ship_id] = body
+
 
 func _on_EffectiveRange_exited(body) -> void:
-	var ship_id: int = body.get_rid().get_id()
-	if targets_acquired.has(ship_id):
-		targets_acquired.erase(ship_id)
+	var ship_id: RID = body.get_rid()
+	if available_targets.has(ship_id):
+		available_targets.erase(ship_id)
 	
-	if ship_id == any_ship_id:
-		any_ship_id = 0
-	elif ship_id == target_ship_id:
+	if ship_id == target_ship_id:
 		target_engaged = false
 	
-	if killcast and targets_acquired.is_empty():
+	if killcast and available_targets.is_empty():
 		killcast.queue_free()
 		killcast = null
-		focus_aim = Vector2.ZERO
+		current_target_id = RID()
 	elif killcast:
-		# do something related to acquiring another target (if possible)
-		pass
+		acquire_new_target()
 
-# Called down from ship.gd for whenever the player targets a specific ship.
-func update_target_parameters(ship_id: int, ship_position: Vector2) -> void:
-	if target_ship_id == ship_id:
-		return
-	
-	focus_aim = ship_position
-	target_ship_id = ship_id
-	
-	if not killcast:
-		killcast = create_killcast()
-		add_child(killcast)
-
+# Instance a new raycast for target acquisition.
 func create_killcast() -> RayCast2D:
 	var new_killcast: RayCast2D = RayCast2D.new()
 	new_killcast.collide_with_bodies = true
@@ -198,29 +186,57 @@ func create_killcast() -> RayCast2D:
 	new_killcast.collision_mask = 7
 	return new_killcast
 
+func acquire_new_target() -> void:
+	print(get_parent().name)
+	print(name)
+	print(available_targets.size())
+	var tmp_avat: Dictionary = available_targets
+	if tmp_avat.has(current_target_id):
+		print(current_target_id)
+		tmp_avat.erase(current_target_id)
+	var ship_ids: Array = tmp_avat.keys()
+	var taq_range: int = ship_ids.size() - 1
+	var rand_key_number: int = randi_range(0, taq_range)
+	var new_target_id = ship_ids[rand_key_number]
+	var ship_instance = tmp_avat[new_target_id]
+	var test_position = to_local(ship_instance.global_position)
+	var test_transform = face_weapon(test_position)
+	if can_fire == true:
+		killcast.target_position = test_position
+		killcast.force_raycast_update()
+
 func face_weapon(target_position: Vector2) -> Transform2D:
-	var new_transform = weapon_node.transform.looking_at(focus_aim)
-	var scale_transform = weapon_node.scale
-	new_transform = new_transform.scaled(weapon_node.scale)
-	var dot_product = default_direction.x.dot(new_transform.x)
-	var angle_to_node = acos(dot_product)
+	var target_transform: Transform2D = weapon_node.transform.looking_at(target_position)
+	var scale_transform: Vector2 = weapon_node.scale
+	target_transform = target_transform.scaled(scale_transform)
+	var dot_product: float = default_direction.x.dot(target_transform.x)
+	var angle_to_node: float = acos(dot_product)
 	can_fire = true
-	if angle_to_node > arc_in_radians:
+	if angle_to_node > arc_in_radians or dot_product < 0:
+		if get_parent().name == &"PlayerShip0":
+			pass
 		can_fire = false
 		return default_direction
-	return new_transform
+	return target_transform
 
 func _physics_process(delta) -> void:
 	if killcast:
 		update_killcast()
 	if killcast and (auto_aim or auto_fire):
-		weapon_node.transform = face_weapon(killcast.target_position)
+		var face_direction: Transform2D = face_weapon(killcast.target_position)
+		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	if killcast and auto_fire and can_fire:
 		fire(owner_rid.get_id())
+	elif killcast and available_targets.size() > 1 and (auto_aim or auto_fire) and not can_fire:
+		acquire_new_target()
 
 func update_killcast() -> void:
 	var collider = killcast.get_collider()
-	if not collider:
+	if not collider is Ship: # Do not shoot at obstacles
+		can_fire = false
 		return
-	focus_aim = to_local(collider.global_position)
-	killcast.target_position = focus_aim
+	if collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+		can_fire = false
+		return
+	current_target_id = collider.get_rid()
+	killcast.target_position = to_local(collider.global_position)
