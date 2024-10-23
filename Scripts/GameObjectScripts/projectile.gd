@@ -27,7 +27,15 @@ func assign_stats(weapon: Weapon, id: int) -> void:
 	projectile_damage = weapon.damage_per_shot
 	projectile_speed = weapon.projectile_speed
 	projectile_range = weapon.range
+	print(projectile_range)
 	ship_id = id
+	var radian_accuracy = deg_to_rad(weapon.accuracy)
+	var lower_limit = -radian_accuracy
+	var upper_limit = radian_accuracy
+	var spread: Transform2D = transform
+	var rand_rotation: float = randi_range(-1, 1) * randf_range(lower_limit, upper_limit)
+	spread = spread.rotated_local(rand_rotation)
+	transform = spread
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
 func _on_Projectile_collision(body) -> void:

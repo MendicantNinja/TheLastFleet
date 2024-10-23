@@ -49,8 +49,8 @@ func fire(ship_id: int) -> void:
 	#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
 		#weapon.create_projectile()
 	var projectile: Area2D = weapon.create_projectile().instantiate()
-	projectile.assign_stats(weapon, ship_id)
 	projectile.global_transform = weapon_node.global_transform
+	projectile.assign_stats(weapon, ship_id)
 	get_tree().root.add_child(projectile)
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
@@ -69,13 +69,15 @@ func _ready():
 		weapon_node.transform = weapon_node.transform.rotated(-PI/2)
 	default_direction = weapon_node.transform
 	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
-
-	var new_shape: Shape2D = CircleShape2D.new()
-	new_shape.radius = weapon.range
-	effective_range_shape.shape = new_shape
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
 	set_weapon_size_and_color()
+
+func set_weapon_slot(p_weapon: Weapon) -> void:
+	weapon = p_weapon
+	var new_shape: Shape2D = CircleShape2D.new()
+	new_shape.radius = weapon.range
+	effective_range_shape.shape = new_shape
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
 	effective_range.collision_mask = mask
@@ -96,6 +98,7 @@ func set_auto_fire() -> void:
 	else:
 		auto_fire = false
 
+# Assigns the RID of the ship the player targets to the variable target_ship_id.
 func set_target_ship(ship_id: RID) -> void:
 	target_ship_id = ship_id
 
@@ -128,6 +131,7 @@ func set_weapon_size_and_color():
 		#_:
 			#print("Unknown weapon type.")
 
+# Creates the context for a weapon's given situation.
 func _on_EffectiveRange_entered(body) -> void:
 	if body.get_rid() == owner_rid: 
 		return # ignore any overlap with other weapon slots
@@ -162,6 +166,8 @@ func _on_EffectiveRange_entered(body) -> void:
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
 
+# Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
+# the effective range and the current combat situation.
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
 	if available_targets.has(ship_id):
@@ -170,14 +176,18 @@ func _on_EffectiveRange_exited(body) -> void:
 	if ship_id == target_ship_id:
 		target_engaged = false
 	
+	var find_new_target: bool = false
+	if current_target_id == ship_id:
+		current_target_id = RID()
+		find_new_target = true
+	
 	if killcast and available_targets.is_empty():
 		killcast.queue_free()
 		killcast = null
-		current_target_id = RID()
-	elif killcast:
+	elif killcast and find_new_target:
 		acquire_new_target()
 
-# Instance a new raycast for target acquisition.
+# Instance a new raycast anytime an "enemy" is within the generalized effective range.
 func create_killcast() -> RayCast2D:
 	var new_killcast: RayCast2D = RayCast2D.new()
 	new_killcast.collide_with_bodies = true
@@ -185,6 +195,9 @@ func create_killcast() -> RayCast2D:
 	new_killcast.collision_mask = 7
 	return new_killcast
 
+# If a weapon is not capable of firing on an existing target but more are around it,
+# this will try to find the nearest available target if it can. This function is
+# called every physics frame IF it still cannot find a valid target.
 func acquire_new_target() -> void:
 	var dupe_available_targets: Dictionary = available_targets.duplicate()
 	if dupe_available_targets.has(current_target_id):
@@ -200,6 +213,9 @@ func acquire_new_target() -> void:
 		killcast.target_position = test_position
 		killcast.force_raycast_update()
 
+# Returns a new transform to face the weapon in the direction of an "enemy" ship.
+# Returns the default transform which is the default direction it should face given nothing
+# is actually within its effective range.
 func face_weapon(target_position: Vector2) -> Transform2D:
 	var target_transform: Transform2D = weapon_node.transform.looking_at(target_position)
 	var scale_transform: Vector2 = weapon_node.scale
@@ -223,6 +239,9 @@ func _physics_process(delta) -> void:
 	elif killcast and not can_fire and (auto_aim or auto_fire) and available_targets.size() > 1:
 		acquire_new_target()
 
+# this function has two purposes:
+# A) updates the raycast every physics frame to track a ship's current position
+# B) checks to see if a ship the player targets is within the effective range of the weapon
 func update_killcast() -> void:
 	var collider = killcast.get_collider()
 	if not collider is Ship: # Do not shoot at obstacles

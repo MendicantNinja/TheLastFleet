@@ -61,18 +61,15 @@ func _ready() -> void:
 		if child is WeaponSlot:
 			all_weapons.append(child)
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
-			#child.effective_range.body_entered.connect(_on_EffectiveRange_body_entered.bind(child))
-			#child.effective_range.body_exited.connect(_on_EffectiveRange_body_entered.bind(child))
 	for i in range(all_weapons.size()):
 		# Temporary hack to test weapons so that the mounts aren't empty.
 		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
 		# assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be 
 		# null and cause errors.
-		all_weapons[i].weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
+		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
 		# In the future, weapons will automatically be assigned from the already existing weapons in 
 		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
 		# everything is a railgun.
-	
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
