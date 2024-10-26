@@ -18,7 +18,10 @@ var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
 var is_friendly: bool = false
-
+var manual_control: bool = false
+var rotate_angle: float = 0.0
+var move_direction: Vector2 = Vector2.ZERO
+var ship_origin: Vector2 = Vector2.ZERO
 # Used for targeting and weapons.
 var mouse_hover: bool = false
 
@@ -73,7 +76,6 @@ func _ready() -> void:
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
-	
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -86,22 +88,26 @@ func _ready() -> void:
 # Any generic input event.
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and is_friendly:
-		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
+		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select and not manual_control:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
-		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
+		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select and not manual_control:
 			ship_select = false # deselect ship by right clicking anywhere
 	elif event is InputEventKey and is_friendly:
-		if (event.keycode == KEY_F and event.pressed) and ship_select:
+		var rotate_key: Array = [KEY_Q, KEY_E]
+		var move_keys: Array = [KEY_W, KEY_A, KEY_S, KEY_D]
+		if (event.keycode == KEY_T and event.pressed) and ship_select:
+			toggle_manual_control()
+		if (event.keycode == KEY_F and event.pressed) and ship_select and manual_control:
 			fire_weapon_slot(all_weapons[0])
-		elif (event.keycode == KEY_Q and event.pressed) and ship_select:
+		elif (event.keycode == KEY_R and event.pressed) and ship_select and manual_control:
 			fire_weapon_system(all_weapons)
-		elif (event.keycode == KEY_C and event.pressed) and ship_select:
+		elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
 			update_auto_aim(all_weapons)
-		elif (event.keycode == KEY_V and event.pressed) and ship_select:
+		elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
 			update_auto_fire(all_weapons)
-	elif event is InputEventKey and not is_friendly: # for non-player/enemy ships
+	elif event is InputEventKey and not is_friendly and not manual_control: # for non-player/enemy ships
 		if (event.keycode == KEY_R and event.pressed) and mouse_hover:
 			var target_ship_id = get_rid()
 			emit_signal("ship_targeted", get_rid())
@@ -119,6 +125,12 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	mouse_hover = false
+
+func toggle_manual_control() -> void:
+	if not manual_control:
+		manual_control = true
+	else:
+		manual_control = false
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -164,17 +176,32 @@ func update_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
+		
+	var velocity: Vector2 = Vector2.ZERO
+	ship_origin = transform.origin
 	
-	var ship_origin: Vector2 = transform.get_origin()
-	var velocity = Vector2.ZERO
-	movement_delta = speed * delta
+	if movement_delta == 0.0:
+		movement_delta = speed * delta
+	
+	if manual_control:
+		var rotate_direction = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
+		rotate_angle = rotate_direction.angle()
+		move_direction = Vector2(Input.get_action_strength("S") - Input.get_action_strength("W"),
+		Input.get_action_strength("D") - Input.get_action_strength("A"))
+	
+	if rotate_angle != 0.0:
+		rotate_angle = rotate_angle * delta * ship_stats.turn_rate
+	
+	if move_direction != Vector2.ZERO:
+		velocity = move_direction * movement_delta
+		velocity += ease_velocity(velocity)
+	
+	if ShipNavigationAgent.get_max_speed() != movement_delta:
+		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var ship_query: Dictionary = {}
 	if not ShipNavigationAgent.is_navigation_finished():
 		ship_query = collision_raycast(global_position, target_position, 7, true, false)
-	
-	#if ship_select and manual_control:
-		#face_weapons(all_weapons, get_global_mouse_position())
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():
@@ -204,7 +231,6 @@ func _physics_process(delta: float) -> void:
 	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
-		ShipNavigationAgent.set_max_speed(movement_delta)
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
 		var direction_to_path: Vector2 = ship_origin.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
@@ -218,19 +244,34 @@ func _physics_process(delta: float) -> void:
 		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
 	
 	acceleration += velocity - linear_velocity
-	# decrease linear velocity to converge acceleration to zero, thus
-	# converging force to zero
 	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
-	# kind of infuriating i cant move this to _integrate_forces (like i should) but im not really
-	# interested in touching this code anymore
+	
+	if acceleration != Vector2.ZERO and sleeping:
+		sleeping = false
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
-	if force.abs().floor() != Vector2.ZERO:
+	if force.abs().floor() != Vector2.ZERO and not manual_control:
 		apply_central_force(force)
+	
+	if manual_control:
+		apply_torque(rotate_angle * 100000)
+		apply_force(move_direction.x * force)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
+
+func ease_velocity(velocity: Vector2) -> Vector2:
+	var new_velocity: Vector2 = Vector2.ZERO
+	var normalize_velocity_x: float = linear_velocity.x / velocity.x
+	var normalize_velocity_y: float = linear_velocity.y / velocity.y
+	if velocity.x == 0.0:
+		normalize_velocity_x = 0.0
+	if velocity.y == 0.0:
+		normalize_velocity_y = 0.0
+	new_velocity.x = linear_velocity.x * ease(normalize_velocity_x, ship_stats.acceleration)
+	new_velocity.y = linear_velocity.y * ease(normalize_velocity_y, ship_stats.acceleration)
+	return new_velocity
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
@@ -290,7 +331,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 	 
 	var skip_next_entry: bool = false
 	for vector in sweep_vectors:
-		if skip_next_entry: 
+		if skip_next_entry:
 			# hokey workaround for removing paths around an invalid path that are likely to cause collisions
 			skip_next_entry = false
 			continue
@@ -298,7 +339,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 		var raycast_results: Dictionary = collision_raycast(local_target_pos, vector, 7, true, false)
 		if raycast_results.is_empty():
 			valid_paths.push_back(vector)
-		else:  
+		else:
 			valid_paths.pop_back() # remove previous valid entry
 			skip_next_entry = true
 	

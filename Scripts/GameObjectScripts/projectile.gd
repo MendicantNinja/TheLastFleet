@@ -27,7 +27,6 @@ func assign_stats(weapon: Weapon, id: int) -> void:
 	projectile_damage = weapon.damage_per_shot
 	projectile_speed = weapon.projectile_speed
 	projectile_range = weapon.range
-	print(projectile_range)
 	ship_id = id
 	var radian_accuracy = deg_to_rad(weapon.accuracy)
 	var lower_limit = -radian_accuracy
