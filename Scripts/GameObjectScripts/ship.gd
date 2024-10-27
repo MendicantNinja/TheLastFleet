@@ -21,8 +21,9 @@ var is_friendly: bool = false
 var manual_control: bool = false
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
-var ship_origin: Vector2 = Vector2.ZERO
+
 # Used for targeting and weapons.
+var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
 
 # Used for intermediate pathing around dynamic agents
@@ -95,18 +96,17 @@ func _input(event: InputEvent) -> void:
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select and not manual_control:
 			ship_select = false # deselect ship by right clicking anywhere
 	elif event is InputEventKey and is_friendly:
-		var rotate_key: Array = [KEY_Q, KEY_E]
-		var move_keys: Array = [KEY_W, KEY_A, KEY_S, KEY_D]
 		if (event.keycode == KEY_T and event.pressed) and ship_select:
 			toggle_manual_control()
+			toggle_manual_aim(all_weapons)
 		if (event.keycode == KEY_F and event.pressed) and ship_select and manual_control:
 			fire_weapon_slot(all_weapons[0])
 		elif (event.keycode == KEY_R and event.pressed) and ship_select and manual_control:
 			fire_weapon_system(all_weapons)
 		elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
-			update_auto_aim(all_weapons)
+			toggle_auto_aim(all_weapons)
 		elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
-			update_auto_fire(all_weapons)
+			toggle_auto_fire(all_weapons)
 	elif event is InputEventKey and not is_friendly and not manual_control: # for non-player/enemy ships
 		if (event.keycode == KEY_R and event.pressed) and mouse_hover:
 			var target_ship_id = get_rid()
@@ -151,15 +151,19 @@ func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		fire_weapon_slot(weapon_slot)
 
-func fire_weapon_slot(weapon_slot: WeaponSlot ) -> void:
+func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	var ship_id = get_rid().get_id()
 	weapon_slot.fire(ship_id)
 
-func update_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
+func toggle_manual_aim(weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		weapon_slot.set_manual_aim()
+
+func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.set_auto_aim()
 
-func update_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
+func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.set_auto_fire()
 
@@ -178,22 +182,23 @@ func _physics_process(delta: float) -> void:
 		return
 		
 	var velocity: Vector2 = Vector2.ZERO
-	ship_origin = transform.origin
 	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta
 	
 	if manual_control:
-		var rotate_direction = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
+		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
 		rotate_angle = rotate_direction.angle()
-		move_direction = Vector2(Input.get_action_strength("S") - Input.get_action_strength("W"),
+		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
 		Input.get_action_strength("D") - Input.get_action_strength("A"))
 	
 	if rotate_angle != 0.0:
-		rotate_angle = rotate_angle * delta * ship_stats.turn_rate
+		var adjust_mass: float = (mass * 1000)
+		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 	
 	if move_direction != Vector2.ZERO:
-		velocity = move_direction * movement_delta
+		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
+		velocity = rotate_movement * movement_delta
 		velocity += ease_velocity(velocity)
 	
 	if ShipNavigationAgent.get_max_speed() != movement_delta:
@@ -232,7 +237,7 @@ func _physics_process(delta: float) -> void:
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
 		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
-		var direction_to_path: Vector2 = ship_origin.direction_to(next_path_position)
+		var direction_to_path: Vector2 = global_position.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
 		
 		var normalize_velocity: Vector2 = linear_velocity / velocity
@@ -246,7 +251,7 @@ func _physics_process(delta: float) -> void:
 	acceleration += velocity - linear_velocity
 	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
 	
-	if acceleration != Vector2.ZERO and sleeping:
+	if acceleration.abs().floor() != Vector2.ZERO and sleeping:
 		sleeping = false
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -255,8 +260,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		apply_central_force(force)
 	
 	if manual_control:
-		apply_torque(rotate_angle * 100000)
-		apply_force(move_direction.x * force)
+		apply_torque(rotate_angle)
+		apply_force(force)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot

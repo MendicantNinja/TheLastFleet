@@ -84,3 +84,7 @@ E={
 avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"
+
+[physics]
+
+2d/solver/contact_max_allowed_penetration=0.01

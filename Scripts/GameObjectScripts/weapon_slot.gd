@@ -27,6 +27,7 @@ class_name WeaponSlot
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
+var manual_aim: bool = false
 var auto_aim: bool = false
 var auto_fire: bool = false
 var can_look_at: bool = false
@@ -46,6 +47,8 @@ var owner_rid: RID
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+		return
+	if manual_aim and not can_look_at:
 		return
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate()
@@ -100,16 +103,26 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 		auto_aim = true
 
 func set_auto_aim() -> void:
+	manual_aim = false
 	if auto_aim == false:
 		auto_aim = true
 	else:
 		auto_aim = false
 
 func set_auto_fire() -> void:
+	manual_aim = false
 	if auto_fire == false:
 		auto_fire = true
 	else:
 		auto_fire = false
+
+func set_manual_aim() -> void:
+	auto_aim = false
+	auto_fire = false
+	if manual_aim == false:
+		manual_aim = true
+	else:
+		manual_aim = false
 
 # Assigns the RID of the ship the player targets to the variable target_ship_id.
 func set_target_ship(ship_id: RID) -> void:
@@ -166,7 +179,7 @@ func _on_EffectiveRange_entered(body) -> void:
 	if raycast_query["collider"].get_collision_layer_value(2):
 		return # ignore if an obstacle is in the way
 	
-	if not killcast:
+	if not killcast and (auto_aim or auto_fire):
 		killcast = create_killcast()
 		add_child(killcast)
 	
@@ -177,7 +190,7 @@ func _on_EffectiveRange_entered(body) -> void:
 	elif killcast and target_ship_id == ship_id:
 		killcast.target_position = to_local(body.global_position)
 		target_engaged = true
-	killcast.force_raycast_update()
+	#killcast.force_raycast_update()
 	
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
@@ -245,6 +258,10 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	return target_transform
 
 func _physics_process(delta) -> void:
+	if manual_aim:
+		var mouse_position = to_local(get_global_mouse_position())
+		var face_direction: Transform2D = face_weapon(mouse_position)
+		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	if killcast:
 		update_killcast()
 	if killcast and (auto_aim or auto_fire):
