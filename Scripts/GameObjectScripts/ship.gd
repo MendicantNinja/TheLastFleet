@@ -1,10 +1,15 @@
 extends RigidBody2D
 class_name Ship
 
+
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
 @onready var ShipCollisionShape = $Area2D/CollisionShape2D
 @onready var ShipSprite = $ShipSprite
+
+@onready var CombatMap: Node2D = get_parent()
+@onready var TacticalMapIcon = $TacticalMapIcon
+@onready var TacticalMap = CombatMap.get_node("%TacticalMap")
 
 @onready var all_weapons: Array[WeaponSlot]
 
@@ -12,6 +17,8 @@ class_name Ship
 @onready var WeaponSlot0 = $WeaponSlot0
 @onready var WeaponSlot1 = $WeaponSlot1
 
+
+var is_allied: bool = false
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
@@ -25,11 +32,37 @@ var acceleration: Vector2 = Vector2.ZERO
 var test: float = 0.0
 var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
-var ship_select: bool = false
+var ship_select: bool = false:
+	set(value):
+		if value == true: 
+			TacticalMapIcon.button_pressed = true # Pressed is solely for GUI effects (brighten) with regards to the TacMapIcon.
+			ship_select = value
+		elif value == false:
+			TacticalMapIcon.button_pressed = false
+			ship_select = value
+			
 
-# Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready.
+# Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready/entering the ship into the scene.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
+
+# Any adjustments before deploying the ship to the combat space. Useful to put it here to avoid headaches involving updating other variables and arrays
+func deploy_ship() -> void:
+	if is_allied == true:
+		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacMapPlayerShip.png")
+		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacMapPlayerShipSelected.png")
+		TacticalMapIcon.modulate = settings.player_color
+		TacticalMapIcon.custom_minimum_size = Vector2(self.get_node("Area2D/CollisionShape2D").shape.radius, self.get_node("Area2D/CollisionShape2D").shape.radius) * 1.1
+		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
+	elif is_allied == false:
+		# Non-identical to is_allied == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
+		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacMapPlayerShip.png")
+		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacMapPlayerShipSelected.png")
+		TacticalMapIcon.modulate = settings.enemy_color
+		TacticalMapIcon.custom_minimum_size = Vector2(self.get_node("Area2D/CollisionShape2D").shape.radius, self.get_node("Area2D/CollisionShape2D").shape.radius) * 1.1
+	# Ship is ready and has entered the scene tree.
+	if TacticalMap.visible == true:
+		TacticalMapIcon.show()
 
 func _ready() -> void:
 	if ship_stats == null:
@@ -62,12 +95,12 @@ func _ready() -> void:
 # Any generic input event.
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
+		#if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
+			#ship_select = true # Select ship. Deselect ship is done in combat_map.gd
+		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
-		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
-			ship_select = false # deselect ship by right clicking anywhere
 	elif event is InputEventKey:
 		if (event.keycode == KEY_F and event.is_pressed()):
 			fire_weapon_slot(all_weapons[0])
@@ -76,9 +109,13 @@ func _input(event: InputEvent) -> void:
 
 # When the player interacts with the ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	if event is InputEventMouseButton:
+	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later.
+	if CombatMap.dragging == true:
+		return
+	if event is InputEventMouseButton and TacticalMap.visible == true:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:
 			ship_select = true # select ship
+			
 		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
 			ship_select = false # deselect ship
 

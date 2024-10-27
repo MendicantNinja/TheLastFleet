@@ -12,7 +12,6 @@ func _ready():
 			player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
 
 
-
 # Saving/Loading the player and their fleet
 func save_game() -> void:
 	var save_me: SaveGame = SaveGame.new()

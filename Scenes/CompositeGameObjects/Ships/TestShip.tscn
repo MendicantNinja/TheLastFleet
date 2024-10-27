@@ -17,8 +17,27 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_sc1ei")
 
+[node name="TacticalMapIcon" type="TextureButton" parent="."]
+visible = false
+z_index = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_filter = 2
+toggle_mode = true
+action_mode = 0
+stretch_mode = 0
+
 [node name="ShipSprite" type="Sprite2D" parent="."]
-self_modulate = Color(0.101362, 0.395403, 0.613697, 1)
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("2_13ai0")

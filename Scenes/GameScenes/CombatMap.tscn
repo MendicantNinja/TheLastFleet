@@ -1,29 +1,61 @@
-[gd_scene load_steps=11 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=15 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="2_r4t6u"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_r78fd"]
+[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_ho88f"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ensw7"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_la3a5"]
 
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
+vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1, -29, 11, 20076, 17118, 20076, 17014, -91)])
+agent_radius = 50.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nv86b"]
+size = Vector2(17000, 20000)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
-
-[sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
-vertices = PackedVector2Array(9973.86, 9797, 47.0313, 9797, 52.9688, 49, 9947.14, 49)
-polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
-outlines = Array[PackedVector2Array]([PackedVector2Array(12, -3, -3, 9847, 10024, 9847, 9997, -1)])
-agent_radius = 50.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_le3lb"]
 radius = 100.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
+
 [node name="CombatMap" type="Node2D"]
 script = ExtResource("1_x40el")
 
-[node name="FleetDeploymentPanel" type="Panel" parent="."]
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_ooheh")
+
+[node name="PlayableArea" type="Area2D" parent="."]
+
+[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
+position = Vector2(8500.5, 10049)
+shape = SubResource("RectangleShape2D_nv86b")
+
+[node name="TacticalMap" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_r78fd")
+
+[node name="Label" type="Label" parent="TacticalMap"]
+offset_left = 3.0
+offset_top = -61.0
+offset_right = 439.0
+offset_bottom = -15.0
+theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
+theme_override_fonts/font = ExtResource("3_ho88f")
+theme_override_font_sizes/font_size = 32
+text = "TACTICAL DISPLAY"
+
+[node name="FleetDeployment" type="CanvasLayer" parent="."]
+
+[node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
 unique_name_in_owner = true
 z_index = 2
 anchors_preset = 8
@@ -31,16 +63,16 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 443.0
-offset_top = 300.0
-offset_right = 1469.0
-offset_bottom = 784.0
+offset_left = -517.0
+offset_top = -240.0
+offset_right = 509.0
+offset_bottom = 244.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("2_lpbtk")
 
-[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeploymentPanel"]
+[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeployment/FleetDeploymentPanel"]
 unique_name_in_owner = true
 layout_mode = 1
 offset_left = 14.0
@@ -51,7 +83,7 @@ theme_override_constants/h_separation = 30
 columns = 10
 script = ExtResource("2_r4t6u")
 
-[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeploymentPanel"]
+[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeployment/FleetDeploymentPanel"]
 layout_mode = 0
 offset_left = 80.0
 offset_top = 378.0
@@ -60,7 +92,7 @@ offset_bottom = 478.0
 scale = Vector2(0.5, 0.5)
 theme_override_constants/separation = 128
 
-[node name="Deploy" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
+[node name="Deploy" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0.27451)
 z_index = 3
@@ -68,7 +100,7 @@ layout_mode = 2
 texture_normal = ExtResource("4_ensw7")
 texture_hover = ExtResource("5_la3a5")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/Deploy"]
+[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Deploy"]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 15
@@ -83,7 +115,7 @@ bbcode_enabled = true
 text = "[center]Deploy"
 scroll_active = false
 
-[node name="All" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
+[node name="All" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0.27451)
 z_index = 3
@@ -91,7 +123,7 @@ layout_mode = 2
 texture_normal = ExtResource("4_ensw7")
 texture_hover = ExtResource("5_la3a5")
 
-[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/All"]
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/All"]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 15
@@ -106,7 +138,7 @@ bbcode_enabled = true
 text = "[center]All"
 scroll_active = false
 
-[node name="Cancel" type="TextureButton" parent="FleetDeploymentPanel/HBoxContainer"]
+[node name="Cancel" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
 unique_name_in_owner = true
 self_modulate = Color(1, 1, 1, 0.27451)
 z_index = 3
@@ -114,7 +146,7 @@ layout_mode = 2
 texture_normal = ExtResource("4_ensw7")
 texture_hover = ExtResource("5_la3a5")
 
-[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeploymentPanel/HBoxContainer/Cancel"]
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Cancel"]
 clip_contents = false
 layout_mode = 1
 anchors_preset = 15
@@ -129,7 +161,8 @@ bbcode_enabled = true
 text = "[center]Cancel (G)"
 scroll_active = false
 
-[node name="BlackenBackground" type="Panel" parent="FleetDeploymentPanel"]
+[node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
+visible = false
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 8
@@ -146,38 +179,13 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
+[node name="TacticalCamera" type="Camera2D" parent="."]
+zoom = Vector2(0.5, 0.5)
+
 [node name="Camera2D" type="Camera2D" parent="."]
+enabled = false
 limit_left = 0
 limit_top = 0
-
-[node name="Sprite2D" type="Sprite2D" parent="."]
-self_modulate = Color(1, 0, 0.266666, 1)
-position = Vector2(-469, 1485)
-rotation = 3.14159
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("1_1p2qq")
-
-[node name="Sprite2D2" type="Sprite2D" parent="."]
-self_modulate = Color(0, 0.116667, 1, 1)
-position = Vector2(-504, 2424)
-scale = Vector2(0.3, 0.3)
-texture = ExtResource("1_1p2qq")
-
-[node name="Sprite2D3" type="Sprite2D" parent="."]
-self_modulate = Color(0.933333, 0, 1, 1)
-position = Vector2(-1561, 1584)
-rotation = 3.14159
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("1_1p2qq")
-
-[node name="Sprite2D4" type="Sprite2D" parent="."]
-self_modulate = Color(0, 1, 0.8, 1)
-position = Vector2(-1638, 2762)
-texture = ExtResource("1_1p2qq")
-
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-position = Vector2(42, -1)
-navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
 position = Vector2(369, 700)
@@ -230,3 +238,10 @@ priority = 1
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip/Area2D"]
 shape = SubResource("CircleShape2D_le3lb")
+
+[node name="SelectionArea" type="Area2D" parent="."]
+unique_name_in_owner = true
+
+[node name="SelectionShape" type="CollisionShape2D" parent="SelectionArea"]
+unique_name_in_owner = true
+shape = SubResource("RectangleShape2D_ekgw8")

@@ -1,5 +1,6 @@
 extends GridContainer
 var ships_to_deploy: Array[ShipIcon]
+@onready var CombatMap: Node2D = $"../../.."
 
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
@@ -21,9 +22,11 @@ func deploy_ships() -> void:
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(ship_icon.ship)
 		ship_instantiation.global_position = Vector2(500, 500)
-		$"../..".add_child(ship_instantiation)
-		#ships_to_deploy[ship_icon.index] = null
+		ship_instantiation.is_allied = true
 		ship_icon.disabled = true
+		CombatMap.add_child(ship_instantiation)
+		CombatMap.ships_in_combat.append(ship_instantiation)
+		ship_instantiation.deploy_ship()
 	on_cancel_pressed()
 		
 	
@@ -57,10 +60,10 @@ func on_cancel_pressed() -> void:
 
 func setup_deployment_screen() -> void:
 	# Add ships to the display and set the ship itself as item metadata.
-	var scene_path = "res://Scenes/OtherScenes/GUIShipIcon.tscn"
+	var scene_path = "res://Scenes/GUIScenes/OtherGUIScenes/GUIShipIcon.tscn"
 	var gui_icon_scene = load(scene_path)
 	ships_to_deploy.resize(game_state.player_fleet.fleet_stats.ships.size())
-	for i in game_state.player_fleet.fleet_stats.ships.size():
+	for i in range(game_state.player_fleet.fleet_stats.ships.size()):
 		var ship_icon: ShipIcon = gui_icon_scene.instantiate()
 		self.add_child(ship_icon)
 		ship_icon.on_added_to_container()
@@ -68,8 +71,6 @@ func setup_deployment_screen() -> void:
 		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
 		ship_icon.ship_label.text = str(ship_icon.ship.deployment_points)
 		ship_icon.index = i
-		print("The index called when setting up the deployment screen is", ship_icon.index)
-	print("Ships to deploy size in setup_deployment_screen is is", ships_to_deploy.size())
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
