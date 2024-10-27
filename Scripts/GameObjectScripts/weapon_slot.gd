@@ -50,6 +50,8 @@ func fire(ship_id: int) -> void:
 		return
 	if manual_aim and not can_look_at:
 		return
+	if not can_fire:
+		return
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate()
 	projectile.global_transform = weapon_node.global_transform
@@ -103,26 +105,30 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 		auto_aim = true
 
 func set_auto_aim() -> void:
-	manual_aim = false
 	if auto_aim == false:
 		auto_aim = true
+		manual_aim = false
 	else:
 		auto_aim = false
+		manual_aim = true
 
 func set_auto_fire() -> void:
-	manual_aim = false
 	if auto_fire == false:
 		auto_fire = true
+		manual_aim = false
 	else:
 		auto_fire = false
+		manual_aim = true
 
 func set_manual_aim() -> void:
-	auto_aim = false
-	auto_fire = false
 	if manual_aim == false:
 		manual_aim = true
+		auto_fire = false
+		auto_aim = false
 	else:
 		manual_aim = false
+		auto_aim = true
+		auto_fire = true
 
 # Assigns the RID of the ship the player targets to the variable target_ship_id.
 func set_target_ship(ship_id: RID) -> void:
@@ -179,7 +185,7 @@ func _on_EffectiveRange_entered(body) -> void:
 	if raycast_query["collider"].get_collision_layer_value(2):
 		return # ignore if an obstacle is in the way
 	
-	if not killcast and (auto_aim or auto_fire):
+	if not killcast:
 		killcast = create_killcast()
 		add_child(killcast)
 	
@@ -187,10 +193,11 @@ func _on_EffectiveRange_entered(body) -> void:
 	if killcast and not target_engaged and current_target_id == RID():
 		killcast.target_position = to_local(body.global_position)
 		current_target_id = ship_id
+		killcast.force_raycast_update()
 	elif killcast and target_ship_id == ship_id:
 		killcast.target_position = to_local(body.global_position)
 		target_engaged = true
-	#killcast.force_raycast_update()
+		killcast.force_raycast_update()
 	
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body

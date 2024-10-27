@@ -74,9 +74,13 @@ func _ready() -> void:
 		# In the future, weapons will automatically be assigned from the already existing weapons in 
 		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
 		# everything is a railgun.
+	
+	toggle_auto_aim(all_weapons)
+	toggle_auto_fire(all_weapons)
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
+	
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -99,10 +103,6 @@ func _input(event: InputEvent) -> void:
 		if (event.keycode == KEY_T and event.pressed) and ship_select:
 			toggle_manual_control()
 			toggle_manual_aim(all_weapons)
-		if (event.keycode == KEY_F and event.pressed) and ship_select and manual_control:
-			fire_weapon_slot(all_weapons[0])
-		elif (event.keycode == KEY_R and event.pressed) and ship_select and manual_control:
-			fire_weapon_system(all_weapons)
 		elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
 			toggle_auto_aim(all_weapons)
 		elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
@@ -147,7 +147,7 @@ func _on_ship_targeted(ship_id: RID) -> void:
 	for weapon in all_weapons:
 		weapon.set_target_ship(ship_id)
 
-func fire_weapon_system (weapon_system: Array[WeaponSlot]) -> void:
+func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		fire_weapon_slot(weapon_slot)
 
@@ -200,6 +200,9 @@ func _physics_process(delta: float) -> void:
 		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
 		velocity = rotate_movement * movement_delta
 		velocity += ease_velocity(velocity)
+	
+	if manual_control and Input.is_action_pressed("m1"):
+		fire_weapon_system(all_weapons)
 	
 	if ShipNavigationAgent.get_max_speed() != movement_delta:
 		ShipNavigationAgent.set_max_speed(movement_delta)
