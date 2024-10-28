@@ -11,7 +11,7 @@ class_name Ship
 @onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
 @onready var TacticalMap = CombatMap.get_node("%TacticalMap")
-
+@onready var ManualControlIndicator = $ManualControlIndicator
 @onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
@@ -23,8 +23,16 @@ class_name Ship
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
-var is_friendly: bool = false
-var manual_control: bool = false
+#var is_player: bool = false # For player-affiliated ships
+var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
+var manual_control: bool = false:
+	set(value):
+		if value == false:
+			ManualControlIndicator.visible = false
+			manual_control = false
+		elif value == true:
+			ManualControlIndicator.visible = true
+			manual_control = true
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 
@@ -52,20 +60,21 @@ var ship_select: bool = false:
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
 
-# Any adjustments before deploying the ship to the combat space. Useful to put it here to avoid headaches involving updating other variables and arrays
+# Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
-	if is_allied == true:
-		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacMapPlayerShip.png")
-		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacMapPlayerShipSelected.png")
+	if is_friendly == true:
+		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
+		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.player_color
-		TacticalMapIcon.custom_minimum_size = Vector2(self.get_node("Area2D/CollisionShape2D").shape.radius, self.get_node("Area2D/CollisionShape2D").shape.radius) * 1.1
+		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.1
 		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
-	elif is_allied == false:
-		# Non-identical to is_allied == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
-		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacMapPlayerShip.png")
-		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacMapPlayerShipSelected.png")
+		ManualControlIndicator.self_modulate = settings.player_color
+	elif is_friendly == false:
+		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
+		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
+		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.enemy_color
-		TacticalMapIcon.custom_minimum_size = Vector2(self.get_node("Area2D/CollisionShape2D").shape.radius, self.get_node("Area2D/CollisionShape2D").shape.radius) * 1.1
+		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.1
 	# Ship is ready and has entered the scene tree.
 	if TacticalMap.visible == true:
 		TacticalMapIcon.show()
@@ -97,7 +106,7 @@ func _ready() -> void:
 		add_to_group("enemy")
 		rotation += PI/2
 	
-	#Assigns weapon slots based on what's in the ship scene.
+	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:
 			all_weapons.append(child)
@@ -130,38 +139,35 @@ func _ready() -> void:
 # Any generic input event.
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		#if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT:
-			#ship_select = true # Select ship. Deselect ship is done in combat_map.gd
-		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
+		if TacticalMap.visible and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select :
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
-		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select and not manual_control:
-			ship_select = false # deselect ship by right clicking anywhere
-	elif event is InputEventKey and is_friendly:
-		if (event.keycode == KEY_T and event.pressed) and ship_select:
-			toggle_manual_control()
-			toggle_manual_aim(all_weapons)
-		elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
-			toggle_auto_aim(all_weapons)
-		elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
-			toggle_auto_fire(all_weapons)
-	elif event is InputEventKey and not is_friendly and not manual_control: # for non-player/enemy ships
-		if (event.keycode == KEY_R and event.pressed) and mouse_hover:
-			var target_ship_id = get_rid()
-			emit_signal("ship_targeted", get_rid())
 	elif event is InputEventKey:
-		if (event.keycode == KEY_F and event.is_pressed()):
-			fire_weapon_slot(all_weapons[0])
-		if (event.keycode == KEY_Q and event.is_pressed()):
-			fire_weapon_system(all_weapons)
+		if is_friendly:
+			if (event.keycode == KEY_T and event.pressed) and ship_select:
+				toggle_manual_control()
+				toggle_manual_aim(all_weapons) # Replace all_weapons with specific weapon systems configured in the ship refit screen from ship stats.
+			elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
+				toggle_auto_aim(all_weapons)
+			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
+				toggle_auto_fire(all_weapons)
+		elif not is_friendly: # for non-player/enemy ships
+			if (event.keycode == KEY_R and event.pressed) and mouse_hover:
+				var target_ship_id = get_rid()
+				emit_signal("ship_targeted", get_rid())
+		else:
+			if (event.keycode == KEY_F and event.is_pressed()):
+				fire_weapon_slot(all_weapons[0])
+			if (event.keycode == KEY_Q and event.is_pressed()):
+				fire_weapon_system(all_weapons)
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later.
+	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
 	if CombatMap.dragging == true:
 		return
-	if event is InputEventMouseButton and TacticalMap.visible == true:
+	if event is InputEventMouseButton and is_friendly == true and TacticalMap.visible == true:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:
 			ship_select = true # select ship
 			
@@ -175,9 +181,19 @@ func _on_mouse_exited() -> void:
 	mouse_hover = false
 
 func toggle_manual_control() -> void:
+	# The visible indicator is turned on and off by the manual control variable's custom setter. Otherwise recursion issues occur.
+	#CombatMap.TacticalMap.display_tactical_map()
 	if not manual_control:
+		if CombatMap.controlled_ship != null:
+			CombatMap.controlled_ship.manual_control = false
+			# Switch all_weapons back to autofiring on the old ship we're switching from.
+			CombatMap.controlled_ship.toggle_manual_aim(all_weapons)
 		manual_control = true
+		print('toggle manual control = true')
+		print(ManualControlIndicator.visible)
+		CombatMap.controlled_ship = self
 	else:
+		
 		manual_control = false
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 

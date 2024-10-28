@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bc321u3k51r4u"]
 
-[ext_resource type="Script" path="res://Scripts/UtilityScripts/combat_camera.gd" id="1_tmkij"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/combat_camera.gd" id="1_tmkij"]
 
 [node name="CombatCamera" type="Camera2D"]
 anchor_mode = 0

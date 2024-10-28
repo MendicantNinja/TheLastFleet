@@ -31,6 +31,7 @@ shapes/navigation/agent_path_color=Color(1, 0, 0, 0.54902)
 shapes/avoidance/agents_radius_color=Color(1, 1, 0, 0.301961)
 shapes/avoidance/obstacles_radius_color=Color(1, 0.501961, 0, 0.376471)
 shapes/avoidance/obstacles_static_edge_pushin_color=Color(1, 0, 0, 0.635294)
+shapes/avoidance/obstacles_static_edge_pushout_color=Color(1, 1, 0, 0.121569)
 shapes/collision/shape_color=Color(1, 1, 0, 1)
 shapes/collision/contact_color=Color(1, 0.2, 0.101961, 1)
 shapes/paths/geometry_color=Color(0.101961, 1, 0.701961, 0.188235)
@@ -91,10 +92,10 @@ avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"
 
-[rendering]
-
-environment/defaults/default_clear_color=Color(0.165656, 0.165656, 0.165656, 1)
-
 [physics]
 
 2d/solver/contact_max_allowed_penetration=0.01
+
+[rendering]
+
+environment/defaults/default_clear_color=Color(0.165656, 0.165656, 0.165656, 1)

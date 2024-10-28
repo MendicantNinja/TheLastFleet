@@ -1,6 +1,5 @@
-[gd_scene load_steps=15 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=14 format=3 uid="uid://cuocntda0dllh"]
 
-[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="1_1p2qq"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="2_r4t6u"]
@@ -9,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ensw7"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_la3a5"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/combat_camera.gd" id="8_i043v"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -22,10 +22,8 @@ size = Vector2(17000, 20000)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_le3lb"]
-radius = 100.0
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
+size = Vector2(0, 0)
 
 [node name="CombatMap" type="Node2D"]
 script = ExtResource("1_x40el")
@@ -38,6 +36,7 @@ navigation_polygon = SubResource("NavigationPolygon_ooheh")
 [node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
 position = Vector2(8500.5, 10049)
 shape = SubResource("RectangleShape2D_nv86b")
+debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="TacticalMap" type="Node2D" parent="."]
 unique_name_in_owner = true
@@ -180,38 +179,20 @@ mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="TacticalCamera" type="Camera2D" parent="."]
+anchor_mode = 0
 zoom = Vector2(0.5, 0.5)
 
-[node name="Camera2D" type="Camera2D" parent="."]
-enabled = false
+[node name="CombatCamera" type="Camera2D" parent="."]
+anchor_mode = 0
+ignore_rotation = false
 limit_left = 0
 limit_top = 0
-
-[node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(500, 900)
-collision_layer = 1
-
-[node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(3000, 200)
-collision_layer = 1
-
-[node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(300, 300)
-collision_layer = 4
-
-[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(300, 450)
-collision_layer = 4
-
-[node name="TestShip3" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(650, 400)
-collision_layer = 4
-collision_mask = 7
-input_pickable = false
-priority = 1
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyShip/Area2D"]
-shape = SubResource("CircleShape2D_le3lb")
+limit_right = 5000
+limit_bottom = 5000
+position_smoothing_enabled = true
+editor_draw_limits = true
+editor_draw_drag_margin = true
+script = ExtResource("8_i043v")
 
 [node name="SelectionArea" type="Area2D" parent="."]
 unique_name_in_owner = true
@@ -219,3 +200,19 @@ unique_name_in_owner = true
 [node name="SelectionShape" type="CollisionShape2D" parent="SelectionArea"]
 unique_name_in_owner = true
 shape = SubResource("RectangleShape2D_ekgw8")
+
+[node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(500, 900)
+
+[node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(3000, 200)
+
+[node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
+modulate = Color(1, 0.0470588, 0.0588235, 1)
+position = Vector2(360, 195)
+collision_layer = 4
+
+[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
+modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(540, 195)
+collision_layer = 4

@@ -1,14 +1,14 @@
-[gd_scene load_steps=5 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=6 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
+[ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
 
 [node name="TestShip" type="RigidBody2D"]
-collision_layer = 0
 collision_mask = 15
 input_pickable = true
 gravity_scale = 0.0
@@ -35,7 +35,15 @@ focus_mode = 0
 mouse_filter = 2
 toggle_mode = true
 action_mode = 0
+button_mask = 0
 stretch_mode = 0
+
+[node name="ManualControlIndicator" type="Sprite2D" parent="."]
+visible = false
+position = Vector2(46, -35)
+rotation = 1.5708
+scale = Vector2(1, 1)
+texture = ExtResource("2_yacd8")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708

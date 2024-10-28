@@ -7,6 +7,7 @@ var line_color: Color = Color8(25, 90, 255, 75)
 
 func display_tactical_map() -> void:
 	# Show the Tac Map
+	CombatMap.tactical_camera()
 	if self.visible == false:
 		self.visible = true
 		display()
@@ -17,7 +18,7 @@ func display_tactical_map() -> void:
 			ship.ship_select = false
 		self.visible = false
 		undisplay()
-
+	
 
 func undisplay() -> void:
 	for ship in CombatMap.ships_in_combat:

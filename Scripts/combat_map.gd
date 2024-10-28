@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var Camera = $Camera2D
+@onready var CombatCamera = $CombatCamera
 @onready var TacticalCamera = $TacticalCamera
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
@@ -10,6 +10,7 @@ extends Node2D
 @onready var Cancel = %Cancel
 
 var ships_in_combat: Array[Ship]
+var controlled_ship: Ship
 
 # Box Selection
 var dragging: bool = false
@@ -57,7 +58,7 @@ func _unhandled_input(event) -> void:
 			# If the mouse is dragging and is not released or clicked or anything redraw the selection rectangle.
 			elif event is InputEventMouseMotion and dragging == true:
 				queue_redraw()
-			# Camera
+			# CombatCamera
 			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				if TacticalCamera.get_zoom() < Vector2(.5, .5):
 					TacticalCamera.zoom += Vector2(0.01, 0.01)
@@ -65,13 +66,13 @@ func _unhandled_input(event) -> void:
 				if TacticalCamera.get_zoom() > Vector2(0.01, 0.01):
 					TacticalCamera.zoom -= Vector2(0.01, 0.01)
 		if TacticalMap.visible == false:
-			if Camera.enabled == true:
+			if CombatCamera.enabled == true:
 				if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-					if Camera.get_zoom() < Vector2(2.0, 2.0):
-						Camera.zoom += Vector2(0.1, 0.1)
+					if CombatCamera.get_zoom() < Vector2(2.0, 2.0):
+						CombatCamera.zoom += Vector2(0.1, 0.1)
 				elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-					if Camera.get_zoom() > Vector2(.5, .5):
-						Camera.zoom -= Vector2(0.1, 0.1)
+					if CombatCamera.get_zoom() > Vector2(.5, .5):
+						CombatCamera.zoom -= Vector2(0.1, 0.1)
 	# Keys
 	elif event is InputEventKey:
 		if (event.keycode == KEY_G and event.is_pressed()):
@@ -80,16 +81,15 @@ func _unhandled_input(event) -> void:
 			elif FleetDeploymentPanel.visible == true:
 				FleetDeploymentPanel.visible = false
 		elif (event.keycode == KEY_TAB and event.is_pressed()):
-			tactical_camera()
 			TacticalMap.display_tactical_map()
 
 func tactical_camera() -> void:
 	if TacticalMap.visible == false:
 		TacticalCamera.enabled = true
-		Camera.enabled = false
+		CombatCamera.enabled = false
 	elif TacticalMap.visible == true:
 		TacticalCamera.enabled = false
-		Camera.enabled = true
+		CombatCamera.enabled = true
 		
 		
 # Box Selection Stuff.
@@ -112,7 +112,7 @@ func select_units() -> void:
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	for object in selection_area.get_overlapping_bodies():
-		if object is Ship and object.is_allied == true:
+		if object is Ship and object.is_friendly == true:
 			#if object.ship_select == true: # Already selected? Deselect.
 				#object.ship_select = false
 			object.ship_select = true

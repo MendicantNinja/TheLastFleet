@@ -22,7 +22,7 @@ func deploy_ships() -> void:
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(ship_icon.ship)
 		ship_instantiation.global_position = Vector2(500, 500)
-		ship_instantiation.is_allied = true
+		ship_instantiation.is_friendly = true
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		CombatMap.ships_in_combat.append(ship_instantiation)
