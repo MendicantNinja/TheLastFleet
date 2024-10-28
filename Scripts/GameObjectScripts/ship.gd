@@ -189,8 +189,6 @@ func toggle_manual_control() -> void:
 			# Switch all_weapons back to autofiring on the old ship we're switching from.
 			CombatMap.controlled_ship.toggle_manual_aim(all_weapons)
 		manual_control = true
-		print('toggle manual control = true')
-		print(ManualControlIndicator.visible)
 		CombatMap.controlled_ship = self
 	else:
 		
