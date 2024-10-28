@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://bc321u3k51r4u"]
+
+[ext_resource type="Script" path="res://Scripts/UtilityScripts/combat_camera.gd" id="1_tmkij"]
+
+[node name="CombatCamera" type="Camera2D"]
+anchor_mode = 0
+ignore_rotation = false
+limit_left = 0
+limit_top = 0
+limit_right = 5000
+limit_bottom = 5000
+position_smoothing_enabled = true
+editor_draw_limits = true
+editor_draw_drag_margin = true
+script = ExtResource("1_tmkij")

@@ -247,9 +247,3 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var bonus_sensor_strength: int = 0
 @export var bonus_sensor_profile: int = 0
 @export var bonus_repair_rate: float = 0.0
-
-func _ready():
-	pass # Replace with function body.
-
-func _process(delta):
-	pass

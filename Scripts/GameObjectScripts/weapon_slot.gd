@@ -2,9 +2,12 @@ extends Node2D
 class_name WeaponSlot
 
 # Nodes
-@onready var weapon_mount_image: Sprite2D = $WeaponMountSprite 
-@onready var weapon_image: Sprite2D = $WeaponMountSprite/WeaponSprite
-
+@onready var weapon_mount_image: Sprite2D = $WeaponNode/WeaponMountSprite
+@onready var weapon_image: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
+@onready var effective_range_shape: CollisionShape2D = $EffectiveRange/EffectiveRangeShape
+@onready var effective_range: Area2D = $EffectiveRange
+@onready var weapon_node: Node2D = $WeaponNode
+@onready var rate_of_fire_timer: Timer = $ROFTimer
 # Important Stuff
 #@export var assigned_ship: Ship
 @export var weapon: Weapon:
@@ -24,21 +27,40 @@ class_name WeaponSlot
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
+var manual_aim: bool = false
+var auto_aim: bool = false
+var auto_fire: bool = false
+var can_look_at: bool = false
+var can_fire: bool = false
+var is_friendly: bool = false
+var target_engaged: bool = false
 
-
+var available_targets: Dictionary = {}
+var killcast: RayCast2D = null
+var target_ship_position: Vector2 = Vector2.ZERO
+var target_ship_id: RID
+var current_target_id: RID
+var arc_in_radians: float = 0.0
+var default_direction: Transform2D
+var owner_rid: RID
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
-func fire() -> void:
-	if weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
-		#for i in weapon.burst_size: # <--- 1 by default. not important yet, but you can see how this can be used for burst functionality
-			#weapon.create_projectile()
-		var projectile: Area2D = weapon.create_projectile().instantiate()
-		projectile.assign_stats(weapon)
-		projectile.global_position = self.global_position + Vector2(0, 0) # Should come out of the edge/front of the weapon.
-		projectile.global_rotation = self.global_rotation
-		$"../..".add_child(projectile)
-		# FOR YELYMANE: Shoot the target! Impart velocity! Add random spread based on accuracy. Etc. 
-		
+func fire(ship_id: int) -> void:
+	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+		return
+	if manual_aim and not can_look_at:
+		return
+	if not can_fire:
+		return
+	
+	var projectile: Area2D = weapon.create_projectile().instantiate()
+	projectile.global_transform = weapon_node.global_transform
+	projectile.assign_stats(weapon, ship_id)
+	get_tree().root.add_child(projectile)
+	
+	can_fire = false
+	rate_of_fire_timer.start()
+
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
 	weapon_mount = p_weapon_mount
@@ -47,24 +69,85 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
-	set_weapon_size_and_color()
-	pass
+	z_index = 1
 	
+	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	can_fire = true
+	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)
+	
+	if position.y > 0:
+		weapon_node.transform = weapon_node.transform.rotated(PI/2)
+	elif position.y < 0:
+		weapon_node.transform = weapon_node.transform.rotated(-PI/2)
+	default_direction = weapon_node.transform
+	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
+	
+	effective_range.body_entered.connect(_on_EffectiveRange_entered)
+	effective_range.body_exited.connect(_on_EffectiveRange_exited)
+	
+	set_weapon_size_and_color()
+
+func set_weapon_slot(p_weapon: Weapon) -> void:
+	weapon = p_weapon
+	
+	var new_shape: Shape2D = CircleShape2D.new()
+	new_shape.radius = weapon.range
+	effective_range_shape.shape = new_shape
+	
+	var interval_in_seconds: float = 1.0 / weapon.fire_rate
+	rate_of_fire_timer.wait_time = interval_in_seconds
+
+func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
+	effective_range.collision_mask = mask
+	is_friendly = friendly_value
+	owner_rid = owner_value
+	if not is_friendly:
+		auto_aim = true
+
+func set_auto_aim() -> void:
+	if auto_aim == false:
+		auto_aim = true
+		manual_aim = false
+	else:
+		auto_aim = false
+		manual_aim = true
+
+func set_auto_fire() -> void:
+	if auto_fire == false:
+		auto_fire = true
+		manual_aim = false
+	else:
+		auto_fire = false
+		manual_aim = true
+
+func set_manual_aim() -> void:
+	if manual_aim == false:
+		manual_aim = true
+		auto_fire = false
+		auto_aim = false
+	else:
+		manual_aim = false
+		auto_aim = true
+		auto_fire = true
+
+# Assigns the RID of the ship the player targets to the variable target_ship_id.
+func set_target_ship(ship_id: RID) -> void:
+	target_ship_id = ship_id
+
 func set_weapon_size_and_color():
 	weapon_mount_image.modulate = settings.player_color
 	#weapon_image.self_modulate = settings.player_color
 	match weapon_mount.weapon_mount_size:
 		data.size_enum.SMALL:
-			self.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
+			weapon_mount_image.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
 		data.size_enum.MEDIUM:
-			self.scale = Vector2(.4, .4)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(.4, .4)#/assigned_ship.scale
 		data.size_enum.LARGE:
-			self.scale = Vector2(.7, .7)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(.7, .7)#/assigned_ship.scale
 		data.size_enum.SPINAL:
-			self.scale = Vector2(1, 1)#/assigned_ship.scale
+			weapon_mount_image.scale = Vector2(1, 1)#/assigned_ship.scale
 		_:
 			print("Unknown weapon size.")
-	
 	
 	#match weapon_mount.weapon_mount_type:
 		#data.weapon_mount_type_enum.BALLISTIC:
@@ -80,7 +163,144 @@ func set_weapon_size_and_color():
 		#_:
 			#print("Unknown weapon type.")
 
+func _on_ROF_timeout() -> void:
+	can_fire = true
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
+# Creates the context for a weapon's given situation.
+func _on_EffectiveRange_entered(body) -> void:
+	if body.get_rid() == owner_rid: 
+		return # ignore any overlap with other weapon slots
+	elif is_friendly == body.is_friendly:
+		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
+	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
+		return # ignore obstacle and projectile layers, respectively
+	
+	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
+	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_transform.origin, body.global_position, 7, [self, owner_rid])
+	query.collide_with_areas = false
+	query.collide_with_bodies = true
+	var raycast_query: Dictionary = space_state.intersect_ray(query)
+	if raycast_query.is_empty():
+		return # ignore if nothing is detected by the query
+	if raycast_query["collider"].get_collision_layer_value(2):
+		return # ignore if an obstacle is in the way
+	
+	if not killcast:
+		killcast = create_killcast()
+		add_child(killcast)
+	
+	var ship_id = body.get_rid()
+	if killcast and not target_engaged and current_target_id == RID():
+		killcast.target_position = to_local(body.global_position)
+		current_target_id = ship_id
+		killcast.force_raycast_update()
+	elif killcast and target_ship_id == ship_id:
+		killcast.target_position = to_local(body.global_position)
+		target_engaged = true
+		killcast.force_raycast_update()
+	
+	if not available_targets.has(ship_id):
+		available_targets[ship_id] = body
+
+# Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
+# the effective range and the current combat situation.
+func _on_EffectiveRange_exited(body) -> void:
+	var ship_id: RID = body.get_rid()
+	if available_targets.has(ship_id):
+		available_targets.erase(ship_id)
+	
+	if ship_id == target_ship_id:
+		target_engaged = false
+	
+	var find_new_target: bool = false
+	if current_target_id == ship_id:
+		current_target_id = RID()
+		find_new_target = true
+	
+	if killcast and available_targets.is_empty():
+		killcast.queue_free()
+		killcast = null
+	elif killcast and find_new_target:
+		acquire_new_target()
+
+# Instance a new raycast anytime an "enemy" is within the generalized effective range.
+func create_killcast() -> RayCast2D:
+	var new_killcast: RayCast2D = RayCast2D.new()
+	new_killcast.collide_with_bodies = true
+	new_killcast.collide_with_areas = false
+	new_killcast.collision_mask = 7
+	return new_killcast
+
+# If a weapon is not capable of firing on an existing target but more are around it,
+# this will try to find the nearest available target if it can. This function is
+# called every physics frame IF it still cannot find a valid target.
+func acquire_new_target() -> void:
+	var dupe_available_targets: Dictionary = available_targets.duplicate()
+	if dupe_available_targets.has(current_target_id):
+		dupe_available_targets.erase(current_target_id)
+	var ship_ids: Array = dupe_available_targets.keys()
+	var taq_range: int = ship_ids.size() - 1
+	var rand_key_number: int = randi_range(0, taq_range)
+	var new_target_id: RID = ship_ids[rand_key_number]
+	var ship_instance: Ship = dupe_available_targets[new_target_id]
+	var test_position: Vector2 = to_local(ship_instance.global_position)
+	var test_transform: Transform2D = face_weapon(test_position)
+	if can_look_at == true:
+		killcast.target_position = test_position
+		killcast.force_raycast_update()
+
+# Returns a new transform to face the weapon in the direction of an "enemy" ship.
+# Returns the default transform which is the default direction it should face given nothing
+# is actually within its effective range.
+func face_weapon(target_position: Vector2) -> Transform2D:
+	var target_transform: Transform2D = weapon_node.transform.looking_at(target_position)
+	var scale_transform: Vector2 = weapon_node.scale
+	target_transform = target_transform.scaled(scale_transform)
+	var dot_product: float = default_direction.x.dot(target_transform.x)
+	var angle_to_node: float = acos(dot_product)
+	can_look_at = true
+	if angle_to_node > arc_in_radians or dot_product < 0:
+		can_look_at = false
+		return default_direction
+	return target_transform
+
+func _physics_process(delta) -> void:
+	if manual_aim:
+		var mouse_position = to_local(get_global_mouse_position())
+		var face_direction: Transform2D = face_weapon(mouse_position)
+		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+	if killcast:
+		update_killcast()
+	if killcast and (auto_aim or auto_fire):
+		var face_direction: Transform2D = face_weapon(killcast.target_position)
+		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+	if killcast and auto_fire and can_look_at and can_fire:
+		fire(owner_rid.get_id())
+	elif killcast and not can_look_at and (auto_aim or auto_fire) and available_targets.size() > 1:
+		acquire_new_target()
+
+# this function has two purposes:
+# A) updates the raycast every physics frame to track a ship's current position
+# B) checks to see if a ship the player targets is within the effective range of the weapon
+func update_killcast() -> void:
+	var collider = killcast.get_collider()
+	if not collider is Ship: # Do not shoot at obstacles
+		can_look_at = false
+		return
+	if collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+		can_look_at = false
+		return
+	
+	current_target_id = collider.get_rid()
+	var ship_position: Vector2 = to_local(collider.global_position)
+	if target_engaged and current_target_id != target_ship_id:
+		var target_position: Vector2 = to_local(available_targets[target_ship_id].global_position)
+		var test_transform: Transform2D = face_weapon(target_position)
+		if can_look_at == true:
+			ship_position = target_position
+			current_target_id = target_ship_id
+			killcast.target_position = ship_position
+			killcast.force_raycast_update()
+			return
+	
+	killcast.target_position = ship_position

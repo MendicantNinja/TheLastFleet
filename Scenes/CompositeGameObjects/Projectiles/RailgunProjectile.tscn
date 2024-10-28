@@ -8,8 +8,8 @@ collision_layer = 0
 script = ExtResource("1_g831g")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+rotation = 1.5708
 polygon = PackedVector2Array(1, 6, 2, 4, 2, 2, 3, 2, 3, -1, 4, -1, 4, -5, 3, -6, 3, -7, 2, -7, 2, -8, -1, -8, -1, -7, -1, -7, -2, -7, -2, -5, -3, -5, -3, -1, -2, 0, -2, 2, -1, 2, -1, 4, 0, 4, 0, 6)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-rotation = -1.5708
 texture = ExtResource("1_ejilr")

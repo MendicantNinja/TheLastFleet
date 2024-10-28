@@ -35,7 +35,7 @@ func _get(property: StringName) -> Variant:
 	if property == "weapon_mount_name":
 	# Calculate weapon_mount_name dynamically based on the enum values
 		return "%s %s" % [data.size_enum.keys()[weapon_mount_size].capitalize(), data.weapon_mount_type_enum.keys()[weapon_mount_type].capitalize()]
-	return get(property)  # Return other properties normally
+	return property  # Return other properties normally
 
 
 

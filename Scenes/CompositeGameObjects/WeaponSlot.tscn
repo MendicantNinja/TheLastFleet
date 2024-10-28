@@ -1,15 +1,31 @@
-[gd_scene load_steps=4 format=3 uid="uid://cydvqlraj4ugp"]
+[gd_scene load_steps=5 format=3 uid="uid://cydvqlraj4ugp"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/weapon_slot.gd" id="1_j5k8b"]
 [ext_resource type="Resource" uid="uid://bg4bkltdik2mb" path="res://Resources/Weapons/EmptySlot.tres" id="2_yiwyf"]
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="3_d4mge"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_82o22"]
+
 [node name="WeaponSlot" type="Node2D"]
-rotation = 1.5708
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")
 weapon_mount = ExtResource("3_d4mge")
 
-[node name="WeaponMountSprite" type="Sprite2D" parent="."]
+[node name="WeaponNode" type="Node2D" parent="."]
 
-[node name="WeaponSprite" type="Sprite2D" parent="WeaponMountSprite"]
+[node name="WeaponMountSprite" type="Sprite2D" parent="WeaponNode"]
+
+[node name="WeaponSprite" type="Sprite2D" parent="WeaponNode/WeaponMountSprite"]
+rotation = 1.5708
+
+[node name="EffectiveRange" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
+input_pickable = false
+monitorable = false
+
+[node name="EffectiveRangeShape" type="CollisionShape2D" parent="EffectiveRange"]
+shape = SubResource("CircleShape2D_82o22")
+debug_color = Color(0, 0.6, 0.701961, 0.160784)
+
+[node name="ROFTimer" type="Timer" parent="."]
