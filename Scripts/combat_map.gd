@@ -39,7 +39,6 @@ func _ready() -> void:
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	for friendly_ship in friendly_group:
 		connect_ship_signals(friendly_ship)
-	pass
 
 func _process(delta) -> void:
 	queue_redraw()
@@ -148,6 +147,7 @@ func toggle_camera_drag() -> bool:
 	else:
 		camera_drag = false
 	return camera_drag
+
 # Connect any signals at the start of the scene to ensure that all friendly and enemy ships
 # are more than capable of signaling to each other changes to specific local scene information.
 # Currently it only handles signals for friendly ships but it would take little to no effort to

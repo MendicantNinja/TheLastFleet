@@ -39,6 +39,7 @@ var available_targets: Dictionary = {}
 var killcast: RayCast2D = null
 var target_ship_position: Vector2 = Vector2.ZERO
 var target_ship_id: RID
+var last_valid_position: Vector2 = Vector2.ZERO
 var current_target_id: RID
 var arc_in_radians: float = 0.0
 var default_direction: Transform2D
@@ -258,13 +259,18 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	target_transform = target_transform.scaled(scale_transform)
 	var dot_product: float = default_direction.x.dot(target_transform.x)
 	var angle_to_node: float = acos(dot_product)
+	
 	can_look_at = true
-	if angle_to_node > arc_in_radians or dot_product < 0 and manual_aim:
+	if angle_to_node > arc_in_radians or dot_product < 0:
 		can_look_at = false
-		return weapon_node.transform
-	elif angle_to_node > arc_in_radians or dot_product < 0 and not manual_aim:
-		can_look_at = false
+	
+	if not can_look_at and manual_aim:
+		target_transform = weapon_node.transform.looking_at(last_valid_position)
+	elif not can_look_at and not manual_aim:
 		return default_direction
+	elif can_look_at:
+		last_valid_position = target_position
+	
 	return target_transform
 
 func _physics_process(delta) -> void:
