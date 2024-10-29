@@ -63,12 +63,6 @@ func _unhandled_input(event) -> void:
 					dragging = false
 					queue_redraw()
 			# If the mouse is dragging and is not released or clicked or anything redraw the selection rectangle.
-			elif event is InputEventMouseMotion:
-				if dragging == true:
-					queue_redraw()
-				if camera_drag:
-					CombatCamera.position -= CombatCamera.event.relative / CombatCamera.zoom
-			# CombatCamera
 			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				if TacticalCamera.get_zoom() < Vector2(.5, .5):
 					TacticalCamera.zoom += Vector2(0.01, 0.01)
@@ -83,7 +77,12 @@ func _unhandled_input(event) -> void:
 				if zoom_value > zoom_max:
 					zoom_value -= Vector2(0.1, 0.1)
 			elif event.button_index == MOUSE_BUTTON_MIDDLE:
-						toggle_camera_drag()
+				toggle_camera_drag()
+	elif event is InputEventMouseMotion:
+		if dragging == true:
+				queue_redraw()
+		if camera_drag:
+			CombatCamera.position -= event.relative / CombatCamera.zoom
 	# Keys
 	elif event is InputEventKey:
 		if (event.keycode == KEY_G and event.is_pressed()):

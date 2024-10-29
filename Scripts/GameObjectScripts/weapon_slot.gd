@@ -260,7 +260,6 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	var angle_to_node: float = acos(dot_product)
 	can_look_at = true
 	if angle_to_node > arc_in_radians or dot_product < 0 and manual_aim:
-		print("elif called")
 		can_look_at = false
 		return weapon_node.transform
 	elif angle_to_node > arc_in_radians or dot_product < 0 and not manual_aim:

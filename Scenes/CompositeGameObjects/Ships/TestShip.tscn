@@ -42,7 +42,6 @@ stretch_mode = 0
 visible = false
 position = Vector2(46, -35)
 rotation = 1.5708
-scale = Vector2(1, 1)
 texture = ExtResource("2_yacd8")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]

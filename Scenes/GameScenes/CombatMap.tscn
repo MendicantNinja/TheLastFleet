@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=13 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ensw7"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_la3a5"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/combat_camera.gd" id="8_i043v"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -191,7 +190,6 @@ limit_bottom = 5000
 position_smoothing_enabled = true
 editor_draw_limits = true
 editor_draw_drag_margin = true
-script = ExtResource("8_i043v")
 
 [node name="SelectionArea" type="Area2D" parent="."]
 unique_name_in_owner = true
