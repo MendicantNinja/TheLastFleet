@@ -161,7 +161,6 @@ text = "[center]Cancel (G)"
 scroll_active = false
 
 [node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
-visible = false
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 8

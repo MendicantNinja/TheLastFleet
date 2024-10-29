@@ -12,6 +12,15 @@ extends Node2D
 var ships_in_combat: Array[Ship]
 var controlled_ship: Ship
 
+var camera_drag: bool = false
+var zoom_max: Vector2 = Vector2(0.5, 0.5)
+var zoom_min: Vector2 = Vector2(1.5, 1.5)
+var zoom_value: Vector2 = Vector2.ONE
+
+func _physics_process(delta) -> void:
+	if CombatCamera.zoom != zoom_value:
+		CombatCamera.zoom = lerp( CombatCamera.zoom, zoom_value, delta)
+
 # Box Selection
 var dragging: bool = false
 var box_selection_start: Vector2 = Vector2.ZERO
@@ -20,6 +29,7 @@ var line_color: Color = settings.gui_color
 @onready var selection_shape: CollisionShape2D = %SelectionShape
 
 func _ready() -> void:
+	CombatCamera.zoom = zoom_value
 	FleetDeploymentList.setup_deployment_screen()
 	#settings.swizzle(FleetDeploymentList)
 	settings.swizzle(FleetDeploymentPanel)
@@ -33,9 +43,6 @@ func _ready() -> void:
 
 func _process(delta) -> void:
 	queue_redraw()
-
-func _physics_process(delta) -> void:
-	pass
 
 func _unhandled_input(event) -> void:
 	if event is InputEventMouseButton: 
@@ -56,8 +63,11 @@ func _unhandled_input(event) -> void:
 					dragging = false
 					queue_redraw()
 			# If the mouse is dragging and is not released or clicked or anything redraw the selection rectangle.
-			elif event is InputEventMouseMotion and dragging == true:
-				queue_redraw()
+			elif event is InputEventMouseMotion:
+				if dragging == true:
+					queue_redraw()
+				if camera_drag:
+					CombatCamera.position -= CombatCamera.event.relative / CombatCamera.zoom
 			# CombatCamera
 			elif event.button_index == MOUSE_BUTTON_WHEEL_UP:
 				if TacticalCamera.get_zoom() < Vector2(.5, .5):
@@ -66,13 +76,14 @@ func _unhandled_input(event) -> void:
 				if TacticalCamera.get_zoom() > Vector2(0.01, 0.01):
 					TacticalCamera.zoom -= Vector2(0.01, 0.01)
 		if TacticalMap.visible == false:
-			if CombatCamera.enabled == true:
-				if event.button_index == MOUSE_BUTTON_WHEEL_UP:
-					if CombatCamera.get_zoom() < Vector2(2.0, 2.0):
-						CombatCamera.zoom += Vector2(0.1, 0.1)
-				elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-					if CombatCamera.get_zoom() > Vector2(.5, .5):
-						CombatCamera.zoom -= Vector2(0.1, 0.1)
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				if zoom_value < zoom_min:
+					zoom_value += Vector2(0.1, 0.1)
+			elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				if zoom_value > zoom_max:
+					zoom_value -= Vector2(0.1, 0.1)
+			elif event.button_index == MOUSE_BUTTON_MIDDLE:
+						toggle_camera_drag()
 	# Keys
 	elif event is InputEventKey:
 		if (event.keycode == KEY_G and event.is_pressed()):
@@ -132,6 +143,12 @@ func get_rect_start_position() -> Vector2:
 	return new_position
 	pass
 
+func toggle_camera_drag() -> bool:
+	if not camera_drag:
+		camera_drag = true
+	else:
+		camera_drag = false
+	return camera_drag
 # Connect any signals at the start of the scene to ensure that all friendly and enemy ships
 # are more than capable of signaling to each other changes to specific local scene information.
 # Currently it only handles signals for friendly ships but it would take little to no effort to
