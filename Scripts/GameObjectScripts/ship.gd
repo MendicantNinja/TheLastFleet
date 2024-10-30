@@ -1,7 +1,6 @@
 extends RigidBody2D
 class_name Ship
 
-
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
 @onready var RepathArea = $RepathArea
@@ -23,6 +22,7 @@ class_name Ship
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
+var armor: float = 0.0
 #var is_player: bool = false # For player-affiliated ships
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -90,6 +90,7 @@ func _ready() -> void:
 	var ship_hull = ship_stats.ship_hull
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
+	armor = ship_hull.armor
 	ShipSprite.self_modulate = settings.player_color
 	
 	var repath_shape: Shape2D = CircleShape2D.new()
@@ -126,7 +127,17 @@ func _ready() -> void:
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
-	
+
+func process_damage(projectile: Projectile) -> void:
+	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+	armor -= armor_damage_reduction
+	var hull_damage: float = armor_damage_reduction * projectile.damage
+	hull_integrity -= hull_damage
+	if hull_integrity <= 0.0:
+		destroy_ship()
+
+func destroy_ship() -> void:
+	queue_free()
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 

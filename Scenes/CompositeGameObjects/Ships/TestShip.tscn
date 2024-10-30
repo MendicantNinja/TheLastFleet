@@ -60,7 +60,7 @@ priority = 1
 
 [node name="RepathShape" type="CollisionShape2D" parent="RepathArea"]
 shape = SubResource("CircleShape2D_4lqs1")
-debug_color = Color(0, 0.6, 0.701961, 0.0588235)
+debug_color = Color(0, 0.6, 0.701961, 0.4)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
 position = Vector2(-25, -18)
