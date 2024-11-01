@@ -37,14 +37,15 @@ var target_engaged: bool = false
 
 var available_targets: Dictionary = {}
 var killcast: RayCast2D = null
-var target_ship_position: Vector2 = Vector2.ZERO
-var target_ship_id: RID
-var last_valid_position: Vector2 = Vector2.ZERO
-var current_target_id: RID
 var arc_in_radians: float = 0.0
+var target_ship_position: Vector2 = Vector2.ZERO
+var last_valid_position: Vector2 = Vector2.ZERO
 var default_direction: Transform2D
+var target_ship_id: RID
+var current_target_id: RID
 var owner_rid: RID
 
+signal weapon_slot_fired(flux)
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
@@ -53,6 +54,11 @@ func fire(ship_id: int) -> void:
 		return
 	if not can_fire:
 		return
+	
+	if weapon.flux_per_shot > 0.0:
+		weapon_slot_fired.emit(weapon.flux_per_shot)
+	elif weapon.flux_per_second > 0.0:
+		weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate()
 	projectile.global_transform = weapon_node.global_transform
@@ -85,8 +91,6 @@ func _ready():
 	
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
-	
-	set_weapon_size_and_color()
 
 func set_weapon_slot(p_weapon: Weapon) -> void:
 	weapon = p_weapon
@@ -104,6 +108,7 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 	owner_rid = owner_value
 	if not is_friendly:
 		auto_aim = true
+	set_weapon_size_and_color()
 
 func set_auto_aim() -> void:
 	if auto_aim == false:
@@ -136,7 +141,10 @@ func set_target_ship(ship_id: RID) -> void:
 	target_ship_id = ship_id
 
 func set_weapon_size_and_color():
-	weapon_mount_image.modulate = settings.player_color
+	if is_friendly:
+		weapon_mount_image.modulate = settings.player_color
+	elif not is_friendly:
+		weapon_mount_image.modulate = get_parent().self_modulate
 	#weapon_image.self_modulate = settings.player_color
 	match weapon_mount.weapon_mount_size:
 		data.size_enum.SMALL:

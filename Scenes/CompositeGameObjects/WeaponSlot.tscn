@@ -26,6 +26,5 @@ monitorable = false
 
 [node name="EffectiveRangeShape" type="CollisionShape2D" parent="EffectiveRange"]
 shape = SubResource("CircleShape2D_82o22")
-debug_color = Color(0, 0.6, 0.701961, 0.160784)
 
 [node name="ROFTimer" type="Timer" parent="."]

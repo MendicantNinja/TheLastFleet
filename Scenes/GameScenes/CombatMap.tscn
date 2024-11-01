@@ -197,19 +197,20 @@ unique_name_in_owner = true
 [node name="SelectionShape" type="CollisionShape2D" parent="SelectionArea"]
 unique_name_in_owner = true
 shape = SubResource("RectangleShape2D_ekgw8")
+debug_color = Color(1, 1, 0, 1)
 
 [node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(500, 900)
+position = Vector2(500, 500)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
 position = Vector2(3000, 200)
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
-modulate = Color(1, 0.0470588, 0.0588235, 1)
+self_modulate = Color(1, 0.0470588, 0.0588235, 1)
 position = Vector2(360, 195)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-modulate = Color(1, 0.0705882, 0.0470588, 1)
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
 position = Vector2(540, 195)
 collision_layer = 4

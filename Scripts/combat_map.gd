@@ -139,7 +139,6 @@ func get_rect_start_position() -> Vector2:
 	else: new_position.y = mouse_position.y
 	
 	return new_position
-	pass
 
 func toggle_camera_drag() -> bool:
 	if not camera_drag:

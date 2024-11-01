@@ -1,12 +1,15 @@
-[gd_scene load_steps=6 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=8 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
 [node name="TestShip" type="RigidBody2D"]
 collision_mask = 15
@@ -85,6 +88,18 @@ debug_path_custom_line_width = 3.0
 
 [node name="NavigationTimer" type="Timer" parent="."]
 wait_time = 3.0
+
+[node name="ShieldSlot" type="Node2D" parent="."]
+script = ExtResource("5_v4g3k")
+
+[node name="Shields" type="Area2D" parent="ShieldSlot"]
+collision_layer = 0
+collision_mask = 8
+input_pickable = false
+
+[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
+shape = SubResource("CircleShape2D_vu5jp")
+debug_color = Color(0.203599, 0.641024, 0, 0.160784)
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

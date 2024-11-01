@@ -18,11 +18,22 @@ class_name Ship
 # even though call_group() broke in 4.3 stable.
 @onready var WeaponSlot0 = $WeaponSlot0
 @onready var WeaponSlot1 = $WeaponSlot1
+@onready var ShieldSlot = $ShieldSlot
+@onready var ShieldArea = $ShieldSlot/Shields
+@onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
 
+# ship stats
 var ship_stats: ShipStats
 var speed: float = 0.0
 var hull_integrity: float = 0.0
 var armor: float = 0.0
+var shield_radius: float = 0.0
+var total_flux: float = 0.0
+var soft_flux: float = 0.0
+var hard_flux: float = 0.0
+var shield_upkeep: float = 0.0
+var shield_toggle: bool = false
+
 #var is_player: bool = false # For player-affiliated ships
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -54,7 +65,6 @@ var ship_select: bool = false:
 		elif value == false:
 			TacticalMapIcon.button_pressed = false
 			ship_select = value
-			
 
 # Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready/entering the ship into the scene.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
@@ -99,6 +109,14 @@ func _ready() -> void:
 	RepathArea.collision_layer = collision_layer
 	RepathArea.collision_mask = collision_mask
 	
+	shield_radius = ShipNavigationAgent.radius
+	
+	shield_upkeep = ship_hull.shield_upkeep
+	total_flux = ship_stats.flux
+	
+	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
+	ShipSprite.modulate = self_modulate
+	
 	if collision_layer == 1: # simplifies some things but definitely not a permanent solution
 		add_to_group("friendly")
 		is_friendly = true
@@ -112,6 +130,7 @@ func _ready() -> void:
 		if child is WeaponSlot:
 			all_weapons.append(child)
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
+			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 	for i in range(all_weapons.size()):
 		# Temporary hack to test weapons so that the mounts aren't empty.
 		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
@@ -139,6 +158,22 @@ func process_damage(projectile: Projectile) -> void:
 func destroy_ship() -> void:
 	queue_free()
 
+func toggle_shield() -> void:
+	if not shield_toggle:
+		shield_toggle = true
+		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
+		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
+	elif shield_toggle:
+		shield_toggle = false
+		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
+		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
+
+func _on_Weapon_Slot_Fired(flux_cost) -> void:
+	hard_flux += flux_cost
+
+func _on_Shield_Hit(damage: float, damage_type: int) -> void:
+	hard_flux += damage * ship_stats.shield_efficiency
+
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
  #888   8 `88b.    8   888   .d88'  888       8       888      
@@ -159,6 +194,8 @@ func _input(event: InputEvent) -> void:
 			if (event.keycode == KEY_T and event.pressed) and ship_select:
 				toggle_manual_control()
 				toggle_manual_aim(all_weapons) # Replace all_weapons with specific weapon systems configured in the ship refit screen from ship stats.
+			if event.keycode == KEY_1 and event.pressed and ship_select:
+				toggle_shield()
 			elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
 				toggle_auto_aim(all_weapons)
 			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
@@ -202,7 +239,6 @@ func toggle_manual_control() -> void:
 		manual_control = true
 		CombatMap.controlled_ship = self
 	else:
-		
 		manual_control = false
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
@@ -240,8 +276,6 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.set_auto_fire()
 
-#func _on_EffectiveRange_body_exited(body: Node2D) -> void:
-	#pass
 #ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 #`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
  #8 `88b.    8      .8"888.       `888.   .8'    888  888               .8"888.          888       888  888      888  8 `88b.    8  
@@ -250,11 +284,15 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
  #8       `888   .8'     `888.       `888'       888  `88.    .88'   .8'     `888.       888       888  `88b    d88'  8       `888  
 #o8o        `8  o88o     o8888o       `8'       o888o  `Y8bood8P'   o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  
 																																   
+
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
-		
+	
 	var velocity: Vector2 = Vector2.ZERO
+	
+	if shield_toggle:
+		soft_flux += shield_upkeep
 	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta

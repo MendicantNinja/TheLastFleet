@@ -53,5 +53,6 @@ func _on_Projectile_collision(body) -> void:
 	
 	if "hull_integrity" in body:
 		body.process_damage(self)
+		queue_free()
 	
-	queue_free()
+	pass
