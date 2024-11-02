@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=10 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
@@ -10,6 +10,14 @@
 radius = 0.01
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
+
+[sub_resource type="Gradient" id="Gradient_nks55"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_47ww1"]
+gradient = SubResource("Gradient_nks55")
+width = 10
 
 [node name="TestShip" type="RigidBody2D"]
 collision_mask = 15
@@ -100,6 +108,22 @@ input_pickable = false
 [node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
 shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203599, 0.641024, 0, 0.160784)
+
+[node name="SoftFluxIndicator" type="TextureProgressBar" parent="."]
+modulate = Color(0.415601, 0.920391, 0, 1)
+offset_right = 10.0
+offset_bottom = 100.0
+fill_mode = 2
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_47ww1")
+
+[node name="HardFluxIndicator" type="TextureProgressBar" parent="."]
+modulate = Color(0.415686, 0.921569, 0, 1)
+offset_right = 10.0
+offset_bottom = 100.0
+fill_mode = 2
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_47ww1")
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

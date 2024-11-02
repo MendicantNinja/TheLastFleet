@@ -32,6 +32,7 @@ var auto_aim: bool = false
 var auto_fire: bool = false
 var can_look_at: bool = false
 var can_fire: bool = false
+var flux_overload: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
 
@@ -48,11 +49,11 @@ var owner_rid: RID
 signal weapon_slot_fired(flux)
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
+	if flux_overload or not can_fire:
+		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return
 	if manual_aim and not can_look_at:
-		return
-	if not can_fire:
 		return
 	
 	if weapon.flux_per_shot > 0.0:
@@ -135,6 +136,9 @@ func set_manual_aim() -> void:
 		manual_aim = false
 		auto_aim = true
 		auto_fire = true
+
+func update_flux_overload(flux_state: bool) -> void:
+	flux_overload = flux_state
 
 # Assigns the RID of the ship the player targets to the variable target_ship_id.
 func set_target_ship(ship_id: RID) -> void:
@@ -291,7 +295,7 @@ func _physics_process(delta) -> void:
 	if killcast and (auto_aim or auto_fire):
 		var face_direction: Transform2D = face_weapon(killcast.target_position)
 		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
-	if killcast and auto_fire and can_look_at and can_fire:
+	if killcast and not flux_overload and auto_fire and can_look_at and can_fire:
 		fire(owner_rid.get_id())
 	elif killcast and not can_look_at and (auto_aim or auto_fire) and available_targets.size() > 1:
 		acquire_new_target()

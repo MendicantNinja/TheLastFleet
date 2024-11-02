@@ -6,7 +6,8 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
-
+@onready var SoftFluxIndicator = $SoftFluxIndicator
+@onready var HardFluxIndicator = $HardFluxIndicator
 @onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
 @onready var TacticalMap = CombatMap.get_node("%TacticalMap")
@@ -33,8 +34,8 @@ var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
+var flux_overload: bool = false
 
-#var is_player: bool = false # For player-affiliated ships
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
 	set(value):
@@ -114,6 +115,11 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
+	var soft_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius)
+	var shard_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius * 0.7, ShipNavigationAgent.radius)
+	SoftFluxIndicator.position = soft_flux_hud_offset
+	HardFluxIndicator.position = shard_flux_hud_offset
+	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	ShipSprite.modulate = self_modulate
 	
@@ -159,6 +165,9 @@ func destroy_ship() -> void:
 	queue_free()
 
 func toggle_shield() -> void:
+	if not shield_toggle and flux_overload:
+		return
+	
 	if not shield_toggle:
 		shield_toggle = true
 		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
@@ -169,10 +178,26 @@ func toggle_shield() -> void:
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
 
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
-	hard_flux += flux_cost
+	soft_flux += flux_cost
 
 func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 	hard_flux += damage * ship_stats.shield_efficiency
+
+func update_flux_indicators() -> void:
+	var current_flux: float = soft_flux + hard_flux
+	if current_flux >= total_flux and not flux_overload:
+		flux_overload = true
+		for weapon in all_weapons:
+			weapon.update_flux_overload(flux_overload)
+		return
+	elif current_flux < total_flux and flux_overload:
+		flux_overload = false
+		for weapon in all_weapons:
+			weapon.update_flux_overload(flux_overload)
+	
+	var flux_rate: float = 100 / total_flux
+	SoftFluxIndicator.value = flux_rate * soft_flux
+	HardFluxIndicator.value = flux_rate * hard_flux
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -185,7 +210,9 @@ func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 # Any generic input event.
 func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		if TacticalMap.visible and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select :
+		if manual_control and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT:
+			toggle_shield()
+		elif TacticalMap.visible and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
@@ -194,8 +221,6 @@ func _input(event: InputEvent) -> void:
 			if (event.keycode == KEY_T and event.pressed) and ship_select:
 				toggle_manual_control()
 				toggle_manual_aim(all_weapons) # Replace all_weapons with specific weapon systems configured in the ship refit screen from ship stats.
-			if event.keycode == KEY_1 and event.pressed and ship_select:
-				toggle_shield()
 			elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
 				toggle_auto_aim(all_weapons)
 			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
@@ -204,11 +229,6 @@ func _input(event: InputEvent) -> void:
 			if (event.keycode == KEY_R and event.pressed) and mouse_hover:
 				var target_ship_id = get_rid()
 				emit_signal("ship_targeted", get_rid())
-		else:
-			if (event.keycode == KEY_F and event.is_pressed()):
-				fire_weapon_slot(all_weapons[0])
-			if (event.keycode == KEY_Q and event.is_pressed()):
-				fire_weapon_system(all_weapons)
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -291,11 +311,25 @@ func _physics_process(delta: float) -> void:
 	
 	var velocity: Vector2 = Vector2.ZERO
 	
-	if shield_toggle:
-		soft_flux += shield_upkeep
-	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta
+	
+	if manual_control and Input.is_action_pressed("vent flux"):
+		if soft_flux > 0.0:
+			soft_flux -= ship_stats.flux_dissipation
+		elif hard_flux > 0.0:
+			hard_flux -= ship_stats.flux_dissipation
+		update_flux_indicators()
+	
+	if manual_control and Input.is_action_pressed("m1") and not flux_overload:
+		fire_weapon_system(all_weapons)
+		update_flux_indicators()
+	
+	if shield_toggle and not flux_overload:
+		soft_flux += shield_upkeep
+		update_flux_indicators()
+	elif shield_toggle and flux_overload:
+		toggle_shield()
 	
 	if manual_control:
 		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
@@ -311,9 +345,6 @@ func _physics_process(delta: float) -> void:
 		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
 		velocity = rotate_movement * movement_delta
 		velocity += ease_velocity(velocity)
-	
-	if manual_control and Input.is_action_pressed("m1"):
-		fire_weapon_system(all_weapons)
 	
 	if ShipNavigationAgent.get_max_speed() != movement_delta:
 		ShipNavigationAgent.set_max_speed(movement_delta)
@@ -362,6 +393,9 @@ func _physics_process(delta: float) -> void:
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
 		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
 	
+	#if velocity == Vector2.ZERO and acceleration != Vector2.ZERO:
+		#acceleration = Vector2.ZERO
+	#elif velocity != Vector2.ZERO:
 	acceleration += velocity - linear_velocity
 	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
 	
@@ -370,6 +404,10 @@ func _physics_process(delta: float) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
+	
+	#if force == Vector2.ZERO:
+		#linear_velocity = linear_velocity
+	
 	if force.abs().floor() != Vector2.ZERO and not manual_control:
 		apply_central_force(force)
 	
