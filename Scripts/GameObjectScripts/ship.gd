@@ -8,6 +8,7 @@ class_name Ship
 @onready var ShipSprite = $ShipSprite
 @onready var SoftFluxIndicator = $SoftFluxIndicator
 @onready var HardFluxIndicator = $HardFluxIndicator
+@onready var HullIntegrityIndicator = $HullIntegrityIndicator
 @onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
 @onready var TacticalMap = CombatMap.get_node("%TacticalMap")
@@ -116,9 +117,13 @@ func _ready() -> void:
 	total_flux = ship_stats.flux
 	
 	var soft_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius)
-	var shard_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius * 0.7, ShipNavigationAgent.radius)
+	var hard_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius + 3, ShipNavigationAgent.radius)
+	var hull_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius * 0.7, ShipNavigationAgent.radius)
 	SoftFluxIndicator.position = soft_flux_hud_offset
-	HardFluxIndicator.position = shard_flux_hud_offset
+	HardFluxIndicator.position = hard_flux_hud_offset
+	HullIntegrityIndicator.position = hull_hud_offset
+	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
+	HullIntegrityIndicator.value = hull_integrity
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	ShipSprite.modulate = self_modulate
@@ -158,6 +163,7 @@ func process_damage(projectile: Projectile) -> void:
 	armor -= armor_damage_reduction
 	var hull_damage: float = armor_damage_reduction * projectile.damage
 	hull_integrity -= hull_damage
+	HullIntegrityIndicator.value = hull_integrity
 	if hull_integrity <= 0.0:
 		destroy_ship()
 
@@ -196,7 +202,7 @@ func update_flux_indicators() -> void:
 			weapon.update_flux_overload(flux_overload)
 	
 	var flux_rate: float = 100 / total_flux
-	SoftFluxIndicator.value = flux_rate * soft_flux
+	SoftFluxIndicator.texture_progress_offset.y = floor(flux_rate * soft_flux)
 	HardFluxIndicator.value = flux_rate * hard_flux
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
