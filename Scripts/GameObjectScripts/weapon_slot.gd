@@ -28,6 +28,7 @@ class_name WeaponSlot
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
 var manual_aim: bool = false
+var hover: bool = false
 var auto_aim: bool = false
 var auto_fire: bool = false
 var can_look_at: bool = false
@@ -79,7 +80,7 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 	weapon = p_weapon
 
 func _draw() -> void:
-	if not manual_aim:
+	if not manual_aim and not hover:
 		range_display_color = Color(range_display_color, 0.1)
 		return
 	
@@ -87,8 +88,8 @@ func _draw() -> void:
 	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
 	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
 	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))
-	var start_transform: Vector2 = weapon_node.transform.x.rotated(start_angle)
-	var end_transform: Vector2 = weapon_node.transform.x.rotated(end_angle)
+	var start_transform: Vector2 = default_direction.x.rotated(start_angle)
+	var end_transform: Vector2 = default_direction.x.rotated(end_angle)
 	start_angle = start_transform.angle()
 	end_angle = end_transform.angle()
 	for i in range(0, subdivisions):
@@ -196,6 +197,10 @@ func set_weapon_size_and_color():
 			#weapon_mount_image.self_modulate = Color8(255, 198, 184, 255)
 		#_:
 			#print("Unknown weapon type.")
+
+func toggle_mouse_hover(mouse_hover: bool) -> void:
+	hover = mouse_hover
+	queue_redraw()
 
 func _on_ROF_timeout() -> void:
 	can_fire = true

@@ -250,9 +250,13 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 
 func _on_mouse_entered() -> void:
 	mouse_hover = true
+	for weapon_slot in all_weapons:
+		weapon_slot.toggle_mouse_hover(mouse_hover)
 
 func _on_mouse_exited() -> void:
 	mouse_hover = false
+	for weapon_slot in all_weapons:
+		weapon_slot.toggle_mouse_hover(mouse_hover)
 
 func toggle_manual_control() -> void:
 	# The visible indicator is turned on and off by the manual control variable's custom setter. Otherwise recursion issues occur.
