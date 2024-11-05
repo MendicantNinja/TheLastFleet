@@ -43,6 +43,7 @@ gradient = SubResource("Gradient_lqjnm")
 width = 10
 
 [node name="TestShip" type="RigidBody2D"]
+z_as_relative = false
 collision_mask = 15
 input_pickable = true
 gravity_scale = 0.0
@@ -134,31 +135,31 @@ debug_color = Color(0.203599, 0.641024, 0, 0.160784)
 
 [node name="SoftFluxIndicator" type="TextureProgressBar" parent="."]
 modulate = Color(0.415601, 0.920391, 0, 1)
+top_level = true
 texture_filter = 1
-offset_right = 16.0
-offset_bottom = 100.0
+offset_right = 100.0
+offset_bottom = 16.0
 value = 4.0
-fill_mode = 2
 nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="."]
 modulate = Color(0.415686, 0.921569, 0, 1)
+top_level = true
 texture_filter = 1
-offset_left = 3.0
-offset_right = 13.0
-offset_bottom = 100.0
-fill_mode = 2
+offset_top = 3.0
+offset_right = 100.0
+offset_bottom = 13.0
 nine_patch_stretch = true
 texture_under = SubResource("GradientTexture1D_amwlv")
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
 [node name="HullIntegrityIndicator" type="TextureProgressBar" parent="."]
 modulate = Color(0.415686, 0.921569, 0, 1)
+top_level = true
 texture_filter = 1
-offset_right = 10.0
-offset_bottom = 100.0
-fill_mode = 2
+offset_right = 100.0
+offset_bottom = 10.0
 nine_patch_stretch = true
 texture_under = SubResource("GradientTexture1D_t5eam")
 texture_progress = SubResource("GradientTexture1D_17qoa")

@@ -36,6 +36,10 @@ var flux_overload: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
 
+var range_display_color: Color = Color.SNOW
+var range_display_count: int = 64
+var range_display_width: float = 0.5
+
 var available_targets: Dictionary = {}
 var killcast: RayCast2D = null
 var arc_in_radians: float = 0.0
@@ -73,6 +77,22 @@ func fire(ship_id: int) -> void:
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
 	weapon_mount = p_weapon_mount
 	weapon = p_weapon
+
+func _draw() -> void:
+	if not manual_aim:
+		range_display_color = Color(range_display_color, 0.1)
+		return
+	
+	var divisor: float = 100.0
+	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
+	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
+	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))
+	var start_transform: Vector2 = weapon_node.transform.x.rotated(start_angle)
+	var end_transform: Vector2 = weapon_node.transform.x.rotated(end_angle)
+	start_angle = start_transform.angle()
+	end_angle = end_transform.angle()
+	for i in range(0, subdivisions):
+		draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
 
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
@@ -136,6 +156,7 @@ func set_manual_aim() -> void:
 		manual_aim = false
 		auto_aim = true
 		auto_fire = true
+	queue_redraw()
 
 func update_flux_overload(flux_state: bool) -> void:
 	flux_overload = flux_state

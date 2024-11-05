@@ -99,16 +99,13 @@ func tactical_camera() -> void:
 	elif TacticalMap.visible == true:
 		TacticalCamera.enabled = false
 		CombatCamera.enabled = true
-		
-		
+
 # Box Selection Stuff.
 func _draw() -> void:
 	if box_selection_start == Vector2.ZERO or TacticalMap.visible == false or dragging == false: 
 		return
 	var end: Vector2 = get_global_mouse_position()
 	var start: Vector2 = box_selection_start
-	
-	
 	draw_rect(Rect2(start, end - start), settings.gui_color, false, 6, true)
 
 func select_units() -> void:

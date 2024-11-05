@@ -33,6 +33,9 @@ var shield_radius: float = 0.0
 var total_flux: float = 0.0
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
+var soft_flux_hud_offset: Vector2 = Vector2.ZERO
+var hard_flux_hud_offset: Vector2 = Vector2.ZERO
+var hull_hud_offset: Vector2 = Vector2.ZERO
 var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
@@ -116,12 +119,9 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
-	var soft_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius)
-	var hard_flux_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius + 3, ShipNavigationAgent.radius)
-	var hull_hud_offset: Vector2 = Vector2(ShipNavigationAgent.radius * 0.7, ShipNavigationAgent.radius)
-	SoftFluxIndicator.position = soft_flux_hud_offset
-	HardFluxIndicator.position = hard_flux_hud_offset
-	HullIntegrityIndicator.position = hull_hud_offset
+	soft_flux_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius)
+	hard_flux_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius + 3)
+	hull_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius * 0.7)
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
 	HullIntegrityIndicator.value = hull_integrity
 	
@@ -202,7 +202,7 @@ func update_flux_indicators() -> void:
 			weapon.update_flux_overload(flux_overload)
 	
 	var flux_rate: float = 100 / total_flux
-	SoftFluxIndicator.texture_progress_offset.y = floor(flux_rate * soft_flux)
+	SoftFluxIndicator.texture_progress_offset.x = floor(flux_rate * soft_flux)
 	HardFluxIndicator.value = flux_rate * hard_flux
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
@@ -316,6 +316,10 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	var velocity: Vector2 = Vector2.ZERO
+	
+	SoftFluxIndicator.position = global_position + soft_flux_hud_offset
+	HardFluxIndicator.position = global_position + hard_flux_hud_offset
+	HullIntegrityIndicator.position = global_position + hull_hud_offset
 	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta
