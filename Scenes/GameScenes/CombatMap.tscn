@@ -51,7 +51,41 @@ theme_override_fonts/font = ExtResource("3_ho88f")
 theme_override_font_sizes/font_size = 32
 text = "TACTICAL DISPLAY"
 
+[node name="Label2" type="Label" parent="TacticalMap"]
+top_level = true
+offset_left = 13.0
+offset_top = 1046.0
+offset_right = 2836.0
+offset_bottom = 2319.0
+theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
+theme_override_fonts/font = ExtResource("3_ho88f")
+theme_override_font_sizes/font_size = 38
+text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
+CONTROLS 
+(In Tactical Map):
+Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all. Hold Ctrl to select multiple.
+Right click creates a move order for selected ships.
+(With a ship selected) T = toggle manual control.
+(Over an enemy ship) R = Set enemy as target. 
+
+(In Manual Control)
+Left click to fire. Right click for shields. WASD to move, Q/E to strafe.
+
+(Camera)
+Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
+
+(Anywhere)
+Tab = Open Tactical Map
+G = Open Deployment Screen (WIP)
+
+
+
+
+
+"
+
 [node name="FleetDeployment" type="CanvasLayer" parent="."]
+visible = false
 
 [node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
 unique_name_in_owner = true
