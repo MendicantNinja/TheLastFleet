@@ -66,7 +66,6 @@ CONTROLS
 Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all. Hold Ctrl to select multiple.
 Right click creates a move order for selected ships.
 (With a ship selected) T = toggle manual control.
-(Over an enemy ship) R = Set enemy as target. 
 
 (In Manual Control)
 Left click to fire. Right click for shields. WASD to move, Q/E to strafe.
@@ -75,6 +74,7 @@ Left click to fire. Right click for shields. WASD to move, Q/E to strafe.
 Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
 
 (Anywhere)
+(Over an enemy ship) R = Set enemy as target. 
 Tab = Open Tactical Map
 G = Open Deployment Screen (WIP)
 
