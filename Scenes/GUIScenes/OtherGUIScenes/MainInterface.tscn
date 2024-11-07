@@ -1,0 +1,134 @@
+[gd_scene load_steps=8 format=3 uid="uid://bppd0ggvntjb2"]
+
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/main_interface.gd" id="1_6rrp8"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="1_dpiv1"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="2_br1un"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="3_7iqua"]
+[ext_resource type="PackedScene" uid="uid://dt4vyn32lj4k7" path="res://Scenes/GUIScenes/OtherGUIScenes/FleetView.tscn" id="4_jv4jk"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/swizzle_control.gd" id="4_xljp3"]
+[ext_resource type="PackedScene" uid="uid://j6uwhl87p0k2" path="res://Scenes/GUIScenes/OtherGUIScenes/RefitView.tscn" id="7_qqfk0"]
+
+[node name="MainInterface" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6rrp8")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CanvasLayer"]
+offset_left = 2.0
+offset_top = 1026.0
+offset_right = 1758.0
+offset_bottom = 1126.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/separation = 12
+
+[node name="(F)leet" type="TextureButton" parent="CanvasLayer/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("1_dpiv1")
+texture_hover = ExtResource("2_br1un")
+script = ExtResource("4_xljp3")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/(F)leet"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_7iqua")
+bbcode_enabled = true
+text = "[center](F)leet"
+scroll_active = false
+
+[node name="R(efit)" type="TextureButton" parent="CanvasLayer/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("1_dpiv1")
+texture_hover = ExtResource("2_br1un")
+script = ExtResource("4_xljp3")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/R(efit)"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_7iqua")
+bbcode_enabled = true
+text = "[center](R)efit"
+scroll_active = false
+
+[node name="(I)nventory" type="TextureButton" parent="CanvasLayer/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("1_dpiv1")
+texture_hover = ExtResource("2_br1un")
+script = ExtResource("4_xljp3")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/(I)nventory"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_7iqua")
+bbcode_enabled = true
+text = "[center](I)nventory"
+scroll_active = false
+
+[node name="(M)ap" type="TextureButton" parent="CanvasLayer/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("1_dpiv1")
+texture_hover = ExtResource("2_br1un")
+script = ExtResource("4_xljp3")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="CanvasLayer/HBoxContainer/(M)ap"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_7iqua")
+bbcode_enabled = true
+text = "[center](M)ap"
+scroll_active = false
+
+[node name="FleetView" parent="." instance=ExtResource("4_jv4jk")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+
+[node name="RefitView" parent="." instance=ExtResource("7_qqfk0")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1

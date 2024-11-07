@@ -42,9 +42,9 @@ var target_ship_id: RID
 var current_target_id: RID
 var arc_in_radians: float = 0.0
 var default_direction: Transform2D
-var owner_rid: RID
+var owner_rid: RID 
 
-# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
+# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot.
 func fire(ship_id: int) -> void:
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return

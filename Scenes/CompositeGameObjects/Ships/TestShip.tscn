@@ -19,16 +19,12 @@ script = ExtResource("1_sc1ei")
 
 [node name="TacticalMapIcon" type="TextureButton" parent="."]
 visible = false
-z_index = 1
+z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.0
-offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 focus_mode = 0
@@ -48,10 +44,9 @@ texture = ExtResource("2_yacd8")
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("2_13ai0")
-offset = Vector2(0, -50)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(59, 0.000213579, -44.9998, -51.0002, -45.0002, 51.9998)
+polygon = PackedVector2Array(52, 0, -49, -51, -49, 51)
 
 [node name="RepathArea" type="Area2D" parent="."]
 collision_layer = 0

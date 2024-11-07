@@ -1,7 +1,5 @@
 extends Node2D
-
 class_name Fleet
-
 var fleet_stats: FleetStats = FleetStats.new()
 
 
@@ -24,7 +22,7 @@ func remove_ship(ship_index: int) -> void:
 
 func move_ship(to_index: int, from_index: int) -> void:
 	if to_index < 0 or to_index >= fleet_stats.ships.size() or from_index < 0 or from_index >= fleet_stats.ships.size():
-		push_error("Fleet->swap_ship() index out of bounds")
+		push_error("Fleet->move_ship() index out of bounds")
 		return
 
 	if to_index != from_index:

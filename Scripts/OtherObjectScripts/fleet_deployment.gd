@@ -6,7 +6,7 @@ func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
 	%Deploy.pressed.connect(self.deploy_ships)
-	
+	%BlackenBackground.size = $"../../../PlayableArea/PlayableAreaBounds".shape.size
 	pass
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
@@ -60,7 +60,7 @@ func on_cancel_pressed() -> void:
 
 func setup_deployment_screen() -> void:
 	# Add ships to the display and set the ship itself as item metadata.
-	var scene_path = "res://Scenes/GUIScenes/OtherGUIScenes/GUIShipIcon.tscn"
+	var scene_path = "res://Scenes/GUIScenes/CombatGUIScenes/GUIShipIcon.tscn"
 	var gui_icon_scene = load(scene_path)
 	ships_to_deploy.resize(game_state.player_fleet.fleet_stats.ships.size())
 	for i in range(game_state.player_fleet.fleet_stats.ships.size()):

@@ -66,15 +66,15 @@ func deploy_ship() -> void:
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.player_color
-		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.1
 		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
+		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.6
 		ManualControlIndicator.self_modulate = settings.player_color
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.enemy_color
-		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.1
+		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.6
 	# Ship is ready and has entered the scene tree.
 	if TacticalMap.visible == true:
 		TacticalMapIcon.show()
