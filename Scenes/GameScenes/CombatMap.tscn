@@ -200,10 +200,13 @@ shape = SubResource("RectangleShape2D_ekgw8")
 debug_color = Color(1, 1, 0, 1)
 
 [node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(500, 500)
+position = Vector2(500, 1000)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(3000, 200)
+position = Vector2(800, 1000)
+
+[node name="PlayerShip2" parent="." instance=ExtResource("3_pai6p")]
+position = Vector2(1100, 1000)
 
 [node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
 self_modulate = Color(1, 0.0470588, 0.0588235, 1)
@@ -212,5 +215,25 @@ collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
 self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(540, 195)
+position = Vector2(650, 195)
+collision_layer = 4
+
+[node name="TestShip3" parent="." instance=ExtResource("3_pai6p")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(1000, 195)
+collision_layer = 4
+
+[node name="TestShip4" parent="." instance=ExtResource("3_pai6p")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(1200, 500)
+collision_layer = 4
+
+[node name="TestShip5" parent="." instance=ExtResource("3_pai6p")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(800, 500)
+collision_layer = 4
+
+[node name="TestShip6" parent="." instance=ExtResource("3_pai6p")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(250, 400)
 collision_layer = 4

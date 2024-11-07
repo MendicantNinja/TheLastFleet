@@ -113,7 +113,6 @@ radius = 70.0
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 max_speed = 1000.0
-debug_enabled = true
 debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0

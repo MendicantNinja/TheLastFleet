@@ -81,7 +81,7 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 
 func _draw() -> void:
 	if not manual_aim and not display_aim:
-		range_display_color = Color(range_display_color, 0.1)
+		range_display_color = Color(range_display_color, 0.4)
 		return
 	
 	var divisor: float = 100.0
