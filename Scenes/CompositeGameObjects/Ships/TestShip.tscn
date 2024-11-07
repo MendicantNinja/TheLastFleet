@@ -74,12 +74,6 @@ action_mode = 0
 button_mask = 0
 stretch_mode = 0
 
-[node name="ManualControlIndicator" type="Sprite2D" parent="."]
-visible = false
-position = Vector2(46, -35)
-rotation = 1.5708
-texture = ExtResource("2_yacd8")
-
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
@@ -134,6 +128,7 @@ shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203599, 0.641024, 0, 0.160784)
 
 [node name="CenterCombatHUD" type="Control" parent="."]
+physics_interpolation_mode = 1
 top_level = true
 layout_mode = 3
 anchors_preset = 0
@@ -141,6 +136,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+physics_interpolation_mode = 0
 modulate = Color(0.415601, 0.920391, 0, 1)
 texture_filter = 1
 layout_mode = 0
@@ -151,6 +147,7 @@ nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
 [node name="SoftFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+physics_interpolation_mode = 0
 modulate = Color(0.415686, 0.921569, 0, 1)
 texture_filter = 1
 layout_mode = 0
@@ -162,6 +159,7 @@ texture_under = SubResource("GradientTexture1D_amwlv")
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
 [node name="HullIntegrityIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+physics_interpolation_mode = 0
 modulate = Color(0.415686, 0.921569, 0, 1)
 texture_filter = 1
 layout_mode = 0
@@ -172,11 +170,20 @@ texture_under = SubResource("GradientTexture1D_t5eam")
 texture_progress = SubResource("GradientTexture1D_17qoa")
 
 [node name="ShipTargetIcon" type="TextureRect" parent="CenterCombatHUD"]
+physics_interpolation_mode = 0
 texture_filter = 1
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
 texture = ExtResource("6_ufc28")
+
+[node name="ManualControlIndicator" type="TextureRect" parent="CenterCombatHUD"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_right = 34.0
+offset_bottom = 30.0
+texture = ExtResource("2_yacd8")
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

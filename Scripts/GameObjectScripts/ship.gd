@@ -10,11 +10,11 @@ class_name Ship
 @onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
 @onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
 @onready var HullIntegrityIndicator = $CenterCombatHUD/HullIntegrityIndicator
+@onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
 @onready var TacticalMap = CombatMap.get_node("%TacticalMap")
-@onready var ManualControlIndicator = $ManualControlIndicator
 @onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
@@ -98,6 +98,8 @@ func deploy_ship() -> void:
 		TacticalMapIcon.show()
 
 func _ready() -> void:
+	ShipSprite.z_index = 1
+	
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
@@ -123,11 +125,14 @@ func _ready() -> void:
 	var hard_flux_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius)
 	var hull_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius * 0.7)
 	var target_ship_offset: Vector2 = Vector2(-shield_radius, shield_radius)
+	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
 	SoftFluxIndicator.position = soft_flux_hud_offset
 	HardFluxIndicator.position = hard_flux_hud_offset
 	HullIntegrityIndicator.position = hull_hud_offset
 	ShipTargetIcon.position = target_ship_offset
+	ManualControlIndicator.position = manual_control_offset
 	
+	ManualControlIndicator.visible = false
 	ShipTargetIcon.visible = false
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
 	HullIntegrityIndicator.value = hull_integrity

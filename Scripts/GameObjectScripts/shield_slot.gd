@@ -65,10 +65,10 @@ func _on_Shields_entered(projectile: Projectile) -> void:
 	var look_at_projectile: Transform2D = shield_transform.looking_at(projectile.global_position)
 	var dot_product: float = shield_transform.x.dot(look_at_projectile.x)
 	var angle_to_projectile: float = acos(dot_product)
-	var shield_arc: float = end_angle - start_angle
+	var shield_arc: float = (end_angle - start_angle) / 2
 	
-	if angle_to_projectile < shield_arc:
+	if angle_to_projectile > shield_arc:
+		return
+	elif angle_to_projectile < shield_arc:
 		projectile.call_deferred("queue_free")
 		shield_hit.emit(projectile.damage, projectile.damage_type)
-	elif angle_to_projectile > shield_arc:
-		return
