@@ -1,10 +1,11 @@
-[gd_scene load_steps=16 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=17 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
+[ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
@@ -133,20 +134,27 @@ input_pickable = false
 shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203599, 0.641024, 0, 0.160784)
 
-[node name="SoftFluxIndicator" type="TextureProgressBar" parent="."]
-modulate = Color(0.415601, 0.920391, 0, 1)
+[node name="CenterCombatHUD" type="Control" parent="."]
 top_level = true
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+modulate = Color(0.415601, 0.920391, 0, 1)
 texture_filter = 1
+layout_mode = 0
 offset_right = 100.0
 offset_bottom = 16.0
 value = 4.0
 nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
-[node name="HardFluxIndicator" type="TextureProgressBar" parent="."]
+[node name="SoftFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
 modulate = Color(0.415686, 0.921569, 0, 1)
-top_level = true
 texture_filter = 1
+layout_mode = 0
 offset_top = 3.0
 offset_right = 100.0
 offset_bottom = 13.0
@@ -154,15 +162,22 @@ nine_patch_stretch = true
 texture_under = SubResource("GradientTexture1D_amwlv")
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
-[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="."]
+[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
 modulate = Color(0.415686, 0.921569, 0, 1)
-top_level = true
 texture_filter = 1
+layout_mode = 0
 offset_right = 100.0
 offset_bottom = 10.0
 nine_patch_stretch = true
 texture_under = SubResource("GradientTexture1D_t5eam")
 texture_progress = SubResource("GradientTexture1D_17qoa")
+
+[node name="ShipTargetIcon" type="TextureRect" parent="CenterCombatHUD"]
+texture_filter = 1
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("6_ufc28")
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

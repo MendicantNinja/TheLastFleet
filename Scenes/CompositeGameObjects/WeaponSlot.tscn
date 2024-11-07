@@ -7,7 +7,6 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_82o22"]
 
 [node name="WeaponSlot" type="Node2D"]
-z_index = 1
 z_as_relative = false
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")

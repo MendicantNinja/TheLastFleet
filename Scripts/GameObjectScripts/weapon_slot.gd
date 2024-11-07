@@ -28,7 +28,7 @@ class_name WeaponSlot
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
 var manual_aim: bool = false
-var hover: bool = false
+var display_aim: bool = false
 var auto_aim: bool = false
 var auto_fire: bool = false
 var can_look_at: bool = false
@@ -80,7 +80,7 @@ func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.w
 	weapon = p_weapon
 
 func _draw() -> void:
-	if not manual_aim and not hover:
+	if not manual_aim and not display_aim:
 		range_display_color = Color(range_display_color, 0.1)
 		return
 	
@@ -98,7 +98,7 @@ func _draw() -> void:
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
-	z_index = 1
+	z_index = 0
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	can_fire = true
@@ -198,8 +198,8 @@ func set_weapon_size_and_color():
 		#_:
 			#print("Unknown weapon type.")
 
-func toggle_mouse_hover(mouse_hover: bool) -> void:
-	hover = mouse_hover
+func toggle_display_aim(toggle: bool) -> void:
+	display_aim = toggle
 	queue_redraw()
 
 func _on_ROF_timeout() -> void:

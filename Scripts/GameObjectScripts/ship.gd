@@ -6,9 +6,11 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
-@onready var SoftFluxIndicator = $SoftFluxIndicator
-@onready var HardFluxIndicator = $HardFluxIndicator
-@onready var HullIntegrityIndicator = $HullIntegrityIndicator
+@onready var CenterCombatHUD = $CenterCombatHUD
+@onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
+@onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
+@onready var HullIntegrityIndicator = $CenterCombatHUD/HullIntegrityIndicator
+@onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
 @onready var TacticalMap = CombatMap.get_node("%TacticalMap")
@@ -33,12 +35,10 @@ var shield_radius: float = 0.0
 var total_flux: float = 0.0
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
-var soft_flux_hud_offset: Vector2 = Vector2.ZERO
-var hard_flux_hud_offset: Vector2 = Vector2.ZERO
-var hull_hud_offset: Vector2 = Vector2.ZERO
 var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
+var targeted: bool = false
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -71,6 +71,9 @@ var ship_select: bool = false:
 			TacticalMapIcon.button_pressed = false
 			ship_select = value
 
+# Custom signals.
+signal ship_targeted(ship_id)
+
 # Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready/entering the ship into the scene.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -94,9 +97,6 @@ func deploy_ship() -> void:
 	if TacticalMap.visible == true:
 		TacticalMapIcon.show()
 
-# Custom signals.
-signal ship_targeted(ship_id)
-
 func _ready() -> void:
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
@@ -119,9 +119,16 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
-	soft_flux_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius)
-	hard_flux_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius + 3)
-	hull_hud_offset = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius * 0.7)
+	var soft_flux_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius + 3)
+	var hard_flux_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius)
+	var hull_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius * 0.7)
+	var target_ship_offset: Vector2 = Vector2(-shield_radius, shield_radius)
+	SoftFluxIndicator.position = soft_flux_hud_offset
+	HardFluxIndicator.position = hard_flux_hud_offset
+	HullIntegrityIndicator.position = hull_hud_offset
+	ShipTargetIcon.position = target_ship_offset
+	
+	ShipTargetIcon.visible = false
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
 	HullIntegrityIndicator.value = hull_integrity
 	
@@ -168,6 +175,7 @@ func process_damage(projectile: Projectile) -> void:
 		destroy_ship()
 
 func destroy_ship() -> void:
+	ShipTargetIcon.visible = false
 	queue_free()
 
 func toggle_shield() -> void:
@@ -202,8 +210,8 @@ func update_flux_indicators() -> void:
 			weapon.update_flux_overload(flux_overload)
 	
 	var flux_rate: float = 100 / total_flux
-	SoftFluxIndicator.texture_progress_offset.x = floor(flux_rate * soft_flux)
-	HardFluxIndicator.value = flux_rate * hard_flux
+	HardFluxIndicator.texture_progress_offset.x = floor(flux_rate * hard_flux)
+	SoftFluxIndicator.value = flux_rate * soft_flux
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -232,9 +240,14 @@ func _input(event: InputEvent) -> void:
 			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
 				toggle_auto_fire(all_weapons)
 		elif not is_friendly: # for non-player/enemy ships
-			if (event.keycode == KEY_R and event.pressed) and mouse_hover:
-				var target_ship_id = get_rid()
+			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
+				targeted = false
+				ShipTargetIcon.visible = false
+				_on_mouse_exited()
+			elif (event.keycode == KEY_R and event.pressed) and mouse_hover:
 				emit_signal("ship_targeted", get_rid())
+				targeted = true
+				ShipTargetIcon.visible = true
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
@@ -251,12 +264,14 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 func _on_mouse_entered() -> void:
 	mouse_hover = true
 	for weapon_slot in all_weapons:
-		weapon_slot.toggle_mouse_hover(mouse_hover)
+		weapon_slot.toggle_display_aim(mouse_hover)
 
 func _on_mouse_exited() -> void:
 	mouse_hover = false
+	if targeted:
+		return
 	for weapon_slot in all_weapons:
-		weapon_slot.toggle_mouse_hover(mouse_hover)
+		weapon_slot.toggle_display_aim(mouse_hover)
 
 func toggle_manual_control() -> void:
 	# The visible indicator is turned on and off by the manual control variable's custom setter. Otherwise recursion issues occur.
@@ -321,9 +336,7 @@ func _physics_process(delta: float) -> void:
 	
 	var velocity: Vector2 = Vector2.ZERO
 	
-	SoftFluxIndicator.position = global_position + soft_flux_hud_offset
-	HardFluxIndicator.position = global_position + hard_flux_hud_offset
-	HullIntegrityIndicator.position = global_position + hull_hud_offset
+	CenterCombatHUD.position = position
 	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta
