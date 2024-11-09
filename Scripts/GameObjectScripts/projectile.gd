@@ -11,6 +11,7 @@ var ship_id: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	z_index = 1
 	input_pickable = false
 	collision_layer = 8
 	collision_mask = 15

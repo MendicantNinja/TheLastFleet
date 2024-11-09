@@ -188,7 +188,6 @@ limit_top = 0
 limit_right = 5000
 limit_bottom = 5000
 position_smoothing_enabled = true
-position_smoothing_speed = 500.0
 editor_draw_limits = true
 editor_draw_drag_margin = true
 

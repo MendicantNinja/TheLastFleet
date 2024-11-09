@@ -58,6 +58,7 @@ var mouse_hover: bool = false
 
 # Used for intermediate pathing around dynamic agents
 var final_target_position: Vector2 = Vector2.ZERO
+var next_path_position: Vector2 = Vector2.ZERO
 var intermediate_pathing: bool = false
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
@@ -98,7 +99,7 @@ func deploy_ship() -> void:
 		TacticalMapIcon.show()
 
 func _ready() -> void:
-	ShipSprite.z_index = 1
+	ShipSprite.z_index = 0
 	
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
@@ -198,9 +199,11 @@ func toggle_shield() -> void:
 
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
+	update_flux_indicators()
 
 func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 	hard_flux += damage * ship_stats.shield_efficiency
+	update_flux_indicators()
 
 func update_flux_indicators() -> void:
 	var current_flux: float = soft_flux + hard_flux
@@ -273,7 +276,7 @@ func _on_mouse_entered() -> void:
 
 func _on_mouse_exited() -> void:
 	mouse_hover = false
-	if targeted:
+	if targeted or (ship_select and manual_control):
 		return
 	for weapon_slot in all_weapons:
 		weapon_slot.toggle_display_aim(mouse_hover)
@@ -290,6 +293,7 @@ func toggle_manual_control() -> void:
 		CombatMap.controlled_ship = self
 	else:
 		manual_control = false
+		_on_mouse_exited()
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -343,6 +347,9 @@ func _physics_process(delta: float) -> void:
 	
 	CenterCombatHUD.position = position
 	
+	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
+		ShipNavigationAgent.set_target_position(position)
+	
 	if movement_delta == 0.0:
 		movement_delta = speed * delta
 	
@@ -355,7 +362,6 @@ func _physics_process(delta: float) -> void:
 	
 	if manual_control and Input.is_action_pressed("m1") and not flux_overload:
 		fire_weapon_system(all_weapons)
-		update_flux_indicators()
 	
 	if shield_toggle and not flux_overload:
 		soft_flux += shield_upkeep
@@ -382,7 +388,7 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var ship_query: Dictionary = {}
-	if not ShipNavigationAgent.is_navigation_finished():
+	if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
 		ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	
 	var sweep_vectors: Array[Vector2] = []
@@ -411,16 +417,18 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_target_position(target_position)
 		intermediate_pathing = false
 	
+	
+	if not ShipNavigationAgent.is_navigation_finished() and Engine.get_physics_frames() % 3 == 0:
+		next_path_position = ShipNavigationAgent.get_next_path_position()
+	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
-		var next_path_position: Vector2 = ShipNavigationAgent.get_next_path_position()
 		var direction_to_path: Vector2 = global_position.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
-		
-		var normalize_velocity: Vector2 = linear_velocity / velocity
-		var ease_x: float = linear_velocity.x * ease(normalize_velocity.x, ship_stats.acceleration)
-		var ease_y: float = linear_velocity.y * ease(normalize_velocity.y, ship_stats.acceleration)
-		velocity += Vector2(ease_x, ease_y)
+		#var normalize_velocity: Vector2 = linear_velocity / velocity
+		#var ease_x: float = linear_velocity.x * ease(normalize_velocity.x, ship_stats.acceleration)
+		#var ease_y: float = linear_velocity.y * ease(normalize_velocity.y, ship_stats.acceleration)
+		velocity += ease_velocity(velocity)
 		
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
 		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
