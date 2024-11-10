@@ -1,11 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://bc18fwpjfm4h3"]
+[gd_scene load_steps=4 format=3 uid="uid://bc18fwpjfm4h3"]
 
 [ext_resource type="Texture2D" uid="uid://dagtkkwtbvank" path="res://Art/GUIArt/icon_ship_selected.png" id="1_0fnvw"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/fleet_ship_icon.gd" id="2_h08hs"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_b2cmd"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_imcn6"]
-bg_color = Color(0.133333, 0.6, 0.784314, 0.196078)
 
 [node name="ShipIcon" type="TextureButton"]
 offset_right = 48.0
@@ -14,7 +11,8 @@ mouse_filter = 1
 keep_pressed_outside = true
 texture_pressed = ExtResource("1_0fnvw")
 texture_hover = ExtResource("1_0fnvw")
-stretch_mode = 0
+texture_focused = ExtResource("1_0fnvw")
+stretch_mode = 5
 script = ExtResource("2_h08hs")
 
 [node name="ShipSprite" type="TextureButton" parent="."]
@@ -25,14 +23,6 @@ offset_bottom = 48.0
 mouse_filter = 2
 ignore_texture_size = true
 stretch_mode = 0
-
-[node name="ShipPanel" type="Panel" parent="ShipSprite"]
-visible = false
-z_index = -1
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_styles/panel = SubResource("StyleBoxFlat_imcn6")
 
 [node name="Label" type="Label" parent="ShipSprite"]
 layout_mode = 0

@@ -12,7 +12,7 @@ extends Control
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	RefitPanel.self_modulate = settings.gui_color
+	settings.swizzle(RefitPanel, settings.gui_color)
 	update_refit_list()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -33,12 +33,11 @@ func update_refit_list() -> void:
 		var ship_stat: ShipStats = player_fleet_stats.ships[i]
 		ship_icon.ship = ship_stat
 		RefitList.add_child(ship_icon)
-		ship_icon.on_added_to_container()
 		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
-		ship_icon.ship_sprite.custom_minimum_size = Vector2(RefitList.size.x/6, RefitList.size.y/4)
+		ship_icon.ship_sprite.custom_minimum_size = Vector2(RefitList.size.x, RefitList.size.x)
 		ship_icon.custom_minimum_size = ship_icon.ship_sprite.custom_minimum_size
-		ship_icon.ship_panel.custom_minimum_size = ship_icon.ship_sprite.custom_minimum_size
 		ship_icon.pivot_offset = ship_icon.custom_minimum_size/2 - position
+		ship_icon.on_added_to_container()
 		ship_icon.index = i
 	
 # When a ship is selected in the panel. Set shipview to the new ship.

@@ -5,7 +5,7 @@ class_name FleetShipIcon
 var ship: ShipStats
 @onready var ship_sprite: TextureButton = $ShipSprite
 @onready var ship_label: Label = $ShipSprite/Label
-@onready var ship_panel: Panel = $ShipSprite/ShipPanel
+#@onready var ship_panel: Panel = $ShipSprite/ShipPanel
 
 func _get_drag_data(position) -> FleetShipIcon:
 	var dragged_ship: FleetShipIcon = self    # This is your custom method generating the drag data.
@@ -28,7 +28,9 @@ func _drop_data(position, data) -> void:
 	
 func on_added_to_container() -> void:
 	self.ship_sprite.self_modulate = settings.player_color
-	self.ship_label.text = "%s Class" % ship.ship_hull.ship_type_name
+	ship_label.position.y = self.custom_minimum_size.y
+	#ship_panel.size.y = self.custom_minimum_size.y+ship_label.size.y
+	ship_label.text = "%s Class" % ship.ship_hull.ship_type_name
 	#settings.swizzle(ShipPanel)
 
 func _ready():

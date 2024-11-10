@@ -41,5 +41,5 @@ func _draw():
 		draw_line(Vector2(0, i*grid_square_size), Vector2(PlayableAreaBounds.size.x, i*grid_square_size), line_color, line_width, true) 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	queue_redraw()
+	pass
 	
