@@ -10,6 +10,13 @@ class_name FleetStats
 @export var ships: Array[ShipStats] = []
 @export_storage var inventory: Array[ItemSlot] = []
 
+var supplies: int:
+	get:
+		return 1
+
+var fuel: int:
+	get:
+		return 1
 # Things that do vary with immediate player input in the galaxy map.
 @export var position: Vector2 = Vector2(0,0)
 @export var thrust: int = 0

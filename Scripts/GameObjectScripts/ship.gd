@@ -6,15 +6,17 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
+
+@onready var CombatMap: Node2D
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
 @onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
 @onready var HullIntegrityIndicator = $CenterCombatHUD/HullIntegrityIndicator
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
-@onready var CombatMap: Node2D = get_parent()
 @onready var TacticalMapIcon = $TacticalMapIcon
-@onready var TacticalMap = CombatMap.get_node("%TacticalMap")
+@onready var TacticalMap 
+@onready var ManualControlIndicator = $ManualControlIndicator
 @onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
@@ -81,19 +83,21 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
+	CombatMap = get_parent()
+	TacticalMap = CombatMap.get_node("%TacticalMap")
 	if is_friendly == true:
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.player_color
-		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.1
 		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
+		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.6
 		ManualControlIndicator.self_modulate = settings.player_color
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.enemy_color
-		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.1
+		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.6
 	# Ship is ready and has entered the scene tree.
 	if TacticalMap.visible == true:
 		TacticalMapIcon.show()
@@ -231,6 +235,8 @@ func update_flux_indicators() -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
+	if get_parent() is Panel:
+		return
 	if event is InputEventMouseButton:
 		if manual_control and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT:
 			toggle_shield()

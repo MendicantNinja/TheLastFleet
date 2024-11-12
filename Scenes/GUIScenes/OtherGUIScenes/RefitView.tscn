@@ -1,0 +1,49 @@
+[gd_scene load_steps=3 format=3 uid="uid://j6uwhl87p0k2"]
+
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/refit_view.gd" id="1_qbvn6"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_5uptw"]
+
+[node name="RefitView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qbvn6")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+clip_contents = false
+layout_mode = 1
+offset_top = -2.0
+offset_right = 387.0
+offset_bottom = 1072.0
+
+[node name="RefitList" type="VBoxContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 24
+
+[node name="RefitPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -542.0
+offset_right = 383.0
+offset_bottom = 538.0
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_5uptw")
+
+[node name="ShipView" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 384.0
+offset_right = 1919.0
+offset_bottom = 1083.0

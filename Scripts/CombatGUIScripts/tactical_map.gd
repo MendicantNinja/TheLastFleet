@@ -33,7 +33,7 @@ func _ready():
 	pass # Replace with function body.
 
 func _draw(): 
-	var grid_square_size: int = 2000
+	var grid_square_size: int = 1000
 	for i in range (PlayableAreaBounds.size.x/grid_square_size): #Draw Vertical N/S Lines
 		draw_line(Vector2(i*grid_square_size, 0), Vector2(i*grid_square_size, PlayableAreaBounds.size.y), line_color, line_width, true) 
 	
@@ -42,5 +42,5 @@ func _draw():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 
 func _process(delta):
-	queue_redraw()
+	pass
 	

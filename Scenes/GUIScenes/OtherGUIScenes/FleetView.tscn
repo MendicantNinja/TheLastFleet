@@ -1,0 +1,52 @@
+[gd_scene load_steps=4 format=3 uid="uid://dt4vyn32lj4k7"]
+
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/fleet_view.gd" id="1_xl2dq"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_u0qfe"]
+[ext_resource type="Theme" uid="uid://dmjchh3dcnesd" path="res://ThemesandFonts/Themes/FleetOverviewTheme.tres" id="3_td5wy"]
+
+[node name="FleetView" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xl2dq")
+
+[node name="FleetPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 364.0
+offset_top = -540.0
+offset_right = 1921.0
+offset_bottom = 540.0
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_u0qfe")
+
+[node name="FleetList" type="GridContainer" parent="FleetPanel"]
+unique_name_in_owner = true
+z_index = 1
+layout_mode = 1
+offset_left = 5.0
+offset_top = 24.0
+offset_right = 1674.0
+offset_bottom = 1090.0
+theme_override_constants/h_separation = 10
+columns = 6
+
+[node name="InfoPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_right = 364.0
+offset_bottom = 1085.0
+
+[node name="Label" type="Label" parent="InfoPanel"]
+layout_mode = 0
+offset_right = 365.0
+offset_bottom = 87.0
+theme = ExtResource("3_td5wy")
+text = "Info"
+horizontal_alignment = 1

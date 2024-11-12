@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://c534hepkrjg32"]
 
 [ext_resource type="Texture2D" uid="uid://dagtkkwtbvank" path="res://Art/GUIArt/icon_ship_selected.png" id="1_374xy"]
-[ext_resource type="Script" path="res://Scenes/GUIScenes/OtherGUIScenes/ShipIcon.gd" id="2_e6735"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ship_icon.gd" id="2_e6735"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_mh320"]
 
 [node name="ShipIcon" type="TextureButton"]

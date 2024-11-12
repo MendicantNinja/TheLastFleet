@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
-[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="2_r4t6u"]
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="2_r4t6u"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_r78fd"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_ho88f"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
@@ -194,6 +194,7 @@ text = "[center]Cancel (G)"
 scroll_active = false
 
 [node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
+unique_name_in_owner = true
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 8
@@ -203,8 +204,8 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -960.0
 offset_top = -540.0
-offset_right = 960.0
-offset_bottom = 540.0
+offset_right = -960.0
+offset_bottom = -540.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -212,15 +213,24 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="TacticalCamera" type="Camera2D" parent="."]
 anchor_mode = 0
+ignore_rotation = false
 zoom = Vector2(0.5, 0.5)
+limit_left = 0
+limit_top = 0
+limit_right = 0
+limit_bottom = 0
+limit_smoothed = true
+position_smoothing_enabled = true
 
 [node name="CombatCamera" type="Camera2D" parent="."]
 anchor_mode = 0
 ignore_rotation = false
+enabled = false
 limit_left = 0
 limit_top = 0
-limit_right = 5000
-limit_bottom = 5000
+limit_right = 0
+limit_bottom = 0
+limit_smoothed = true
 position_smoothing_enabled = true
 editor_draw_limits = true
 editor_draw_drag_margin = true
