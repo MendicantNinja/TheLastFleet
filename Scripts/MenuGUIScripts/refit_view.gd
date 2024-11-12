@@ -33,8 +33,9 @@ func update_refit_list() -> void:
 		var ship_stat: ShipStats = player_fleet_stats.ships[i]
 		ship_icon.ship = ship_stat
 		RefitList.add_child(ship_icon)
+		ship_icon.owner = self
 		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
-		ship_icon.ship_sprite.custom_minimum_size = Vector2(RefitList.size.x, RefitList.size.x)
+		ship_icon.ship_sprite.custom_minimum_size = Vector2(%ScrollContainer.size.x, %ScrollContainer.size.x) * .9
 		ship_icon.custom_minimum_size = ship_icon.ship_sprite.custom_minimum_size
 		ship_icon.pivot_offset = ship_icon.custom_minimum_size/2 - position
 		ship_icon.on_added_to_container()
@@ -42,4 +43,6 @@ func update_refit_list() -> void:
 	
 # When a ship is selected in the panel. Set shipview to the new ship.
 func view_ship(ship: Ship) -> void:
+	ShipView.add_child(ship)
+	ship.position = ShipView.size/2
 	pass

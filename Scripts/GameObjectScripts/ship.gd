@@ -8,9 +8,9 @@ class_name Ship
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
 
-@onready var CombatMap: Node2D = get_parent()
+@onready var CombatMap: Node2D
 @onready var TacticalMapIcon = $TacticalMapIcon
-@onready var TacticalMap = CombatMap.get_node("%TacticalMap")
+@onready var TacticalMap 
 @onready var ManualControlIndicator = $ManualControlIndicator
 @onready var all_weapons: Array[WeaponSlot]
 
@@ -62,6 +62,8 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
+	CombatMap = get_parent()
+	TacticalMap = CombatMap.get_node("%TacticalMap")
 	if is_friendly == true:
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
@@ -138,6 +140,8 @@ func _ready() -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
+	if get_parent() is Panel:
+		return
 	if event is InputEventMouseButton:
 		if TacticalMap.visible and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select :
 			intermediate_pathing = false

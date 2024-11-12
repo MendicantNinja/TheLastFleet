@@ -26,6 +26,7 @@ func update_fleet_list() -> void:
 		var ship_stat: ShipStats = player_fleet_stats.ships[i]
 		ship_icon.ship = ship_stat
 		FleetList.add_child(ship_icon)
+		ship_icon.owner = self
 		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
 		ship_icon.ship_sprite.custom_minimum_size = Vector2(FleetList.size.x/6, FleetList.size.y/4)
 		ship_icon.custom_minimum_size = ship_icon.ship_sprite.custom_minimum_size

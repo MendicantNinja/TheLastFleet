@@ -191,14 +191,14 @@ func get_rect_start_position() -> Vector2:
 	pass
 
 func toggle_camera_drag() -> bool:
-	if not camera_drag:
+	if camera_drag == false:
 		camera_drag = true
 	else:
 		camera_drag = false
 	return camera_drag
 	
 func toggle_tactical_camera_drag() -> bool:
-	if not tactical_camera_drag:
+	if tactical_camera_drag == false:
 		tactical_camera_drag = true
 	else:
 		tactical_camera_drag = false
