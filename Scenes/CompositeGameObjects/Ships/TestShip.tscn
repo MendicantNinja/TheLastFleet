@@ -78,10 +78,9 @@ stretch_mode = 0
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("2_13ai0")
-offset = Vector2(0, -50)
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(59, 0.000213579, -44.9998, -51.0002, -45.0002, 51.9998)
+polygon = PackedVector2Array(54, 0, -50, -54, -50, 54)
 
 [node name="RepathArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -104,9 +103,11 @@ target_desired_distance = 100.0
 path_max_distance = 50.0
 avoidance_enabled = true
 radius = 70.0
+max_neighbors = 4
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 max_speed = 1000.0
+debug_enabled = true
 debug_use_custom = true
 debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0

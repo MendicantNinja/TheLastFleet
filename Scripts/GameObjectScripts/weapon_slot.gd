@@ -52,6 +52,7 @@ var current_target_id: RID
 var owner_rid: RID
 
 signal weapon_slot_fired(flux)
+
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
 	if flux_overload or not can_fire:
@@ -132,7 +133,19 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 		auto_aim = true
 	set_weapon_size_and_color()
 
-func set_auto_aim() -> void:
+func set_auto_fire(fire_value: bool) -> void:
+	auto_fire = fire_value
+	if fire_value == false:
+		manual_aim = true
+
+func set_auto_aim(aim_value: bool) -> void:
+	auto_aim = aim_value
+	if aim_value == false:
+		manual_aim = true
+
+# Not my brightest programming decision but whatever
+# this exists mostly for manual control sake, not for AI sake.
+func toggle_auto_aim() -> void:
 	if auto_aim == false:
 		auto_aim = true
 		manual_aim = false
@@ -140,7 +153,7 @@ func set_auto_aim() -> void:
 		auto_aim = false
 		manual_aim = true
 
-func set_auto_fire() -> void:
+func toggle_auto_fire() -> void:
 	if auto_fire == false:
 		auto_fire = true
 		manual_aim = false
@@ -148,7 +161,7 @@ func set_auto_fire() -> void:
 		auto_fire = false
 		manual_aim = true
 
-func set_manual_aim() -> void:
+func toggle_manual_aim() -> void:
 	if manual_aim == false:
 		manual_aim = true
 		auto_fire = false
