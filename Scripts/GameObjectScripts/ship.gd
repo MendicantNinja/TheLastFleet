@@ -300,7 +300,7 @@ func _input(event: InputEvent) -> void:
 	if not ship_select:
 		return
 	if event is InputEventMouseButton:
-		if Input.is_action_just_pressed("alt select") and manual_control:
+		if Input.is_action_just_pressed("m2") and manual_control:
 			toggle_shield()
 		elif Input.is_action_just_pressed("zoom in") and manual_control and zoom_value < zoom_in_limit:
 			zoom_value += Vector2(0.01, 0.01)
@@ -494,8 +494,8 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var ship_query: Dictionary = {}
-	if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		ship_query = collision_raycast(global_position, target_position, 7, true, false)
+	#if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
+		#ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():
@@ -688,4 +688,4 @@ func _on_NavigationTimer_timeout() -> void:
 # somebody else can code this because im pretty much burnt on this stuff
 func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
 	if safe_velocity != Vector2.ZERO:
-		linear_velocity = safe_velocity
+		linear_velocity += safe_velocity / 2.0
