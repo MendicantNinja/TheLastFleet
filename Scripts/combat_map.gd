@@ -41,6 +41,7 @@ func display_map(map_value: bool) -> void:
 	if map_value == true:
 		visible = true
 		CombatCamera.enabled = true
+		
 	elif map_value == false:
 		visible = false
 		CombatCamera.enabled = false

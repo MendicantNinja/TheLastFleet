@@ -314,10 +314,13 @@ func _input(event: InputEvent) -> void:
 		if is_friendly:
 			if (event.keycode == KEY_T and event.pressed) and ship_select:
 				toggle_manual_control()
-			elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
+			elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				toggle_auto_aim(all_weapons)
-			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
+			elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				toggle_auto_fire(all_weapons)
+			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
+				toggle_manual_control()
+				camera_removed.emit()
 		elif not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
