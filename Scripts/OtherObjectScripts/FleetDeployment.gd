@@ -6,8 +6,6 @@ func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
 	%Deploy.pressed.connect(self.deploy_ships)
-	
-	pass
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 	if toggled_on == true:
@@ -26,10 +24,8 @@ func deploy_ships() -> void:
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		CombatMap.ships_in_combat.append(ship_instantiation)
-		ship_instantiation.deploy_ship()
 	on_cancel_pressed()
-		
-	
+
 func on_all_pressed() -> void:
 	var excluding_deployed: Array[ShipIcon] = ships_to_deploy.duplicate()
 	for ship_icon in excluding_deployed:

@@ -36,6 +36,7 @@ var can_fire: bool = false
 var flux_overload: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
+var manual_camera: bool = false
 
 var range_display_color: Color = Color.SNOW
 var range_display_count: int = 64
@@ -52,6 +53,7 @@ var current_target_id: RID
 var owner_rid: RID
 
 signal weapon_slot_fired(flux)
+signal remove_manual_camera(camera)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -161,12 +163,12 @@ func toggle_auto_fire() -> void:
 		auto_fire = false
 		manual_aim = true
 
-func toggle_manual_aim() -> void:
-	if manual_aim == false:
+func set_manual_aim(aim_value: bool) -> void:
+	if aim_value == true:
 		manual_aim = true
 		auto_fire = false
 		auto_aim = false
-	else:
+	elif aim_value == false:
 		manual_aim = false
 		auto_aim = true
 		auto_fire = true
