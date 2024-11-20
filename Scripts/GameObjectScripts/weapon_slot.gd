@@ -289,14 +289,13 @@ func create_killcast() -> RayCast2D:
 # this will try to find the nearest available target if it can. This function is
 # called every physics frame IF it still cannot find a valid target.
 func acquire_new_target() -> void:
-	var dupe_available_targets: Dictionary = available_targets.duplicate()
-	if dupe_available_targets.has(current_target_id):
-		dupe_available_targets.erase(current_target_id)
-	var ship_ids: Array = dupe_available_targets.keys()
+	if available_targets.is_empty():
+		return
+	var ship_ids: Array = available_targets.keys()
 	var taq_range: int = ship_ids.size() - 1
 	var rand_key_number: int = randi_range(0, taq_range)
 	var new_target_id: RID = ship_ids[rand_key_number]
-	var ship_instance: Ship = dupe_available_targets[new_target_id]
+	var ship_instance: Ship = available_targets[new_target_id]
 	var test_position: Vector2 = to_local(ship_instance.global_position)
 	var test_transform: Transform2D = face_weapon(test_position)
 	if can_look_at == true:
@@ -345,6 +344,9 @@ func _physics_process(delta) -> void:
 # A) updates the raycast every physics frame to track a ship's current position
 # B) checks to see if a ship the player targets is within the effective range of the weapon
 func update_killcast() -> void:
+	if available_targets.is_empty():
+		killcast.queue_free()
+		return
 	var collider = killcast.get_collider()
 	if not collider is Ship: # Do not shoot at obstacles
 		can_look_at = false
@@ -364,5 +366,7 @@ func update_killcast() -> void:
 			killcast.target_position = ship_position
 			killcast.force_raycast_update()
 			return
+	elif not target_engaged:
+		acquire_new_target()
 	
 	killcast.target_position = ship_position

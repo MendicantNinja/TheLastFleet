@@ -306,7 +306,7 @@ func _input(event: InputEvent) -> void:
 			zoom_value += Vector2(0.01, 0.01)
 		elif Input.is_action_just_pressed("zoom out") and manual_control and zoom_value > zoom_out_limit:
 			zoom_value -= Vector2(0.01, 0.01)
-		elif Input.is_action_just_pressed("m2") and ship_select and group_name.is_empty() and not manual_control:
+		elif Input.is_action_just_pressed("m2") and group_leader and not manual_control:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
