@@ -1,0 +1,38 @@
+[gd_scene load_steps=4 format=3 uid="uid://b35c4hnqhjwq3"]
+
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/refit_weapon_slot_display.gd" id="1_p47y2"]
+[ext_resource type="Texture2D" uid="uid://pjfcs0okkcpp" path="res://Art/WeaponArt/weapon_mount.png" id="1_ttuxj"]
+[ext_resource type="Texture2D" uid="uid://bmfq47tneelw4" path="res://Art/WeaponArt/weapon_mount_refit_selected.png" id="3_5le1c"]
+
+[node name="WeaponSlotDisplay" type="TextureButton"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = -760.0
+offset_bottom = -340.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 1
+action_mode = 0
+button_mask = 3
+texture_normal = ExtResource("1_ttuxj")
+texture_pressed = ExtResource("1_ttuxj")
+texture_hover = ExtResource("1_ttuxj")
+texture_focused = ExtResource("1_ttuxj")
+stretch_mode = 3
+script = ExtResource("1_p47y2")
+
+[node name="WeaponSelectedRect" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+self_modulate = Color(1, 0.755, 0.3, 1)
+z_index = 2
+z_as_relative = false
+layout_mode = 0
+offset_right = 202.0
+offset_bottom = 199.0
+texture = ExtResource("3_5le1c")

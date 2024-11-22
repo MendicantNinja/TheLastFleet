@@ -8,6 +8,7 @@ class_name Ship
 @onready var ShipSprite = $ShipSprite
 
 @onready var CombatMap: Node2D
+@onready var TacticalMap
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
 @onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
@@ -15,8 +16,6 @@ class_name Ship
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var TacticalMapIcon = $TacticalMapIcon
-@onready var TacticalMap 
-@onready var ManualControlIndicator = $ManualControlIndicator
 @onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
@@ -83,7 +82,7 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
-	CombatMap = get_parent()
+	
 	TacticalMap = CombatMap.get_node("%TacticalMap")
 	if is_friendly == true:
 		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
@@ -103,6 +102,7 @@ func deploy_ship() -> void:
 		TacticalMapIcon.show()
 
 func _ready() -> void:
+	#CombatMap = get_parent()
 	ShipSprite.z_index = 0
 	
 	if ship_stats == null:
@@ -265,8 +265,7 @@ func _input(event: InputEvent) -> void:
 
 # When the player interacts with a ship via mouse.
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
-	if CombatMap.dragging == true:
+	if get_parent() is Panel or CombatMap.dragging == true:
 		return
 	if event is InputEventMouseButton and is_friendly == true and TacticalMap.visible == true:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:

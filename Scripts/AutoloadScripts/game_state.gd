@@ -2,12 +2,11 @@ extends Node
 # General save game that exports to a single file. 
 
 var player_name: String = "Joe_Fleet"
-var player_fleet: Fleet = Fleet.new() #player_fleet.fleet_stats
+var player_fleet: Fleet = Fleet.new()
 
 func _ready():
 	#for when user names are implemented ResourceLoader.load("user://"+get_child(0, true).text+".res")
 	if player_fleet.fleet_stats.ships.is_empty():
-		player_fleet = Fleet.new()
 		for i in range (4):
 			player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
 

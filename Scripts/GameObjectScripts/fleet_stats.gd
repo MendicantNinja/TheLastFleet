@@ -20,11 +20,12 @@ var fuel: int:
 # Things that do vary with immediate player input in the galaxy map.
 @export var position: Vector2 = Vector2(0,0)
 @export var thrust: int = 0
-
+func _init():
+	if inventory.is_empty():
+		inventory.append(ItemSlot.new(data.item_enum.RAILGUN, 2))
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
-	#position = Vector2(0, 0)
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

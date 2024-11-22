@@ -10,6 +10,7 @@ class_name WeaponSlot
 @onready var rate_of_fire_timer: Timer = $ROFTimer
 # Important Stuff
 #@export var assigned_ship: Ship
+
 @export var weapon: Weapon:
 	set(value):
 		weapon = value

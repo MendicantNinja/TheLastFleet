@@ -5,7 +5,9 @@
 [resource]
 script = ExtResource("2_pilrw")
 weapon_name = "Empty"
+item_enum = 6
 weapon_size = 0
+armament_points = 0
 projectile_speed = 10.0
 damage_type = 0
 damage_per_shot = 0

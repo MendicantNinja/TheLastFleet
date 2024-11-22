@@ -151,8 +151,11 @@ enum weapon_damage_enum {
  #888    "     888          888    "     888    "         888           `"Y88b 
  #888          888       o  888       o  888       o      888      oo     .d8P 
 #o888o        o888ooooood8 o888ooooood8 o888ooooood8     o888o     8""88888P'   
-  
+ 
+
+# To-Do: Rewrite weapon enums to item enums? 
 enum item_enum {
+	
 	# Logistical/Usable Items
 	SUPPLIES,
 	FUEL,
@@ -162,17 +165,18 @@ enum item_enum {
 	# Solely Commercial Items
 	DRUGS,
 	
-	# Weapons 
+	# Weapons: List from largest to smallest weapons for the purposes of sorting inventory, then by most expensive or rare first. Empty should always go last.
 	RAILGUN,
+	EMPTY,
 	
-	# Fighters
+	# Fighters: follow the same principle as weapons. Expensive to cheap/common.
 	RAPTOR,
 	
 }
-#var item_dictionary: Dictionary = {
-	#weapon_enum.RAILGUN: load("res://Resources/Weapons/Railgun.tres"),
-	#weapon_enum.EMPTY: preload("res://Resources/Weapons/EmptySlot.tres")
-	#}
+
+var item_dictionary: Dictionary = {
+	item_enum.RAILGUN: preload("res://Resources/Weapons/Railgun.tres"),
+	}
 
 enum faction_enum {
 	PLAYER,

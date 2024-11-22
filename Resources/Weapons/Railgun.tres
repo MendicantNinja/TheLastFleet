@@ -7,8 +7,10 @@
 [resource]
 script = ExtResource("1_7onbb")
 weapon_name = "Railgun"
+item_enum = 5
 weapon_size = 0
 image = ExtResource("1_ifae6")
+armament_points = 0
 projectile_scene = ExtResource("2_crkqq")
 projectile_speed = 1000.0
 damage_type = 0

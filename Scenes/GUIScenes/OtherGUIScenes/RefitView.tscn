@@ -47,3 +47,20 @@ layout_mode = 0
 offset_left = 384.0
 offset_right = 1919.0
 offset_bottom = 1083.0
+mouse_filter = 2
+
+[node name="InventoryScrollContainer" type="ScrollContainer" parent="."]
+unique_name_in_owner = true
+visible = false
+clip_contents = false
+layout_mode = 1
+offset_left = 441.0
+offset_top = 83.0
+offset_right = 441.0
+offset_bottom = 83.0
+
+[node name="InventoryList" type="VBoxContainer" parent="InventoryScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3

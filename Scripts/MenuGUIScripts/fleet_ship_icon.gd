@@ -33,7 +33,6 @@ func on_added_to_container() -> void:
 	self.ship_sprite.self_modulate = settings.player_color
 	ship_label.position.y = self.custom_minimum_size.y
 	ship_label.text = "%s Class" % ship.ship_hull.ship_type_name
-	ship_sprite
 	#settings.swizzle(ShipPanel)
 
 func on_pressed() -> void:

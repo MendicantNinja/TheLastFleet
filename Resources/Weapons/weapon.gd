@@ -10,9 +10,10 @@ func create_projectile() -> PackedScene:
 
 # Misc Stats
 @export var weapon_name: String = "Ratsmacker"
+@export var item_enum: data.item_enum
 @export var weapon_size: data.size_enum = data.size_enum.SMALL
 @export var image: Texture2D
-#@export var armament_points: int = 0
+@export var armament_points: int = 0
 @export var firing_sound: Resource
 
 # Projectile-related stats (that still affect game balance)
