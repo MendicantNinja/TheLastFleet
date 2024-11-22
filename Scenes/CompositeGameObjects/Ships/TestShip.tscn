@@ -53,30 +53,13 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_sc1ei")
 
-[node name="TacticalMapIcon" type="TextureButton" parent="."]
-visible = false
-z_index = 2
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 0
-mouse_filter = 2
-toggle_mode = true
-action_mode = 0
-button_mask = 0
-stretch_mode = 0
-
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
 scale = Vector2(0.1, 0.1)
 texture = ExtResource("2_13ai0")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(52, 0, -49, -51, -49, 51)
+polygon = PackedVector2Array(54, 0, -50, -54, -50, 54)
 
 [node name="RepathArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -99,6 +82,7 @@ target_desired_distance = 100.0
 path_max_distance = 50.0
 avoidance_enabled = true
 radius = 70.0
+max_neighbors = 4
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0
 max_speed = 1000.0
@@ -123,7 +107,6 @@ shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203599, 0.641024, 0, 0.160784)
 
 [node name="CenterCombatHUD" type="Control" parent="."]
-physics_interpolation_mode = 1
 top_level = true
 layout_mode = 3
 anchors_preset = 0
@@ -179,6 +162,27 @@ layout_mode = 0
 offset_right = 34.0
 offset_bottom = 30.0
 texture = ExtResource("2_yacd8")
+
+[node name="TacticalMapIcon" type="TextureButton" parent="CenterCombatHUD"]
+visible = false
+z_index = 1
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -36.0
+offset_top = -36.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+focus_mode = 0
+mouse_filter = 2
+action_mode = 0
+button_mask = 0
+stretch_mode = 0
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

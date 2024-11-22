@@ -26,10 +26,8 @@ func deploy_ships() -> void:
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		CombatMap.ships_in_combat.append(ship_instantiation)
-		ship_instantiation.deploy_ship()
 	on_cancel_pressed()
-		
-	
+
 func on_all_pressed() -> void:
 	var excluding_deployed: Array[ShipIcon] = ships_to_deploy.duplicate()
 	for ship_icon in excluding_deployed:
@@ -71,6 +69,3 @@ func setup_deployment_screen() -> void:
 		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
 		ship_icon.ship_label.text = str(ship_icon.ship.deployment_points)
 		ship_icon.index = i
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass

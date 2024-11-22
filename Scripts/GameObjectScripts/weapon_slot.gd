@@ -37,6 +37,7 @@ var can_fire: bool = false
 var flux_overload: bool = false
 var is_friendly: bool = false
 var target_engaged: bool = false
+var manual_camera: bool = false
 
 var range_display_color: Color = Color.SNOW
 var range_display_count: int = 64
@@ -53,6 +54,8 @@ var current_target_id: RID
 var owner_rid: RID
 
 signal weapon_slot_fired(flux)
+signal remove_manual_camera(camera)
+
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
 	if flux_overload or not can_fire:
@@ -133,7 +136,19 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 		auto_aim = true
 	set_weapon_size_and_color()
 
-func set_auto_aim() -> void:
+func set_auto_fire(fire_value: bool) -> void:
+	auto_fire = fire_value
+	if fire_value == false:
+		manual_aim = true
+
+func set_auto_aim(aim_value: bool) -> void:
+	auto_aim = aim_value
+	if aim_value == false:
+		manual_aim = true
+
+# Not my brightest programming decision but whatever
+# this exists mostly for manual control sake, not for AI sake.
+func toggle_auto_aim() -> void:
 	if auto_aim == false:
 		auto_aim = true
 		manual_aim = false
@@ -141,7 +156,7 @@ func set_auto_aim() -> void:
 		auto_aim = false
 		manual_aim = true
 
-func set_auto_fire() -> void:
+func toggle_auto_fire() -> void:
 	if auto_fire == false:
 		auto_fire = true
 		manual_aim = false
@@ -149,12 +164,12 @@ func set_auto_fire() -> void:
 		auto_fire = false
 		manual_aim = true
 
-func set_manual_aim() -> void:
-	if manual_aim == false:
+func set_manual_aim(aim_value: bool) -> void:
+	if aim_value == true:
 		manual_aim = true
 		auto_fire = false
 		auto_aim = false
-	else:
+	elif aim_value == false:
 		manual_aim = false
 		auto_aim = true
 		auto_fire = true
@@ -275,14 +290,13 @@ func create_killcast() -> RayCast2D:
 # this will try to find the nearest available target if it can. This function is
 # called every physics frame IF it still cannot find a valid target.
 func acquire_new_target() -> void:
-	var dupe_available_targets: Dictionary = available_targets.duplicate()
-	if dupe_available_targets.has(current_target_id):
-		dupe_available_targets.erase(current_target_id)
-	var ship_ids: Array = dupe_available_targets.keys()
+	if available_targets.is_empty():
+		return
+	var ship_ids: Array = available_targets.keys()
 	var taq_range: int = ship_ids.size() - 1
 	var rand_key_number: int = randi_range(0, taq_range)
 	var new_target_id: RID = ship_ids[rand_key_number]
-	var ship_instance: Ship = dupe_available_targets[new_target_id]
+	var ship_instance: Ship = available_targets[new_target_id]
 	var test_position: Vector2 = to_local(ship_instance.global_position)
 	var test_transform: Transform2D = face_weapon(test_position)
 	if can_look_at == true:
@@ -331,6 +345,9 @@ func _physics_process(delta) -> void:
 # A) updates the raycast every physics frame to track a ship's current position
 # B) checks to see if a ship the player targets is within the effective range of the weapon
 func update_killcast() -> void:
+	if available_targets.is_empty():
+		killcast.queue_free()
+		return
 	var collider = killcast.get_collider()
 	if not collider is Ship: # Do not shoot at obstacles
 		can_look_at = false
@@ -350,5 +367,7 @@ func update_killcast() -> void:
 			killcast.target_position = ship_position
 			killcast.force_raycast_update()
 			return
+	elif not target_engaged:
+		acquire_new_target()
 	
 	killcast.target_position = ship_position

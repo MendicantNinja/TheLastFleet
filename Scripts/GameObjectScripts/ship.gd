@@ -15,8 +15,11 @@ class_name Ship
 @onready var HullIntegrityIndicator = $CenterCombatHUD/HullIntegrityIndicator
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
+@onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 @onready var TacticalMapIcon = $TacticalMapIcon
+@onready var TacticalMap = CombatMap.get_node("%TacticalMap")
 @onready var all_weapons: Array[WeaponSlot]
+var ManualControlCamera: Camera2D = null
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -57,7 +60,18 @@ var move_direction: Vector2 = Vector2.ZERO
 var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
 
-# Used for intermediate pathing around dynamic agents
+# camera goodies
+var zoom_in_limit: Vector2 = Vector2(1.2, 1.2)
+var zoom_out_limit: Vector2 = Vector2(0.6, 0.6)
+var zoom_value: Vector2 = Vector2.ONE
+
+# group/unit stuff
+var group_name: StringName = &""
+var group_leader: bool = false
+var group_transform: Transform2D = Transform2D.IDENTITY
+var group_velocity: Vector2 = Vector2.ZERO
+
+# Used for navigation
 var final_target_position: Vector2 = Vector2.ZERO
 var next_path_position: Vector2 = Vector2.ZERO
 var intermediate_pathing: bool = false
@@ -75,29 +89,27 @@ var ship_select: bool = false:
 
 # Custom signals.
 signal ship_targeted(ship_id)
+signal alt_select()
+signal switch_to_manual()
+signal camera_removed()
+signal request_manual_camera()
+signal ship_selected()
 
 # Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready/entering the ship into the scene.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
 
-# Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
-func deploy_ship() -> void:
-	
-	TacticalMap = CombatMap.get_node("%TacticalMap")
+	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
+	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
+	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
+	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
+	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 	if is_friendly == true:
-		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
-		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 		TacticalMapIcon.modulate = settings.player_color
+		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.1
 		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
-		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.6
 		ManualControlIndicator.self_modulate = settings.player_color
 	elif is_friendly == false:
-		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
-		TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
-		TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
-		TacticalMapIcon.modulate = settings.enemy_color
-		TacticalMapIcon.custom_minimum_size = Vector2(self.RepathShape.shape.radius, self.RepathShape.shape.radius) * 1.6
-	# Ship is ready and has entered the scene tree.
 	if TacticalMap.visible == true:
 		TacticalMapIcon.show()
 
@@ -145,7 +157,7 @@ func _ready() -> void:
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	ShipSprite.modulate = self_modulate
 	
-	if collision_layer == 1: # simplifies some things but definitely not a permanent solution
+	if collision_layer == 1:
 		add_to_group("friendly")
 		is_friendly = true
 		rotation -= PI/2
@@ -169,6 +181,7 @@ func _ready() -> void:
 		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
 		# everything is a railgun.
 	
+	deploy_ship()
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
 	self.input_event.connect(_on_input_event)
@@ -185,6 +198,10 @@ func process_damage(projectile: Projectile) -> void:
 		destroy_ship()
 
 func destroy_ship() -> void:
+	if group_leader:
+		# signal to CombatArena or something equivalent that a unit leader is dead
+		# so that a new leader is found, given the group exists
+		pass
 	ShipTargetIcon.visible = false
 	queue_free()
 
@@ -225,6 +242,57 @@ func update_flux_indicators() -> void:
 	HardFluxIndicator.texture_progress_offset.x = floor(flux_rate * hard_flux)
 	SoftFluxIndicator.value = flux_rate * soft_flux
 
+func display_icon(value: bool) -> void:
+	TacticalMapIcon.visible = value
+
+# Units/Groups
+
+func group_remove(n_group_name: StringName) -> void:
+	if group_leader and n_group_name == group_name:
+		group_leader = false
+	if n_group_name == group_name:
+		group_name = &""
+	print("%s removed from %s" % [name, n_group_name])
+	remove_from_group(n_group_name)
+
+func group_add(n_group_name: StringName) -> void:
+	for weapon_slot in all_weapons:
+		if weapon_slot.auto_fire:
+			continue
+		weapon_slot.set_auto_aim(true)
+		weapon_slot.set_auto_fire(true)
+	print("%s added to %s" % [name, n_group_name])
+	group_name = n_group_name
+	add_to_group(group_name)
+
+func set_group_leader(leader_value: bool) -> void:
+	group_leader = leader_value
+	var ret_group: Array = []
+	if not group_name.is_empty() and leader_value == false:
+		ret_group = get_tree().get_nodes_in_group(group_name)
+		remove_from_group(group_name)
+		group_name = &""
+	if not ret_group.is_empty():
+		var group_range: int = ret_group.size() - 1
+		var pick_rand_unit: int = randi_range(0, group_range)
+		var new_unit_leader: Ship = ret_group[pick_rand_unit]
+		new_unit_leader.set_group_leader(true)
+		if final_target_position != Vector2.ZERO:
+			new_unit_leader.set_navigation_position(final_target_position)
+		elif target_position != Vector2.ZERO:
+			new_unit_leader.set_navigation_position(target_position)
+	ShipNavigationAgent.set_target_position(position)
+
+func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
+	add_child(camera)
+	ManualControlCamera = camera
+	ManualControlCamera.enabled = true
+	zoom_value = n_zoom_value
+	if n_zoom_value > zoom_out_limit:
+		zoom_value = zoom_out_limit
+	elif n_zoom_value < zoom_in_limit:
+		zoom_value = zoom_in_limit
+
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
  #888   8 `88b.    8   888   .d88'  888       8       888      
@@ -233,14 +301,18 @@ func update_flux_indicators() -> void:
  #888   8       `888   888          `88.    .8'       888      
 #o888o o8o        `8  o888o           `YbodP'        o888o    
 
+	if not ship_select:
+		return
 # Any generic input event.
 func _input(event: InputEvent) -> void:
-	if get_parent() is Panel:
-		return
 	if event is InputEventMouseButton:
-		if manual_control and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT:
+		if Input.is_action_just_pressed("m2") and manual_control:
 			toggle_shield()
-		elif TacticalMap.visible and event.pressed and event.button_mask == MOUSE_BUTTON_MASK_RIGHT and ship_select:
+		elif Input.is_action_just_pressed("zoom in") and manual_control and zoom_value < zoom_in_limit:
+			zoom_value += Vector2(0.01, 0.01)
+		elif Input.is_action_just_pressed("zoom out") and manual_control and zoom_value > zoom_out_limit:
+			zoom_value -= Vector2(0.01, 0.01)
+		elif Input.is_action_just_pressed("m2") and group_leader and not manual_control:
 			intermediate_pathing = false
 			target_position = get_global_mouse_position()
 			ShipNavigationAgent.set_target_position(target_position)  # move selected ship at event position
@@ -248,11 +320,13 @@ func _input(event: InputEvent) -> void:
 		if is_friendly:
 			if (event.keycode == KEY_T and event.pressed) and ship_select:
 				toggle_manual_control()
-				toggle_manual_aim(all_weapons) # Replace all_weapons with specific weapon systems configured in the ship refit screen from ship stats.
-			elif (event.keycode == KEY_C and event.pressed) and ship_select and manual_control:
+			elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				toggle_auto_aim(all_weapons)
-			elif (event.keycode == KEY_V and event.pressed) and ship_select and manual_control:
+			elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				toggle_auto_fire(all_weapons)
+			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
+				toggle_manual_control()
+				camera_removed.emit()
 		elif not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
@@ -263,16 +337,19 @@ func _input(event: InputEvent) -> void:
 				targeted = true
 				ShipTargetIcon.visible = true
 
-# When the player interacts with a ship via mouse.
-func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	if get_parent() is Panel or CombatMap.dragging == true:
-		return
+	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
+	if event is InputEventMouseButton:
+		if Input.is_action_pressed("alt select") and Input.is_action_just_pressed("select"):
+			alt_select.emit()
+			return
+		if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
 	if event is InputEventMouseButton and is_friendly == true and TacticalMap.visible == true:
 		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:
 			ship_select = true # select ship
-			
-		elif event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and ship_select:
+			highlight_selection(ship_select)
+		elif Input.is_action_just_pressed("select") and is_friendly and ship_select:
 			ship_select = false # deselect ship
+			highlight_selection(ship_select)
 
 func _on_mouse_entered() -> void:
 	mouse_hover = true
@@ -286,19 +363,40 @@ func _on_mouse_exited() -> void:
 	for weapon_slot in all_weapons:
 		weapon_slot.toggle_display_aim(mouse_hover)
 
+func highlight_selection(select_value: bool = false) -> void:
+	print("%s is highlighted? %s" % [name, select_value])
+	TacticalMapIcon.toggle_mode = select_value
+	TacticalMapIcon.button_pressed = select_value
+	get_viewport().set_input_as_handled()
+	if select_value == true and ship_select == true:
+		ship_selected.emit()
+
 func toggle_manual_control() -> void:
-	# The visible indicator is turned on and off by the manual control variable's custom setter. Otherwise recursion issues occur.
-	#CombatMap.TacticalMap.display_tactical_map()
-	if not manual_control:
-		if CombatMap.controlled_ship != null:
-			CombatMap.controlled_ship.manual_control = false
-			# Switch all_weapons back to autofiring on the old ship we're switching from.
-			CombatMap.controlled_ship.toggle_manual_aim(all_weapons)
-		manual_control = true
-		CombatMap.controlled_ship = self
-	else:
+	if ship_select == false:
 		manual_control = false
+		return
+	
+	if manual_control == false:
+		manual_control = true
+	elif manual_control == true:
+		manual_control = false
+		camera_removed.emit(zoom_value, ManualControlCamera.position)
+		ManualControlCamera.queue_free()
+		ManualControlCamera = null
+		ship_select = false
 		_on_mouse_exited()
+	toggle_manual_aim(all_weapons, manual_control)
+	
+	if manual_control == true and group_leader:
+		set_group_leader(false)
+	if manual_control == true and is_in_group(group_name):
+		remove_from_group(group_name)
+		group_name = &""
+	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
+		ShipNavigationAgent.set_target_position(position)
+	if manual_control == true:
+		switch_to_manual.emit()
+		request_manual_camera.emit()
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -323,17 +421,17 @@ func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	var ship_id = get_rid().get_id()
 	weapon_slot.fire(ship_id)
 
-func toggle_manual_aim(weapon_system: Array[WeaponSlot]) -> void:
+func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
 	for weapon_slot in weapon_system:
-		weapon_slot.set_manual_aim()
+		weapon_slot.set_manual_aim(manual_aim_value)
 
 func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
-		weapon_slot.set_auto_aim()
+		weapon_slot.toggle_auto_aim()
 
 func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
-		weapon_slot.set_auto_fire()
+		weapon_slot.toggle_auto_fire()
 
 #ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
 #`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
@@ -343,13 +441,20 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
  #8       `888   .8'     `888.       `888'       888  `88.    .88'   .8'     `888.       888       888  `88b    d88'  8       `888  
 #o8o        `8  o88o     o8888o       `8'       o888o  `Y8bood8P'   o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  
 																																   
+func set_navigation_position(to_position: Vector2) -> void:
+	target_position = to_position
+	ShipNavigationAgent.set_target_position(to_position)
+	get_viewport().set_input_as_handled()
+
+func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
+	group_velocity = n_velocity
+	group_transform = next_transform
 
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
 	var velocity: Vector2 = Vector2.ZERO
-	
 	CenterCombatHUD.position = position
 	
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
@@ -365,7 +470,7 @@ func _physics_process(delta: float) -> void:
 			hard_flux -= ship_stats.flux_dissipation
 		update_flux_indicators()
 	
-	if manual_control and Input.is_action_pressed("m1") and not flux_overload:
+	if manual_control and Input.is_action_pressed("select") and not flux_overload:
 		fire_weapon_system(all_weapons)
 	
 	if shield_toggle and not flux_overload:
@@ -375,6 +480,8 @@ func _physics_process(delta: float) -> void:
 		toggle_shield()
 	
 	if manual_control:
+		if ManualControlCamera.zoom != zoom_value:
+			ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
 		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
@@ -393,8 +500,8 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var ship_query: Dictionary = {}
-	if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		ship_query = collision_raycast(global_position, target_position, 7, true, false)
+	#if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
+		#ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():
@@ -404,7 +511,8 @@ func _physics_process(delta: float) -> void:
 		var start_angle: float = -PI/4
 		var increment_angle: float = PI/16
 		var sweep_range: int = 8
-		sweep_vectors = radial_vector_sweep(ship_query, target_query, start_angle, increment_angle, sweep_range)
+		if collider_instance.collision_layer != collision_layer:
+			sweep_vectors = radial_vector_sweep(ship_query, target_query, start_angle, increment_angle, sweep_range)
 	
 	# raycast_sweep() returns an empty array if sweep_vectors is empty
 	var valid_paths: Array[Vector2] = raycast_sweep(sweep_vectors, target_position)
@@ -422,29 +530,31 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_target_position(target_position)
 		intermediate_pathing = false
 	
-	
-	if not ShipNavigationAgent.is_navigation_finished() and Engine.get_physics_frames() % 3 == 0:
-		next_path_position = ShipNavigationAgent.get_next_path_position()
-	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
+		next_path_position = ShipNavigationAgent.get_next_path_position()
 		var direction_to_path: Vector2 = global_position.direction_to(next_path_position)
 		velocity = direction_to_path * movement_delta
-		#var normalize_velocity: Vector2 = linear_velocity / velocity
-		#var ease_x: float = linear_velocity.x * ease(normalize_velocity.x, ship_stats.acceleration)
-		#var ease_y: float = linear_velocity.y * ease(normalize_velocity.y, ship_stats.acceleration)
 		velocity += ease_velocity(velocity)
-		
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
 		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
+	
+	if group_leader:
+		get_tree().call_group(group_name, "move_follower", velocity, transform)
 	
 	#if velocity == Vector2.ZERO and acceleration != Vector2.ZERO:
 		#acceleration = Vector2.ZERO
 	#elif velocity != Vector2.ZERO:
-	acceleration += velocity - linear_velocity
-	linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
+	if not group_leader and not group_name.is_empty():
+		velocity = group_velocity
+		var rotate_to: float = transform.x.angle_to(group_transform.x)
+		var transform_look_at: Transform2D = transform.rotated_local(rotate_to)
+		transform = transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
 	
-	if acceleration.abs().floor() != Vector2.ZERO and sleeping:
+	acceleration = velocity - linear_velocity
+	#linear_velocity += lerp(-linear_velocity, Vector2.ZERO, delta * ship_stats.deceleration)
+	
+	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -471,8 +581,8 @@ func ease_velocity(velocity: Vector2) -> Vector2:
 		normalize_velocity_x = 0.0
 	if velocity.y == 0.0:
 		normalize_velocity_y = 0.0
-	new_velocity.x = linear_velocity.x * ease(normalize_velocity_x, ship_stats.acceleration)
-	new_velocity.y = linear_velocity.y * ease(normalize_velocity_y, ship_stats.acceleration)
+	new_velocity.x = (velocity.x + linear_velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
+	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
 	return new_velocity
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
@@ -584,4 +694,4 @@ func _on_NavigationTimer_timeout() -> void:
 # somebody else can code this because im pretty much burnt on this stuff
 func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
 	if safe_velocity != Vector2.ZERO:
-		linear_velocity = safe_velocity
+		linear_velocity += safe_velocity / 2.0

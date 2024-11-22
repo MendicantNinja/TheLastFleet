@@ -23,11 +23,3 @@ func load_game(fleet_name: String = "Joe_Fleet") -> void:
 
 # Saving/Loading the galactic state (GalaxyMap/FactionData). 
 # Faction and Galactic Stats
-
-# Called when the node enters the scene tree for the first time.
-
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass

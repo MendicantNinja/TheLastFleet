@@ -1,13 +1,17 @@
-[gd_scene load_steps=13 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=14 format=3 uid="uid://cuocntda0dllh"]
 
-[ext_resource type="Script" path="res://Scripts/combat_map.gd" id="1_x40el"]
-[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_lpbtk"]
-[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="2_r4t6u"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_r78fd"]
-[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_ho88f"]
-[ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="3_pai6p"]
-[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ensw7"]
-[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_la3a5"]
+[ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
+[ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
+[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="5_mfr8c"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
+[ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
+size = Vector2(0, 0)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -21,222 +25,27 @@ size = Vector2(17000, 20000)
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
-size = Vector2(0, 0)
+[node name="CombatArena" type="Node2D"]
+script = ExtResource("1_fx56v")
 
-[node name="CombatMap" type="Node2D"]
-script = ExtResource("1_x40el")
+[node name="CombatMap" type="Node2D" parent="."]
+script = ExtResource("2_moq8i")
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-navigation_polygon = SubResource("NavigationPolygon_ooheh")
-
-[node name="PlayableArea" type="Area2D" parent="."]
-
-[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
-position = Vector2(8500.5, 10049)
-shape = SubResource("RectangleShape2D_nv86b")
-debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
-
-[node name="FleetDeployment" type="CanvasLayer" parent="."]
-
-[node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
-unique_name_in_owner = true
-z_index = 2
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -517.0
-offset_top = -240.0
-offset_right = 509.0
-offset_bottom = 244.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("2_lpbtk")
-
-[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeployment/FleetDeploymentPanel"]
-unique_name_in_owner = true
-layout_mode = 1
-offset_left = 14.0
-offset_top = 5.0
-offset_right = 1010.0
-offset_bottom = 376.0
-theme_override_constants/h_separation = 30
-columns = 10
-script = ExtResource("2_r4t6u")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeployment/FleetDeploymentPanel"]
-layout_mode = 0
-offset_left = 80.0
-offset_top = 378.0
-offset_right = 1836.0
-offset_bottom = 478.0
-scale = Vector2(0.5, 0.5)
-theme_override_constants/separation = 128
-
-[node name="Deploy" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
-unique_name_in_owner = true
-self_modulate = Color(1, 1, 1, 0.27451)
-z_index = 3
-layout_mode = 2
-texture_normal = ExtResource("4_ensw7")
-texture_hover = ExtResource("5_la3a5")
-
-[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Deploy"]
-clip_contents = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("2_lpbtk")
-bbcode_enabled = true
-text = "[center]Deploy"
-scroll_active = false
-
-[node name="All" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
-unique_name_in_owner = true
-self_modulate = Color(1, 1, 1, 0.27451)
-z_index = 3
-layout_mode = 2
-texture_normal = ExtResource("4_ensw7")
-texture_hover = ExtResource("5_la3a5")
-
-[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/All"]
-clip_contents = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("2_lpbtk")
-bbcode_enabled = true
-text = "[center]All"
-scroll_active = false
-
-[node name="Cancel" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
-unique_name_in_owner = true
-self_modulate = Color(1, 1, 1, 0.27451)
-z_index = 3
-layout_mode = 2
-texture_normal = ExtResource("4_ensw7")
-texture_hover = ExtResource("5_la3a5")
-
-[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Cancel"]
-clip_contents = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_right = -1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("2_lpbtk")
-bbcode_enabled = true
-text = "[center]Cancel (G)"
-scroll_active = false
-
-[node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
-unique_name_in_owner = true
-show_behind_parent = true
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -960.0
-offset_top = -540.0
-offset_right = -960.0
-offset_bottom = -540.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
-
-[node name="TacticalCamera" type="Camera2D" parent="."]
+[node name="CombatCamera" type="Camera2D" parent="CombatMap"]
 anchor_mode = 0
 ignore_rotation = false
-zoom = Vector2(0.5, 0.5)
+process_callback = 0
 limit_left = 0
 limit_top = 0
-limit_right = 0
-limit_bottom = 0
-limit_smoothed = true
-position_smoothing_enabled = true
-
-[node name="CombatCamera" type="Camera2D" parent="."]
-anchor_mode = 0
-ignore_rotation = false
-enabled = false
-limit_left = 0
-limit_top = 0
-limit_right = 0
-limit_bottom = 0
-limit_smoothed = true
+limit_right = 5000
+limit_bottom = 5000
 position_smoothing_enabled = true
 editor_draw_limits = true
 editor_draw_drag_margin = true
 
-[node name="SelectionArea" type="Area2D" parent="."]
-unique_name_in_owner = true
-
-[node name="SelectionShape" type="CollisionShape2D" parent="SelectionArea"]
-unique_name_in_owner = true
-shape = SubResource("RectangleShape2D_ekgw8")
-debug_color = Color(1, 1, 0, 1)
-
-[node name="PlayerShip0" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(500, 1000)
-
-[node name="PlayerShip1" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(800, 1000)
-
-[node name="PlayerShip2" parent="." instance=ExtResource("3_pai6p")]
-position = Vector2(1100, 1000)
-
-[node name="TestShip" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0470588, 0.0588235, 1)
-position = Vector2(360, 195)
-collision_layer = 4
-
-[node name="TestShip2" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(650, 195)
-collision_layer = 4
-
-[node name="TestShip3" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(1000, 195)
-collision_layer = 4
-
-[node name="TestShip4" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(1200, 500)
-collision_layer = 4
-
-[node name="TestShip5" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(800, 500)
-collision_layer = 4
-
-[node name="TestShip6" parent="." instance=ExtResource("3_pai6p")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(250, 400)
-collision_layer = 4
-
 [node name="TacticalMap" type="Node2D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("2_r78fd")
+script = ExtResource("2_cwwbl")
 
 [node name="Label" type="Label" parent="TacticalMap"]
 offset_left = 3.0
@@ -244,18 +53,20 @@ offset_top = -61.0
 offset_right = 439.0
 offset_bottom = -15.0
 theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
-theme_override_fonts/font = ExtResource("3_ho88f")
+theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 32
 text = "TACTICAL DISPLAY"
+metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
+visible = false
 top_level = true
 offset_left = 13.0
 offset_top = 1046.0
 offset_right = 2836.0
 offset_bottom = 2319.0
 theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
-theme_override_fonts/font = ExtResource("3_ho88f")
+theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 38
 text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
 CONTROLS 
@@ -280,3 +91,196 @@ G = Open Deployment Screen (WIP)
 
 
 "
+
+[node name="SelectionArea" type="Area2D" parent="TacticalMap"]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 0
+
+[node name="SelectionShape" type="CollisionShape2D" parent="TacticalMap/SelectionArea"]
+unique_name_in_owner = true
+shape = SubResource("RectangleShape2D_ekgw8")
+debug_color = Color(1, 1, 0, 1)
+
+[node name="TacticalCamera" type="Camera2D" parent="TacticalMap"]
+anchor_mode = 0
+zoom = Vector2(0.5, 0.5)
+process_callback = 0
+limit_left = 0
+limit_top = 0
+position_smoothing_enabled = true
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_ooheh")
+
+[node name="PlayableArea" type="Area2D" parent="."]
+
+[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
+position = Vector2(8500.5, 10049)
+shape = SubResource("RectangleShape2D_nv86b")
+debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
+
+[node name="FleetDeployment" type="CanvasLayer" parent="."]
+visible = false
+
+[node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
+unique_name_in_owner = true
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -517.0
+offset_top = -240.0
+offset_right = 509.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+
+[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeployment/FleetDeploymentPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 14.0
+offset_top = 5.0
+offset_right = 1010.0
+offset_bottom = 376.0
+theme_override_constants/h_separation = 30
+columns = 10
+script = ExtResource("5_mfr8c")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeployment/FleetDeploymentPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 378.0
+offset_right = 1836.0
+offset_bottom = 478.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/separation = 128
+
+[node name="Deploy" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Deploy"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Deploy"
+scroll_active = false
+
+[node name="All" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/All"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]All"
+scroll_active = false
+
+[node name="Cancel" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Cancel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Cancel (G)"
+scroll_active = false
+
+[node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(500, 1000)
+
+[node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(800, 1000)
+
+[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(1100, 1000)
+
+[node name="TestShip" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0470588, 0.0588235, 1)
+position = Vector2(360, 195)
+collision_layer = 4
+
+[node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(650, 195)
+collision_layer = 4
+
+[node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(1000, 195)
+collision_layer = 4
+
+[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(1200, 500)
+collision_layer = 4
+
+[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(800, 500)
+collision_layer = 4
+
+[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
+self_modulate = Color(1, 0.0705882, 0.0470588, 1)
+position = Vector2(250, 400)
+collision_layer = 4
