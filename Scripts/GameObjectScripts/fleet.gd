@@ -120,10 +120,8 @@ func merge_weapons() -> void:
 		fleet_stats.inventory.append(weapons_map[weapon_type])
 
 	# Debugging output
-	print("Merged weapons:")
-	print("Inventory size after merging: ", fleet_stats.inventory.size())
-	for item_slot in fleet_stats.inventory:
-		print(item_slot.type_of_item, " ",  item_slot.number_of_items)
+	#for item_slot in fleet_stats.inventory:
+		#print(item_slot.type_of_item, " ",  item_slot.number_of_items)
 
 func compare_items_by_type(a: ItemSlot, b: ItemSlot) -> int:
 	print("compare_items_by_type called")

@@ -28,6 +28,9 @@ func _process(delta):
 func _gui_input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		hide_weapon_list()
+		if get_viewport().gui_get_focus_owner() is WeaponSlotDisplay:
+			get_viewport().gui_get_focus_owner().release_focus()
+		
 
 # Create the ships in the list and the ability to scroll down
 func update_refit_list() -> void:
