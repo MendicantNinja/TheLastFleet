@@ -31,7 +31,7 @@ func indicate_selected_button(p_control: Control) -> void:
 	settings.swizzle(Refit)
 	settings.swizzle(Map)
 	settings.swizzle(Inventory)
-	settings.swizzle_and_brighten_player_color(p_control, settings.gui_color)
+	settings.swizzle_and_brighten(p_control, settings.gui_color)
 	
 	if p_control == Fleet:
 		swap_gui(FleetView)

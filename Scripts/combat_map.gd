@@ -1,6 +1,6 @@
 extends Node2D
 
-const ManualControlCamera = preload("res://Scenes/UtilityScenes/ManualControlCamera.tscn")
+const ManualControlCamera = preload("res://Scenes/GUIScenes/CombatGUIScenes/ManualControlCamera.tscn")
 
 @onready var CombatCamera = $CombatCamera
 @onready var Cancel = %Cancel
@@ -22,6 +22,21 @@ func _ready() -> void:
 	CombatCamera.limit_left = -extra_bounds
 	CombatCamera.limit_right = map_bounds.x + extra_bounds
 	CombatCamera.limit_bottom = map_bounds.y + extra_bounds
+
+func _unhandled_input(event):
+	if not visible:
+		return
+	if event is InputEventMouseButton:
+		if Input.is_action_just_pressed("zoom in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
+			zoom_value += Vector2(0.1, 0.1)
+		elif Input.is_action_just_pressed("zoom out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
+			zoom_value -= Vector2(0.1, 0.1)
+	elif event is InputEventMouseMotion:
+		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
+			CombatCamera.position -= event.relative / CombatCamera.zoom
+	elif event is InputEventKey:
+		if event.keycode == KEY_TAB and event.pressed:
+			switch_maps.emit()
 
 func toggle_cameras() -> void:
 	pass

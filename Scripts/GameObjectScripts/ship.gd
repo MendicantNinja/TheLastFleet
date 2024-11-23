@@ -170,6 +170,7 @@ func _ready() -> void:
 		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
 		# assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be 
 		# null and cause errors.
+		print("Iteration to set railguns as the weapon called")
 		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
 		# In the future, weapons will automatically be assigned from the already existing weapons in 
 		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 

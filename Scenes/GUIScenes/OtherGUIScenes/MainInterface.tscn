@@ -4,7 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="1_dpiv1"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="2_br1un"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="3_7iqua"]
-[ext_resource type="PackedScene" uid="uid://dt4vyn32lj4k7" path="res://Scenes/GUIScenes/OtherGUIScenes/FleetView.tscn" id="4_jv4jk"]
+[ext_resource type="PackedScene" path="res://Scenes/GUIScenes/OtherGUIScenes/FleetView.tscn" id="4_jv4jk"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/swizzle_control.gd" id="4_xljp3"]
 [ext_resource type="PackedScene" uid="uid://j6uwhl87p0k2" path="res://Scenes/GUIScenes/OtherGUIScenes/RefitView.tscn" id="7_qqfk0"]
 

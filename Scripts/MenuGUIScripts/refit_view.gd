@@ -10,9 +10,8 @@ extends Control
 @onready var player_fleet: Fleet = game_state.player_fleet
 @onready var player_fleet_stats: FleetStats = player_fleet.fleet_stats
 
-var displayed_ship: Ship
 var ship_weapons_display: Array[TextureButton]
-
+var displayed_ship: int
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -87,16 +86,18 @@ func display_weapon_list(this_weapon_display: TextureButton) -> void:
 func hide_weapon_list() -> void:
 	InventoryScrollContainer.visible = false
 
+# View whatever ship you've selected from the list.
+
 func view_ship(ship: Ship) -> void:
+	# Clear ship. Clear weapon buttons.
 	for child in ShipView.get_children():
 		child.queue_free()
 	ship_weapons_display.clear()
-	displayed_ship = ship
-	ShipView.add_child(displayed_ship)
-	displayed_ship.position = ShipView.size/2
+	ShipView.add_child(ship)
+	ship.position = ShipView.size/2
 	
 	# Display and Hide Appropriate GUI
-	for weapon_slot in displayed_ship.all_weapons:
+	for weapon_slot in ship.all_weapons:
 		var weapon_slot_selection: WeaponSlotDisplay = load("res://Scenes/GUIScenes/OtherGUIScenes/WeaponSlotDisplay.tscn").instantiate()
 		#var weapon_slot_selection: WeaponSlotDisplay = WeaponSlotDisplay.new()
 		weapon_slot_selection.weapon_slot = weapon_slot

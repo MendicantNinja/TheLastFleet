@@ -40,6 +40,7 @@ func on_pressed() -> void:
 		return
 	else:
 		var ship_hull_instance: Ship = ship.ship_hull.ship_packed_scene.instantiate()
+		
 		owner.view_ship(ship_hull_instance)
 
 
