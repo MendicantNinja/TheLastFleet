@@ -6,9 +6,6 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
-
-@onready var CombatMap: Node2D
-@onready var TacticalMap
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
 @onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
@@ -16,8 +13,6 @@ class_name Ship
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
-@onready var TacticalMapIcon = $TacticalMapIcon
-@onready var TacticalMap = CombatMap.get_node("%TacticalMap")
 @onready var all_weapons: Array[WeaponSlot]
 var ManualControlCamera: Camera2D = null
 
@@ -95,10 +90,11 @@ signal camera_removed()
 signal request_manual_camera()
 signal ship_selected()
 
-# Comment this out if it causes trouble. Used for initializing ships into combat based on stored fleet data. Should be called before ready/entering the ship into the scene.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
 
+# Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
+func deploy_ship() -> void:
 	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
 	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
@@ -106,12 +102,10 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
-		TacticalMapIcon.custom_minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 1.1
-		TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 		ManualControlIndicator.self_modulate = settings.player_color
 	elif is_friendly == false:
-	if TacticalMap.visible == true:
-		TacticalMapIcon.show()
+		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
+		TacticalMapIcon.modulate = settings.enemy_color
 
 func _ready() -> void:
 	#CombatMap = get_parent()
@@ -336,20 +330,19 @@ func _input(event: InputEvent) -> void:
 				emit_signal("ship_targeted", get_rid())
 				targeted = true
 				ShipTargetIcon.visible = true
-
+func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
 	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
 	if event is InputEventMouseButton:
 		if Input.is_action_pressed("alt select") and Input.is_action_just_pressed("select"):
 			alt_select.emit()
 			return
 		if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
-	if event is InputEventMouseButton and is_friendly == true and TacticalMap.visible == true:
-		if event.pressed and event.button_mask == MOUSE_BUTTON_MASK_LEFT and not ship_select:
 			ship_select = true # select ship
 			highlight_selection(ship_select)
 		elif Input.is_action_just_pressed("select") and is_friendly and ship_select:
 			ship_select = false # deselect ship
 			highlight_selection(ship_select)
+
 
 func _on_mouse_entered() -> void:
 	mouse_hover = true

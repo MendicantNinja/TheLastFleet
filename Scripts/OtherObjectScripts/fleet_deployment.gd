@@ -6,7 +6,6 @@ func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
 	%Deploy.pressed.connect(self.deploy_ships)
-	%BlackenBackground.size = $"../../../PlayableArea/PlayableAreaBounds".shape.size
 	pass
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:

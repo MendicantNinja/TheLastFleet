@@ -20,7 +20,7 @@ func swizzle_and_darken(swizzled: CanvasItem, color: Color = gui_color) -> void:
 	swizzled.self_modulate.g = color.g - 40
 	swizzled.self_modulate.b = color.b - 40
 
-func swizzle_and_brighten_player_color(swizzled: CanvasItem, color: Color = player_color) -> void:
+func swizzle_and_brighten(swizzled: CanvasItem, color: Color = gui_color) -> void:
 	swizzled.self_modulate.r = color.r + 40
 	swizzled.self_modulate.g = color.g + 40
 	swizzled.self_modulate.b = color.b + 40

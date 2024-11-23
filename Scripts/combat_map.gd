@@ -10,38 +10,18 @@ var zoom_out_limit: Vector2 = Vector2(0.3, 0.3)
 var camera_position: Vector2 = Vector2.ZERO
 var zoom_min: Vector2 = Vector2(1.5, 1.5)
 var zoom_value: Vector2 = Vector2.ONE
+@onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
+
 signal switch_maps()
-		CombatCamera.zoom = lerp( CombatCamera.zoom, zoom_value, delta)
 
 func _ready() -> void:
 	# Camera
+	CombatCamera.zoom = zoom_value
 	var extra_bounds: int = 3000
-	TacticalCamera.limit_top = -extra_bounds
-	TacticalCamera.limit_left = -extra_bounds
-	TacticalCamera.limit_right = PlayableAreaBounds.shape.size.x + extra_bounds
-	TacticalCamera.limit_bottom = PlayableAreaBounds.shape.size.y + extra_bounds
-	TacticalCamera.zoom = tactical_zoom_value
-	
 	CombatCamera.limit_top = -extra_bounds
 	CombatCamera.limit_left = -extra_bounds
-	CombatCamera.limit_right = PlayableAreaBounds.shape.size.x + extra_bounds
-	CombatCamera.limit_bottom = PlayableAreaBounds.shape.size.y + extra_bounds
-		connect_ship_signals(friendly_ship)
-func _unhandled_input(event):
-	if not visible:
-		return
-	if event is InputEventMouseButton:
-		if Input.is_action_just_pressed("zoom in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
-			zoom_value += Vector2(0.1, 0.1)
-		elif Input.is_action_just_pressed("zoom out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
-			zoom_value -= Vector2(0.1, 0.1)
-				toggle_camera_drag()
-	elif event is InputEventMouseMotion:
-		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
-	# Keys
-		if event.keycode == KEY_TAB and event.pressed:
-			switch_maps.emit()
-	draw_rect(Rect2(start, end - start), settings.gui_color, false, 6, true)
+	CombatCamera.limit_right = map_bounds.x + extra_bounds
+	CombatCamera.limit_bottom = map_bounds.y + extra_bounds
 
 func toggle_cameras() -> void:
 	pass
@@ -49,6 +29,7 @@ func toggle_cameras() -> void:
 func _physics_process(delta) -> void:
 	if CombatCamera.zoom != zoom_value:
 		CombatCamera.zoom = lerp(CombatCamera.zoom, zoom_value, 0.5)
+
 func display_map(map_value: bool) -> void:
 	if map_value == true:
 		visible = true
@@ -77,4 +58,3 @@ func _on_camera_removed(n_zoom_value: Vector2, offset: Vector2, unit: Ship) -> v
 	CombatCamera.position = offset/2
 	zoom_value = n_zoom_value
 	unit.camera_removed.disconnect(_on_camera_removed)
-		ship.ship_targeted.connect(friendly_ship._on_ship_targeted)

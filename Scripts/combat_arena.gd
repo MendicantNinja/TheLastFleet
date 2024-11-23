@@ -1,13 +1,13 @@
 extends Node2D
 
 @onready var CombatMap = $CombatMap
-@onready var PlayableAreaBounds = $PlayableArea/PlayableAreaBounds
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
 @onready var TacticalMap = %TacticalMap
 @onready var All = %All
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
+@onready var PlayableAreaBounds = %PlayableAreaBounds
 
 # groups
 var available_group_names: Array[StringName] = [&"group A", &"group B", &"group C", &"group D"]
@@ -21,12 +21,13 @@ func _ready() -> void:
 	TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
+	
 	FleetDeploymentList.setup_deployment_screen()
-	#settings.swizzle(FleetDeploymentList)
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(All)
 	settings.swizzle(Deploy)
 	settings.swizzle(Cancel)
+	#%BlackenBackground.size = PlayableAreaBounds.shape.size
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	for friendly_ship in friendly_group:
 		connect_ship_signals(friendly_ship)

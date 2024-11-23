@@ -5,7 +5,7 @@
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
-[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/FleetDeployment.gd" id="5_mfr8c"]
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
@@ -116,15 +116,16 @@ navigation_polygon = SubResource("NavigationPolygon_ooheh")
 [node name="PlayableArea" type="Area2D" parent="."]
 
 [node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
+unique_name_in_owner = true
 position = Vector2(8500.5, 10049)
 shape = SubResource("RectangleShape2D_nv86b")
 debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="FleetDeployment" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
 unique_name_in_owner = true
+visible = false
 z_index = 2
 anchors_preset = 8
 anchor_left = 0.5
@@ -239,8 +240,8 @@ anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -960.0
 offset_top = -540.0
-offset_right = 960.0
-offset_bottom = 540.0
+offset_right = 16040.0
+offset_bottom = 19460.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
