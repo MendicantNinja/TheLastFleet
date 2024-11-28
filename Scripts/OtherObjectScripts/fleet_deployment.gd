@@ -24,7 +24,7 @@ func deploy_ships() -> void:
 		ship_instantiation.is_friendly = true
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
-		CombatMap.ships_in_combat.append(ship_instantiation)
+		ship_instantiation.display_icon(true)
 	on_cancel_pressed()
 
 func on_all_pressed() -> void:
