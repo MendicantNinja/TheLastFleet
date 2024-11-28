@@ -19,8 +19,6 @@ var ManualControlCamera: Camera2D = null
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
 # even though call_group() broke in 4.3 stable.
-@onready var WeaponSlot0 = $WeaponSlot0
-@onready var WeaponSlot1 = $WeaponSlot1
 @onready var ShieldSlot = $ShieldSlot
 @onready var ShieldArea = $ShieldSlot/Shields
 @onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
@@ -108,7 +106,6 @@ func deploy_ship() -> void:
 		TacticalMapIcon.modulate = settings.enemy_color
 
 func _ready() -> void:
-	#CombatMap = get_parent()
 	ShipSprite.z_index = 0
 	
 	if ship_stats == null:
@@ -166,16 +163,10 @@ func _ready() -> void:
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 	for i in range(all_weapons.size()):
-		# Temporary hack to test weapons so that the mounts aren't empty.
-		# MENDICANT ONLY: all_weapons[i]=ship_stats.weapon_slots[i] make sure that ship stats 
-		# assigns the child nodes like WeaponMountSprite and WeaponSprite or else they will be 
-		# null and cause errors.
-		print("Iteration to set railguns as the weapon called")
+		# Placeholder
 		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
-		# In the future, weapons will automatically be assigned from the already existing weapons in 
-		# ship_stats during fleet deployment. Unfortunately refitting + save/load isn't in yet so 
-		# everything is a railgun.
-	
+		#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
+		#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
 	deploy_ship()
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)

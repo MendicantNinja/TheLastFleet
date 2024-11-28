@@ -2,7 +2,7 @@ extends TextureButton
 class_name FleetShipIcon
 
 @onready var index: int
-var ship: ShipStats
+var ship_stats: ShipStats
 @onready var ship_sprite: TextureButton = $ShipSprite
 @onready var ship_label: Label = $ShipSprite/Label
 func _get_drag_data(position) -> FleetShipIcon:
@@ -22,26 +22,26 @@ func _can_drop_data(at_position, data) -> bool:
 func _drop_data(position, data) -> void:
 		game_state.player_fleet.move_ship(data.index, self.index)
 		if owner.name == "FleetView":
-			print("fleet view called")
+			#print("fleet view called")
 			owner.update_fleet_list()
 		elif owner.name == "RefitView":
-			print("refit view called")
+			#print("refit view called")
 			owner.update_refit_list()
 		#get_tree().current_scene.update_fleet_list()
 	
 func on_added_to_container() -> void:
 	self.ship_sprite.self_modulate = settings.player_color
 	ship_label.position.y = self.custom_minimum_size.y
-	ship_label.text = "%s Class" % ship.ship_hull.ship_type_name
+	ship_label.text = "%s Class" % ship_stats.ship_hull.ship_type_name
 	#settings.swizzle(ShipPanel)
 
 func on_pressed() -> void:
 	if owner.name == "FleetView":
 		return
 	else:
-		var ship_hull_instance: Ship = ship.ship_hull.ship_packed_scene.instantiate()
-		
-		owner.view_ship(ship_hull_instance)
+		var ship_hull_instance: Ship = ship_stats.ship_hull.ship_packed_scene.instantiate()
+		ship_hull_instance.initialize(ship_stats)
+		owner.view_ship(ship_hull_instance, ship_stats)
 
 
 func _ready():

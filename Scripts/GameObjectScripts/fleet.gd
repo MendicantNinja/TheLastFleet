@@ -50,7 +50,7 @@ func add_item(item_to_add: Resource, number_of_items: int = 1) -> void:
 		item = ItemSlot.new(item_to_add.item_enum, number_of_items)
 		fleet_stats.inventory.append(item)
 	else:
-		print_stack()
+		#print_stack()
 		push_error("Not a valid item to add, please code the implementation")
 	merge_weapons()
 

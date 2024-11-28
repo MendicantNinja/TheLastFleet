@@ -41,11 +41,10 @@ func update_refit_list() -> void:
 		child.free()
 	for i in range(player_fleet_stats.ships.size()):
 		var ship_icon: FleetShipIcon = fleet_gui_icon_scene.instantiate()
-		var ship_stat: ShipStats = player_fleet_stats.ships[i]
-		ship_icon.ship = ship_stat
+		ship_icon.ship_stats = player_fleet_stats.ships[i]
 		RefitList.add_child(ship_icon)
 		ship_icon.owner = self
-		ship_icon.ship_sprite.texture_normal = ship_icon.ship.ship_hull.ship_sprite
+		ship_icon.ship_sprite.texture_normal = ship_icon.ship_stats.ship_hull.ship_sprite
 		ship_icon.ship_sprite.custom_minimum_size = Vector2(%ScrollContainer.size.x, %ScrollContainer.size.x) * .9
 		ship_icon.custom_minimum_size = ship_icon.ship_sprite.custom_minimum_size
 		ship_icon.pivot_offset = ship_icon.custom_minimum_size/2 - position
@@ -88,23 +87,29 @@ func hide_weapon_list() -> void:
 
 # View whatever ship you've selected from the list.
 
-func view_ship(ship: Ship) -> void:
+func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 	# Clear ship. Clear weapon buttons.
+	#if player_fleet_stats.ships[0] == ship_stats:
+		#print("Ship stats equals")
+	#else:
+		#print("Ship stats unequal")
 	for child in ShipView.get_children():
 		child.queue_free()
 	ship_weapons_display.clear()
 	ShipView.add_child(ship)
 	ship.position = ShipView.size/2
-	
+	ship.ship_stats = ship_stats
 	# Display and Hide Appropriate GUI
-	for weapon_slot in ship.all_weapons:
+	for i in ship.all_weapons.size():
+		#print("Ship_stats weapon as of this view_ship is ", ship.ship_stats.weapon_slots[i].weapon.weapon_name)
 		var weapon_slot_selection: WeaponSlotDisplay = load("res://Scenes/GUIScenes/OtherGUIScenes/WeaponSlotDisplay.tscn").instantiate()
-		#var weapon_slot_selection: WeaponSlotDisplay = WeaponSlotDisplay.new()
-		weapon_slot_selection.weapon_slot = weapon_slot
+		weapon_slot_selection.ship_weapon_slot = ship.all_weapons[i]
+		weapon_slot_selection.ship_stats_weapon_slot = ship.ship_stats.weapon_slots[i]
 		ShipView.add_child(weapon_slot_selection)
-		weapon_slot_selection.scale = weapon_slot.weapon_mount_image.scale
-		weapon_slot_selection.square_size = weapon_slot.weapon_mount_image.get_rect().size
-		weapon_slot_selection.global_position = weapon_slot.weapon_mount_image.global_position
+		#Perhaps adjusting this to be ship_stats_stats.weapon_slots somehow or setting scale for every weapon slot in code based on size could help so that a hack does not have to be used.
+		weapon_slot_selection.scale = ship.all_weapons[i].weapon_mount_image.scale
+		weapon_slot_selection.square_size = ship.all_weapons[i].weapon_mount_image.get_rect().size
+		weapon_slot_selection.global_position = ship.all_weapons[i].weapon_mount_image.global_position
 		#ABSOLUTE BULLSHIT HACK: ARBITRARY SCALING OF 1.55 AND MODULATING WEAPON_SLOT_DISPLAY TO TRANSPARENCY. MAY NOT WORK FOR LARGER MOUNTS!!
 		weapon_slot_selection.pivot_offset = -(weapon_slot_selection.size * weapon_slot_selection.scale)  / 1.55
 		weapon_slot_selection.root = self

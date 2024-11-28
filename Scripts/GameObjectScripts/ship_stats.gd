@@ -28,7 +28,7 @@ func initialize() -> void:
 	# Assign empty weapon slots based on the ship hulls mounts.
 	weapon_slots.resize(ship_hull.weapon_mounts.size())
 	for i in range(ship_hull.weapon_mounts.size()):
-		weapon_slots[i] = WeaponSlot.new(ship_hull.weapon_mounts[i])
+		weapon_slots[i] = WeaponSlot.new(ship_hull.weapon_mounts[i]) # New automatically assigns the weapon as empty here.
 
 # Updates stats. Internal function not called outside of this script. Should be called with a co-function whenever there is potentially a stat change (a new hull mod).
 func update() -> void:

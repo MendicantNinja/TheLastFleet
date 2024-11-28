@@ -14,7 +14,7 @@ class_name ShipHull
 @export var ship_packed_scene: PackedScene # I wonder if this will cause recursion issues?
 # Ship Systems
 @export var ship_system: data.ship_system_enum = data.ship_system_enum.NONE          # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
-@export var weapon_mounts: Array[WeaponMount] = []               # Array of weapon mounts (e.g., types of hardpoints, turrets)
+@export var weapon_mounts: Array[WeaponMount] = []               # Array of weapon mounts (e.g., types of hardpoints, turrets). Ends up ultimately being set by the packed scene?
 @export var base_mods: Array = []                       # List of hullmods that come packaged with the base hull.
 
 # Ship Dimensions
