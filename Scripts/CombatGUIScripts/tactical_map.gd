@@ -60,11 +60,13 @@ func _unhandled_input(event) -> void:
 	elif event is InputEventKey:
 		if event.keycode == KEY_TAB and event.pressed:
 			switch_maps.emit()
-		if Input.is_action_just_pressed("alt select"):
+		if Input.is_action_pressed("alt select") and selected_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
 			queue_redraw()
 		elif Input.is_action_just_released("alt select"):
+			if target_group.size() > 0:
+				attack_targets()
 			attack_group = false
 			selection_line_color = settings.gui_color
 			queue_redraw()
@@ -98,8 +100,8 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	get_viewport().set_input_as_handled()
 
 func move_new_unit(to_position: Vector2) -> void:
-	var selected_group: Array = get_tree().get_nodes_in_group(tmp_group_name)
-	if selected_group.is_empty():
+	var tmp_group: Array = get_tree().get_nodes_in_group(tmp_group_name)
+	if selected_group.is_empty() and tmp_group.is_empty():
 		get_viewport().set_input_as_handled()
 		return
 	
@@ -115,12 +117,27 @@ func move_new_unit(to_position: Vector2) -> void:
 
 # this will require iteration soon
 func attack_targets() -> void:
+	current_group_name = available_group_names.pop_back()
+	taken_group_names.push_back(current_group_name)
+	make_group(tmp_group_name, current_group_name)
+	
+	# These next few lines might cause issues later.
+	var target_group_name: StringName = current_group_name + &"targets"
 	for unit in target_group:
-		unit.add_to_group(tmp_target_name)
 		unit.add_to_group(highlight_group_name)
-	get_tree().call_group(tmp_target_name, "highlight_selection", true)
+		unit.add_to_group(target_group_name)
+	get_tree().call_group(target_group_name, "highlight_selection", true)
+	
+	var group_leader: Ship = null
+	var leaders: Array[Ship] = []
+	for unit: Ship in get_tree().get_nodes_in_group(current_group_name):
+		if unit.group_leader == true:
+			leaders.push_back(unit)
+			unit.group_leader = false
 
 func select_units() -> void:
+	if prev_selected_ship != null:
+		_on_ship_selected(prev_selected_ship)
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	SelectionArea.global_position = area_position
@@ -150,7 +167,7 @@ func select_units() -> void:
 	if attack_group and selected_group.is_empty():
 		reset_box_selection()
 		return
-	if attack_group and not selected_group.is_empty() and not tmp_target_group.is_empty():
+	elif attack_group and not selected_group.is_empty() and not tmp_target_group.is_empty():
 		target_group = tmp_target_group
 		attack_targets()
 		reset_box_selection()
@@ -159,6 +176,7 @@ func select_units() -> void:
 	var prev_group_name: StringName = &""
 	var current_names: Array = []
 	var same_group_count: int = 0
+	reset_units_affiliation(tmp_group)
 	for unit in tmp_group:
 		var in_valid_group: bool = crossreference_unit_groups(unit)
 		if in_valid_group and prev_group_name.is_empty():
@@ -170,6 +188,10 @@ func select_units() -> void:
 		elif in_valid_group and unit.group_name != prev_group_name and not current_names.has(unit.group_name):
 			current_names.push_back(unit.group_name)
 	
+	if selected_group.size() == 1 and selected_group[0] == prev_selected_ship:
+		selected_group[0].ship_select = false
+		selected_group.clear()
+	
 	if current_names.size() > 1:
 		reset_units_affiliation(tmp_group)
 	
@@ -178,24 +200,17 @@ func select_units() -> void:
 	
 	if same_group_count == tmp_group.size():
 		selected_group = tmp_group
+		make_tmp_group(tmp_group)
 		current_group_name = prev_group_name
-		make_tmp_group(tmp_group, tmp_group_name)
 	elif not tmp_group.is_empty():
-		make_tmp_group(tmp_group, tmp_group_name)
+		make_tmp_group(tmp_group)
 		selected_group = tmp_group
 	
 	reset_box_selection()
 
-func make_tmp_group(group: Array, group_name: StringName) -> void:
-	var tmp_group: Array = get_tree().get_nodes_in_group(tmp_group_name)
-	if attack_group == false and not tmp_group_name.is_empty():
-		for unit in tmp_group:
-			unit.highlight_selection(false)
-	
-	var tmp_target_group: Array = get_tree().get_nodes_in_group(tmp_target_name)
-	if attack_group == false and not tmp_target_group.is_empty():
-		for unit in tmp_target_group:
-			unit.highlight_selection(false)
+func make_tmp_group(group: Array) -> void:
+	get_tree().call_group(highlight_group_name, "highlight_selection", false)
+	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
 	
 	for unit in group:
 		unit.highlight_selection(true)
@@ -263,9 +278,18 @@ func _on_switched_to_manual() -> void:
 func _on_ship_selected(unit: Ship) -> void:
 	if prev_selected_ship and prev_selected_ship != unit:
 		prev_selected_ship.highlight_selection(false)
+	#if prev_selected_ship == unit and selected_group.size() == 1:
+	if prev_selected_ship == unit:
+		prev_selected_ship.highlight_selection(false)
+		unit.remove_from_group(highlight_group_name)
+		unit.remove_from_group(tmp_group_name)
+		selected_group.clear()
+		prev_selected_ship = null
+		return
 	unit.remove_from_group(highlight_group_name)
 	get_tree().call_group(highlight_group_name, "highlight_selection", false)
 	prev_selected_ship = unit
+	selected_group.push_back(unit)
 
 func _on_alt_select(ship: Ship) -> void:
 	if not visible:
@@ -278,19 +302,23 @@ func _on_alt_select(ship: Ship) -> void:
 		highlight_value = true
 		ship.highlight_selection(highlight_value)
 		ship.add_to_group(highlight_group_name)
+		ship.add_to_group(tmp_group_name)
 		return
 	elif target_group.is_empty() and not selected_group.is_empty() and not ship.is_friendly:
 		target_group.push_back(ship)
 		highlight_value = true
 		ship.highlight_selection(highlight_value)
 		ship.add_to_group(highlight_group_name)
+		ship.add_to_group(tmp_target_name)
 		return
 	
 	if ship.is_friendly and not selected_group.is_empty():
 		if not selected_group.has(ship):
+			ship.add_to_group(tmp_group_name)
 			selected_group.push_back(ship)
 			highlight_value = true
 		elif selected_group.has(ship):
+			ship.remove_from_group(tmp_group_name)
 			selected_group.erase(ship)
 	
 	if not ship.is_friendly and not target_group.is_empty():
@@ -298,6 +326,7 @@ func _on_alt_select(ship: Ship) -> void:
 			target_group.push_back(ship)
 			highlight_value = true
 		elif target_group.has(ship):
+			ship.remove_from_group(tmp_target_name)
 			target_group.erase(ship)
 	
 	if target_group.is_empty():

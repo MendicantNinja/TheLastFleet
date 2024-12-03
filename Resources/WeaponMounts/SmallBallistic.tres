@@ -8,5 +8,5 @@ script = ExtResource("1_eeycj")
 weapon_mount_type = 0
 weapon_mount_size = 0
 image = ExtResource("1_cqony")
-firing_arc = 90
+firing_arc = 15
 is_fixed = false

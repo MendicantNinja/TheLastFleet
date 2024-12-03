@@ -6,7 +6,7 @@
 [resource]
 script = ExtResource("2_pilrw")
 weapon_name = "Empty"
-item_enum = 6
+item_enum = 0
 weapon_size = 0
 image = ExtResource("1_5r546")
 armament_points = 0

@@ -55,6 +55,7 @@ var owner_rid: RID
 
 signal weapon_slot_fired(flux)
 signal remove_manual_camera(camera)
+signal target_within_range(value)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -108,10 +109,6 @@ func _ready():
 	can_fire = true
 	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)
 	
-	if position.y > 0:
-		weapon_node.transform = weapon_node.transform.rotated(PI/2)
-	elif position.y < 0:
-		weapon_node.transform = weapon_node.transform.rotated(-PI/2)
 	default_direction = weapon_node.transform
 	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
 	
@@ -320,8 +317,10 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	if not can_look_at and manual_aim:
 		target_transform = weapon_node.transform.looking_at(last_valid_position)
 	elif not can_look_at and not manual_aim:
+		target_within_range.emit(false)
 		return default_direction
 	elif can_look_at:
+		target_within_range.emit(true)
 		last_valid_position = target_position
 	
 	return target_transform
