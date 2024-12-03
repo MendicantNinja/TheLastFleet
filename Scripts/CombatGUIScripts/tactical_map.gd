@@ -195,15 +195,7 @@ func select_units() -> void:
 		elif in_valid_group and unit.group_name != prev_group_name and not current_names.has(unit.group_name):
 			current_names.push_back(unit.group_name)
 	
-	if selected_group.size() == 1 and selected_group[0] == prev_selected_ship:
-		selected_group[0].ship_select = false
-		selected_group.clear()
-	
-	if current_names.size() > 1:
-		reset_units_affiliation(tmp_group)
-	
-	if tmp_group.size() == 1:
-		reset_units_affiliation(tmp_group)
+	reset_units_affiliation(tmp_group)
 	
 	if same_group_count == tmp_group.size():
 		selected_group = tmp_group
@@ -233,9 +225,12 @@ func reset_units_affiliation(group_select: Array) -> void:
 	for unit: Ship in group_select:
 		if unit.group_leader:
 			unit.set_group_leader(false)
+		if unit.group_name.is_empty():
+			continue
 		unit.remove_from_group(unit.group_name)
 		var ret_group: Array = get_tree().get_nodes_in_group(unit.group_name)
 		unit.group_name = &""
+	selected_group.clear()
 	reset_group_names()
 
 func crossreference_unit_groups(unit: Ship) -> bool:
@@ -277,6 +272,7 @@ func _on_switched_to_manual() -> void:
 	reset_box_selection()
 
 func _on_ship_selected(unit: Ship) -> void:
+	selected_group.clear()
 	if prev_selected_ship and prev_selected_ship != unit:
 		prev_selected_ship.highlight_selection(false)
 	#if prev_selected_ship == unit and selected_group.size() == 1:
@@ -284,13 +280,12 @@ func _on_ship_selected(unit: Ship) -> void:
 		prev_selected_ship.highlight_selection(false)
 		unit.remove_from_group(highlight_group_name)
 		unit.remove_from_group(tmp_group_name)
-		selected_group.clear()
+		unit.set_group_leader(false)
 		prev_selected_ship = null
 		return
 	unit.remove_from_group(highlight_group_name)
 	get_tree().call_group(highlight_group_name, "highlight_selection", false)
 	prev_selected_ship = unit
-	selected_group.clear()
 	selected_group.push_back(unit)
 
 func _on_alt_select(ship: Ship) -> void:

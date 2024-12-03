@@ -276,23 +276,9 @@ func group_add(n_group_name: StringName) -> void:
 
 func set_group_leader(leader_value: bool) -> void:
 	group_leader = leader_value
-	var ret_group: Array = []
-	if not group_name.is_empty() and leader_value == false:
-		ret_group = get_tree().get_nodes_in_group(group_name)
-		remove_from_group(group_name)
-		group_name = &""
-	if not ret_group.is_empty():
-		var group_range: int = ret_group.size() - 1
-		var pick_rand_unit: int = randi_range(0, group_range)
-		var new_unit_leader: Ship = ret_group[pick_rand_unit]
-		new_unit_leader.set_group_leader(true)
-		if final_target_position != Vector2.ZERO:
-			new_unit_leader.set_navigation_position(final_target_position)
-			return
-		elif target_position != Vector2.ZERO:
-			new_unit_leader.set_navigation_position(target_position)
-			return
-	ShipNavigationAgent.set_target_position(position)
+	var ret_group = get_tree().get_nodes_in_group(group_name)
+	if leader_value == false and ret_group.size() > 0:
+		set_navigation_position(position)
 
 func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
 	if not ship_select:
