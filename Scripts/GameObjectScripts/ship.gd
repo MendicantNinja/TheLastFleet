@@ -277,8 +277,8 @@ func group_add(n_group_name: StringName) -> void:
 func set_group_leader(leader_value: bool) -> void:
 	group_leader = leader_value
 	var ret_group = get_tree().get_nodes_in_group(group_name)
-	if leader_value == false and ret_group.size() > 0:
-		set_navigation_position(position)
+	if leader_value == false and ret_group.size() > 0 and not ShipNavigationAgent.is_navigation_finished():
+		set_navigation_position(target_position)
 
 func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
 	if not ship_select:
