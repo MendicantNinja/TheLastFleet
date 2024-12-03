@@ -74,7 +74,9 @@ func _unhandled_input(event) -> void:
 func process_move(to_position: Vector2) -> void:
 	if selected_group.is_empty() and current_group_name.is_empty():
 		return
-	if current_group_name.is_empty():
+	
+	var tmp_group: Array = get_tree().get_nodes_in_group(tmp_group_name)
+	if not tmp_group.is_empty() or current_group_name.is_empty():
 		move_new_unit(to_position)
 		return
 	
@@ -100,6 +102,7 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	get_viewport().set_input_as_handled()
 
 func move_new_unit(to_position: Vector2) -> void:
+	reset_group_names()
 	var tmp_group: Array = get_tree().get_nodes_in_group(tmp_group_name)
 	if selected_group.is_empty() and tmp_group.is_empty():
 		get_viewport().set_input_as_handled()
@@ -117,6 +120,7 @@ func move_new_unit(to_position: Vector2) -> void:
 
 # this will require iteration soon
 func attack_targets() -> void:
+	reset_group_names()
 	current_group_name = available_group_names.pop_back()
 	taken_group_names.push_back(current_group_name)
 	make_group(tmp_group_name, current_group_name)
@@ -136,8 +140,10 @@ func attack_targets() -> void:
 			unit.group_leader = false
 
 func select_units() -> void:
+	reset_group_names()
 	if prev_selected_ship != null:
 		_on_ship_selected(prev_selected_ship)
+	
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	SelectionArea.global_position = area_position
@@ -150,6 +156,7 @@ func select_units() -> void:
 	if selection.size() == 0:
 		get_tree().call_group(highlight_group_name, "highlight_selection", false)
 		get_tree().call_group(highlight_group_name, "remove_group", highlight_group_name)
+		get_tree().call_group(tmp_group_name, "remove_group", tmp_group_name)
 		target_group.clear()
 		selected_group.clear()
 		reset_box_selection()
@@ -176,7 +183,7 @@ func select_units() -> void:
 	var prev_group_name: StringName = &""
 	var current_names: Array = []
 	var same_group_count: int = 0
-	reset_units_affiliation(tmp_group)
+	
 	for unit in tmp_group:
 		var in_valid_group: bool = crossreference_unit_groups(unit)
 		if in_valid_group and prev_group_name.is_empty():
@@ -220,11 +227,7 @@ func make_tmp_group(group: Array) -> void:
 func make_group(prev_group_name: StringName, new_group_name: StringName) -> void:
 	get_tree().call_group(prev_group_name, "group_add", new_group_name)
 	get_tree().call_group(prev_group_name, "group_remove", prev_group_name)
-	
-	var other_group: Array = get_tree().get_nodes_in_group(prev_group_name)
-	if other_group.is_empty() and taken_group_names.has(prev_group_name):
-		taken_group_names.erase(prev_group_name)
-		available_group_names.push_back(prev_group_name)
+	reset_group_names()
 
 func reset_units_affiliation(group_select: Array) -> void:
 	for unit: Ship in group_select:
@@ -232,10 +235,8 @@ func reset_units_affiliation(group_select: Array) -> void:
 			unit.set_group_leader(false)
 		unit.remove_from_group(unit.group_name)
 		var ret_group: Array = get_tree().get_nodes_in_group(unit.group_name)
-		if ret_group.is_empty() and taken_group_names.has(unit.group_name):
-			taken_group_names.erase(unit.group_name)
-			available_group_names.push_back(unit.group_name)
 		unit.group_name = &""
+	reset_group_names()
 
 func crossreference_unit_groups(unit: Ship) -> bool:
 	var group_name: StringName = unit.group_name
@@ -289,6 +290,7 @@ func _on_ship_selected(unit: Ship) -> void:
 	unit.remove_from_group(highlight_group_name)
 	get_tree().call_group(highlight_group_name, "highlight_selection", false)
 	prev_selected_ship = unit
+	selected_group.clear()
 	selected_group.push_back(unit)
 
 func _on_alt_select(ship: Ship) -> void:
@@ -340,6 +342,12 @@ func _on_alt_select(ship: Ship) -> void:
 		ship.remove_from_group(highlight_group_name)
 	
 	ship.highlight_selection(highlight_value)
+
+func reset_group_names() -> void:
+	for group_name in taken_group_names:
+		var group: Array = get_tree().get_nodes_in_group(group_name)
+		if group.is_empty():
+			available_group_names.push_back(group_name)
 
 func get_rect_start_position() -> Vector2:
 	var new_position: Vector2
