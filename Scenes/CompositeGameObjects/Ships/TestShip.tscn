@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=21 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
@@ -10,7 +10,6 @@
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="5_wktsu"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="8_iviui"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
@@ -62,16 +61,16 @@ script = ExtResource("1_sc1ei")
 script = ExtResource("7_thatc")
 
 [node name="main" type="Node" parent="CombatBehaviorTree"]
-script = ExtResource("8_iviui")
+script = ExtResource("4_yl4qo")
 
 [node name="target ship" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_yl4qo")
 
-[node name="choose target" type="Node" parent="CombatBehaviorTree/main/target ship"]
-script = ExtResource("5_wktsu")
-
 [node name="move to target" type="Node" parent="CombatBehaviorTree/main/target ship"]
 script = ExtResource("5_fqvsw")
+
+[node name="choose target" type="Node" parent="CombatBehaviorTree/main/target ship"]
+script = ExtResource("5_wktsu")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
