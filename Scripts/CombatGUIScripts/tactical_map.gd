@@ -17,6 +17,7 @@ var selection_line_color: Color = settings.gui_color
 # Selection (in general)
 var available_group_names: Array[StringName] = [&"group A", &"group B", &"group C", &"group D"]
 var taken_group_names: Array[StringName] = []
+var current_groups: Dictionary = {}
 var tmp_group_name: StringName = &"temporary group"
 var tmp_target_name: StringName = &"temporary target"
 var highlight_group_name: StringName = &"friendly selection"
@@ -79,10 +80,16 @@ func process_move(to_position: Vector2) -> void:
 	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
 	
 	var unit_leaders: Array = []
-	var current_groups: Dictionary = {}
 	for unit in highlighted_group:
 		if unit.group_leader:
 			unit_leaders.push_back(unit)
+	
+	var funny_pair: Array = current_groups.values()
+	for pair in funny_pair:
+		if highlighted_group == pair and unit_leaders.size() == 1:
+			var leader = unit_leaders[0]
+			move_unit(unit_leaders[0], to_position)
+			return
 	
 	if prev_group.size() == highlighted_group.size() and unit_leaders.size() == 1:
 		var leader = unit_leaders[0]
@@ -93,6 +100,7 @@ func process_move(to_position: Vector2) -> void:
 	for leader: Ship in unit_leaders:
 		leader.set_group_leader(false)
 	
+	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
@@ -115,13 +123,15 @@ func move_new_unit(to_position: Vector2) -> void:
 	new_leader.set_group_leader(true)
 	current_group_name = new_group_name
 	current_selected_group = highlighted_group
+	current_groups[current_group_name] = current_selected_group
+	current_groups[current_group_name].sort()
 	
 	move_unit(new_leader, to_position)
-	reset_group_names()
 
 # this will require iteration soon
 func attack_targets() -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	reset_group_affiliation(highlighted_group)
 	var group_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
@@ -156,6 +166,7 @@ func select_units() -> void:
 	await get_tree().physics_frame
 	var selection: Array[Node2D] = SelectionArea.get_overlapping_bodies()
 	reset_box_selection()
+	
 	if attack_group == true and selection.size() == 0:
 		get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
 		get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
@@ -165,6 +176,13 @@ func select_units() -> void:
 		get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
 		current_group_name = &""
 		return
+	
+	var past_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	for ship in past_group:
+		if not ship in selection:
+			ship.highlight_selection(false)
+			ship.remove_from_group(highlight_group_name)
+			ship.remove_from_group(highlight_enemy_name)
 	
 	for ship in selection:
 		if not ship.is_friendly and attack_group == true:
@@ -176,18 +194,7 @@ func select_units() -> void:
 		attack_targets()
 		return
 	
-	var tmp_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	var group_dict: Dictionary = {}
-	for unit in tmp_group:
-		if not group_dict.has(unit.group_name) and not unit.group_name.is_empty():
-			group_dict[unit.group_name] = []
-		elif not unit.group_name.is_empty():
-			group_dict[unit.group_name].push_back(unit)
-	
-	if group_dict.keys().size() > 1:
-		current_selected_group.clear()
-		reset_group_affiliation(tmp_group)
-	
+	current_selected_group.clear()
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 
 func reset_group_affiliation(group_select: Array) -> void:
@@ -196,7 +203,14 @@ func reset_group_affiliation(group_select: Array) -> void:
 			unit.set_group_leader(false)
 		unit.remove_from_group(unit.group_name)
 		unit.group_name = &""
-	reset_group_names()
+	
+	var count_down: int = taken_group_names.size() - 1
+	for group_idx in range(count_down, -1, -1):
+		var group_name: StringName = taken_group_names[group_idx]
+		var group: Array = get_tree().get_nodes_in_group(group_name)
+		if group.is_empty():
+			taken_group_names.remove_at(group_idx)
+			available_group_names.push_back(group_name)
 
 func reset_current_group_leader(unit: Ship) -> void:
 	unit.remove_from_group(unit.group_name)
@@ -213,17 +227,6 @@ func reset_current_group_leader(unit: Ship) -> void:
 		new_leader.set_group_leader(true)
 		new_leader.set_navigation_position(relative_position)
 	unit.set_group_leader(false)
-
-func reset_group_names() -> void:
-	for group_name in taken_group_names:
-		var group: Array = get_tree().get_nodes_in_group(group_name)
-		if current_group_name == group_name:
-			continue
-		if group.size() == 1:
-			group[0].remove_from_group(group_name)
-			group[0].set_group_leader(false)
-		if group.is_empty() or group.size() == 1:
-			available_group_names.push_back(group_name)
 
 func reset_box_selection() -> void:
 	box_selection_start = Vector2.ZERO

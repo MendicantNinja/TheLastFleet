@@ -66,11 +66,11 @@ script = ExtResource("4_yl4qo")
 [node name="target ship" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_yl4qo")
 
-[node name="move to target" type="Node" parent="CombatBehaviorTree/main/target ship"]
-script = ExtResource("5_fqvsw")
-
 [node name="choose target" type="Node" parent="CombatBehaviorTree/main/target ship"]
 script = ExtResource("5_wktsu")
+
+[node name="move to target" type="Node" parent="CombatBehaviorTree/main"]
+script = ExtResource("5_fqvsw")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
