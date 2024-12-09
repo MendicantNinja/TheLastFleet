@@ -10,10 +10,6 @@ extends Node2D
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 
 # groups
-var available_group_names: Array[StringName] = [&"group A", &"group B", &"group C", &"group D"]
-var taken_group_names: Array[StringName] = []
-var tmp_group_name: StringName = &"temporary group"
-var tmp_target_name: StringName = &"temporary target"
 
 func _ready() -> void:
 	TacticalMap.switch_maps.connect(_on_switch_maps)

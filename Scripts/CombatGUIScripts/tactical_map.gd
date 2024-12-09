@@ -15,7 +15,8 @@ var box_selection_end: Vector2 = Vector2.ZERO
 var selection_line_color: Color = settings.gui_color
 
 # Selection (in general)
-var available_group_names: Array[StringName] = [&"group A", &"group B", &"group C", &"group D"]
+var group_iterator: int = 0
+var available_group_names: Array[StringName] = []
 var taken_group_names: Array[StringName] = []
 var current_groups: Dictionary = {}
 var tmp_group_name: StringName = &"temporary group"
@@ -23,7 +24,7 @@ var tmp_target_name: StringName = &"temporary target"
 var highlight_group_name: StringName = &"friendly selection"
 var highlight_enemy_name: StringName = &"enemy selection"
 var current_group_name: StringName = &""
-var current_selected_group: Array = []
+#var current_selected_group: Array = []
 var target_group: Array = []
 var prev_selected_ship: Ship = null
 var attack_group: bool = false
@@ -103,29 +104,49 @@ func process_move(to_position: Vector2) -> void:
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
 
+# Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	unit_leader.set_navigation_position(to_position)
 	get_viewport().set_input_as_handled()
 
+
 func move_new_unit(to_position: Vector2) -> void:
+	# 1) Create an array of ships (nodes) from the ships the player currently has selected
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	# Delete this to fix left click?
 	if highlighted_group.is_empty():
 		get_viewport().set_input_as_handled()
 		return
 	
-	var new_group_name: StringName = available_group_names.pop_back()
-	taken_group_names.push_back(new_group_name)
-	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
-	
+	# 2) Pick the group leader ship at random
 	var unit_range: int = highlighted_group.size() - 1
 	var pick_leader: int = randi_range(0, unit_range)
 	var new_leader: Ship = highlighted_group[pick_leader]
 	new_leader.set_group_leader(true)
-	current_group_name = new_group_name
-	current_selected_group = highlighted_group
-	current_groups[current_group_name] = current_selected_group
-	current_groups[current_group_name].sort()
 	
+	# 3) Generate and assign a name. Sort the name arrays.
+	var new_group_name: StringName 
+	if available_group_names.size() > 0:
+		new_group_name = available_group_names.pop_back()
+	elif available_group_names.size() == 0:
+	# iterate a new group name
+		new_group_name = StringName("Group " + str(group_iterator))
+		group_iterator += 1
+	
+	taken_group_names.push_back(new_group_name)
+	available_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	taken_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	
+	# 4) create the group from the currently selected ships
+	# Current_selected_group is full of unique references to ships. Any changes made will not back propagate to highlighted_group and vice versa.
+	var current_selected_group: Array
+	current_groups[new_group_name] = current_selected_group
+	# ship.group_add() must be called on every individual ship. it does special things
+	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	#current_groups[current_group_name] = current_selected_group
+	
+	
+	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 
 # this will require iteration soon
@@ -193,24 +214,25 @@ func select_units() -> void:
 	if attack_group:
 		attack_targets()
 		return
-	
-	current_selected_group.clear()
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 
+# Takes a group of recently selected ships and creates a new group for them.
 func reset_group_affiliation(group_select: Array) -> void:
+	# removes them if they're already in a group. removes leader status ofc
 	for unit: Ship in group_select:
 		if unit.group_leader:
 			unit.set_group_leader(false)
 		unit.remove_from_group(unit.group_name)
 		unit.group_name = &""
 	
-	var count_down: int = taken_group_names.size() - 1
-	for group_idx in range(count_down, -1, -1):
-		var group_name: StringName = taken_group_names[group_idx]
-		var group: Array = get_tree().get_nodes_in_group(group_name)
-		if group.is_empty():
-			taken_group_names.remove_at(group_idx)
-			available_group_names.push_back(group_name)
+	# Give a name to our new group here. Assign
+	#var count_down: int = taken_group_names.size() - 1
+	#for group_idx in range(count_down, -1, -1):
+		#var group_name: StringName = taken_group_names[group_idx]
+		#var group: Array = get_tree().get_nodes_in_group(group_name)
+		#if group.is_empty():
+			#taken_group_names.remove_at(group_idx)
+			#available_group_names.push_back(group_name)
 
 func reset_current_group_leader(unit: Ship) -> void:
 	unit.remove_from_group(unit.group_name)
