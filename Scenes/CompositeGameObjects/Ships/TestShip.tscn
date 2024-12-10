@@ -1,11 +1,12 @@
-[gd_scene load_steps=21 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=22 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_yl4qo"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/move_to_target.gd" id="5_fqvsw"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/is_target_available.gd" id="5_aqd75"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/move_into_range.gd" id="5_fqvsw"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="5_wktsu"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
@@ -60,16 +61,16 @@ script = ExtResource("1_sc1ei")
 [node name="CombatBehaviorTree" type="Node" parent="."]
 script = ExtResource("7_thatc")
 
-[node name="main" type="Node" parent="CombatBehaviorTree"]
+[node name="target enemy" type="Node" parent="CombatBehaviorTree"]
 script = ExtResource("4_yl4qo")
 
-[node name="target ship" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_yl4qo")
+[node name="is target available" type="Node" parent="CombatBehaviorTree/target enemy"]
+script = ExtResource("5_aqd75")
 
-[node name="choose target" type="Node" parent="CombatBehaviorTree/main/target ship"]
+[node name="choose target" type="Node" parent="CombatBehaviorTree/target enemy"]
 script = ExtResource("5_wktsu")
 
-[node name="move to target" type="Node" parent="CombatBehaviorTree/main"]
+[node name="move into range" type="Node" parent="CombatBehaviorTree/target enemy"]
 script = ExtResource("5_fqvsw")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]

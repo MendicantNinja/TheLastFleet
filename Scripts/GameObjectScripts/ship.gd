@@ -185,7 +185,7 @@ func _ready() -> void:
 	var min_range: float = weapon_ranges.keys().min()
 	longest_range_weapon = weapon_ranges[max_range]
 	shortest_range_weapon = weapon_ranges[min_range]
-	furthest_safe_distance = transform.origin.distance_to(longest_range_weapon.transform.origin)
+	furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
 	furthest_safe_distance += longest_range_weapon.weapon.range
 	
 	deploy_ship()
@@ -446,6 +446,11 @@ func _physics_process(delta: float) -> void:
 	var velocity: Vector2 = Vector2.ZERO
 	CenterCombatHUD.position = position
 	
+	if ShipNavigationAgent.is_navigation_finished() and not manual_control:
+		if rotate_angle != 0.0 and move_direction != Vector2.ZERO:
+			rotate_angle = 0.0
+			move_direction = Vector2.ZERO
+	
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
@@ -475,15 +480,6 @@ func _physics_process(delta: float) -> void:
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
 		Input.get_action_strength("D") - Input.get_action_strength("A"))
-	
-	if rotate_angle != 0.0:
-		var adjust_mass: float = (mass * 1000)
-		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-	
-	if move_direction != Vector2.ZERO:
-		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-		velocity = rotate_movement * movement_delta
-		velocity += ease_velocity(velocity)
 	
 	if ShipNavigationAgent.get_max_speed() != movement_delta:
 		ShipNavigationAgent.set_max_speed(movement_delta)
@@ -528,12 +524,18 @@ func _physics_process(delta: float) -> void:
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
 		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
 	
+	if rotate_angle != 0.0:
+		var adjust_mass: float = (mass * 1000)
+		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+	
+	if move_direction != Vector2.ZERO:
+		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
+		velocity = rotate_movement * movement_delta
+		velocity += ease_velocity(velocity)
+	
 	if group_leader and not ShipNavigationAgent.is_navigation_finished():
 		get_tree().call_group(group_name, "move_follower", velocity, transform)
 	
-	#if velocity == Vector2.ZERO and acceleration != Vector2.ZERO:
-		#acceleration = Vector2.ZERO
-	#elif velocity != Vector2.ZERO:
 	if not group_leader and not group_name.is_empty() and group_velocity != Vector2.ZERO:
 		velocity = group_velocity
 		group_velocity = Vector2.ZERO
@@ -553,7 +555,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		#linear_velocity = linear_velocity
 	
 	if force.abs().floor() != Vector2.ZERO and not manual_control:
-		apply_central_force(force)
+		apply_torque(rotate_angle)
+		apply_force(force)
 	
 	if manual_control:
 		apply_torque(rotate_angle)
@@ -574,9 +577,33 @@ func ease_velocity(velocity: Vector2) -> Vector2:
 	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
 	return new_velocity
 
-func move_to_targeted_ship(targeted_ship: Ship, blackboard: Blackboard) -> void:
-	var direction_to: Vector2 = transform.origin.direction_to(targeted_ship.position)
+func get_target_into_range(target: Ship) -> bool:
+	var direction_to: Vector2 = position.direction_to(target.position)
 	transform.x = direction_to
+	return false
+
+func set_combat_ai(value: bool) -> void:
+	CombatBehaviorTree.enabled = value
+
+func set_blackboard_data(key: Variant, value: Variant) -> void:
+	var blackboard = CombatBehaviorTree.blackboard
+	blackboard.set_data(key, value)
+
+func remove_blackboard_data(key: Variant) -> void:
+	var blackboard = CombatBehaviorTree.blackboard
+	blackboard.remove_data(key)
+
+func find_closest_target(available_targets: Array) -> Ship:
+	var closest_target: Ship = null
+	var distances: Dictionary = {}
+	
+	for target in available_targets:
+		var distance_to: float = position.distance_to(target.position)
+		distances[distance_to] = target
+	var shortest_distance: float = distances.keys().min()
+	
+	closest_target = distances[shortest_distance]
+	return closest_target
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:

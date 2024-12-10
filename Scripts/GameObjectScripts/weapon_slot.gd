@@ -41,7 +41,7 @@ var manual_camera: bool = false
 
 var range_display_color: Color = Color.SNOW
 var range_display_count: int = 64
-var range_display_width: float = 0.5
+var range_display_width: float = 1.0
 
 var available_targets: Dictionary = {}
 var killcast: RayCast2D = null

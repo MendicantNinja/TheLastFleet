@@ -18,13 +18,9 @@ var selection_line_color: Color = settings.gui_color
 var available_group_names: Array[StringName] = [&"group A", &"group B", &"group C", &"group D"]
 var taken_group_names: Array[StringName] = []
 var current_groups: Dictionary = {}
-var tmp_group_name: StringName = &"temporary group"
-var tmp_target_name: StringName = &"temporary target"
 var highlight_group_name: StringName = &"friendly selection"
 var highlight_enemy_name: StringName = &"enemy selection"
 var current_group_name: StringName = &""
-var current_selected_group: Array = []
-var target_group: Array = []
 var prev_selected_ship: Ship = null
 var attack_group: bool = false
 
@@ -69,7 +65,7 @@ func _unhandled_input(event) -> void:
 			selection_line_color = Color(Color.CRIMSON)
 			queue_redraw()
 		elif Input.is_action_just_released("alt select"):
-			if highlighted_enemy_group.size() > 0:
+			if highlighted_group.size() > 0 and highlighted_enemy_group.size() > 0:
 				attack_targets()
 			attack_group = false
 			selection_line_color = settings.gui_color
@@ -79,25 +75,25 @@ func process_move(to_position: Vector2) -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
 	
-	var unit_leaders: Array = []
+	var group_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
-			unit_leaders.push_back(unit)
+			group_leaders.push_back(unit)
 	
 	var funny_pair: Array = current_groups.values()
 	for pair in funny_pair:
-		if highlighted_group == pair and unit_leaders.size() == 1:
-			var leader = unit_leaders[0]
-			move_unit(unit_leaders[0], to_position)
+		if highlighted_group == pair and group_leaders.size() == 1:
+			var leader = group_leaders[0]
+			move_unit(leader, to_position)
 			return
 	
-	if prev_group.size() == highlighted_group.size() and unit_leaders.size() == 1:
-		var leader = unit_leaders[0]
+	if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
+		var leader = group_leaders[0]
 		if leader in prev_group and leader in highlighted_group:
-			move_unit(unit_leaders[0], to_position)
+			move_unit(leader, to_position)
 			return
 	
-	for leader: Ship in unit_leaders:
+	for leader: Ship in group_leaders:
 		leader.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
@@ -113,7 +109,13 @@ func move_new_unit(to_position: Vector2) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	
-	var new_group_name: StringName = available_group_names.pop_back()
+	var new_group_name: StringName = &""
+	if available_group_names.size() > 0:
+		new_group_name = available_group_names.pop_back()
+	elif available_group_names.size() == 0:
+		# iterate a new group name
+		pass
+	
 	taken_group_names.push_back(new_group_name)
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	
@@ -122,38 +124,60 @@ func move_new_unit(to_position: Vector2) -> void:
 	var new_leader: Ship = highlighted_group[pick_leader]
 	new_leader.set_group_leader(true)
 	current_group_name = new_group_name
-	current_selected_group = highlighted_group
-	current_groups[current_group_name] = current_selected_group
-	current_groups[current_group_name].sort()
+	current_groups[current_group_name] = highlighted_group
 	
 	move_unit(new_leader, to_position)
 
 # this will require iteration soon
 func attack_targets() -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	reset_group_affiliation(highlighted_group)
+	var targeted_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
+	var target_group_key: StringName = &" targets"
+	var target_key: StringName = &"target"
+	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
+	
 	var group_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
 			group_leaders.push_back(unit)
 	
-	var group_lead: Ship = null
+	var funny_pair: Array = current_groups.values()
+	var is_existing_group: bool = false
+	for pair in funny_pair:
+		if highlighted_group == pair and group_leaders.size() == 1:
+			is_existing_group = true
+	
+	if is_existing_group == true:
+		var leader: Ship = group_leaders[0]
+		var key_copy: StringName = leader.group_name + target_group_key
+		var targets_available: Array = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
+		if targeted_group == targets_available:
+			return
+		get_tree().call_group(leader.group_name, "remove_blackboard_data", key_copy)
+		get_tree().call_group(leader.group_name, "remove_blackboard_data", target_key)
+	
+	reset_group_affiliation(highlighted_group)
+	
+	var leader: Ship = null
+	var unit_range: int = highlighted_group.size() - 1
+	var pick_leader: int = randi_range(0, unit_range)
+	var new_leader: Ship = highlighted_group[pick_leader]
 	if group_leaders.size() == 0:
-		var unit_range: int = highlighted_group.size() - 1
-		var pick_leader: int = randi_range(0, unit_range)
-		var new_leader: Ship = highlighted_group[pick_leader]
-		group_lead.set_group_leader(true)
-		#current_group_name = new_group_name
-		#current_selected_group = highlighted_group
+		leader = new_leader
 	elif group_leaders.size() == 1:
-		group_lead = group_leaders[0]
+		leader = group_leaders[0]
 	elif group_leaders.size() > 1:
-		for leader: Ship in group_leaders:
-			leader.set_group_leader(false)
+		leader = new_leader
+	leader.set_group_leader(true)
 	
-	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
+	var new_group_name: StringName = available_group_names.pop_back()
+	taken_group_names.push_back(new_group_name)
+	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	current_groups[new_group_name] = highlighted_group
 	
-	pass
+	target_group_key = leader.group_name + &" targets" 
+	leader.set_blackboard_data(target_group_key, targeted_group)
+	leader.set_combat_ai(true)
 
 func select_units() -> void:
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
@@ -179,9 +203,14 @@ func select_units() -> void:
 	
 	var past_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	for ship in past_group:
-		if not ship in selection:
+		if not ship in selection and ship.is_friendly and attack_group == false:
 			ship.highlight_selection(false)
 			ship.remove_from_group(highlight_group_name)
+	
+	var past_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
+	for ship in past_enemy_group:
+		if not ship in selection and not ship.is_friendly:
+			ship.highlight_selection(false)
 			ship.remove_from_group(highlight_enemy_name)
 	
 	for ship in selection:
@@ -194,12 +223,14 @@ func select_units() -> void:
 		attack_targets()
 		return
 	
-	current_selected_group.clear()
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 
 func reset_group_affiliation(group_select: Array) -> void:
 	for unit: Ship in group_select:
-		if unit.group_leader:
+		var affiliated_group: Array = get_tree().get_nodes_in_group(unit.group_name)
+		if affiliated_group.size() > 1 and unit.group_leader:
+			reset_group_leader(unit)
+		elif unit.group_leader:
 			unit.set_group_leader(false)
 		unit.remove_from_group(unit.group_name)
 		unit.group_name = &""
@@ -212,7 +243,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			taken_group_names.remove_at(group_idx)
 			available_group_names.push_back(group_name)
 
-func reset_current_group_leader(unit: Ship) -> void:
+func reset_group_leader(unit: Ship) -> void:
 	unit.remove_from_group(unit.group_name)
 	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
 	var group_range: int = group.size() - 1
@@ -226,6 +257,7 @@ func reset_current_group_leader(unit: Ship) -> void:
 		var relative_position: Vector2 = new_leader.position + delta_position
 		new_leader.set_group_leader(true)
 		new_leader.set_navigation_position(relative_position)
+	unit.group_name = &""
 	unit.set_group_leader(false)
 
 func reset_box_selection() -> void:
@@ -241,7 +273,6 @@ func display_map(map_value: bool) -> void:
 	# Hide the Tac Map
 	elif map_value == false:
 		TacticalCamera.enabled = false
-		target_group = []
 		attack_group = false
 		visible = false
 	
@@ -304,7 +335,7 @@ func _on_ship_selected(unit: Ship) -> void:
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:
 		if unit.group_leader == true:
-			reset_current_group_leader(unit)
+			reset_group_leader(unit)
 	
 	get_tree().call_group(highlight_group_name, "highlight_selection", false)
 	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
@@ -317,6 +348,7 @@ func _on_ship_selected(unit: Ship) -> void:
 	unit.add_to_group(highlight_group_name)
 	unit.highlight_selection(true)
 	prev_selected_ship = unit
+	reset_box_selection()
 
 func _on_switched_to_manual() -> void:
 	if not visible:
