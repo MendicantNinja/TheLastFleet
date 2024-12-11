@@ -14,7 +14,7 @@ var box_selection_start: Vector2 = Vector2.ZERO
 var box_selection_end: Vector2 = Vector2.ZERO
 var selection_line_color: Color = settings.gui_color
 
-# Selection (in general)
+# Group Creation
 var group_iterator: int = 0
 var available_group_names: Array[StringName] = []
 var taken_group_names: Array[StringName] = []
@@ -77,17 +77,22 @@ func _unhandled_input(event) -> void:
 			queue_redraw()
 
 func process_move(to_position: Vector2) -> void:
+	# input, process_move, IF already existing move_unit, 
+	# else if not already existing: move_new_unit, reset_group_affiliation, move_unit
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
 	
+	# Append unit leaders to array for use later.
 	var unit_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
 			unit_leaders.push_back(unit)
 	
-	var funny_pair: Array = current_groups.values()
-	for pair in funny_pair:
-		if highlighted_group == pair and unit_leaders.size() == 1:
+	# If the group we're selecting is already a group that exists, move it and do not proceed.
+	var group_array: Array = current_groups.values()
+	print(group_array.size())
+	for group in group_array:
+		if highlighted_group == group and unit_leaders.size() == 1:
 			var leader = unit_leaders[0]
 			move_unit(unit_leaders[0], to_position)
 			return
@@ -134,18 +139,15 @@ func move_new_unit(to_position: Vector2) -> void:
 		group_iterator += 1
 	
 	taken_group_names.push_back(new_group_name)
-	available_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
-	taken_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	#available_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
+	#taken_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
 	
-	# 4) create the group from the currently selected ships
-	# Current_selected_group is full of unique references to ships. Any changes made will not back propagate to highlighted_group and vice versa.
-	var current_selected_group: Array
+	# 4) create the group from the currently selected ships. Current_selected_group is full of unique references to ships. Any changes made will not back propagate to highlighted_group and vice versa.
+	var current_selected_group: Array = highlighted_group.duplicate()
 	current_groups[new_group_name] = current_selected_group
-	# ship.group_add() must be called on every individual ship. it does special things
+	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
-	#current_groups[current_group_name] = current_selected_group
-	
-	
+
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 
