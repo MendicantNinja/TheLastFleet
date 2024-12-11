@@ -18,5 +18,5 @@ func has_data(key, blackboard_name = &"default"):
 	return blackboard.has(blackboard_name) and blackboard[blackboard_name].has(key) and blackboard[blackboard_name][key] != null
 
 func remove_data(key, blackboard_name = &"default") -> void:
-	if blackboard.has(blackboard_name):
+	if has_data(key):
 		blackboard[blackboard_name].erase(key)

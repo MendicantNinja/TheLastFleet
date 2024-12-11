@@ -136,25 +136,28 @@ func attack_targets() -> void:
 	var target_key: StringName = &"target"
 	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
 	
-	var group_leaders: Array = []
-	for unit in highlighted_group:
-		if unit.group_leader:
-			group_leaders.push_back(unit)
-	
 	var funny_pair: Array = current_groups.values()
 	var is_existing_group: bool = false
 	for pair in funny_pair:
-		if highlighted_group == pair and group_leaders.size() == 1:
+		if highlighted_group == pair:
 			is_existing_group = true
 	
+	# Alt select and select_units causes 
 	if is_existing_group == true:
-		var leader: Ship = group_leaders[0]
-		var key_copy: StringName = leader.group_name + target_group_key
-		var targets_available: Array = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
+		var unit = highlighted_group[0]
+		var key_copy: StringName = unit.group_name + target_group_key
+		var targets_available = unit.CombatBehaviorTree.blackboard.ret_data(key_copy)
 		if targeted_group == targets_available:
 			return
-		get_tree().call_group(leader.group_name, "remove_blackboard_data", key_copy)
-		get_tree().call_group(leader.group_name, "remove_blackboard_data", target_key)
+	
+	var group_leaders: Array = []
+	for unit in highlighted_group:
+		var key_copy: StringName = unit.group_name + target_group_key
+		unit.remove_blackboard_data(key_copy)
+		unit.remove_blackboard_data(target_key)
+		if unit.group_leader:
+			group_leaders.push_back(unit)
+			unit.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
 	
@@ -191,11 +194,9 @@ func select_units() -> void:
 	var selection: Array[Node2D] = SelectionArea.get_overlapping_bodies()
 	reset_box_selection()
 	
-	if attack_group == true and selection.size() == 0:
+	if selection.size() == 0:
 		get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
 		get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
-		return
-	elif attack_group == false and selection.size() == 0:
 		get_tree().call_group(highlight_group_name, "highlight_selection", false)
 		get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
 		current_group_name = &""
