@@ -162,8 +162,13 @@ func _ready() -> void:
 		add_to_group("friendly")
 		is_friendly = true
 		rotation -= PI/2
+		CombatBehaviorTree.toggle_root(false)
 	else:
 		add_to_group("enemy")
+		group_name = StringName("NPC %s" % [name])
+		CombatBehaviorTree.toggle_root(true)
+		set_group_leader(true)
+		add_to_group(group_name)
 		rotation += PI/2
 	
 	# Assigns weapon slots based on what's in the ship scene.
@@ -196,9 +201,11 @@ func _ready() -> void:
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
-	CombatBehaviorTree.toggle_root(false)
 
 func process_damage(projectile: Projectile) -> void:
+	if CombatBehaviorTree.enabled == false:
+		CombatBehaviorTree.enabled = true
+	
 	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
 	armor -= armor_damage_reduction
 	var hull_damage: float = armor_damage_reduction * projectile.damage
@@ -441,6 +448,8 @@ func set_navigation_position(to_position: Vector2) -> void:
 	get_viewport().set_input_as_handled()
 
 func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
+	if CombatBehaviorTree.enabled == true:
+		CombatBehaviorTree.toggle_root(false)
 	if group_leader:
 		return
 	if not ShipNavigationAgent.is_navigation_finished():
@@ -616,6 +625,9 @@ func update_available_target_connections(target_group_key: StringName) -> void:
 func find_closest_target(available_targets: Array) -> Ship:
 	var closest_target: Ship = null
 	var distances: Dictionary = {}
+	
+	if available_targets.is_empty():
+		return
 	
 	for target in available_targets:
 		var distance_to: float = position.distance_to(target.position)

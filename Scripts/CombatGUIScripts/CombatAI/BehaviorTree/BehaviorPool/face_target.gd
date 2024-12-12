@@ -11,21 +11,19 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var oriented_count: int = 0
 	var required_orientation: Array = []
 	for weapon_slot: WeaponSlot in preferred_weapons:
-		if weapon_slot.can_look_at == true:
+		var weapon_node: Node2D = weapon_slot.weapon_node
+		var target_transform: Transform2D = weapon_node.global_transform.looking_at(target.global_position)
+		var dot_product: float = weapon_slot.default_direction.x.dot(target_transform.x)
+		var angle_to_node: float = acos(dot_product)
+		if angle_to_node < weapon_slot.arc_in_radians or dot_product > 0:
 			oriented_count += 1
+		required_orientation.push_back(target_transform)
 	
-	if oriented_count == preferred_weapons.size():
+	if oriented_count == preferred_weapons.size() - 1:
 		return SUCCESS
 	
-	var target_transform: Transform2D = Transform2D()
-	for weapon_slot: WeaponSlot in preferred_weapons:
-		var weapon_node: Node2D = weapon_slot.weapon_node
-		target_transform = weapon_node.global_transform.looking_at(target.global_position)
-		var scale_transform: Vector2 = weapon_node.scale
-		target_transform = target_transform.scaled(scale_transform)
-		required_orientation.push_back(target_transform)
-	var test_transform: Transform2D = target_transform
+	var test_transform: Transform2D = required_orientation[0]
 	test_transform.origin = agent.global_position
 	agent.transform = agent.transform.interpolate_with(test_transform, agent.rotational_delta)
 	
-	return RUNNING
+	return FAILURE

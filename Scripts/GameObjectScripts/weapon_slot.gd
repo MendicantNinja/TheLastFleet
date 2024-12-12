@@ -56,6 +56,8 @@ var owner_rid: RID = RID()
 signal weapon_slot_fired(flux)
 signal remove_manual_camera(camera)
 signal target_in_range(value)
+signal new_threats(targets)
+signal update_threats(targets)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -178,6 +180,8 @@ func update_flux_overload(flux_state: bool) -> void:
 # Assigns the RID of the ship the player targets to the variable target_unit.
 func set_target_unit(unit) -> void:
 	target_unit = unit.get_rid()
+	if not available_targets.has(target_unit):
+		target_in_range.emit(false)
 
 func set_weapon_size_and_color():
 	if is_friendly:
@@ -254,6 +258,7 @@ func _on_EffectiveRange_entered(body) -> void:
 	
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
+		new_threats.emit(available_targets.values())
 
 # Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
 # the effective range and the current combat situation.
@@ -261,8 +266,9 @@ func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
 	available_targets.erase(ship_id)
 	
+	update_threats.emit(available_targets.values())
+
 	if killcast and available_targets.is_empty():
-		target_in_range.emit(false)
 		killcast.queue_free()
 		killcast = null
 
