@@ -100,7 +100,7 @@ collision_mask = 0
 [node name="SelectionShape" type="CollisionShape2D" parent="TacticalMap/SelectionArea"]
 unique_name_in_owner = true
 shape = SubResource("RectangleShape2D_ekgw8")
-debug_color = Color(1, 1, 0, 1)
+debug_color = Color(1, 1, 0, 0.231373)
 
 [node name="TacticalCamera" type="Camera2D" parent="TacticalMap"]
 anchor_mode = 0

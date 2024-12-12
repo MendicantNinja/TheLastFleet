@@ -51,10 +51,10 @@ func _on_switch_maps() -> void:
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.
-# Currently it only handles signals for friendly ships but it would take little to no effort to
-# expand this for both. Ideally, we only use this to connect signals that are required for BOTH
-# enemies and friendlies. 
+# Ship targeted is moved over to the behavior tree but this function should ostensibly remain
+# until it is clear this is no longer useful to us.
 func connect_ship_signals(friendly_ship: Ship) -> void:
-	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
-	for ship in enemy_group:
-		ship.ship_targeted.connect(friendly_ship._on_ship_targeted)
+	#var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
+	#for ship in enemy_group:
+		#ship.ship_targeted.connect(friendly_ship._on_ship_targeted)
+	pass
