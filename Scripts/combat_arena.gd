@@ -3,6 +3,7 @@ extends Node2D
 @onready var CombatMap = $CombatMap
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
+@onready var OptionsMenuPanel = %OptionsMenuPanel 
 @onready var TacticalMap = %TacticalMap
 @onready var All = %All
 @onready var Deploy = %Deploy
@@ -20,6 +21,8 @@ func _ready() -> void:
 	
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
+	settings.swizzle(%OptionsMenuPanel)
+	settings.swizzle(%MainMenuButton)
 	settings.swizzle(All)
 	settings.swizzle(Deploy)
 	settings.swizzle(Cancel)
@@ -32,12 +35,21 @@ func _unhandled_input(event) -> void:
 	if event is InputEventKey:
 		if (event.keycode == KEY_G and event.pressed):
 			toggle_fleet_deployment_panel()
+		if (event.keycode == KEY_ESCAPE and event.pressed):
+			toggle_options_menu()
 
 func toggle_fleet_deployment_panel() -> void:
 	if FleetDeploymentPanel.visible == false:
 		FleetDeploymentPanel.visible = true
 	else:
 		FleetDeploymentPanel.visible = false
+
+func toggle_options_menu() -> void:
+	if OptionsMenuPanel.visible == false:
+		OptionsMenuPanel.visible = true
+	else:
+		OptionsMenuPanel.visible = false
+
 
 func _on_switch_maps() -> void:
 	if CombatMap.visible:
