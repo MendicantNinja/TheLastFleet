@@ -60,7 +60,7 @@ func display_map(map_value: bool) -> void:
 			ship.request_manual_camera.connect(set_manual_camera.bind(ship))
 
 func set_manual_camera(unit: Ship) -> void:
-	if prev_selected_unit and prev_selected_unit != unit:
+	if prev_selected_unit and prev_selected_unit != unit and prev_selected_unit != null:
 		prev_selected_unit.toggle_manual_control()
 	
 	CombatCamera.enabled = false
