@@ -70,7 +70,7 @@ var group_velocity: Vector2 = Vector2.ZERO
 var posture: StringName = &""
 
 # Used for combat
-var targeted_ships: Array = []
+var target_in_range: bool = false
 
 # Used for navigation
 var final_target_position: Vector2 = Vector2.ZERO
@@ -79,6 +79,7 @@ var intermediate_pathing: bool = false
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
+var rotational_delta: float = 0.0
 var ship_select: bool = false:
 	set(value):
 		if value == true: 
@@ -90,12 +91,12 @@ var ship_select: bool = false:
 		ship_selected.emit()
 
 # Custom signals.
-signal ship_targeted(ship_id)
 signal alt_select()
 signal switch_to_manual()
 signal camera_removed()
 signal request_manual_camera()
 signal ship_selected()
+signal destroyed()
 
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -171,6 +172,7 @@ func _ready() -> void:
 			all_weapons.append(child)
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
+			child.target_in_range.connect(_on_target_in_range)
 	
 	for i in range(all_weapons.size()):
 		# Placeholder
@@ -210,6 +212,7 @@ func destroy_ship() -> void:
 		# signal to CombatArena or something equivalent that a unit leader is dead
 		# so that a new leader is found, given the group exists
 		pass
+	destroyed.emit()
 	ShipTargetIcon.visible = false
 	queue_free()
 
@@ -226,6 +229,15 @@ func toggle_shield() -> void:
 		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
 
+func set_shields(value: bool) -> void:
+	shield_toggle = value
+	if value == true:
+		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
+		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
+	else:
+		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
+		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
+	
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
 	update_flux_indicators()
@@ -390,12 +402,9 @@ func toggle_manual_control() -> void:
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 
-func _on_ship_targeted(ship_id: RID) -> void:
-	if not ship_select:
-		return
-	
+func set_target_for_weapons(unit) -> void:
 	for weapon in all_weapons:
-		weapon.set_target_ship(ship_id)
+		weapon.set_target_unit(unit)
 
 func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
@@ -443,7 +452,7 @@ func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
-	var velocity: Vector2 = Vector2.ZERO
+	var velocity = Vector2.ZERO
 	CenterCombatHUD.position = position
 	
 	if ShipNavigationAgent.is_navigation_finished() and not manual_control:
@@ -454,8 +463,9 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
-	if movement_delta == 0.0:
+	if movement_delta == 0.0 or rotational_delta == 0.0:
 		movement_delta = speed * delta
+		rotational_delta = ship_stats.turn_rate * delta
 	
 	if manual_control and Input.is_action_pressed("vent flux"):
 		if soft_flux > 0.0:
@@ -522,7 +532,7 @@ func _physics_process(delta: float) -> void:
 		velocity = direction_to_path * movement_delta
 		velocity += ease_velocity(velocity)
 		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
-		transform = transform.interpolate_with(transform_look_at, delta * ship_stats.turn_rate)
+		transform = transform.interpolate_with(transform_look_at, rotational_delta)
 	
 	if rotate_angle != 0.0:
 		var adjust_mass: float = (mass * 1000)
@@ -577,10 +587,8 @@ func ease_velocity(velocity: Vector2) -> Vector2:
 	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
 	return new_velocity
 
-func get_target_into_range(target: Ship) -> bool:
-	var direction_to: Vector2 = position.direction_to(target.position)
-	transform.x = direction_to
-	return false
+func _on_target_in_range(value: bool) -> void:
+	target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
 	CombatBehaviorTree.enabled = value
@@ -593,6 +601,18 @@ func remove_blackboard_data(key: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	blackboard.remove_data(key)
 
+func update_available_target_connections(target_group_key: StringName) -> void:
+	var blackboard = CombatBehaviorTree.blackboard
+	var target_key: StringName = &"target"
+	var available_targets: Array = []
+	if not blackboard.has_data(target_group_key):
+		return
+	
+	available_targets = blackboard.ret_data(target_group_key)
+	for target in available_targets:
+		if not target.destroyed.is_connected(blackboard._on_target_destroyed):
+			target.destroyed.connect(blackboard._on_target_destroyed.bind(target, target_group_key, target_key))
+
 func find_closest_target(available_targets: Array) -> Ship:
 	var closest_target: Ship = null
 	var distances: Dictionary = {}
@@ -601,8 +621,8 @@ func find_closest_target(available_targets: Array) -> Ship:
 		var distance_to: float = position.distance_to(target.position)
 		distances[distance_to] = target
 	var shortest_distance: float = distances.keys().min()
-	
 	closest_target = distances[shortest_distance]
+	
 	return closest_target
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.

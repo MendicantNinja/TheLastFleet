@@ -25,7 +25,7 @@ var prev_selected_ship: Ship = null
 var attack_group: bool = false
 
 # Camera stuff
-var zoom_in_limit: Vector2 = Vector2(0.5, 0.5)
+var zoom_in_limit: Vector2 = Vector2(0.9, 0.9)
 var zoom_out_limit: Vector2 = Vector2(0.13, 0.13) 
 
 signal switch_maps()
@@ -60,7 +60,7 @@ func _unhandled_input(event) -> void:
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 		if event.keycode == KEY_TAB and event.pressed:
 			switch_maps.emit()
-		if Input.is_action_pressed("alt select") and highlighted_group.size() > 0:
+		if Input.is_action_pressed("alt select") and  Input.is_action_pressed("select") and highlighted_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
 			queue_redraw()
@@ -92,9 +92,6 @@ func process_move(to_position: Vector2) -> void:
 		if leader in prev_group and leader in highlighted_group:
 			move_unit(leader, to_position)
 			return
-	
-	for leader: Ship in group_leaders:
-		leader.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
@@ -142,7 +139,7 @@ func attack_targets() -> void:
 		if highlighted_group == pair:
 			is_existing_group = true
 	
-	# Alt select and select_units causes 
+	# Alt select and select_units causes a multitude of problems I can't bother to fix.
 	if is_existing_group == true:
 		var unit = highlighted_group[0]
 		var key_copy: StringName = unit.group_name + target_group_key
@@ -157,7 +154,6 @@ func attack_targets() -> void:
 		unit.remove_blackboard_data(target_key)
 		if unit.group_leader:
 			group_leaders.push_back(unit)
-			unit.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
 	
@@ -228,12 +224,12 @@ func select_units() -> void:
 
 func reset_group_affiliation(group_select: Array) -> void:
 	for unit: Ship in group_select:
-		var affiliated_group: Array = get_tree().get_nodes_in_group(unit.group_name)
-		if affiliated_group.size() > 1 and unit.group_leader:
-			reset_group_leader(unit)
-		elif unit.group_leader:
-			unit.set_group_leader(false)
 		unit.remove_from_group(unit.group_name)
+		var affiliated_group: Array = get_tree().get_nodes_in_group(unit.group_name)
+		if unit.group_leader == true and affiliated_group.size() > 0:
+			reset_group_leader(unit)
+		elif unit.group_leader == true:
+			unit.set_group_leader(false)
 		unit.group_name = &""
 	
 	var count_down: int = taken_group_names.size() - 1
@@ -245,7 +241,6 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 
 func reset_group_leader(unit: Ship) -> void:
-	unit.remove_from_group(unit.group_name)
 	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
 	var group_range: int = group.size() - 1
 	var rand_select_leader: int = randi_range(0, group_range)
@@ -258,7 +253,6 @@ func reset_group_leader(unit: Ship) -> void:
 		var relative_position: Vector2 = new_leader.position + delta_position
 		new_leader.set_group_leader(true)
 		new_leader.set_navigation_position(relative_position)
-	unit.group_name = &""
 	unit.set_group_leader(false)
 
 func reset_box_selection() -> void:

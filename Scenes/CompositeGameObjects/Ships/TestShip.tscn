@@ -1,14 +1,18 @@
-[gd_scene load_steps=22 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=26 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
+[ext_resource type="Script" path="res://Scenes/CompositeGameObjects/Ships/is_near_death.gd" id="4_toh83"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_yl4qo"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/is_target_available.gd" id="5_aqd75"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/move_into_range.gd" id="5_fqvsw"]
+[ext_resource type="Script" path="res://Scenes/CompositeGameObjects/Ships/toggle_shields.gd" id="5_mwg8y"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="5_wktsu"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/face_target.gd" id="6_bv7ug"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Decorator/bt_succeeder.gd" id="6_lfran"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
 
@@ -61,17 +65,38 @@ script = ExtResource("1_sc1ei")
 [node name="CombatBehaviorTree" type="Node" parent="."]
 script = ExtResource("7_thatc")
 
-[node name="target enemy" type="Node" parent="CombatBehaviorTree"]
+[node name="main" type="Node" parent="CombatBehaviorTree"]
 script = ExtResource("4_yl4qo")
 
-[node name="is target available" type="Node" parent="CombatBehaviorTree/target enemy"]
+[node name="target enemy" type="Node" parent="CombatBehaviorTree/main"]
+script = ExtResource("4_yl4qo")
+
+[node name="is target available" type="Node" parent="CombatBehaviorTree/main/target enemy"]
 script = ExtResource("5_aqd75")
 
-[node name="choose target" type="Node" parent="CombatBehaviorTree/target enemy"]
+[node name="choose target" type="Node" parent="CombatBehaviorTree/main/target enemy"]
 script = ExtResource("5_wktsu")
 
-[node name="move into range" type="Node" parent="CombatBehaviorTree/target enemy"]
+[node name="move into range" type="Node" parent="CombatBehaviorTree/main/target enemy"]
 script = ExtResource("5_fqvsw")
+
+[node name="reorient ship for weapons" type="Node" parent="CombatBehaviorTree/main/target enemy"]
+script = ExtResource("6_lfran")
+
+[node name="face target" type="Node" parent="CombatBehaviorTree/main/target enemy/reorient ship for weapons"]
+script = ExtResource("6_bv7ug")
+
+[node name="threat assess" type="Node" parent="CombatBehaviorTree/main"]
+script = ExtResource("4_yl4qo")
+
+[node name="near death" type="Node" parent="CombatBehaviorTree/main/threat assess"]
+script = ExtResource("4_yl4qo")
+
+[node name="is near death" type="Node" parent="CombatBehaviorTree/main/threat assess/near death"]
+script = ExtResource("4_toh83")
+
+[node name="toggle shields" type="Node" parent="CombatBehaviorTree/main/threat assess/near death"]
+script = ExtResource("5_mwg8y")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
@@ -88,7 +113,7 @@ priority = 1
 
 [node name="RepathShape" type="CollisionShape2D" parent="RepathArea"]
 shape = SubResource("CircleShape2D_4lqs1")
-debug_color = Color(0, 0.6, 0.701961, 0.4)
+debug_color = Color(0, 0.6, 0.701961, 0.0823529)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
 position = Vector2(-25, -18)
@@ -124,7 +149,7 @@ input_pickable = false
 
 [node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
 shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203599, 0.641024, 0, 0.160784)
+debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 
 [node name="CenterCombatHUD" type="Control" parent="."]
 top_level = true

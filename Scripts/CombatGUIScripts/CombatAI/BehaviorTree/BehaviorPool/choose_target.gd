@@ -20,5 +20,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		get_tree().call_group(agent_group_name, "set_blackboard_data", target_key, target)
 		get_tree().call_group(agent_group_name, "set_blackboard_data", target_group_key, available_targets)
 		blackboard.set_data(target_key, target)
+		get_tree().call_group(agent_group_name, "set_target_for_weapons", target)
+		get_tree().call_group(agent_group_name, "update_available_target_connections", target_group_key)
+		print(target.position)
 	
 	return SUCCESS
