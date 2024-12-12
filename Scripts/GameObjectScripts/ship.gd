@@ -328,10 +328,10 @@ func _input(event: InputEvent) -> void:
 		if is_friendly:
 			if (event.keycode == KEY_T and event.pressed) and ship_select:
 				toggle_manual_control()
-			#elif (event.keycode == KEY_C and event.pressed) and manual_control:
-				#toggle_auto_aim(all_weapons)
-			#elif (event.keycode == KEY_V and event.pressed) and manual_control:
-				#toggle_auto_fire(all_weapons)
+			elif (event.keycode == KEY_C and event.pressed) and manual_control:
+				toggle_auto_aim(all_weapons)
+			elif (event.keycode == KEY_V and event.pressed) and manual_control:
+				toggle_auto_fire(all_weapons)
 			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
 				toggle_manual_control()
 				camera_removed.emit()
@@ -378,6 +378,9 @@ func toggle_manual_control() -> void:
 	if ship_select == false:
 		manual_control = false
 		return
+	
+	if CombatBehaviorTree.enabled == true:
+		CombatBehaviorTree.toggle_root(false)
 	
 	if manual_control == false:
 		manual_control = true
@@ -449,7 +452,7 @@ func set_navigation_position(to_position: Vector2) -> void:
 
 func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 	if CombatBehaviorTree.enabled == true:
-		CombatBehaviorTree.toggle_root(false)
+		set_combat_ai(false)
 	if group_leader:
 		return
 	if not ShipNavigationAgent.is_navigation_finished():
@@ -600,7 +603,9 @@ func _on_target_in_range(value: bool) -> void:
 	target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
-	CombatBehaviorTree.enabled = value
+	if value == true and group_leader == true and not ShipNavigationAgent.is_navigation_finished():
+		set_navigation_position(position)
+	CombatBehaviorTree.toggle_root(value)
 
 func set_blackboard_data(key: Variant, value: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
@@ -630,6 +635,8 @@ func find_closest_target(available_targets: Array) -> Ship:
 		return
 	
 	for target in available_targets:
+		if target == null:
+			continue
 		var distance_to: float = position.distance_to(target.position)
 		distances[distance_to] = target
 	var shortest_distance: float = distances.keys().min()

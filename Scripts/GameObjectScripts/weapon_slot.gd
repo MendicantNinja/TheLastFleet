@@ -264,10 +264,13 @@ func _on_EffectiveRange_entered(body) -> void:
 # the effective range and the current combat situation.
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
-	available_targets.erase(ship_id)
 	
 	update_threats.emit(available_targets.values())
-
+	if ship_id == target_unit:
+		target_in_range.emit(false)
+	
+	available_targets.erase(ship_id)
+	
 	if killcast and available_targets.is_empty():
 		killcast.queue_free()
 		killcast = null
