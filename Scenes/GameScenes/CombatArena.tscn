@@ -59,32 +59,37 @@ text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
-visible = false
 top_level = true
-offset_left = 13.0
-offset_top = 1046.0
-offset_right = 2836.0
-offset_bottom = 2319.0
+offset_left = 47.0
+offset_top = 53.0
+offset_right = 2870.0
+offset_bottom = 1558.0
 theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 38
 text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
+
 CONTROLS 
-(In Tactical Map):
-Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all. Hold Ctrl to select multiple.
-Right click creates a move order for selected ships.
-(With a ship selected) T = toggle manual control.
-
-(In Manual Control)
-Left click to fire. Right click for shields. WASD to move, Q/E to strafe.
-
 (Camera)
 Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
 
 (Anywhere)
+Tab = Swap between tactical/combat camera
+G = Call For Reinforcements
+
+(In Tactical Map):
+Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all.
+Right click creates a move order for selected ships.
+Left click and drag + control with friendly ships selected box selects an enemy group and orders them to attack.
+(With a single ship selected) T = toggle manual control.
+
+(In Manual Control)
+Left click to fire. Right click for shields. WASD to move, Q/E to rotate.
 (Over an enemy ship) R = Set enemy as target. 
-Tab = Open Tactical Map
-G = Open Deployment Screen (WIP)
+
+
+
+
 
 
 
