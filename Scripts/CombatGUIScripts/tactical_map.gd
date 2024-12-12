@@ -87,8 +87,8 @@ func process_move(to_position: Vector2) -> void:
 	var group_array: Array = current_groups.values()
 	print(group_array.size())
 	for group in group_array:
-		if highlighted_group == group and unit_leaders.size() == 1:
-			move_unit(unit_leaders[0], to_position)
+		if highlighted_group == group and group_leaders.size() == 1:
+			move_unit(group_leaders[0], to_position)
 			return
 	
 	if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
@@ -236,7 +236,6 @@ func select_units() -> void:
 	if attack_group:
 		attack_targets()
 		return
-	current_selected_group.clear()
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 
 # Takes a group of recently selected ships and creates a new group for them.
