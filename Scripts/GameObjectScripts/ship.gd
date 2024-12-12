@@ -215,10 +215,13 @@ func process_damage(projectile: Projectile) -> void:
 		destroy_ship()
 
 func destroy_ship() -> void:
-	if group_leader:
-		# signal to CombatArena or something equivalent that a unit leader is dead
-		# so that a new leader is found, given the group exists
-		pass
+	remove_from_group(group_name)
+	var group: Array = get_tree().get_nodes_in_group(group_name)
+	if group_leader and group.size() > 1:
+		var unit_range: int = group.size() - 2
+		var pick_leader: int = randi_range(0, unit_range)
+		var new_leader: Ship = group[pick_leader]
+		new_leader.set_group_leader(true)
 	destroyed.emit()
 	ShipTargetIcon.visible = false
 	queue_free()
