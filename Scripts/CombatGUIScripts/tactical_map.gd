@@ -85,7 +85,6 @@ func process_move(to_position: Vector2) -> void:
 	
 	# If the group we're selecting is already a group that exists, move it and do not proceed.
 	var group_array: Array = current_groups.values()
-	print(group_array.size())
 	for group in group_array:
 		if highlighted_group == group and group_leaders.size() == 1:
 			move_unit(group_leaders[0], to_position)
@@ -102,6 +101,8 @@ func process_move(to_position: Vector2) -> void:
 
 # Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
+	get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
+	get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
 	unit_leader.set_navigation_position(to_position)
 	get_viewport().set_input_as_handled()
 
@@ -151,17 +152,22 @@ func attack_targets() -> void:
 	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
 	
 	var funny_pair: Array = current_groups.values()
-	var is_existing_group: bool = false
+	var existing_group: Array = []
 	for pair in funny_pair:
 		if highlighted_group == pair:
-			is_existing_group = true
+			existing_group = pair
 	
 	# Alt select and select_units causes a multitude of problems I can't bother to fix.
-	if is_existing_group == true:
-		var unit = highlighted_group[0]
-		var key_copy: StringName = unit.group_name + target_group_key
-		var targets_available = unit.CombatBehaviorTree.blackboard.ret_data(key_copy)
+	if not existing_group.is_empty():
+		var leader = null
+		for unit in existing_group:
+			if unit.group_leader == true:
+				leader = unit
+				break
+		var key_copy: StringName = leader.group_name + target_group_key
+		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
 		if targeted_group == targets_available:
+			get_tree().call_group(leader.group_name, "set_combat_ai", true)
 			return
 	
 	var group_leaders: Array = []
@@ -186,7 +192,15 @@ func attack_targets() -> void:
 		leader = new_leader
 	leader.set_group_leader(true)
 	
-	var new_group_name: StringName = available_group_names.pop_back()
+	# 3) Generate and assign a name. Sort the name arrays.
+	var new_group_name: StringName 
+	if available_group_names.size() > 0:
+		new_group_name = available_group_names.pop_back()
+	elif available_group_names.size() == 0:
+	# iterate a new group name
+		new_group_name = StringName("Group " + str(group_iterator))
+		group_iterator += 1
+	
 	taken_group_names.push_back(new_group_name)
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	current_groups[new_group_name] = highlighted_group
