@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=17 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -10,6 +10,8 @@
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
+[ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
+[ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
@@ -60,6 +62,7 @@ text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
+visible = false
 top_level = true
 offset_left = 47.0
 offset_top = 53.0
@@ -324,6 +327,23 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="SpaceBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="SpaceBackground"]
+offset_left = 2.0
+offset_right = 2209.0
+offset_bottom = 1924.0
+texture = ExtResource("10_uvm3m")
+stretch_mode = 4
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground"]
+self_modulate = Color(1, 1, 1, 0.34902)
+offset_right = 1925.0
+offset_bottom = 1923.0
+texture = ExtResource("11_kx52a")
+stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(3486, 2854)
