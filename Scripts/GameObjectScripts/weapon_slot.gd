@@ -105,7 +105,6 @@ func _draw() -> void:
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
-	z_index = 2
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	can_fire = true
