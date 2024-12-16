@@ -14,7 +14,7 @@ func create_projectile() -> PackedScene:
 @export var weapon_size: data.size_enum = data.size_enum.SMALL
 @export var image: Texture2D
 @export var armament_points: int = 0
-@export var firing_sound: Resource
+@export var firing_sound: AudioStream
 
 # Projectile-related stats (that still affect game balance)
 @export var projectile_scene: PackedScene # Must be known so that the weapon class knows what sort of projectile to create.

@@ -47,9 +47,9 @@ layout_mode = 1
 anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -300.0
-offset_right = 300.0
-offset_bottom = 280.0
+offset_left = -599.0
+offset_right = 616.0
+offset_bottom = 227.0
 grow_horizontal = 2
 texture = ExtResource("1_k1n24")
 
@@ -72,7 +72,6 @@ texture_hover = ExtResource("6_4abs8")
 script = ExtResource("4_k0np7")
 
 [node name="OnHoverGlowSheen" type="TextureRect" parent="ListContainer/NewGameButton"]
-visible = false
 self_modulate = Color(0.6, 0.6, 0.6, 1)
 layout_mode = 0
 offset_right = 40.0
@@ -92,25 +91,6 @@ theme = ExtResource("4_dnp8m")
 text = "NEW GAME"
 scroll_active = false
 
-[node name="SkirmishButton" type="TextureButton" parent="ListContainer"]
-layout_mode = 2
-texture_normal = ExtResource("3_x54xu")
-texture_hover = ExtResource("6_4abs8")
-script = ExtResource("8_jhx2c")
-
-[node name="ButtonText" type="RichTextLabel" parent="ListContainer/SkirmishButton"]
-clip_contents = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 1
-theme = ExtResource("4_dnp8m")
-text = "SKIRMISH"
-scroll_active = false
-
 [node name="LoadGameButton" type="TextureButton" parent="ListContainer"]
 visible = false
 layout_mode = 2
@@ -128,6 +108,25 @@ grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("4_dnp8m")
 text = "LOAD GAME"
+scroll_active = false
+
+[node name="SkirmishButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("8_jhx2c")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/SkirmishButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "SKIRMISH"
 scroll_active = false
 
 [node name="SettingsButton" type="TextureButton" parent="ListContainer"]

@@ -9,7 +9,11 @@ var energy_color: Color = Color (.25, .25, 1.5, 1.0 )
 var missile_color: Color = Color (.75, 1.5, 0, 1.0 )
 var universal_color: Color = Color (.9, .9, .9, 1.0 )
 
-# For things that are partially transparent, use swizzle rather than assigning the value directly lest opacity/alpha be set to 255.
+var master_volume: float = 1.00
+var sound_effect_volume: float = 1.00
+var music_volume: float = 1.00
+
+# For things that are partially transparent, use swizzle rather than assigning the gui/player color directly. If you don't opacity/alpha will be set to 255 always.
 func swizzle(swizzled: CanvasItem, color: Color = gui_color) -> void:
 	swizzled.self_modulate.r = color.r
 	swizzled.self_modulate.g = color.g

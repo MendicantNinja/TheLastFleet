@@ -213,6 +213,8 @@ func process_damage(projectile: Projectile) -> void:
 	HullIntegrityIndicator.value = hull_integrity
 	if hull_integrity <= 0.0:
 		destroy_ship()
+	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
+		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
 
 func destroy_ship() -> void:
 	remove_from_group(group_name)
