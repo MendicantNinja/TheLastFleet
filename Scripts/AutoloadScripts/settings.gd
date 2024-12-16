@@ -1,6 +1,6 @@
 extends Node
 
-var player_color: Color = Color8(200, 100, 25, 255)
+var player_color: Color = Color8(50, 75, 255, 255)
 var enemy_color: Color = Color8(255, 50, 50, 255)
 var gui_color: Color = Color8(50, 50, 255, 255)
 
