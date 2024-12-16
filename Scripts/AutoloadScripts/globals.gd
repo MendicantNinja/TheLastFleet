@@ -4,8 +4,8 @@ func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	# Universal Setup
 	var audio_stream_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
 	audio_stream_player.autoplay = true
-	audio_stream_player.pitch_scale = audio_stream_player.pitch_scale * randf_range(.95, 1.05)
-
+	audio_stream_player.pitch_scale = audio_stream_player.pitch_scale * randf_range(.80, 1.2)
+	#audio_stream_player.max_distance = 1600
 	# Variable Setup
 	audio_stream_player.stream = sound #randomize later on if we do multiple samples
 	audio_stream_player.position = position

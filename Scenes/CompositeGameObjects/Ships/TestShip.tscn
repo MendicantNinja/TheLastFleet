@@ -121,12 +121,10 @@ shape = SubResource("CircleShape2D_4lqs1")
 debug_color = Color(0, 0.6, 0.701961, 0.0823529)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
-visible = false
 show_behind_parent = true
 position = Vector2(9, -18)
 
 [node name="WeaponSlot1" parent="." instance=ExtResource("3_b8p4t")]
-visible = false
 show_behind_parent = true
 position = Vector2(9, 18)
 
