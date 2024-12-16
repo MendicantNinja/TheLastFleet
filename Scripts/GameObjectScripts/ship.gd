@@ -217,8 +217,8 @@ func process_damage(projectile: Projectile) -> void:
 func destroy_ship() -> void:
 	remove_from_group(group_name)
 	var group: Array = get_tree().get_nodes_in_group(group_name)
-	if group_leader and group.size() > 1:
-		var unit_range: int = group.size() - 2
+	if group_leader == true and group.size() > 1:
+		var unit_range: int = group.size() - 1
 		var pick_leader: int = randi_range(0, unit_range)
 		var new_leader: Ship = group[pick_leader]
 		new_leader.set_group_leader(true)
