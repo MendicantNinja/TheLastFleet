@@ -111,12 +111,15 @@ func deploy_ship() -> void:
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
+		$ShipLivery.self_modulate = settings.player_color
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.modulate = settings.enemy_color
+		$ShipLivery.self_modulate = settings.enemy_color
 
 func _ready() -> void:
 	ShipSprite.z_index = 0
+	$ShipLivery.z_index = 1
 	
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
@@ -126,7 +129,7 @@ func _ready() -> void:
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
-	ShipSprite.self_modulate = settings.player_color
+	#ShipSprite.self_modulate = settings.player_color
 	
 	var repath_shape: Shape2D = CircleShape2D.new()
 	repath_shape.radius = ShipNavigationAgent.radius
@@ -156,7 +159,7 @@ func _ready() -> void:
 	HullIntegrityIndicator.value = hull_integrity
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
-	ShipSprite.modulate = self_modulate
+	#ShipSprite.modulate = self_modulate
 	
 	if collision_layer == 1:
 		add_to_group("friendly")
@@ -213,8 +216,11 @@ func process_damage(projectile: Projectile) -> void:
 	HullIntegrityIndicator.value = hull_integrity
 	if hull_integrity <= 0.0:
 		destroy_ship()
+	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
+		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
 
 func destroy_ship() -> void:
+	destroyed.emit()
 	remove_from_group(group_name)
 	var group: Array = get_tree().get_nodes_in_group(group_name)
 	if group_leader == true and group.size() > 1:
@@ -222,7 +228,6 @@ func destroy_ship() -> void:
 		var pick_leader: int = randi_range(0, unit_range)
 		var new_leader: Ship = group[pick_leader]
 		new_leader.set_group_leader(true)
-	destroyed.emit()
 	ShipTargetIcon.visible = false
 	queue_free()
 
@@ -622,8 +627,6 @@ func update_available_target_connections(target_group_key: StringName) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	var target_key: StringName = &"target"
 	var available_targets: Array = []
-	if not blackboard.has_data(target_group_key):
-		return
 	
 	available_targets = blackboard.ret_data(target_group_key)
 	for target in available_targets:
@@ -634,16 +637,15 @@ func find_closest_target(available_targets: Array) -> Ship:
 	var closest_target: Ship = null
 	var distances: Dictionary = {}
 	
-	if available_targets.is_empty():
-		return
-	
 	for target in available_targets:
 		if target == null:
 			continue
 		var distance_to: float = position.distance_to(target.position)
 		distances[distance_to] = target
-	var shortest_distance: float = distances.keys().min()
-	closest_target = distances[shortest_distance]
+	
+	if not distances.is_empty():
+		var shortest_distance: float = distances.keys().min()
+		closest_target = distances[shortest_distance]
 	
 	return closest_target
 

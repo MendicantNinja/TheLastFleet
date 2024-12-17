@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=17 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -6,9 +6,12 @@
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
+[ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
+[ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
@@ -27,6 +30,14 @@ bg_color = Color(0, 0, 0, 0.588235)
 
 [node name="CombatArena" type="Node2D"]
 script = ExtResource("1_fx56v")
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+bus = &"Music"
+playback_type = 1
+
+[node name="GUI" type="AudioStreamPlayer2D" parent="."]
+bus = &"Music"
+playback_type = 1
 
 [node name="CombatMap" type="Node2D" parent="."]
 script = ExtResource("2_moq8i")
@@ -61,30 +72,37 @@ metadata/_edit_use_anchors_ = true
 [node name="Label2" type="Label" parent="TacticalMap"]
 visible = false
 top_level = true
-offset_left = 13.0
-offset_top = 1046.0
-offset_right = 2836.0
-offset_bottom = 2319.0
+offset_left = 47.0
+offset_top = 53.0
+offset_right = 2870.0
+offset_bottom = 1558.0
 theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 38
 text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
+
 CONTROLS 
-(In Tactical Map):
-Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all. Hold Ctrl to select multiple.
-Right click creates a move order for selected ships.
-(With a ship selected) T = toggle manual control.
-
-(In Manual Control)
-Left click to fire. Right click for shields. WASD to move, Q/E to strafe.
-
 (Camera)
 Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
 
 (Anywhere)
+Escape = Options Menu
+Tab = Swap between tactical/combat camera
+G = Call For Reinforcements
+
+(In Tactical Map):
+Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all.
+Right click creates a move order for selected ships.
+Left click and drag + control with friendly ships selected box selects an enemy group and orders them to attack.
+(With a single ship selected) T = toggle manual control.
+
+(In Manual Control)
+Left click to fire. Right click for shields. WASD to move, Q/E to rotate.
 (Over an enemy ship) R = Set enemy as target. 
-Tab = Open Tactical Map
-G = Open Deployment Screen (WIP)
+
+
+
+
 
 
 
@@ -120,6 +138,77 @@ unique_name_in_owner = true
 position = Vector2(8500.5, 10049)
 shape = SubResource("RectangleShape2D_nv86b")
 debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
+
+[node name="OptionsMenu" type="CanvasLayer" parent="."]
+
+[node name="OptionsMenuPanel" type="Panel" parent="OptionsMenu"]
+unique_name_in_owner = true
+visible = false
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -289.0
+offset_top = -325.0
+offset_right = 306.0
+offset_bottom = 363.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+
+[node name="OptionsList" type="VBoxContainer" parent="OptionsMenu/OptionsMenuPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 17.0
+offset_right = 518.0
+offset_bottom = 907.0
+scale = Vector2(0.7, 0.7)
+script = ExtResource("6_5ty2s")
+
+[node name="MainMenuButton" type="TextureButton" parent="OptionsMenu/OptionsMenuPanel/OptionsList"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="MainMenuLabel" type="RichTextLabel" parent="OptionsMenu/OptionsMenuPanel/OptionsList/MainMenuButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Main Menu"
+scroll_active = false
+
+[node name="BlackenBackground2" type="Panel" parent="OptionsMenu/OptionsMenuPanel"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -969.5
+offset_top = -564.0
+offset_right = 16030.5
+offset_bottom = 19436.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="FleetDeployment" type="CanvasLayer" parent="."]
 
@@ -246,6 +335,23 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="SpaceBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="SpaceBackground"]
+offset_left = 2.0
+offset_right = 2209.0
+offset_bottom = 1924.0
+texture = ExtResource("10_uvm3m")
+stretch_mode = 4
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground"]
+self_modulate = Color(1, 1, 1, 0.34902)
+offset_right = 1925.0
+offset_bottom = 1923.0
+texture = ExtResource("11_kx52a")
+stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(3486, 2854)

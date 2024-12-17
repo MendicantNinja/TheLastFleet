@@ -163,7 +163,6 @@ func attack_targets() -> void:
 		for unit in existing_group:
 			if unit.group_leader == true:
 				leader = unit
-				break
 		var key_copy: StringName = leader.group_name + target_group_key
 		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
 		if targeted_group == targets_available:
@@ -172,9 +171,9 @@ func attack_targets() -> void:
 	
 	var group_leaders: Array = []
 	for unit in highlighted_group:
-		var key_copy: StringName = unit.group_name + target_group_key
-		unit.remove_blackboard_data(key_copy)
-		unit.remove_blackboard_data(target_key)
+		#var key_copy: StringName = unit.group_name + target_group_key
+		#unit.remove_blackboard_data(key_copy)
+		#unit.remove_blackboard_data(target_key)
 		if unit.group_leader:
 			group_leaders.push_back(unit)
 	
@@ -206,6 +205,12 @@ func attack_targets() -> void:
 	current_groups[new_group_name] = highlighted_group
 	
 	target_group_key = leader.group_name + &" targets" 
+	var target_idx: int = 0
+	for target in targeted_group:
+		if target == null:
+			targeted_group.remove_at(target_idx)
+		target_idx += 1
+	
 	leader.set_blackboard_data(target_group_key, targeted_group)
 	leader.set_combat_ai(true)
 
@@ -305,14 +310,8 @@ func display_map(map_value: bool) -> void:
 	
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
-	for ship in friendly_group:
-		if not ship.alt_select.is_connected(_on_alt_select):
-			ship.alt_select.connect(_on_alt_select.bind(ship))
-			ship.switch_to_manual.connect(_on_switched_to_manual)
-			ship.ship_selected.connect(_on_ship_selected.bind(ship))
-	for ship in enemy_group:
-		if not ship.alt_select.is_connected(_on_alt_select):
-			ship.alt_select.connect(_on_alt_select.bind(ship))
+	connect_unit_signals(friendly_group)
+	connect_unit_signals(enemy_group)
 	
 	get_tree().call_group("enemy", "display_icon", visible)
 	get_tree().call_group("friendly", "display_icon", visible)
@@ -358,7 +357,7 @@ func _on_alt_select(ship: Ship) -> void:
 	
 	ship.highlight_selection(highlight_value)
 
-func _on_ship_selected(unit: Ship) -> void:
+func _on_unit_selected(unit: Ship) -> void:
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:
 		if unit.group_leader == true:
@@ -376,6 +375,17 @@ func _on_ship_selected(unit: Ship) -> void:
 	unit.highlight_selection(true)
 	prev_selected_ship = unit
 	reset_box_selection()
+
+func connect_unit_signals(units: Array) -> void:
+	for n_unit in units:
+		if n_unit == null:
+			continue
+		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
+			n_unit.switch_to_manual.connect(_on_switched_to_manual)
+			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
+		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
 
 func _on_switched_to_manual() -> void:
 	if not visible:

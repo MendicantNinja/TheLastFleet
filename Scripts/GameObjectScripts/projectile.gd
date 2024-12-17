@@ -7,6 +7,7 @@ var damage: int = 0
 var speed: float = 0
 var range: int = 0
 var damage_type: int = 0
+
 var ship_id: int
 
 # Called when the node enters the scene tree for the first time.

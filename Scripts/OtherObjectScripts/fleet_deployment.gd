@@ -2,6 +2,8 @@ extends GridContainer
 var ships_to_deploy: Array[ShipIcon]
 @onready var CombatMap: Node2D = $"../../.."
 
+signal units_deployed(units)
+
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
@@ -15,6 +17,7 @@ func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 		ships_to_deploy[this_icon.index] = null
 
 func deploy_ships() -> void:
+	var instantiated_units: Array = []
 	for ship_icon in ships_to_deploy:
 		if ship_icon == null or ship_icon.disabled:
 			continue
@@ -24,7 +27,9 @@ func deploy_ships() -> void:
 		ship_instantiation.is_friendly = true
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
+		instantiated_units.push_back(ship_instantiation)
 		ship_instantiation.display_icon(true)
+	units_deployed.emit(instantiated_units)
 	on_cancel_pressed()
 
 func on_all_pressed() -> void:

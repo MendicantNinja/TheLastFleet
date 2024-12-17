@@ -14,7 +14,7 @@ func create_projectile() -> PackedScene:
 @export var weapon_size: data.size_enum = data.size_enum.SMALL
 @export var image: Texture2D
 @export var armament_points: int = 0
-@export var firing_sound: Resource
+@export var firing_sound: AudioStream
 
 # Projectile-related stats (that still affect game balance)
 @export var projectile_scene: PackedScene # Must be known so that the weapon class knows what sort of projectile to create.
@@ -29,7 +29,7 @@ func create_projectile() -> PackedScene:
 #@export var burst_delay: float = 0.0                   # Delay between the next burst in seconds. 
 
 # Range and Accuracy
-@export var range: float = 1000                         # Maximum range of the weapon
+@export var range: float = 600                         # Maximum range of the weapon
 #@export var beam: bool = false                         # Whether the weapon is a continuous beam
 @export var accuracy: float = 1.0                      # Accuracy of the weapon (0.0 = low, 1.0 = perfect)
 #@export var spread: float = 0.0                        # Spread of the weapon’s shots (applies to some projectile weapons)
