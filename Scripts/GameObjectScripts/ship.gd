@@ -111,15 +111,15 @@ func deploy_ship() -> void:
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
-		#$ShipLivery.self_modulate = settings.player_color
+		$ShipLivery.self_modulate = settings.player_color
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.modulate = settings.enemy_color
-		#$ShipLivery.self_modulate = settings.enemy_color
+		$ShipLivery.self_modulate = settings.enemy_color
 
 func _ready() -> void:
 	ShipSprite.z_index = 0
-	#$ShipLivery.z_index = 1
+	$ShipLivery.z_index = 1
 	
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)

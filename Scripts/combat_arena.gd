@@ -51,6 +51,7 @@ func toggle_options_menu() -> void:
 	else:
 		OptionsMenuPanel.visible = false
 
+
 func _on_switch_maps() -> void:
 	if CombatMap.visible:
 		CombatMap.display_map(false)
