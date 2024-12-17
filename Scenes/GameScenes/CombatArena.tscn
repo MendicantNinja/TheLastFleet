@@ -32,11 +32,9 @@ bg_color = Color(0, 0, 0, 0.588235)
 script = ExtResource("1_fx56v")
 
 [node name="Music" type="AudioStreamPlayer2D" parent="."]
-bus = &"Music"
 playback_type = 1
 
 [node name="GUI" type="AudioStreamPlayer2D" parent="."]
-bus = &"Music"
 playback_type = 1
 
 [node name="CombatMap" type="Node2D" parent="."]
