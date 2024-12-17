@@ -19,6 +19,9 @@ weapon_mount = ExtResource("3_d4mge")
 [node name="WeaponSprite" type="Sprite2D" parent="WeaponNode/WeaponMountSprite"]
 rotation = 1.5708
 
+[node name="WeaponSFX" type="AudioStreamPlayer2D" parent="WeaponNode"]
+bus = &"SFX"
+
 [node name="EffectiveRange" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 0

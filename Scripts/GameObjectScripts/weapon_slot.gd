@@ -77,6 +77,7 @@ func fire(ship_id: int) -> void:
 	projectile.global_transform = weapon_node.global_transform
 	projectile.assign_stats(weapon, ship_id)
 	get_tree().root.add_child(projectile)
+	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
 	can_fire = false
 	rate_of_fire_timer.start()
@@ -105,7 +106,6 @@ func _draw() -> void:
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
-	z_index = 2
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	can_fire = true

@@ -1,7 +1,6 @@
-[gd_scene load_steps=27 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=28 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
-[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_13ai0"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="4_qjhaj"]
@@ -16,6 +15,8 @@
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/face_target.gd" id="6_bv7ug"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
+[ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
+[ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
@@ -101,11 +102,14 @@ script = ExtResource("5_i7uex")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
-scale = Vector2(0.1, 0.1)
-texture = ExtResource("2_13ai0")
+texture = ExtResource("12_6r768")
+
+[node name="ShipLivery" type="Sprite2D" parent="."]
+rotation = 1.5708
+texture = ExtResource("13_bdbdv")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(54, 0, -50, -54, -50, 54)
+polygon = PackedVector2Array(54, 0, -18, -73, -19, 77)
 
 [node name="RepathArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -117,10 +121,12 @@ shape = SubResource("CircleShape2D_4lqs1")
 debug_color = Color(0, 0.6, 0.701961, 0.0823529)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
-position = Vector2(-25, -18)
+show_behind_parent = true
+position = Vector2(9, -18)
 
 [node name="WeaponSlot1" parent="." instance=ExtResource("3_b8p4t")]
-position = Vector2(-25, 18)
+show_behind_parent = true
+position = Vector2(9, 18)
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
 path_desired_distance = 50.0

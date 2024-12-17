@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_xb8pa"]
 [ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_6a6no"]
-[ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="2_o8yer"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="2_rh0ln"]
+[ext_resource type="Texture2D" uid="uid://dl4wcjtsccgku" path="res://Art/ShipArt/ship1enginemaximalist.png" id="3_cllak"]
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="3_tjgeo"]
 
 [resource]
@@ -17,7 +17,7 @@ ship_packed_scene = ExtResource("2_rh0ln")
 ship_system = 0
 weapon_mounts = Array[ExtResource("2_6a6no")]([ExtResource("3_tjgeo"), ExtResource("3_tjgeo")])
 base_mods = []
-ship_sprite = ExtResource("2_o8yer")
+ship_sprite = ExtResource("3_cllak")
 ship_scaling = 1
 hull_integrity = 500
 armor = 300
