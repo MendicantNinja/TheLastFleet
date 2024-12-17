@@ -27,6 +27,7 @@ func _ready() -> void:
 	settings.swizzle(Deploy)
 	settings.swizzle(Cancel)
 	#%BlackenBackground.size = PlayableAreaBounds.shape.size
+	FleetDeploymentList.units_deployed.connect(TacticalMap.connect_unit_signals)
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	for friendly_ship in friendly_group:
 		connect_ship_signals(friendly_ship)
