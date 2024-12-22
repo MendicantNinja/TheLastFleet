@@ -57,7 +57,7 @@ signal weapon_slot_fired(flux)
 signal remove_manual_camera(camera)
 signal target_in_range(value)
 signal new_threats(targets)
-signal update_threats(targets)
+signal threat_exited(targets)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
@@ -258,20 +258,21 @@ func _on_EffectiveRange_entered(body) -> void:
 	
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
-		new_threats.emit(available_targets.values())
+		new_threats.emit(body)
 
 # Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
 # the effective range and the current combat situation.
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
 	
-	update_threats.emit(available_targets.values())
+	threat_exited.emit(body)
 	if ship_id == target_unit:
 		target_in_range.emit(false)
 	
 	available_targets.erase(ship_id)
 	
 	if killcast and available_targets.is_empty():
+		target_in_range.emit(false)
 		killcast.queue_free()
 		killcast = null
 

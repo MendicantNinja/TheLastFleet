@@ -15,6 +15,8 @@ class_name Ship
 @onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var all_weapons: Array[WeaponSlot]
+
+var blackboard: Blackboard
 var ManualControlCamera: Camera2D = null
 
 # Temporary variables
@@ -68,6 +70,7 @@ var group_leader: bool = false
 var group_transform: Transform2D = Transform2D.IDENTITY
 var group_velocity: Vector2 = Vector2.ZERO
 var posture: StringName = &""
+var idle: bool = true
 
 # Used for combat
 var target_in_range: bool = false
@@ -118,6 +121,7 @@ func deploy_ship() -> void:
 		$ShipLivery.self_modulate = settings.enemy_color
 
 func _ready() -> void:
+	blackboard = CombatBehaviorTree.blackboard
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	
@@ -162,16 +166,13 @@ func _ready() -> void:
 	#ShipSprite.modulate = self_modulate
 	
 	if collision_layer == 1:
-		add_to_group("friendly")
+		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
 		CombatBehaviorTree.toggle_root(false)
 	else:
-		add_to_group("enemy")
-		group_name = StringName("NPC %s" % [name])
+		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
-		set_group_leader(true)
-		add_to_group(group_name)
 		rotation += PI/2
 	
 	# Assigns weapon slots based on what's in the ship scene.
@@ -252,7 +253,7 @@ func set_shields(value: bool) -> void:
 	else:
 		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
-	
+
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
 	update_flux_indicators()
@@ -301,7 +302,11 @@ func group_add(n_group_name: StringName) -> void:
 	add_to_group(group_name)
 
 func set_group_leader(leader_value: bool) -> void:
+	print("%s made leader of %s" % [name, group_name])
 	group_leader = leader_value
+
+func set_idle_flag(value: bool) -> void:
+	idle = value
 
 func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
 	if not ship_select:
@@ -377,7 +382,7 @@ func _on_mouse_exited() -> void:
 		weapon_slot.toggle_display_aim(mouse_hover)
 
 func highlight_selection(select_value: bool = false) -> void:
-	print("%s is highlighted? %s" % [name, select_value])
+	#print("%s is highlighted? %s" % [name, select_value])
 	TacticalMapIcon.toggle_mode = select_value
 	TacticalMapIcon.button_pressed = select_value
 	get_viewport().set_input_as_handled()
@@ -630,6 +635,8 @@ func update_available_target_connections(target_group_key: StringName) -> void:
 	
 	available_targets = blackboard.ret_data(target_group_key)
 	for target in available_targets:
+		if target == null:
+			continue
 		if not target.destroyed.is_connected(blackboard._on_target_destroyed):
 			target.destroyed.connect(blackboard._on_target_destroyed.bind(target, target_group_key, target_key))
 

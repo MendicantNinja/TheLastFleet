@@ -9,7 +9,7 @@ extends Node2D
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
-
+@onready var ComputerAdmiral = $Admiral
 # groups
 
 func _ready() -> void:
@@ -31,6 +31,12 @@ func _ready() -> void:
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	for friendly_ship in friendly_group:
 		connect_ship_signals(friendly_ship)
+
+func _process(delta) -> void:
+	if get_tree().get_node_count_in_group(&"friendly") == 0 and ComputerAdmiral.AdmiralAI.enabled == true:
+		ComputerAdmiral.AdmiralAI.toggle_root(false)
+	if get_tree().get_node_count_in_group(&"friendly") > 0 and ComputerAdmiral.AdmiralAI.enabled == false:
+		ComputerAdmiral.AdmiralAI.toggle_root(true)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:

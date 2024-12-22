@@ -1,13 +1,20 @@
-[gd_scene load_steps=17 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=24 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/admiral.gd" id="2_shfex"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_xxm3d"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_5naox"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_38tt5"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/initialize_groups.gd" id="5_dpyjf"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/direct_attack.gd" id="7_0at63"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/assign_new_leader.gd" id="7_otbhq"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
@@ -29,7 +36,33 @@ size = Vector2(17000, 20000)
 bg_color = Color(0, 0, 0, 0.588235)
 
 [node name="CombatArena" type="Node2D"]
+process_mode = 1
 script = ExtResource("1_fx56v")
+
+[node name="Admiral" type="Node2D" parent="."]
+script = ExtResource("2_shfex")
+
+[node name="AdmiralAI" type="Node" parent="Admiral"]
+script = ExtResource("2_xxm3d")
+enabled = false
+
+[node name="main" type="Node" parent="Admiral/AdmiralAI"]
+script = ExtResource("4_5naox")
+
+[node name="group management" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("5_38tt5")
+
+[node name="assign new leader" type="Node" parent="Admiral/AdmiralAI/main/group management"]
+script = ExtResource("7_otbhq")
+
+[node name="initialize groups" type="Node" parent="Admiral/AdmiralAI/main/group management"]
+script = ExtResource("5_dpyjf")
+
+[node name="tactics" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("4_5naox")
+
+[node name="direct attack" type="Node" parent="Admiral/AdmiralAI/main/tactics"]
+script = ExtResource("7_0at63")
 
 [node name="Music" type="AudioStreamPlayer2D" parent="."]
 bus = &"Music"
@@ -354,22 +387,22 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3486, 2854)
+position = Vector2(3060, 3097)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3786, 2854)
+position = Vector2(4157, 3279)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4086, 2854)
+position = Vector2(4621, 2980)
 
 [node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(1973, 2814)
+position = Vector2(2082, 3425)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2273, 2814)
+position = Vector2(2696, 3304)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2573, 2814)
+position = Vector2(1716, 2915)
 
 [node name="TestShip" parent="." instance=ExtResource("8_kko0w")]
 self_modulate = Color(1, 0.0470588, 0.0588235, 1)

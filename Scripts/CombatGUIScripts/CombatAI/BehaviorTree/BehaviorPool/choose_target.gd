@@ -14,6 +14,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	available_targets = blackboard.ret_data(target_group_key)
 	
 	target = agent.find_closest_target(available_targets)
+	if target == null:
+		return RUNNING
+	
 	if agent.group_leader == true and not blackboard.has_data(target_key):
 		get_tree().call_group(agent_group_name, "set_blackboard_data", target_key, target)
 		get_tree().call_group(agent_group_name, "set_blackboard_data", target_group_key, available_targets)
