@@ -155,7 +155,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
-modulate = Color(0.486275, 0.843137, 0.294118, 0.862745)
+modulate = Color(0.486275, 0.843137, 0.294118, 0.588235)
 z_index = 1
 anchors_preset = 0
 
@@ -240,7 +240,7 @@ theme_override_font_sizes/font_size = 10
 text = "HULL"
 
 [node name="IndicatorDecor" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI"]
-self_modulate = Color(1, 1, 1, 0.392157)
+self_modulate = Color(1, 1, 1, 0.588235)
 layout_mode = 0
 offset_top = -48.0
 offset_right = 130.0

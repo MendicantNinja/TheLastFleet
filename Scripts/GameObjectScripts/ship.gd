@@ -493,12 +493,11 @@ func _physics_process(delta: float) -> void:
 	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
-	#ConstantSizedGUI.global_position = global_position
+	
 	if manual_control == true:
+		# if one wants to make the manually controlled hud less transparent than friendly ships
 		#var current_color: Color = ConstantSizedGUI.modulate
 		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
-		print("the ships global position is ", self.global_position)
-		print("the GUI's global position is ", ConstantSizedGUI.global_position)
 		pass
 	
 	
