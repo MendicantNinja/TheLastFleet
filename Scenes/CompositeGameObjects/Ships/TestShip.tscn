@@ -17,6 +17,10 @@
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
+[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="17_j44wp"]
+[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/combatHUDdetail.png" id="20_7ssvb"]
+[ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="20_n3gvt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
 radius = 0.01
@@ -29,21 +33,6 @@ colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
 
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_47ww1"]
 gradient = SubResource("Gradient_nks55")
-width = 10
-
-[sub_resource type="Gradient" id="Gradient_abojs"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_amwlv"]
-gradient = SubResource("Gradient_abojs")
-
-[sub_resource type="Gradient" id="Gradient_i76yl"]
-offsets = PackedFloat32Array(0)
-colors = PackedColorArray(0, 0, 0, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_t5eam"]
-gradient = SubResource("Gradient_i76yl")
 width = 10
 
 [sub_resource type="Gradient" id="Gradient_lqjnm"]
@@ -165,39 +154,100 @@ anchors_preset = 0
 offset_right = 40.0
 offset_bottom = 40.0
 
-[node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+[node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
+modulate = Color(0.486275, 0.843137, 0.294118, 0.862745)
+z_index = 1
+anchors_preset = 0
+
+[node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI"]
 physics_interpolation_mode = 0
-modulate = Color(0.415601, 0.920391, 0, 1)
 texture_filter = 1
 layout_mode = 0
-offset_right = 100.0
-offset_bottom = 16.0
-value = 4.0
+offset_left = 71.0
+offset_top = -80.0
+offset_right = 171.0
+offset_bottom = -70.0
+scale = Vector2(0.75, 0.75)
 nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_47ww1")
 
-[node name="SoftFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
+[node name="SoftFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
 physics_interpolation_mode = 0
-modulate = Color(0.415686, 0.921569, 0, 1)
-texture_filter = 1
-layout_mode = 0
-offset_top = 3.0
-offset_right = 100.0
-offset_bottom = 13.0
-nine_patch_stretch = true
-texture_under = SubResource("GradientTexture1D_amwlv")
-texture_progress = SubResource("GradientTexture1D_47ww1")
-
-[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="CenterCombatHUD"]
-physics_interpolation_mode = 0
-modulate = Color(0.415686, 0.921569, 0, 1)
+show_behind_parent = true
 texture_filter = 1
 layout_mode = 0
 offset_right = 100.0
 offset_bottom = 10.0
 nine_patch_stretch = true
-texture_under = SubResource("GradientTexture1D_t5eam")
+texture_progress = SubResource("GradientTexture1D_47ww1")
+
+[node name="BarOutliner" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 102.0
+offset_bottom = 12.0
+texture = ExtResource("16_roh2q")
+stretch_mode = 2
+
+[node name="FluxPip" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 14.0
+texture = ExtResource("17_j44wp")
+
+[node name="Label" type="Label" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -54.6667
+offset_top = -2.66667
+offset_right = 4.33333
+offset_bottom = 18.3333
+theme = ExtResource("20_n3gvt")
+theme_override_font_sizes/font_size = 10
+text = "FLUX"
+
+[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_left = 71.0
+offset_top = -63.0
+offset_right = 171.0
+offset_bottom = -53.0
+scale = Vector2(0.75, 0.75)
+nine_patch_stretch = true
 texture_progress = SubResource("GradientTexture1D_17qoa")
+
+[node name="BarOutLiner2" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 104.0
+offset_bottom = 12.0
+texture = ExtResource("16_roh2q")
+stretch_mode = 2
+
+[node name="Label" type="Label" parent="CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -54.6667
+offset_top = -2.66667
+offset_right = 5.33329
+offset_bottom = 21.3333
+theme = ExtResource("20_n3gvt")
+theme_override_font_sizes/font_size = 10
+text = "HULL"
+
+[node name="IndicatorDecor" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI"]
+self_modulate = Color(1, 1, 1, 0.392157)
+layout_mode = 0
+offset_top = -48.0
+offset_right = 130.0
+offset_bottom = -8.0
+scale = Vector2(1.2, 1.2)
+texture = ExtResource("20_7ssvb")
+stretch_mode = 2
 
 [node name="ShipTargetIcon" type="TextureRect" parent="CenterCombatHUD"]
 physics_interpolation_mode = 0

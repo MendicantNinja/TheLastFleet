@@ -1,0 +1,16 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bka1x3hcxtfcg"]
+
+[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="1_kggyn"]
+
+[sub_resource type="FontVariation" id="FontVariation_ru2o2"]
+base_font = ExtResource("1_kggyn")
+variation_opentype = {
+2003265652: 800
+}
+variation_embolden = 1.0
+spacing_glyph = 1
+
+[resource]
+default_font_size = 12
+Label/font_sizes/font_size = 16
+Label/fonts/font = SubResource("FontVariation_ru2o2")

@@ -70,7 +70,6 @@ text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
-visible = false
 top_level = true
 offset_left = 47.0
 offset_top = 53.0

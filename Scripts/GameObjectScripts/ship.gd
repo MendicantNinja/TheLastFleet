@@ -6,13 +6,19 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
+
+@onready var CombatCamera = null
+
 @onready var CenterCombatHUD = $CenterCombatHUD
-@onready var SoftFluxIndicator = $CenterCombatHUD/SoftFluxIndicator
-@onready var HardFluxIndicator = $CenterCombatHUD/HardFluxIndicator
-@onready var HullIntegrityIndicator = $CenterCombatHUD/HullIntegrityIndicator
+@onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
+@onready var SoftFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/SoftFluxIndicator
+@onready var HardFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator
+@onready var HullIntegrityIndicator = $CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator
+@onready var FluxPip = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/FluxPip
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
+
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var all_weapons: Array[WeaponSlot]
 var ManualControlCamera: Camera2D = null
@@ -100,6 +106,7 @@ signal destroyed()
 
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
+	
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
@@ -108,15 +115,19 @@ func deploy_ship() -> void:
 	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
 	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
+	
+	# Needed to know the zoom level for GUI scaling.
+	CombatCamera = $"../CombatMap/CombatCamera"
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
 		$ShipLivery.self_modulate = settings.player_color
+		
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.modulate = settings.enemy_color
 		$ShipLivery.self_modulate = settings.enemy_color
-
+	
 func _ready() -> void:
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
@@ -142,14 +153,14 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
-	var soft_flux_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius + 3)
-	var hard_flux_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius)
-	var hull_hud_offset: Vector2 = Vector2(shield_radius, -shield_radius * 0.7)
+
+	var hard_flux_hud_offset: Vector2 = Vector2(shield_radius * 1.5, -shield_radius * 1.5)
+	var hull_hud_offset: Vector2 = Vector2(shield_radius * 1.5, -shield_radius * 1.2)
 	var target_ship_offset: Vector2 = Vector2(-shield_radius, shield_radius)
 	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
-	SoftFluxIndicator.position = soft_flux_hud_offset
-	HardFluxIndicator.position = hard_flux_hud_offset
-	HullIntegrityIndicator.position = hull_hud_offset
+
+	#ConstantSizedGUI.position = hard_flux_hud_offset
+
 	ShipTargetIcon.position = target_ship_offset
 	ManualControlIndicator.position = manual_control_offset
 	
@@ -273,10 +284,11 @@ func update_flux_indicators() -> void:
 		for weapon in all_weapons:
 			weapon.update_flux_overload(flux_overload)
 	
-	var flux_rate: float = 100 / total_flux
-	HardFluxIndicator.texture_progress_offset.x = floor(flux_rate * hard_flux)
-	SoftFluxIndicator.value = flux_rate * soft_flux
-
+	var flux_rate: float = 100 / total_flux # Returns a factor multiplier of the total flux that can be used to get a percentage. e.g 100/2000 = .05. 
+	HardFluxIndicator.value = floor(flux_rate * hard_flux)
+	SoftFluxIndicator.value = floor(flux_rate * soft_flux)
+	SoftFluxIndicator.position.x = HardFluxIndicator.value
+	FluxPip.position.x = HardFluxIndicator.value - 2
 func display_icon(value: bool) -> void:
 	TacticalMapIcon.visible = value
 
@@ -473,7 +485,22 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	var velocity = Vector2.ZERO
+	ConstantSizedGUI.scale = Vector2.ONE
+	if CombatCamera != null and CombatCamera.enabled:
+		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
+	if ManualControlCamera != null and ManualControlCamera.enabled:
+		ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
+	
+	# Rare GUI Updates
 	CenterCombatHUD.position = position
+	#ConstantSizedGUI.global_position = global_position
+	if manual_control == true:
+		#var current_color: Color = ConstantSizedGUI.modulate
+		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
+		print("the ships global position is ", self.global_position)
+		print("the GUI's global position is ", ConstantSizedGUI.global_position)
+		pass
+	
 	
 	if ShipNavigationAgent.is_navigation_finished() and not manual_control:
 		if rotate_angle != 0.0 and move_direction != Vector2.ZERO:
