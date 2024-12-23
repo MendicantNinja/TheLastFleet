@@ -10,7 +10,8 @@ extends Node2D
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 @onready var ComputerAdmiral = $Admiral
-# groups
+
+var InfluenceMap: Imap
 
 func _ready() -> void:
 	TacticalMap.switch_maps.connect(_on_switch_maps)
@@ -19,6 +20,14 @@ func _ready() -> void:
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	
+	var AreaBoundsShape: Shape2D = PlayableAreaBounds.get_shape()
+	var max_width: int = PlayableAreaBounds.shape.size.x
+	var max_height: int = PlayableAreaBounds.shape.size.y
+	var origin_x: float = 0.0
+	var origin_y: float = 0.0
+	var max_cell_size: float = 500
+	InfluenceMap = Imap.new(max_width, max_height, origin_x, origin_y, max_cell_size)
+	InfluenceMap.propagate_influence(5, 5, 5, 1.0)
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)
