@@ -7,7 +7,9 @@ class_name Ship
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
 
+# Needed for GUI scaling and some other things, signaling up is difficult. Would have to involve passing (all of them, they all need gui scaling) the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
+@onready var TacticalCamera = null
 
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
@@ -21,7 +23,6 @@ class_name Ship
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var all_weapons: Array[WeaponSlot]
-var ManualControlCamera: Camera2D = null
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -64,6 +65,7 @@ var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
 
 # camera goodies
+var manual_camera_freelook: bool = false
 var zoom_in_limit: Vector2 = Vector2(1.2, 1.2)
 var zoom_out_limit: Vector2 = Vector2(0.6, 0.6)
 var zoom_value: Vector2 = Vector2.ONE
@@ -98,8 +100,8 @@ var ship_select: bool = false:
 
 # Custom signals.
 signal alt_select()
-signal switch_to_manual()
 signal camera_removed()
+signal switch_to_manual()
 signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
@@ -118,15 +120,16 @@ func deploy_ship() -> void:
 	
 	# Needed to know the zoom level for GUI scaling.
 	CombatCamera = $"../CombatMap/CombatCamera"
+	TacticalCamera = $"../TacticalMap/TacticalCamera"
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
-		$ShipLivery.self_modulate = settings.player_color
+		settings.swizzle($ShipLivery, settings.player_color) 
 		
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.modulate = settings.enemy_color
-		$ShipLivery.self_modulate = settings.enemy_color
+		settings.swizzle($ShipLivery, settings.enemy_color) 
 	
 func _ready() -> void:
 	ShipSprite.z_index = 0
@@ -140,7 +143,7 @@ func _ready() -> void:
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
-	#ShipSprite.self_modulate = settings.player_color
+
 	
 	var repath_shape: Shape2D = CircleShape2D.new()
 	repath_shape.radius = ShipNavigationAgent.radius
@@ -153,14 +156,8 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
-
-	var hard_flux_hud_offset: Vector2 = Vector2(shield_radius * 1.5, -shield_radius * 1.5)
-	var hull_hud_offset: Vector2 = Vector2(shield_radius * 1.5, -shield_radius * 1.2)
 	var target_ship_offset: Vector2 = Vector2(-shield_radius, shield_radius)
 	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
-
-	#ConstantSizedGUI.position = hard_flux_hud_offset
-
 	ShipTargetIcon.position = target_ship_offset
 	ManualControlIndicator.position = manual_control_offset
 	
@@ -315,17 +312,17 @@ func group_add(n_group_name: StringName) -> void:
 func set_group_leader(leader_value: bool) -> void:
 	group_leader = leader_value
 
-func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
-	if not ship_select:
-		return
-	add_child(camera)
-	ManualControlCamera = camera
-	ManualControlCamera.enabled = true
-	zoom_value = n_zoom_value
-	if n_zoom_value > zoom_out_limit:
-		zoom_value = zoom_out_limit
-	elif n_zoom_value < zoom_in_limit:
-		zoom_value = zoom_in_limit
+#func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
+	#if not ship_select:
+		#return
+	#add_child(camera)
+	#ManualControlCamera = camera
+	#ManualControlCamera.enabled = true
+	#zoom_value = n_zoom_value
+	#if n_zoom_value > zoom_out_limit:
+		#zoom_value = zoom_out_limit
+	#elif n_zoom_value < zoom_in_limit:
+		#zoom_value = zoom_in_limit
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -353,7 +350,7 @@ func _input(event: InputEvent) -> void:
 			elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				toggle_auto_fire(all_weapons)
 			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
-				toggle_manual_control()
+				#toggle_manual_control()
 				camera_removed.emit()
 		elif not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
@@ -404,11 +401,10 @@ func toggle_manual_control() -> void:
 	
 	if manual_control == false:
 		manual_control = true
+		CombatCamera.position_smoothing_enabled = false
+		CombatCamera.global_position = self.global_position
 	elif manual_control == true:
 		manual_control = false
-		camera_removed.emit(zoom_value, ManualControlCamera.position)
-		ManualControlCamera.queue_free()
-		ManualControlCamera = null
 		ship_select = false
 		_on_mouse_exited()
 	toggle_manual_aim(all_weapons, manual_control)
@@ -421,8 +417,11 @@ func toggle_manual_control() -> void:
 	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
 		ShipNavigationAgent.set_target_position(position)
 	if manual_control == true:
-		switch_to_manual.emit()
-		request_manual_camera.emit()
+		switch_to_manual.emit() # Calls to Tactical Map to swap Camera and give a ship
+		request_manual_camera.emit() # Calls to combat map to switch the current/prev selected unit.
+
+func toggle_manual_camera_freelook(toggle_status: bool) -> void:
+	manual_camera_freelook = toggle_status
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -431,6 +430,8 @@ func toggle_manual_control() -> void:
 	#`888.8'  `888.8'      888    "      .88ooo8888.    888         888      888  8     `88b.8       `"Y88b 
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
+
+
 
 func set_target_for_weapons(unit) -> void:
 	for weapon in all_weapons:
@@ -481,20 +482,39 @@ func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 	group_transform = next_transform
 
 func _physics_process(delta: float) -> void:
+
+	# Needs to be per second.
+	#if soft_flux == 0:
+		#hard_flux -= ship_stats.flux_dissipation
+		#
+	#elif soft_flux < ship_stats.flux_dissipation:
+		#var flux_to_carry_over: float = ship_stats.flux_dissipation - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
+		#hard_flux -= flux_to_carry_over
+		#soft_flux = 0
+	#else: 
+		#soft_flux -= ship_stats.flux_dissipation
+	#update_flux_indicators()
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
 	var velocity = Vector2.ZERO
-	ConstantSizedGUI.scale = Vector2.ONE
-	if CombatCamera != null and CombatCamera.enabled:
-		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
-	if ManualControlCamera != null and ManualControlCamera.enabled:
-		ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
+
+	
+	#if TacticalCamera != null and TacticalCamera.enabled:
+		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
+	#if ManualControlCamera != null and ManualControlCamera.enabled:
+		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
 	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
+	ConstantSizedGUI.scale = Vector2.ONE
+	if CombatCamera != null and CombatCamera.enabled:
+		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 	
-	if manual_control == true:
+	if manual_control == true: 
+		if manual_camera_freelook == false:
+			CombatCamera.global_position = self.global_position
+		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
 		# if one wants to make the manually controlled hud less transparent than friendly ships
 		#var current_color: Color = ConstantSizedGUI.modulate
 		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
@@ -530,8 +550,8 @@ func _physics_process(delta: float) -> void:
 		toggle_shield()
 	
 	if manual_control:
-		if ManualControlCamera.zoom != zoom_value:
-			ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
+		#if ManualControlCamera.zoom != zoom_value:
+			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
 		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
@@ -541,8 +561,8 @@ func _physics_process(delta: float) -> void:
 		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var ship_query: Dictionary = {}
-	#if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		#ship_query = collision_raycast(global_position, target_position, 7, true, false)
+	if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
+		ship_query = collision_raycast(global_position, target_position, 7, true, false)
 	
 	var sweep_vectors: Array[Vector2] = []
 	if not ship_query.is_empty():

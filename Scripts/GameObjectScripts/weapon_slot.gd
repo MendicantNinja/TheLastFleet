@@ -133,7 +133,7 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 	owner_rid = owner_value
 	if not is_friendly:
 		auto_aim = true
-	set_weapon_size_and_color()
+	#set_weapon_size_and_color()
 
 func set_auto_fire(fire_value: bool) -> void:
 	auto_fire = fire_value
@@ -183,24 +183,24 @@ func set_target_unit(unit) -> void:
 	if not available_targets.has(target_unit):
 		target_in_range.emit(false)
 
-func set_weapon_size_and_color():
-	if is_friendly:
-		weapon_mount_image.modulate = settings.player_color
-	elif not is_friendly:
-		weapon_mount_image.modulate = get_parent().self_modulate
-	#weapon_image.self_modulate = settings.player_color
-	match weapon_mount.weapon_mount_size:
-		data.size_enum.SMALL:
-			weapon_mount_image.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
-		data.size_enum.MEDIUM:
-			weapon_mount_image.scale = Vector2(.4, .4)#/assigned_ship.scale
-		data.size_enum.LARGE:
-			weapon_mount_image.scale = Vector2(.7, .7)#/assigned_ship.scale
-		data.size_enum.SPINAL:
-			weapon_mount_image.scale = Vector2(1, 1)#/assigned_ship.scale
-		_:
-			print("Unknown weapon size.")
-	
+#func set_weapon_size_and_color():
+	#if is_friendly:
+		#weapon_mount_image.modulate = settings.player_color
+	#elif not is_friendly:
+		#weapon_mount_image.modulate = get_parent().self_modulate
+	##weapon_image.self_modulate = settings.player_color
+	#match weapon_mount.weapon_mount_size:
+		#data.size_enum.SMALL:
+			#weapon_mount_image.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
+		#data.size_enum.MEDIUM:
+			#weapon_mount_image.scale = Vector2(.4, .4)#/assigned_ship.scale
+		#data.size_enum.LARGE:
+			#weapon_mount_image.scale = Vector2(.7, .7)#/assigned_ship.scale
+		#data.size_enum.SPINAL:
+			#weapon_mount_image.scale = Vector2(1, 1)#/assigned_ship.scale
+		#_:
+			#print("Unknown weapon size.")
+	#
 	#match weapon_mount.weapon_mount_type:
 		#data.weapon_mount_type_enum.BALLISTIC:
 			#weapon_mount_image.self_modulate = Color8(255, 100, 20, 255)

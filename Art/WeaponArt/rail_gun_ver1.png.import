@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dhi63fbhiue7"
-path="res://.godot/imported/Aeroshuttle_base.webp-a3a559efbc391917924c81325e2f2335.ctex"
+uid="uid://t6d5ttnwe32e"
+path="res://.godot/imported/rail_gun_ver1.png-b6cc3418890748adcbfa08c8d70a8d63.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/ShipArt/Aeroshuttle_base.webp"
-dest_files=["res://.godot/imported/Aeroshuttle_base.webp-a3a559efbc391917924c81325e2f2335.ctex"]
+source_file="res://Art/WeaponArt/rail_gun_ver1.png"
+dest_files=["res://.godot/imported/rail_gun_ver1.png-b6cc3418890748adcbfa08c8d70a8d63.ctex"]
 
 [params]
 

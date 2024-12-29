@@ -43,8 +43,6 @@ playback_type = 1
 script = ExtResource("2_moq8i")
 
 [node name="CombatCamera" type="Camera2D" parent="CombatMap"]
-anchor_mode = 0
-ignore_rotation = false
 process_callback = 0
 limit_left = 0
 limit_top = 0

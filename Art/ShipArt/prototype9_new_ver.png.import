@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ba86c6j23n4ye"
-path="res://.godot/imported/CondorSimonJanich.png-77722de2cb33256a9289fe05f787d597.ctex"
+uid="uid://bja5d5p7yl0c0"
+path="res://.godot/imported/prototype9_new_ver.png-9c49c8136b7795f71851e150cea67b9b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/ShipArt/CondorSimonJanich.png"
-dest_files=["res://.godot/imported/CondorSimonJanich.png-77722de2cb33256a9289fe05f787d597.ctex"]
+source_file="res://Art/ShipArt/prototype9_new_ver.png"
+dest_files=["res://.godot/imported/prototype9_new_ver.png-9c49c8136b7795f71851e150cea67b9b.ctex"]
 
 [params]
 
