@@ -31,6 +31,13 @@ func set_cell_value(x: int, y: int, value: float) -> void:
 func add_value(x: int, y: int, value: float) -> void:
 	map_grid[x][y] += value
 
+func find_cell_index_from_position(position: Vector2) -> Vector2:
+	var indices: Vector2i = Vector2i.ZERO
+	var position_x: int = position.x / cell_size
+	var position_y: int = position.y / cell_size
+	indices = Vector2i(position_x, position_y)
+	return indices
+
 func propagate_influence(center_x: int, center_y: int, radius: int, magnitude: float = 1.0) -> void:
 	var start_x: int = center_x - (radius / 2)
 	var start_y: int = center_y - (radius / 2)
