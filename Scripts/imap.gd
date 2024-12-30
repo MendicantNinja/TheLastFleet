@@ -94,7 +94,7 @@ func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 
 			var target_x: int = x + start_x
 			var target_y: int = y + start_y
 			if (target_x >= 0 && target_x < width && target_y >= 0 && target_y < height):
-				add_value(x, y, source_map.get_cell_value(x, y) * magnitude)
+				add_value(target_y, target_x, source_map.get_cell_value(x, y) * magnitude)
 
 func add_into_map(target_map: Imap, center_x: int, center_y: int, magnitude: float = 1.0, offset_x: int = 0, offset_y: int = 0) -> void:
 	if target_map == null:
@@ -121,4 +121,4 @@ func add_into_map(target_map: Imap, center_x: int, center_y: int, magnitude: flo
 		for x in range(min_x, max_x, 1):
 			var source_x: int = x + start_x - neg_adj_x
 			var source_y: int = y + start_y - neg_adj_y
-			target_map.add_value(x, y, map_grid[x][y] * magnitude)
+			target_map.add_value(y, x, map_grid[x][y] * magnitude)

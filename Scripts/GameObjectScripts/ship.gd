@@ -190,6 +190,10 @@ func _ready() -> void:
 		#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
 		#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
 	
+	# Placeholder for now
+	var occupancy_template: ImapTemplate = imap_manager.template_maps[imap_manager.MapType.OCCUPANCY_MAP]
+	template_maps[occupancy_template.type] = occupancy_template.template_maps[2]
+	
 	deploy_ship()
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
