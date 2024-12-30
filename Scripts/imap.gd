@@ -2,7 +2,7 @@ extends Object
 class_name Imap
 
 var anchor_location: Vector2
-var cell_size: float # 
+var cell_size: int 
 var height: int # height of the map
 var width: int # width of the map
 var map_grid: Array # 2D Array
@@ -38,30 +38,26 @@ func add_value(x: int, y: int, value: float) -> void:
 
 func find_cell_index_from_position(position: Vector2) -> Vector2:
 	var indices: Vector2i = Vector2i.ZERO
-	var position_x: int = position.x / cell_size
-	var position_y: int = position.y / cell_size
-	indices = Vector2i(position_x, position_y)
+	var cell_column: int = position.x / cell_size
+	var cell_row: int = position.y / cell_size
+	indices = Vector2i(cell_column, cell_row)
 	return indices
 
-func propagate_influence(center_x: int, center_y: int, radius: int, magnitude: float = 1.0) -> void:
-	var start_x: int = center_x - (radius / 2)
-	var start_y: int = center_y - (radius / 2)
-	var end_x: int = center_x + (radius / 2)
-	var end_y: int = center_y + (radius / 2)
+func correct_influence(map: Imap, center_index: Vector2, position: Vector2) -> Imap:
+	var dupe_imap: Imap = Imap.new(map.height, map.width, 0.0, 0.0, map.cell_size)
+	dupe_imap.map_type = map.map_type
 	
-	var min_x: int = max(0, start_x)
-	var min_y: int = max(0, start_y)
-	var max_x: int = min(end_x, width)
-	var max_y: int = min(end_y, height)
+	var start_x: int = center_index.x - (map.width / 2)
+	var start_y: int = center_index.y - (map.height / 2)
+	var map_anchor: Vector2 = Vector2(start_x, start_y) * cell_size
+	for y in range(0, map.height, 1):
+		for x in range(0, map.width, 1):
+			var cell_center: Vector2 
+			var adj_value: float = 0.0
+			
+			map.set_cell_value(y, x, 0.0)
 	
-	for y in range(min_y, max_y + 1, 1):
-		for x in range(min_x, max_x + 1, 1):
-			var p: Vector2 = Vector2(center_x, center_y)
-			var q: Vector2 = Vector2(x, y)
-			var distance: float = q.distance_to(p)
-			var normalized_distance: float = distance / sqrt(radius)
-			var prop_value: float = magnitude - magnitude * normalized_distance # basic linear drop off
-			set_cell_value(x, y, prop_value)
+	return
 
 func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 	var radius: int = height

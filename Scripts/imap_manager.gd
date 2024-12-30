@@ -32,22 +32,21 @@ func register_agents(agents: Array) -> void:
 
 func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 	for imap_type in current_maps:
-		var agent_template_map: Imap = agent.template_maps[imap_type]
+		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
 		var prev_cell_index: Vector2 = map.find_cell_index_from_position(prev_position)
 		var current_cell_index: Vector2 = map.find_cell_index_from_position(agent.global_position)
-		if prev_cell_index == current_cell_index: # until i calculate edges and nearest neighor cells
-			continue
+		#var adjust_imap: Imap = map.correct_influence(template_map, current_cell_index, agent.global_position)
 		if prev_position == Vector2.ZERO:
-			map.add_map(agent_template_map, current_cell_index.x, current_cell_index.y, 1.0)
+			map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
 			continue
-		map.add_map(agent_template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
-		map.add_map(agent_template_map, current_cell_index.x, current_cell_index.y, 1.0)
+		map.add_map(template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
+		map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
 
 func _on_agent_destroyed(agent: Ship) -> void:
 	var agent_position: Vector2 = agent.global_position
 	for imap_type in current_maps:
-		var agent_template_map: Imap = agent.template_maps[imap_type]
+		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
 		var cell_index: Vector2 = map.find_cell_index_from_position(agent_position)
-		agent_template_map.add_map(map, cell_index.x, cell_index.y, -1.0)
+		template_map.add_map(map, cell_index.x, cell_index.y, -1.0)

@@ -71,6 +71,7 @@ var idle: bool = true
 
 # Used for combat AI / behavior tree / influence map
 var template_maps: Dictionary = {}
+var adj_template_maps: Dictionary = {}
 var target_in_range: bool = false
 var prev_position: Vector2 = Vector2.ZERO
 

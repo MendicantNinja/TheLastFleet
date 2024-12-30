@@ -384,7 +384,6 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1
-visible = false
 
 [node name="Background" type="TextureRect" parent="SpaceBackground"]
 offset_left = 2.0
@@ -406,74 +405,8 @@ position = Vector2(951, 853)
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(2343, 2014)
 
-[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(10025, 3425)
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(2250, 2000)
 
-[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6598, 4487)
-
-[node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7823, 4569)
-
-[node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6696, 3581)
-
-[node name="TestShip" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0470588, 0.0588235, 1)
-position = Vector2(6443, 1843)
-collision_layer = 4
-
-[node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(6733, 1843)
-collision_layer = 4
-
-[node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(7083, 1843)
-collision_layer = 4
-
-[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(7289, 2068)
-collision_layer = 4
-
-[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(6931, 2078)
-collision_layer = 4
-
-[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(6549, 2073)
-collision_layer = 4
-
-[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0470588, 0.0588235, 1)
-position = Vector2(9517, 1903)
-collision_layer = 4
-
-[node name="TestShip8" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(9807, 1903)
-collision_layer = 4
-
-[node name="TestShip9" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(10157, 1903)
-collision_layer = 4
-
-[node name="TestShip10" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(10363, 2128)
-collision_layer = 4
-
-[node name="TestShip11" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(10005, 2138)
-collision_layer = 4
-
-[node name="TestShip12" parent="." instance=ExtResource("8_kko0w")]
-self_modulate = Color(1, 0.0705882, 0.0470588, 1)
-position = Vector2(9623, 2133)
-collision_layer = 4
+[node name="Marker2D2" type="Marker2D" parent="."]
+position = Vector2(2375, 2125)
