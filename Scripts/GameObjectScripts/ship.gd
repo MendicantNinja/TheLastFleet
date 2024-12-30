@@ -343,7 +343,7 @@ func _input(event: InputEvent) -> void:
 			zoom_value -= Vector2(0.01, 0.01)
 	elif event is InputEventKey:
 		if is_friendly:
-			if (event.keycode == KEY_T and event.pressed) and ship_select:
+			if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
 				toggle_manual_control()
 			elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				toggle_auto_aim(all_weapons)
@@ -375,12 +375,13 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 
 func _on_mouse_entered() -> void:
 	mouse_hover = true
-	for weapon_slot in all_weapons:
-		weapon_slot.toggle_display_aim(mouse_hover)
+	if manual_control == false:
+		for weapon_slot in all_weapons:
+			weapon_slot.toggle_display_aim(mouse_hover)
 
 func _on_mouse_exited() -> void:
 	mouse_hover = false
-	if targeted or (ship_select and manual_control):
+	if targeted or manual_control:
 		return
 	for weapon_slot in all_weapons:
 		weapon_slot.toggle_display_aim(mouse_hover)
@@ -401,6 +402,7 @@ func toggle_manual_control() -> void:
 	
 	if manual_control == false:
 		manual_control = true
+		ship_select = false
 		CombatCamera.position_smoothing_enabled = false
 		CombatCamera.global_position = self.global_position
 	elif manual_control == true:
@@ -448,6 +450,7 @@ func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.set_manual_aim(manual_aim_value)
+		weapon_slot.toggle_display_aim(manual_aim_value)
 
 func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:

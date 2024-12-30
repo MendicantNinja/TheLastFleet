@@ -92,7 +92,7 @@ func _draw() -> void:
 		range_display_color = Color(range_display_color, 0.4)
 		return
 	
-	var divisor: float = 100.0
+	var divisor: float = weapon.range / 2# Change to effective range later from shipmods? Firing arcs need a bit of a rework sometime.
 	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
 	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
 	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))
@@ -100,8 +100,9 @@ func _draw() -> void:
 	var end_transform: Vector2 = default_direction.x.rotated(end_angle)
 	start_angle = start_transform.angle()
 	end_angle = end_transform.angle()
-	for i in range(0, subdivisions):
-		draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
+	if display_aim == true:
+		for i in range(0, subdivisions):
+			draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
 
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image

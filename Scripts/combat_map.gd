@@ -63,7 +63,8 @@ func display_map(map_value: bool) -> void:
 func set_manual_camera(unit: Ship) -> void:
 	if manually_controlled_unit and manually_controlled_unit != unit and manually_controlled_unit != null:
 		manually_controlled_unit.toggle_manual_control()
-	manually_controlled_unit = unit
+		manually_controlled_unit.toggle_manual_aim(manually_controlled_unit.all_weapons, false) # Needed to shut off weapons because the code is fucked.
+	manually_controlled_unit = unit # Discards the old unit, brings in the new.
 #
 #func _on_camera_removed(n_zoom_value: Vector2, offset: Vector2, unit: Ship) -> void:
 	#CombatCamera.enabled = true
