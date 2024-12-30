@@ -6,6 +6,9 @@ var cell_size: float #
 var height: int # height of the map
 var width: int # width of the map
 var map_grid: Array # 2D Array
+var map_type: int
+
+signal update_grid_value(x, y, value)
 
 func _init(new_width: int, new_height: int, x: float = 0.0, y: float = 0.0, new_cell_size: int = 1) -> void:
 	width = int(new_width / new_cell_size)
@@ -27,9 +30,11 @@ func get_cell_value(x: int, y: int) -> float:
 func set_cell_value(x: int, y: int, value: float) -> void:
 	if (x >= 0 && x < width && y >= 0 && y < height):
 		map_grid[x][y] = value
+		update_grid_value.emit(x, y, value)
 
 func add_value(x: int, y: int, value: float) -> void:
 	map_grid[x][y] += value
+	update_grid_value.emit(x, y, map_grid[x][y])
 
 func find_cell_index_from_position(position: Vector2) -> Vector2:
 	var indices: Vector2i = Vector2i.ZERO
@@ -56,7 +61,7 @@ func propagate_influence(center_x: int, center_y: int, radius: int, magnitude: f
 			var distance: float = q.distance_to(p)
 			var normalized_distance: float = distance / sqrt(radius)
 			var prop_value: float = magnitude - magnitude * normalized_distance # basic linear drop off
-			map_grid[x][y] = prop_value
+			set_cell_value(x, y, prop_value)
 
 func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 	var radius: int = height
@@ -66,7 +71,7 @@ func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 			var cell_vector: Vector2 = Vector2(x, y)
 			var distance: float = center.distance_to(cell_vector)
 			var prop_value: float = max(0, magnitude * exp(-distance / sqrt(center.x)))
-			map_grid[x][y] = prop_value
+			set_cell_value(x, y, prop_value)
 
 func propagate_influence_as_ring(magnitude: float = 1.0) -> void:
 	var radius: int = height
@@ -76,7 +81,7 @@ func propagate_influence_as_ring(magnitude: float = 1.0) -> void:
 			var cell_vector: Vector2 = Vector2(x, y)
 			var distance: float = center.distance_to(cell_vector)
 			var prop_value: float = max(0, magnitude * sin(PI*(distance - (radius - 1)) / center.x))
-			map_grid[x][y] = prop_value
+			set_cell_value(x, y, prop_value)
 
 func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 1.0, offset_x: int = 0, offset_y: int = 0) -> void:
 	if source_map == null:
@@ -89,7 +94,7 @@ func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 
 			var target_x: int = x + start_x
 			var target_y: int = y + start_y
 			if (target_x >= 0 && target_x < width && target_y >= 0 && target_y < height):
-				map_grid[target_x][target_y] += source_map.get_cell_value(x, y) * magnitude
+				add_value(x, y, source_map.get_cell_value(x, y) * magnitude)
 
 func add_into_map(target_map: Imap, center_x: int, center_y: int, magnitude: float = 1.0, offset_x: int = 0, offset_y: int = 0) -> void:
 	if target_map == null:

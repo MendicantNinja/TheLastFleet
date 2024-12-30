@@ -20,7 +20,7 @@ var group_targets_key_suffix: StringName = &" targets"
 var target_key: StringName = &"target"
 
 func _ready() -> void:
-	process_mode = PROCESS_MODE_PAUSABLE
+	pass
 
 func _physics_process(_delta) -> void:
 	if available_units.is_empty():

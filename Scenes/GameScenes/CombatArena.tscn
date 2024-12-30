@@ -36,8 +36,21 @@ size = Vector2(17000, 20000)
 bg_color = Color(0, 0, 0, 0.588235)
 
 [node name="CombatArena" type="Node2D"]
-process_mode = 1
 script = ExtResource("1_fx56v")
+
+[node name="ImapDebug" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ImapGridContainer" type="GridContainer" parent="ImapDebug"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
 
 [node name="Admiral" type="Node2D" parent="."]
 script = ExtResource("2_shfex")
@@ -371,6 +384,7 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1
+visible = false
 
 [node name="Background" type="TextureRect" parent="SpaceBackground"]
 offset_left = 2.0

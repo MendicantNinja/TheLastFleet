@@ -36,9 +36,6 @@ var total_flux: float = 0.0
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
-var longest_range_weapon = null
-var shortest_range_weapon = null
-var furthest_safe_distance: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
@@ -72,8 +69,10 @@ var group_velocity: Vector2 = Vector2.ZERO
 var posture: StringName = &""
 var idle: bool = true
 
-# Used for combat
+# Used for combat AI / behavior tree / influence map
+var template_maps: Dictionary = {}
 var target_in_range: bool = false
+var prev_position: Vector2 = Vector2.ZERO
 
 # Used for navigation
 var final_target_position: Vector2 = Vector2.ZERO
@@ -100,6 +99,7 @@ signal camera_removed()
 signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
+signal update_agent_influence(last_position)
 
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -165,6 +165,7 @@ func _ready() -> void:
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
 	
+	add_to_group(&"agent")
 	if collision_layer == 1:
 		add_to_group(&"friendly")
 		is_friendly = true
@@ -188,16 +189,6 @@ func _ready() -> void:
 		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
 		#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
 		#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
-	
-	var weapon_ranges: Dictionary = {}
-	for weapon_slot in all_weapons:
-		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
-	var max_range: float = weapon_ranges.keys().max()
-	var min_range: float = weapon_ranges.keys().min()
-	longest_range_weapon = weapon_ranges[max_range]
-	shortest_range_weapon = weapon_ranges[min_range]
-	furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
-	furthest_safe_distance += longest_range_weapon.weapon.range
 	
 	deploy_ship()
 	toggle_auto_aim(all_weapons)
@@ -223,6 +214,7 @@ func process_damage(projectile: Projectile) -> void:
 func destroy_ship() -> void:
 	destroyed.emit()
 	remove_from_group(group_name)
+	remove_from_group(&"agent")
 	var group: Array = get_tree().get_nodes_in_group(group_name)
 	if group_leader == true and group.size() > 1:
 		var unit_range: int = group.size() - 1
@@ -488,6 +480,11 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
+	if Engine.get_physics_frames() % 60 == 0 and global_position != prev_position:
+		update_agent_influence.emit(prev_position)
+		prev_position = global_position
+
+
 	if movement_delta == 0.0 or rotational_delta == 0.0:
 		movement_delta = speed * delta
 		rotational_delta = ship_stats.turn_rate * delta

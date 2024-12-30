@@ -1,5 +1,7 @@
 extends Node2D
 
+const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
+
 @onready var CombatMap = $CombatMap
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
@@ -10,11 +12,16 @@ extends Node2D
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 @onready var ComputerAdmiral = $Admiral
+@onready var ImapDebug = $ImapDebug
+@onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
+var debug_imap: bool = true
 var influence_map: Imap
+var imap_debug_grid: Array
 #var local_influence_map: Imap
 
 func _ready() -> void:
+	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
 	TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
@@ -25,6 +32,21 @@ func _ready() -> void:
 	var max_height: int = PlayableAreaBounds.shape.size.y
 	var max_cell_size: int = 250
 	influence_map = Imap.new(max_width, max_height, 0.0, 0.0, max_cell_size)
+	
+	if debug_imap == true:
+		influence_map.update_grid_value.connect(_on_grid_value_changed)
+		var grid_row_size: int = influence_map.map_grid.size()
+		var grid_column_size: int = influence_map.map_grid[0].size()
+		ImapDebug.size = PlayableAreaBounds.shape.size
+		ImapDebugGrid.columns = grid_column_size
+		for i in range(grid_row_size):
+			imap_debug_grid.append([])
+			for j in range(grid_column_size):
+				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
+				cell_instance.custom_minimum_size = Vector2.ONE * max_cell_size
+				cell_instance.get_child(0).text = str(influence_map.get_cell_value(i, j))
+				ImapDebugGrid.add_child(cell_instance)
+				imap_debug_grid.append([cell_instance])
 	
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
@@ -40,10 +62,11 @@ func _ready() -> void:
 		connect_ship_signals(friendly_ship)
 
 func _process(delta) -> void:
-	if get_tree().get_node_count_in_group(&"friendly") == 0 and ComputerAdmiral.AdmiralAI.enabled == true:
-		ComputerAdmiral.AdmiralAI.toggle_root(false)
-	if get_tree().get_node_count_in_group(&"friendly") > 0 and ComputerAdmiral.AdmiralAI.enabled == false:
-		ComputerAdmiral.AdmiralAI.toggle_root(true)
+	pass
+	#if get_tree().get_node_count_in_group(&"friendly") == 0 and ComputerAdmiral.AdmiralAI.enabled == true:
+		#ComputerAdmiral.AdmiralAI.toggle_root(false)
+	#if get_tree().get_node_count_in_group(&"friendly") > 0 and ComputerAdmiral.AdmiralAI.enabled == false:
+		#ComputerAdmiral.AdmiralAI.toggle_root(true)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
@@ -74,6 +97,9 @@ func _on_switch_maps() -> void:
 		TacticalMap.display_map(false)
 	
 	get_viewport().set_input_as_handled()
+
+func _on_grid_value_changed(x, y, value) -> void:
+	imap_debug_grid[x][y].get_child(0).text = str(value)
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.
