@@ -37,11 +37,16 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 		var prev_cell_index: Vector2 = map.find_cell_index_from_position(prev_position)
 		var current_cell_index: Vector2 = map.find_cell_index_from_position(agent.global_position)
 		#var adjust_imap: Imap = map.correct_influence(template_map, current_cell_index, agent.global_position)
+		if prev_cell_index == current_cell_index:
+			continue
 		if prev_position == Vector2.ZERO:
 			map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
+			#agent.adj_template_maps[imap_type] = adjust_imap
 			continue
+		#var prev_adjust_imap: Imap = agent.adj_template_maps[imap_type]
 		map.add_map(template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
 		map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
+		#agent.adj_template_maps[imap_type] = adjust_imap
 
 func _on_agent_destroyed(agent: Ship) -> void:
 	var agent_position: Vector2 = agent.global_position

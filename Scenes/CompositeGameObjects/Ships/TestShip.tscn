@@ -97,11 +97,12 @@ script = ExtResource("5_fqvsw")
 script = ExtResource("5_mwg8y")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
-texture_filter = 3
+texture_filter = 1
 rotation = 1.5708
 texture = ExtResource("12_6r768")
 
 [node name="ShipLivery" type="Sprite2D" parent="."]
+texture_filter = 1
 rotation = 1.5708
 texture = ExtResource("13_bdbdv")
 
@@ -234,5 +235,4 @@ action_mode = 0
 button_mask = 0
 stretch_mode = 0
 
-[connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

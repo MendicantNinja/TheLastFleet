@@ -54,7 +54,6 @@ var current_target_id: RID = RID()
 var owner_rid: RID = RID()
 
 signal weapon_slot_fired(flux)
-signal remove_manual_camera(camera)
 signal target_in_range(value)
 signal new_threats(targets)
 signal threat_exited(targets)
@@ -86,7 +85,8 @@ func fire(ship_id: int) -> void:
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
 	weapon_mount = p_weapon_mount
 	weapon = p_weapon
-
+	
+@warning_ignore("integer_division")
 func _draw() -> void:
 	if not manual_aim and not display_aim:
 		range_display_color = Color(range_display_color, 0.4)
@@ -307,8 +307,6 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	target_transform = target_transform.scaled(scale_transform)
 	var dot_product: float = default_direction.x.dot(target_transform.x)
 	var angle_to_node: float = acos(dot_product)
-	
-	var direction_to: Vector2 = weapon_node.transform.x.direction_to(target_position)
 	
 	can_look_at = true
 	if angle_to_node > arc_in_radians or dot_product < 0:

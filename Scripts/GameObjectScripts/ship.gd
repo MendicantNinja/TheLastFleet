@@ -16,7 +16,6 @@ class_name Ship
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var all_weapons: Array[WeaponSlot]
 
-var blackboard: Blackboard
 var ManualControlCamera: Camera2D = null
 
 # Temporary variables
@@ -122,7 +121,6 @@ func deploy_ship() -> void:
 		$ShipLivery.self_modulate = settings.enemy_color
 
 func _ready() -> void:
-	blackboard = CombatBehaviorTree.blackboard
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	
@@ -485,14 +483,14 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
-	if Engine.get_physics_frames() % 60 == 0 and global_position != prev_position:
+	if Engine.get_physics_frames() % 100 == 0 and global_position != prev_position:
 		update_agent_influence.emit(prev_position)
 		prev_position = global_position
-
 
 	if movement_delta == 0.0 or rotational_delta == 0.0:
 		movement_delta = speed * delta
 		rotational_delta = ship_stats.turn_rate * delta
+		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	if manual_control and Input.is_action_pressed("vent flux"):
 		if soft_flux > 0.0:
@@ -517,40 +515,6 @@ func _physics_process(delta: float) -> void:
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
 		Input.get_action_strength("D") - Input.get_action_strength("A"))
-	
-	if ShipNavigationAgent.get_max_speed() != movement_delta:
-		ShipNavigationAgent.set_max_speed(movement_delta)
-	
-	var ship_query: Dictionary = {}
-	#if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		#ship_query = collision_raycast(global_position, target_position, 7, true, false)
-	
-	var sweep_vectors: Array[Vector2] = []
-	if not ship_query.is_empty():
-		var collider_instance: Node = instance_from_id(ship_query["collider_id"])
-		var collider_center: Vector2 = collider_instance.global_position
-		var target_query: Dictionary = collision_raycast(target_position, collider_center, 7, true, false)
-		var start_angle: float = -PI/4
-		var increment_angle: float = PI/16
-		var sweep_range: int = 8
-		if collider_instance.collision_layer != collision_layer:
-			sweep_vectors = radial_vector_sweep(ship_query, target_query, start_angle, increment_angle, sweep_range)
-	
-	# raycast_sweep() returns an empty array if sweep_vectors is empty
-	var valid_paths: Array[Vector2] = raycast_sweep(sweep_vectors, target_position)
-	if not sweep_vectors.is_empty() and valid_paths.is_empty():
-		valid_paths = raycast_sweep(sweep_vectors, global_position)
-	
-	if intermediate_pathing == false and not valid_paths.is_empty() and not ShipNavigationAgent.is_navigation_finished():
-		intermediate_pathing = true
-		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
-		final_target_position = target_position
-		NavigationTimer.start()
-	# Do this after finishing the intermediate pathing.
-	elif intermediate_pathing == true and ShipNavigationAgent.is_navigation_finished():
-		target_position = final_target_position
-		ShipNavigationAgent.set_target_position(target_position)
-		intermediate_pathing = false
 	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
@@ -661,10 +625,6 @@ func find_closest_target(available_targets: Array) -> Ship:
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
 	var results: Dictionary = {}
-	# If there are bizarre pathing issues, this may be part of the reason why. Review _physics_process for
-	# any potential edge case issues.
-	#if intermediate_pathing == false and ShipNavigationAgent.is_navigation_finished():
-	#	return results
 	
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(from, to, collision_bitmask, [self])
@@ -762,9 +722,3 @@ func _on_NavigationTimer_timeout() -> void:
 		valid_paths = raycast_sweep(sweep_vectors, global_position)
 	elif not valid_paths.is_empty():
 		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
-
-# if this fails to fix the problem with avoidance, oh well
-# somebody else can code this because im pretty much burnt on this stuff
-func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
-	if safe_velocity != Vector2.ZERO:
-		linear_velocity += safe_velocity / 2.0

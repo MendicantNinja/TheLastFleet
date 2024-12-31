@@ -10,6 +10,7 @@ var map_type: int
 
 signal update_grid_value(x, y, value)
 
+@warning_ignore("integer_division")
 func _init(new_width: int, new_height: int, x: float = 0.0, y: float = 0.0, new_cell_size: int = 1) -> void:
 	width = int(new_width / new_cell_size)
 	height = int(new_height / new_cell_size)
@@ -36,6 +37,7 @@ func add_value(x: int, y: int, value: float) -> void:
 	map_grid[x][y] += value
 	update_grid_value.emit(x, y, map_grid[x][y])
 
+@warning_ignore("integer_division", "narrowing_conversion")
 func find_cell_index_from_position(position: Vector2) -> Vector2:
 	var indices: Vector2i = Vector2i.ZERO
 	var cell_column: int = position.x / cell_size
@@ -43,22 +45,34 @@ func find_cell_index_from_position(position: Vector2) -> Vector2:
 	indices = Vector2i(cell_column, cell_row)
 	return indices
 
+@warning_ignore("integer_division", "narrowing_conversion")
 func correct_influence(map: Imap, center_index: Vector2, position: Vector2) -> Imap:
 	var dupe_imap: Imap = Imap.new(map.height, map.width, 0.0, 0.0, map.cell_size)
 	dupe_imap.map_type = map.map_type
 	
+	var center_pos: Vector2 = Vector2(center_index.x, center_index.y) * cell_size
+	center_pos = Vector2(center_pos.x + cell_size / 2, center_pos.y + cell_size / 2)
+	
 	var start_x: int = center_index.x - (map.width / 2)
 	var start_y: int = center_index.y - (map.height / 2)
 	var map_anchor: Vector2 = Vector2(start_x, start_y) * cell_size
+	var adj_y: int = 0
 	for y in range(0, map.height, 1):
+		var adj_x: int = 0
+		adj_y += 1
 		for x in range(0, map.width, 1):
-			var cell_center: Vector2 
-			var adj_value: float = 0.0
-			
-			map.set_cell_value(y, x, 0.0)
-	
-	return
+			adj_x += 1
+			var cell_corner: Vector2 = Vector2(map_anchor.x * adj_x, map_anchor.y * adj_y)
+			var cell_center: Vector2 = Vector2(cell_corner.x + cell_size / 2, cell_corner.y + cell_size / 2)
+			var distance_to_center_cell: float = cell_corner.distance_to(center_pos)
+			var distance_to_pos: float = cell_center.distance_to(position)
+			var norm_distance: float = distance_to_pos / distance_to_center_cell
+			var cell_value: float = map.get_cell_value(x, y)
+			var adj_value: float = cell_value + (cell_value * (1 - norm_distance))
+			dupe_imap.set_cell_value(y, x, adj_value)
+	return dupe_imap
 
+@warning_ignore("integer_division")
 func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 	var radius: int = height
 	var center: Vector2 = Vector2(((radius - 1) / 2), ((radius - 1) / 2))
@@ -69,6 +83,7 @@ func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 			var prop_value: float = max(0, magnitude * exp(-distance / sqrt(center.x)))
 			set_cell_value(x, y, prop_value)
 
+@warning_ignore("integer_division")
 func propagate_influence_as_ring(magnitude: float = 1.0) -> void:
 	var radius: int = height
 	var center: Vector2 = Vector2(((radius - 1) / 2), ((radius - 1) / 2))
@@ -79,6 +94,7 @@ func propagate_influence_as_ring(magnitude: float = 1.0) -> void:
 			var prop_value: float = max(0, magnitude * sin(PI*(distance - (radius - 1)) / center.x))
 			set_cell_value(x, y, prop_value)
 
+@warning_ignore("integer_division")
 func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 1.0, offset_x: int = 0, offset_y: int = 0) -> void:
 	if source_map == null:
 		assert(source_map != null, "source map required for adding maps together is null")
@@ -90,8 +106,10 @@ func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 
 			var target_x: int = x + start_x
 			var target_y: int = y + start_y
 			if (target_x >= 0 && target_x < width && target_y >= 0 && target_y < height):
-				add_value(target_y, target_x, source_map.get_cell_value(x, y) * magnitude)
-
+				map_grid[target_y][target_x] += source_map.map_grid[x][y] * magnitude
+				update_grid_value.emit(target_y, target_x, map_grid[target_y][target_x])
+	
+@warning_ignore("integer_division")
 func add_into_map(target_map: Imap, center_x: int, center_y: int, magnitude: float = 1.0, offset_x: int = 0, offset_y: int = 0) -> void:
 	if target_map == null:
 		assert(target_map != null, "target map required for adding into current map is null")
@@ -117,4 +135,4 @@ func add_into_map(target_map: Imap, center_x: int, center_y: int, magnitude: flo
 		for x in range(min_x, max_x, 1):
 			var source_x: int = x + start_x - neg_adj_x
 			var source_y: int = y + start_y - neg_adj_y
-			target_map.add_value(y, x, map_grid[x][y] * magnitude)
+			target_map.add_value(y, x, map_grid[source_x][source_y] * magnitude)

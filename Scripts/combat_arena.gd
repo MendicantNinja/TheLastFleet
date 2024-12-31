@@ -42,6 +42,7 @@ func _ready() -> void:
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.max_cell_size
 				cell_instance.get_child(0).text = str(occupancy_map.get_cell_value(i, j))
+				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
 	
@@ -98,7 +99,12 @@ func _on_switch_maps() -> void:
 	get_viewport().set_input_as_handled()
 
 func _on_grid_value_changed(x, y, value) -> void:
-	imap_debug_grid[x][y].get_child(0).text = str(snappedf(value, 0.001))
+	var adj_value: float = snappedf(value, 0.001)
+	if adj_value != 0.0:
+		imap_debug_grid[x][y].get_child(0).visible = true
+		imap_debug_grid[x][y].get_child(0).text = str(adj_value)
+	else:
+		imap_debug_grid[x][y].get_child(0).visible = false
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.
