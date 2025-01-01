@@ -70,9 +70,10 @@ var idle: bool = true
 
 # Used for combat AI / behavior tree / influence map
 var template_maps: Dictionary = {}
-var adj_template_maps: Dictionary = {}
+var template_cell_indices: Dictionary = {}
 var target_in_range: bool = false
 var prev_position: Vector2 = Vector2.ZERO
+#var adj_template_maps: Dictionary = {}
 
 # Used for navigation
 var final_target_position: Vector2 = Vector2.ZERO
@@ -167,15 +168,14 @@ func _ready() -> void:
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE] = occupancy_template.template_maps[1]
-		
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
 		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
 		CombatBehaviorTree.toggle_root(false)
 	else:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE] = occupancy_template.template_maps[1]
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
 		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2

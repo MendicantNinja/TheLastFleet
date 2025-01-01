@@ -44,23 +44,22 @@ func register_agents(agents: Array) -> void:
 
 func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 	for imap_type in current_maps:
-		var template_map: Imap
-		if imap_type == MapType.OCCUPANCY_MAP and agent.is_friendly:
-			template_map = agent.template_maps[TemplateType.INVERT_OCCUPANCY_TEMPLATE]
-		else:
-			template_map = agent.template_maps[imap_type]
+		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
-		var prev_cell_index: Vector2 = map.find_cell_index_from_position(prev_position)
 		var current_cell_index: Vector2 = map.find_cell_index_from_position(agent.global_position)
 		#var adjust_imap: Imap = map.correct_influence(template_map, current_cell_index, agent.global_position)
 		if prev_position == Vector2.ZERO:
 			map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
-			#agent.adj_template_maps[imap_type] = adjust_imap
+			agent.template_cell_indices[imap_type] = current_cell_index
 			continue
-		#var prev_adjust_imap: Imap = agent.adj_template_maps[imap_type]
+		var center_cell_pos: Vector2 = Vector2(current_cell_index.x, current_cell_index.y) * map.cell_size
+		var distance_to_agent: float = center_cell_pos.distance_to(agent.global_position)
+		if distance_to_agent < max_cell_size:
+			continue
+		var prev_cell_index: Vector2 = agent.template_cell_indices[imap_type]
 		map.add_map(template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
 		map.add_map(template_map, current_cell_index.x, current_cell_index.y, 1.0)
-		#agent.adj_template_maps[imap_type] = adjust_imap
+		agent.template_cell_indices[imap_type] = current_cell_index
 
 func _on_agent_destroyed(agent: Ship) -> void:
 	var agent_position: Vector2 = agent.global_position

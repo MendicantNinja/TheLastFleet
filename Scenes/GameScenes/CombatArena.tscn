@@ -400,57 +400,57 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2703, 5408)
+position = Vector2(6980, 15671)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3067, 5404)
+position = Vector2(7344, 15667)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3440, 5416)
+position = Vector2(7717, 15679)
 
 [node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3804, 5412)
+position = Vector2(8081, 15675)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4163, 5414)
+position = Vector2(8440, 15677)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4527, 5410)
+position = Vector2(8804, 15673)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4900, 5422)
+position = Vector2(9177, 15685)
 
 [node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5264, 5418)
+position = Vector2(9541, 15681)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2370, 2071)
+position = Vector2(7131, 3069)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2696, 2071)
+position = Vector2(7457, 3069)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3032, 2076)
+position = Vector2(7793, 3074)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3358, 2076)
+position = Vector2(8119, 3074)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3700, 2084)
+position = Vector2(8461, 3082)
 collision_layer = 4
 
 [node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4026, 2084)
+position = Vector2(8787, 3082)
 collision_layer = 4
 
 [node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4362, 2089)
+position = Vector2(9123, 3087)
 collision_layer = 4
 
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4688, 2089)
+position = Vector2(9449, 3087)
 collision_layer = 4
