@@ -16,6 +16,5 @@ theme_override_styles/panel = SubResource("StyleBoxEmpty_7642u")
 [node name="Value" type="Label" parent="."]
 texture_filter = 3
 layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 8
+size_flags_horizontal = 4
 theme_override_font_sizes/font_size = 32

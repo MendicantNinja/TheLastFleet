@@ -163,14 +163,19 @@ func _ready() -> void:
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
-	
+	var occupancy_template: ImapTemplate
 	add_to_group(&"agent")
 	if collision_layer == 1:
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE] = occupancy_template.template_maps[1]
+		
 		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
 		CombatBehaviorTree.toggle_root(false)
 	else:
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE] = occupancy_template.template_maps[1]
 		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2
@@ -188,10 +193,6 @@ func _ready() -> void:
 		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
 		#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
 		#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
-	
-	# Placeholder for now
-	var occupancy_template: ImapTemplate = imap_manager.template_maps[imap_manager.MapType.OCCUPANCY_MAP]
-	template_maps[occupancy_template.type] = occupancy_template.template_maps[2]
 	
 	deploy_ship()
 	toggle_auto_aim(all_weapons)

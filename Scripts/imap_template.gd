@@ -1,18 +1,12 @@
 extends Object
 class_name ImapTemplate
 
-enum TemplateType {
-	OCCUPANCY_TEMPLATE, # Occupancy indicates the space a unit occupies and its zone of influence.
-	THREAT_TEMPLATE, # Threat denotes its attack abilities such as the strength of its weapons and accuracy.
-}
-
 var max_radius: int
-var type: TemplateType
+var type: int
 var template_maps: Dictionary = {}
 
 func init_occupancy_map_templates(n_radius: int, magnitude: float = 1.0) -> void:
 	max_radius = n_radius
-	type = TemplateType.OCCUPANCY_TEMPLATE
 	var new_template_maps: Dictionary = {}
 	for r in range(1, max_radius + 1, 1):
 		var size: int = (2 * r) + 1
@@ -23,7 +17,6 @@ func init_occupancy_map_templates(n_radius: int, magnitude: float = 1.0) -> void
 
 func init_threat_map_templates(n_radius: int, magnitude: float = 1.0) -> void:
 	max_radius = n_radius
-	type = TemplateType.THREAT_TEMPLATE
 	var new_template_maps: Dictionary = {}
 	for r in range(1, max_radius + 1, 1):
 		var size: int = (2 * r) + 1

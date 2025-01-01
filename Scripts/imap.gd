@@ -64,12 +64,11 @@ func correct_influence(map: Imap, center_index: Vector2, position: Vector2) -> I
 			adj_x += 1
 			var cell_corner: Vector2 = Vector2(map_anchor.x * adj_x, map_anchor.y * adj_y)
 			var cell_center: Vector2 = Vector2(cell_corner.x + cell_size / 2, cell_corner.y + cell_size / 2)
-			var distance_to_center_cell: float = cell_corner.distance_to(center_pos)
-			var distance_to_pos: float = cell_center.distance_to(position)
-			var norm_distance: float = distance_to_pos / distance_to_center_cell
-			var cell_value: float = map.get_cell_value(x, y)
-			var adj_value: float = cell_value + (cell_value * (1 - norm_distance))
-			dupe_imap.set_cell_value(y, x, adj_value)
+			var corner_to_center: float = cell_corner.distance_to(center_pos)
+			var cc_distance_to_pos: float = cell_center.distance_to(position)
+			var norm_distance: float = cc_distance_to_pos / corner_to_center
+			var adj_value: float = map.map_grid[x][y] + (map.map_grid[x][y] * (1 - norm_distance))
+			dupe_imap.map_grid[y][x] = adj_value
 	return dupe_imap
 
 @warning_ignore("integer_division")
@@ -80,7 +79,7 @@ func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 		for x in range(-radius, radius, 1):
 			var cell_vector: Vector2 = Vector2(x, y)
 			var distance: float = center.distance_to(cell_vector)
-			var prop_value: float = max(0, magnitude * exp(-distance / sqrt(center.x)))
+			var prop_value: float = magnitude - magnitude * (distance / radius)
 			set_cell_value(x, y, prop_value)
 
 @warning_ignore("integer_division")
@@ -105,8 +104,11 @@ func add_map(source_map: Imap, center_x: int, center_y: int, magnitude: float = 
 		for x in range(0, source_map.width, 1):
 			var target_x: int = x + start_x
 			var target_y: int = y + start_y
+			var value: float = map_grid[target_y][target_x] + source_map.map_grid[x][y] * magnitude
+			if snappedf(value, 0.1) == 0.0:
+				value = 0.0
 			if (target_x >= 0 && target_x < width && target_y >= 0 && target_y < height):
-				map_grid[target_y][target_x] += source_map.map_grid[x][y] * magnitude
+				map_grid[target_y][target_x] = value
 				update_grid_value.emit(target_y, target_x, map_grid[target_y][target_x])
 	
 @warning_ignore("integer_division")
