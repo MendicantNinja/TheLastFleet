@@ -4,8 +4,8 @@ extends TextureButton
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	#$OnHoverGlowSheen.hide()
-	self.pressed.connect(self.new_game_pressed)
-	self.pressed.connect(self.on_pressed)
+	settings.swizzle(self, settings.gui_color)
+	self.pressed.connect(self.on_button_pressed)
 	self.focus_entered.connect(self.on_focus_entered)
 	self.mouse_entered.connect(self.on_mouse_entered)
 
@@ -14,7 +14,7 @@ func _process(delta: float) -> void:
 	pass
 
 # Not actually new game, I just copy paste code.
-func new_game_pressed() -> void:
+func on_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/GameScenes/CombatArena.tscn")
 
 func on_focus_entered() -> void:
@@ -39,18 +39,6 @@ func on_mouse_entered() -> void:
 	#self.add_child(gui_noise_player)
 	#
 	#var gui_noise = load("res://Noises of GUI/SpellSkillHover.ogg")
-	#gui_noise_player.stream = gui_noise
-	#gui_noise_player.play()
-	#
-	#await gui_noise_player.finished
-	#gui_noise_player.queue_free()
-
-func on_pressed() -> void:
-	pass
-	#var gui_noise_player: AudioStreamPlayer  = AudioStreamPlayer.new()
-	#self.add_child(gui_noise_player)
-	#
-	#var gui_noise = load("res://Noises of GUI/ButtonConfirm.ogg")
 	#gui_noise_player.stream = gui_noise
 	#gui_noise_player.play()
 	#

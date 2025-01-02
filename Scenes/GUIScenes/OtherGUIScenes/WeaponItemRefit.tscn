@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="1_0fumj"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="2_664h8"]
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/weapon_item_refit.gd" id="3_uhf50"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/weapon_item_refit.gd" id="3_uhf50"]
 [ext_resource type="Texture2D" uid="uid://bxuqhr406b5a4" path="res://Art/WeaponArt/weapon.png" id="4_f17mg"]
 [ext_resource type="Theme" uid="uid://didj7odtya3rd" path="res://ThemesandFonts/Themes/MainMenuButtonTheme.tres" id="5_366w7"]
 [ext_resource type="Texture2D" uid="uid://bmfq47tneelw4" path="res://Art/WeaponArt/weapon_mount_refit_selected.png" id="5_pcb0w"]

@@ -49,6 +49,7 @@ z_as_relative = false
 collision_mask = 15
 input_pickable = true
 gravity_scale = 0.0
+center_of_mass_mode = 1
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10

@@ -1,8 +1,8 @@
 extends TextureButton
 class_name WeaponSlotDisplay
 
-var ship_stats_weapon_slot: WeaponSlot
-var ship_weapon_slot: WeaponSlot
+var ship_stats_weapon_slot: WeaponSlot # weapon slot in the ship_stats data
+var ship_weapon_slot: WeaponSlot # weapon slot in the packed scene
 var square_size: Vector2
 var display_this: bool = false
 @onready var WeaponSelectedRect: TextureRect = %WeaponSelectedRect

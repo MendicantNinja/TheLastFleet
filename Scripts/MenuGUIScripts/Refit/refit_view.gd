@@ -4,7 +4,6 @@ extends Control
 @onready var ShipView = %ShipView
 @onready var InventoryScrollContainer = %InventoryScrollContainer
 @onready var InventoryList = %InventoryList
-
 # Called when the node enters the scene tree for the first time.
 
 @onready var player_fleet: Fleet = game_state.player_fleet
@@ -51,7 +50,7 @@ func update_refit_list() -> void:
 		ship_icon.on_added_to_container()
 		ship_icon.index = i
 
-# Update weapons display when installing or uninstalling weapons, or entering the scene
+# Update weapon inventory when installing or uninstalling weapons, or entering the scene
 func update_weapon_list() -> void:
 	var scene_path: String = "res://Scenes/GUIScenes/OtherGUIScenes/WeaponItemRefit.tscn"
 	var weapon_item_count_scene = load(scene_path)
@@ -75,8 +74,8 @@ func update_weapon_list() -> void:
 		weapon_item.WeaponCount.text = str(weapon_count.number_of_items) + " in inventory"
 		weapon_item.OrdinancePointCount.text = str(data.item_dictionary.get(weapon_count.type_of_item).armament_points)
 		weapon_item.item_slot = weapon_count
-# When a ship is selected in the panel. Set Shipview's child to the new ship.
 
+# When a ship is selected in the panel. Set Shipview's child to the new ship.
 func display_weapon_list(this_weapon_display: TextureButton) -> void:
 	InventoryScrollContainer.visible = true
 	InventoryScrollContainer.global_position.y = this_weapon_display.global_position.y - this_weapon_display.size.y
@@ -99,6 +98,7 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 	ShipView.add_child(ship)
 	ship.position = ShipView.size/2
 	ship.ship_stats = ship_stats
+	%WeaponSystemsButton.update_weapon_list(ship)
 	# Display and Hide Appropriate GUI
 	for i in ship.all_weapons.size():
 		#print("Ship_stats weapon as of this view_ship is ", ship.ship_stats.weapon_slots[i].weapon.weapon_name)
@@ -113,5 +113,6 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 		#ABSOLUTE BULLSHIT HACK: ARBITRARY SCALING OF 1.55 AND MODULATING WEAPON_SLOT_DISPLAY TO TRANSPARENCY. MAY NOT WORK FOR LARGER MOUNTS!!
 		weapon_slot_selection.pivot_offset = -(weapon_slot_selection.size * weapon_slot_selection.scale)  / 1.55
 		weapon_slot_selection.root = self
+		
 
 	ship.CenterCombatHUD.visible = false

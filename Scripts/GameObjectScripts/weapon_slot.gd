@@ -25,6 +25,7 @@ class_name WeaponSlot
 			weapon_mount_image.texture = value.image
 		else:
 			return
+@export var weapon_system_group = null
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
@@ -92,7 +93,7 @@ func _draw() -> void:
 		range_display_color = Color(range_display_color, 0.4)
 		return
 	
-	var divisor: float = weapon.range / 2# Change to effective range later from shipmods? Firing arcs need a bit of a rework sometime.
+	var divisor: float = weapon.range # Change to effective range later from shipmods? Firing arcs need a bit of a rework sometime.
 	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
 	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
 	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))

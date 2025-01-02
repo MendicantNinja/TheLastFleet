@@ -22,7 +22,6 @@ class_name Ship
 @onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
-@onready var all_weapons: Array[WeaponSlot]
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -61,6 +60,7 @@ var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 
 # Used for targeting and weapons.
+var all_weapons: Array[WeaponSlot]
 var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
 
@@ -106,6 +106,7 @@ signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
 
+# Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
 	
@@ -199,16 +200,17 @@ func _ready() -> void:
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:
 		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
+	toggle_auto_aim(all_weapons)
+	toggle_auto_fire(all_weapons)
+
 	var max_range: float = weapon_ranges.keys().max()
 	var min_range: float = weapon_ranges.keys().min()
 	longest_range_weapon = weapon_ranges[max_range]
 	shortest_range_weapon = weapon_ranges[min_range]
 	furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
 	furthest_safe_distance += longest_range_weapon.weapon.range
-	
+
 	deploy_ship()
-	toggle_auto_aim(all_weapons)
-	toggle_auto_fire(all_weapons)
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
@@ -555,10 +557,10 @@ func _physics_process(delta: float) -> void:
 	if manual_control:
 		#if ManualControlCamera.zoom != zoom_value:
 			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
-		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("E") - Input.get_action_strength("Q"))
+		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-		Input.get_action_strength("D") - Input.get_action_strength("A"))
+		Input.get_action_strength("E") - Input.get_action_strength("Q"))
 	
 	if ShipNavigationAgent.get_max_speed() != movement_delta:
 		ShipNavigationAgent.set_max_speed(movement_delta)

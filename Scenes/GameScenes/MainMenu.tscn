@@ -1,15 +1,15 @@
 [gd_scene load_steps=11 format=3 uid="uid://825w50grrkcp"]
 
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/main_menu.gd" id="1_a5rc2"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/main_menu.gd" id="1_a5rc2"]
 [ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="2_gxqpj"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="3_x54xu"]
 [ext_resource type="Texture2D" uid="uid://b7si0v1od6beq" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_03-1024x1024.png" id="3_yxwyn"]
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/list_container.gd" id="4_d31sy"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/list_container.gd" id="4_d31sy"]
 [ext_resource type="Theme" uid="uid://didj7odtya3rd" path="res://ThemesandFonts/Themes/MainMenuButtonTheme.tres" id="4_dnp8m"]
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/new_game.gd" id="4_k0np7"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/new_game.gd" id="4_k0np7"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="6_4abs8"]
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/skirmish_button.gd" id="8_jhx2c"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/skirmish_button.gd" id="8_jhx2c"]
 
 [node name="Control" type="Control"]
 layout_mode = 3

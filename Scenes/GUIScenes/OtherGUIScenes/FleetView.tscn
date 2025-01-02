@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://dt4vyn32lj4k7"]
 
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/fleet_view.gd" id="1_xl2dq"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Fleet/fleet_view.gd" id="1_xl2dq"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_u0qfe"]
 [ext_resource type="Theme" uid="uid://dmjchh3dcnesd" path="res://ThemesandFonts/Themes/FleetOverviewTheme.tres" id="3_td5wy"]
 

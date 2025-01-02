@@ -1,7 +1,25 @@
-[gd_scene load_steps=3 format=3 uid="uid://j6uwhl87p0k2"]
+[gd_scene load_steps=13 format=3 uid="uid://j6uwhl87p0k2"]
 
-[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/refit_view.gd" id="1_qbvn6"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/refit_view.gd" id="1_qbvn6"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="2_5uptw"]
+[ext_resource type="Theme" uid="uid://didj7odtya3rd" path="res://ThemesandFonts/Themes/MainMenuButtonTheme.tres" id="3_kupwg"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/weapon_system_display.gd" id="3_wxwge"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="4_ikkrg"]
+[ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="4_mxloi"]
+[ext_resource type="Texture2D" uid="uid://blbr2v8ctmjnv" path="res://Art/GUIArt/checkerbox_30x30.png" id="5_65bll"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_rhyi2"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/weapon_systems_button.gd" id="6_3xhs0"]
+[ext_resource type="Texture2D" uid="uid://d2yi5yhs03wvg" path="res://Art/GUIArt/checkerbox_filled_30x30_2.png" id="6_xoo0c"]
+[ext_resource type="Texture2D" uid="uid://cx4j1uwybbjf8" path="res://Art/GUIArt/blank_box_30x30.png" id="7_kbb73"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0u4a"]
+bg_color = Color(0.0609897, 0.0734619, 0.0546385, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.37, 0.37, 0.37, 1)
+border_blend = true
 
 [node name="RefitView" type="Control"]
 layout_mode = 3
@@ -44,14 +62,13 @@ theme = ExtResource("2_5uptw")
 [node name="ShipView" type="Panel" parent="."]
 unique_name_in_owner = true
 layout_mode = 0
-offset_left = 384.0
-offset_right = 1919.0
+offset_left = 385.0
+offset_right = 1920.0
 offset_bottom = 1083.0
 mouse_filter = 2
 
 [node name="InventoryScrollContainer" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
-visible = false
 clip_contents = false
 layout_mode = 1
 offset_left = 441.0
@@ -64,3 +81,217 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
+
+[node name="WeaponSystemDisplayPanel" type="Panel" parent="."]
+layout_mode = 0
+offset_left = 392.0
+offset_top = 215.0
+offset_right = 896.0
+offset_bottom = 531.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_y0u4a")
+
+[node name="Title" type="RichTextLabel" parent="WeaponSystemDisplayPanel"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -179.5
+offset_right = 179.5
+offset_bottom = 40.0
+grow_horizontal = 2
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]Weapon System Assignment"
+autowrap_mode = 0
+
+[node name="WeaponSystemDisplay" type="GridContainer" parent="WeaponSystemDisplayPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 29.0
+offset_top = 75.0
+offset_right = 446.0
+offset_bottom = 262.0
+theme_override_constants/v_separation = 12
+columns = 9
+script = ExtResource("3_wxwge")
+
+[node name="WeaponSystemNumberTitle" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 1, 0.517647, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "WEAPON SYSTEM ID"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]1"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber2" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]2"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber3" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]3"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber4" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]4"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber5" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]5"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber6" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]6"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber7" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]7"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemNumber8" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 0.92549, 1, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "[center]8"
+fit_content = true
+autowrap_mode = 0
+
+[node name="AutofireLabel" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 1, 0.517647, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "Enable Autofire"
+fit_content = true
+autowrap_mode = 0
+
+[node name="CheckBox" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox2" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox3" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox4" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox5" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox6" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox7" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="CheckBox8" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+layout_mode = 2
+texture_normal = ExtResource("5_65bll")
+texture_pressed = ExtResource("6_xoo0c")
+texture_hover = ExtResource("7_kbb73")
+
+[node name="TestTitle" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
+self_modulate = Color(0.501961, 1, 0.517647, 1)
+layout_mode = 2
+size_flags_horizontal = 3
+theme = ExtResource("4_mxloi")
+bbcode_enabled = true
+text = "railgun"
+fit_content = true
+autowrap_mode = 0
+
+[node name="WeaponSystemsButton" type="TextureButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 395.0
+offset_top = 692.0
+offset_right = 895.0
+offset_bottom = 792.0
+theme = ExtResource("3_kupwg")
+texture_normal = ExtResource("4_ikkrg")
+texture_hover = ExtResource("5_rhyi2")
+script = ExtResource("6_3xhs0")
+
+[node name="Weapon Systems" type="RichTextLabel" parent="WeaponSystemsButton"]
+layout_mode = 0
+offset_top = 28.0
+offset_right = 500.0
+offset_bottom = 74.0
+theme = ExtResource("3_kupwg")
+bbcode_enabled = true
+text = "[center]Weapon Systems"
+fit_content = true
