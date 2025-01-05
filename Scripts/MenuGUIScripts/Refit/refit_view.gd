@@ -11,7 +11,6 @@ extends Control
 
 var ship_weapons_display: Array[TextureButton]
 var displayed_ship: int
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	settings.swizzle(RefitPanel, settings.gui_color)
@@ -25,18 +24,16 @@ func _process(delta):
 # Hide the weapon list if left clicked in an empty area AKA no GUI element handled it
 func _gui_input(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		hide_weapon_list()
 		if get_viewport().gui_get_focus_owner() is WeaponSlotDisplay:
 			get_viewport().gui_get_focus_owner().release_focus()
-		
+	pass
 
 # Create the ships in the list and the ability to scroll down
 func update_refit_list() -> void:
 	var scene_path: String = "res://Scenes/GUIScenes/OtherGUIScenes/FleetGUIShipIcon.tscn"
 	var fleet_gui_icon_scene = load(scene_path)
 	# Populate the GUI with a list of ships in the fleet from 0 to i. 
-	var children = RefitList.get_children()
-	for child in children:
+	for child in RefitList.get_children():
 		child.free()
 	for i in range(player_fleet_stats.ships.size()):
 		var ship_icon: FleetShipIcon = fleet_gui_icon_scene.instantiate()
@@ -49,6 +46,9 @@ func update_refit_list() -> void:
 		ship_icon.pivot_offset = ship_icon.custom_minimum_size/2 - position
 		ship_icon.on_added_to_container()
 		ship_icon.index = i
+		if i == 0:
+			ship_icon.emit_signal("pressed")
+			ship_icon.set_pressed_no_signal(true)
 
 # Update weapon inventory when installing or uninstalling weapons, or entering the scene
 func update_weapon_list() -> void:
@@ -75,17 +75,16 @@ func update_weapon_list() -> void:
 		weapon_item.OrdinancePointCount.text = str(data.item_dictionary.get(weapon_count.type_of_item).armament_points)
 		weapon_item.item_slot = weapon_count
 
-# When a ship is selected in the panel. Set Shipview's child to the new ship.
-func display_weapon_list(this_weapon_display: TextureButton) -> void:
+func display_weapon_list(this_weapon_display: Panel) -> void:
 	InventoryScrollContainer.visible = true
 	InventoryScrollContainer.global_position.y = this_weapon_display.global_position.y - this_weapon_display.size.y
 	InventoryScrollContainer.global_position.x = this_weapon_display.global_position.x - InventoryList.size.x - 50
+	queue_redraw()
 
 func hide_weapon_list() -> void:
 	InventoryScrollContainer.visible = false
 
-# View whatever ship you've selected from the list.
-
+# When a ship is selected in the panel. Set Shipview's child to the new ship.
 func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 	# Clear ship. Clear weapon buttons.
 	#if player_fleet_stats.ships[0] == ship_stats:
@@ -98,7 +97,7 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 	ShipView.add_child(ship)
 	ship.position = ShipView.size/2
 	ship.ship_stats = ship_stats
-	%WeaponSystemsButton.update_weapon_list(ship)
+	%WeaponSystemDisplay.update_weapon_systems(ship)
 	# Display and Hide Appropriate GUI
 	for i in ship.all_weapons.size():
 		#print("Ship_stats weapon as of this view_ship is ", ship.ship_stats.weapon_slots[i].weapon.weapon_name)
@@ -106,13 +105,19 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 		weapon_slot_selection.ship_weapon_slot = ship.all_weapons[i]
 		weapon_slot_selection.ship_stats_weapon_slot = ship.ship_stats.weapon_slots[i]
 		ShipView.add_child(weapon_slot_selection)
-		#Perhaps adjusting this to be ship_stats_stats.weapon_slots somehow or setting scale for every weapon slot in code based on size could help so that a hack does not have to be used.
-		weapon_slot_selection.scale = ship.all_weapons[i].weapon_mount_image.scale
-		weapon_slot_selection.square_size = ship.all_weapons[i].weapon_mount_image.get_rect().size
-		weapon_slot_selection.global_position = ship.all_weapons[i].weapon_mount_image.global_position
-		#ABSOLUTE BULLSHIT HACK: ARBITRARY SCALING OF 1.55 AND MODULATING WEAPON_SLOT_DISPLAY TO TRANSPARENCY. MAY NOT WORK FOR LARGER MOUNTS!!
-		weapon_slot_selection.pivot_offset = -(weapon_slot_selection.size * weapon_slot_selection.scale)  / 1.55
+		weapon_slot_selection.global_position = ship.all_weapons[i].global_position
+		weapon_slot_selection.custom_minimum_size = weapon_slot_selection.ship_weapon_slot.weapon_mount_image.texture.get_size() * .6
+		weapon_slot_selection.size = weapon_slot_selection.custom_minimum_size
+		weapon_slot_selection.position -= weapon_slot_selection.size/2
+		weapon_slot_selection.WeaponSelectedRect.custom_minimum_size = weapon_slot_selection.ship_weapon_slot.weapon_mount_image.texture.get_size()
 		weapon_slot_selection.root = self
 		
-
 	ship.CenterCombatHUD.visible = false
+
+func _draw() -> void: 
+	var weapon_slot_display: WeaponSlotDisplay
+	if get_viewport().gui_get_focus_owner() is WeaponSlotDisplay:
+			weapon_slot_display = get_viewport().gui_get_focus_owner()
+	else:
+		return
+	draw_rect(Rect2(weapon_slot_display.global_position, weapon_slot_display.custom_minimum_size * 1.4), Color(0.765, 0.404, 0.129, 255), true)

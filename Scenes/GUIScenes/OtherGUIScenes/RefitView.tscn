@@ -10,7 +10,7 @@
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="5_rhyi2"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/weapon_systems_button.gd" id="6_3xhs0"]
 [ext_resource type="Texture2D" uid="uid://d2yi5yhs03wvg" path="res://Art/GUIArt/checkerbox_filled_30x30_2.png" id="6_xoo0c"]
-[ext_resource type="Texture2D" uid="uid://cx4j1uwybbjf8" path="res://Art/GUIArt/blank_box_30x30.png" id="7_kbb73"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/autofire_check_box.gd" id="8_dgrbk"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_y0u4a"]
 bg_color = Color(0.0609897, 0.0734619, 0.0546385, 1)
@@ -69,6 +69,7 @@ mouse_filter = 2
 
 [node name="InventoryScrollContainer" type="ScrollContainer" parent="."]
 unique_name_in_owner = true
+visible = false
 clip_contents = false
 layout_mode = 1
 offset_left = 441.0
@@ -82,12 +83,38 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
+[node name="WeaponSystemsButton" type="TextureButton" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+offset_left = 390.0
+offset_top = 833.0
+offset_right = 890.0
+offset_bottom = 933.0
+theme = ExtResource("3_kupwg")
+texture_normal = ExtResource("4_ikkrg")
+texture_hover = ExtResource("5_rhyi2")
+script = ExtResource("6_3xhs0")
+
+[node name="Weapon Systems" type="RichTextLabel" parent="WeaponSystemsButton"]
+layout_mode = 0
+offset_top = 28.0
+offset_right = 500.0
+offset_bottom = 74.0
+mouse_filter = 2
+theme = ExtResource("3_kupwg")
+bbcode_enabled = true
+text = "[center](W)eapon Systems"
+fit_content = true
+
 [node name="WeaponSystemDisplayPanel" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
 layout_mode = 0
 offset_left = 392.0
 offset_top = 215.0
 offset_right = 896.0
 offset_bottom = 531.0
+mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_y0u4a")
 
 [node name="Title" type="RichTextLabel" parent="WeaponSystemDisplayPanel"]
@@ -110,7 +137,7 @@ unique_name_in_owner = true
 layout_mode = 0
 offset_left = 29.0
 offset_top = 75.0
-offset_right = 446.0
+offset_right = 474.0
 offset_bottom = 262.0
 theme_override_constants/v_separation = 12
 columns = 9
@@ -218,80 +245,56 @@ autowrap_mode = 0
 
 [node name="CheckBox" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox2" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox3" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox4" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox5" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox6" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox7" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
+script = ExtResource("8_dgrbk")
 
 [node name="CheckBox8" type="TextureButton" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
 layout_mode = 2
+toggle_mode = true
 texture_normal = ExtResource("5_65bll")
 texture_pressed = ExtResource("6_xoo0c")
-texture_hover = ExtResource("7_kbb73")
-
-[node name="TestTitle" type="RichTextLabel" parent="WeaponSystemDisplayPanel/WeaponSystemDisplay"]
-self_modulate = Color(0.501961, 1, 0.517647, 1)
-layout_mode = 2
-size_flags_horizontal = 3
-theme = ExtResource("4_mxloi")
-bbcode_enabled = true
-text = "railgun"
-fit_content = true
-autowrap_mode = 0
-
-[node name="WeaponSystemsButton" type="TextureButton" parent="."]
-unique_name_in_owner = true
-layout_mode = 0
-offset_left = 395.0
-offset_top = 692.0
-offset_right = 895.0
-offset_bottom = 792.0
-theme = ExtResource("3_kupwg")
-texture_normal = ExtResource("4_ikkrg")
-texture_hover = ExtResource("5_rhyi2")
-script = ExtResource("6_3xhs0")
-
-[node name="Weapon Systems" type="RichTextLabel" parent="WeaponSystemsButton"]
-layout_mode = 0
-offset_top = 28.0
-offset_right = 500.0
-offset_bottom = 74.0
-theme = ExtResource("3_kupwg")
-bbcode_enabled = true
-text = "[center]Weapon Systems"
-fit_content = true
+script = ExtResource("8_dgrbk")

@@ -109,6 +109,7 @@ func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
 	
+	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	can_fire = true
 	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)

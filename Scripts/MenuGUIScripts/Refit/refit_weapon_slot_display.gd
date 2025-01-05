@@ -1,11 +1,11 @@
-extends TextureButton
+extends Panel
 class_name WeaponSlotDisplay
 
 var ship_stats_weapon_slot: WeaponSlot # weapon slot in the ship_stats data
 var ship_weapon_slot: WeaponSlot # weapon slot in the packed scene
-var square_size: Vector2
-var display_this: bool = false
-@onready var WeaponSelectedRect: TextureRect = %WeaponSelectedRect
+var draw_rectangle: bool = false
+var rectangle_color: Color = Color(0.765, 0.404, 0.129, 255)
+@onready var WeaponSelectedRect: Control = %WeaponSelectedRect
 var root
 # Called when the node enters the scene tree for the first time.
 
@@ -16,7 +16,6 @@ func _ready():
 	mouse_entered.connect(_on_mouse_entered)
 	mouse_exited.connect(_on_mouse_exited)
 	self.gui_input.connect(_on_input_event)
-	WeaponSelectedRect.self_modulate = Color (1.5, 1.5, 0, 1.0 )
 	pass # Replace with function body.
 
 func _on_input_event(event):
@@ -27,18 +26,21 @@ func _on_input_event(event):
 		print("The ship_stats weapon in refit_weapon is/is not equal to the one in player fleet ", ship_stats_weapon_slot == game_state.player_fleet.fleet_stats.ships[0].weapon_slots[0])
 		root.update_weapon_list()
 		
-		
 	
 func _on_focus_entered() -> void:
 	ship_weapon_slot.toggle_display_aim(true)
 	%WeaponSelectedRect.visible = true
 	root.display_weapon_list(self)
+	draw_rectangle = true
+	queue_redraw()
 	pass
 
 func _on_focus_exited() -> void:
 	root.hide_weapon_list()
 	ship_weapon_slot.toggle_display_aim(false)
 	%WeaponSelectedRect.visible = false
+	draw_rectangle = false
+	queue_redraw()
 
 func _on_mouse_entered() -> void:
 	ship_weapon_slot.toggle_display_aim(true)

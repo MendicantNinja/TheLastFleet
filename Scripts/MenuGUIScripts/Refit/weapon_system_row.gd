@@ -1,12 +1,11 @@
-extends Object
-class_name WeaponSystem
+extends HBoxContainer
 
-var auto_fire_start: bool = false
-var auto_fire: bool = false
-
-var weapons: Array[WeaponSlot] = []
 
 # Called when the node enters the scene tree for the first time.
+
+func initialize(weapon: Weapon) -> void:
+	%AutofireLabel.text = weapon.name
+
 func _ready():
 	pass # Replace with function body.
 

@@ -120,13 +120,14 @@ func deploy_ship() -> void:
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 	
 	# Needed to know the zoom level for GUI scaling.
-	CombatCamera = $"../CombatMap/CombatCamera"
-	TacticalCamera = $"../TacticalMap/TacticalCamera"
+	if get_tree().current_scene.name == "CombatArena":
+		CombatCamera = $"../CombatMap/CombatCamera"
+		TacticalCamera = $"../TacticalMap/TacticalCamera"
+		
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
 		settings.swizzle($ShipLivery, settings.player_color) 
-		
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		TacticalMapIcon.modulate = settings.enemy_color

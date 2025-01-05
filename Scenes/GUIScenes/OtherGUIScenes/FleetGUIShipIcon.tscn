@@ -8,6 +8,7 @@
 offset_right = 48.0
 offset_bottom = 48.0
 mouse_filter = 1
+action_mode = 0
 keep_pressed_outside = true
 texture_pressed = ExtResource("1_0fnvw")
 texture_hover = ExtResource("1_0fnvw")
@@ -26,10 +27,8 @@ stretch_mode = 0
 
 [node name="Label" type="Label" parent="ShipSprite"]
 layout_mode = 0
-offset_left = 80.0
-offset_top = 270.0
-offset_right = 189.0
-offset_bottom = 294.0
+offset_right = 109.0
+offset_bottom = 24.0
 theme_override_colors/font_color = Color(0.732133, 0.76, 0.342, 1)
 theme_override_fonts/font = ExtResource("3_b2cmd")
 text = "Ship Class"

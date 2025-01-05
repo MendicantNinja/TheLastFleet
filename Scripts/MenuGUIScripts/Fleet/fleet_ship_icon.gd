@@ -30,7 +30,7 @@ func _drop_data(position, data) -> void:
 		#get_tree().current_scene.update_fleet_list()
 	
 func on_added_to_container() -> void:
-	self.ship_sprite.self_modulate = settings.player_color
+	#self.ship_sprite.self_modulate = settings.player_color
 	ship_label.position.y = self.custom_minimum_size.y
 	ship_label.text = "%s Class" % ship_stats.ship_hull.ship_type_name
 	#settings.swizzle(ShipPanel)

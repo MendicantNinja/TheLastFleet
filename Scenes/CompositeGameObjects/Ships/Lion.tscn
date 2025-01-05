@@ -115,34 +115,27 @@ shape = SubResource("CircleShape2D_4lqs1")
 debug_color = Color(0, 0.6, 0.701961, 0.0823529)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(-24, -30)
 weapon_mount = ExtResource("15_xrkcv")
 
 [node name="WeaponSlot1" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(-24, 30)
 weapon_mount = ExtResource("15_xrkcv")
 
 [node name="WeaponSlot2" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(66, 0)
 weapon_mount = ExtResource("15_xrkcv")
 
 [node name="WeaponSlot3" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(60, 21)
 
 [node name="WeaponSlot4" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(60, -29)
 
 [node name="WeaponSlot5" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(38, -46)
 
 [node name="WeaponSlot6" parent="." instance=ExtResource("14_b3w6e")]
-z_index = 2
 position = Vector2(38, 38)
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
