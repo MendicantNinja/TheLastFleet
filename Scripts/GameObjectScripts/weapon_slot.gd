@@ -364,7 +364,7 @@ func update_killcast(delta) -> void:
 		var face_direction: Transform2D = face_weapon(killcast.target_position)
 		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	
-	if can_look_at and can_fire:
+	if can_look_at and can_fire and auto_fire:
 		fire(owner_rid.get_id())
 	
 	if can_look_at == false and available_targets.size() > 1:

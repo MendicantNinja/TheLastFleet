@@ -165,10 +165,13 @@ func _ready() -> void:
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
 	var occupancy_template: ImapTemplate
+	var threat_template: ImapTemplate
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[3]
 		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
@@ -176,6 +179,8 @@ func _ready() -> void:
 	else:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[3]
 		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2
@@ -386,10 +391,8 @@ func highlight_selection(select_value: bool = false) -> void:
 func toggle_manual_control() -> void:
 	if ship_select == false:
 		manual_control = false
+		CombatBehaviorTree.toggle_root(true)
 		return
-	
-	if CombatBehaviorTree.enabled == true:
-		CombatBehaviorTree.toggle_root(false)
 	
 	if manual_control == false:
 		manual_control = true
@@ -400,6 +403,7 @@ func toggle_manual_control() -> void:
 		ManualControlCamera = null
 		ship_select = false
 		_on_mouse_exited()
+	
 	toggle_manual_aim(all_weapons, manual_control)
 	
 	if manual_control == true and group_leader:
@@ -409,9 +413,13 @@ func toggle_manual_control() -> void:
 		group_name = &""
 	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
 		ShipNavigationAgent.set_target_position(position)
+	
 	if manual_control == true:
 		switch_to_manual.emit()
 		request_manual_camera.emit()
+		CombatBehaviorTree.toggle_root(false)
+	else:
+		CombatBehaviorTree.toggle_root(true)
 
 #oooooo   oooooo     oooo oooooooooooo       .o.       ooooooooo.     .oooooo.   ooooo      ooo  .oooooo..o 
  #`888.    `888.     .8'  `888'     `8      .888.      `888   `Y88.  d8P'  `Y8b  `888b.     `8' d8P'    `Y8 
@@ -484,7 +492,7 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
-	if Engine.get_physics_frames() % 100 == 0 and global_position != prev_position:
+	if Engine.get_physics_frames() % 60 == 0 and global_position != prev_position:
 		update_agent_influence.emit(prev_position)
 		prev_position = global_position
 
@@ -723,3 +731,8 @@ func _on_NavigationTimer_timeout() -> void:
 		valid_paths = raycast_sweep(sweep_vectors, global_position)
 	elif not valid_paths.is_empty():
 		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
+
+
+func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
+	if safe_velocity != Vector2.ZERO:
+		linear_velocity += safe_velocity / 2.0

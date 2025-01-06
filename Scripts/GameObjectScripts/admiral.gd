@@ -19,6 +19,8 @@ var enemy_group_key_prefix: StringName = &"Enemy Group "
 var group_targets_key_suffix: StringName = &" targets"
 var target_key: StringName = &"target"
 
+var enemy_clusters: Array = []
+
 func _ready() -> void:
 	pass
 

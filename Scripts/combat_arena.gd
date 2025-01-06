@@ -18,6 +18,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 # Imap values and goodies
 var debug_imap: bool = true
 var occupancy_map: Imap
+var threat_map: Imap
 var imap_debug_grid: Array
 
 func _ready() -> void:
@@ -28,7 +29,11 @@ func _ready() -> void:
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	
-	occupancy_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.max_cell_size)
+	occupancy_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	threat_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	occupancy_map.map_type = imap_manager.MapType.OCCUPANCY_MAP
+	threat_map.map_type = imap_manager.MapType.THREAT_MAP
+	var register_maps: Array = [occupancy_map, threat_map]
 	
 	if debug_imap == true:
 		occupancy_map.update_grid_value.connect(_on_grid_value_changed)
@@ -40,14 +45,15 @@ func _ready() -> void:
 			imap_debug_grid.append([])
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
-				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.max_cell_size
+				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
 				cell_instance.get_child(0).text = str(occupancy_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
 	
 	imap_manager.register_agents(get_tree().get_nodes_in_group(&"agent"))
-	imap_manager.register_map(occupancy_map)
+	for map in register_maps:
+		imap_manager.register_map(map)
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)
@@ -60,13 +66,6 @@ func _ready() -> void:
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	for friendly_ship in friendly_group:
 		connect_ship_signals(friendly_ship)
-
-func _process(delta) -> void:
-	pass
-	#if get_tree().get_node_count_in_group(&"friendly") == 0 and ComputerAdmiral.AdmiralAI.enabled == true:
-		#ComputerAdmiral.AdmiralAI.toggle_root(false)
-	#if get_tree().get_node_count_in_group(&"friendly") > 0 and ComputerAdmiral.AdmiralAI.enabled == false:
-		#ComputerAdmiral.AdmiralAI.toggle_root(true)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
@@ -86,7 +85,6 @@ func toggle_options_menu() -> void:
 		OptionsMenuPanel.visible = true
 	else:
 		OptionsMenuPanel.visible = false
-
 
 func _on_switch_maps() -> void:
 	if CombatMap.visible:

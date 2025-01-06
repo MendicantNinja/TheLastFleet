@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=24 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -8,13 +8,14 @@
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_5naox"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_38tt5"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/initialize_groups.gd" id="5_dpyjf"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_vrrkk"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/direct_attack.gd" id="7_0at63"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/assign_new_leader.gd" id="7_otbhq"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
@@ -42,18 +43,25 @@ script = ExtResource("2_shfex")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
 script = ExtResource("2_xxm3d")
+enabled = false
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_5naox")
 
-[node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_vrrkk")
+[node name="group management" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("5_38tt5")
 
-[node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("6_jorw7")
+[node name="assign new leader" type="Node" parent="Admiral/AdmiralAI/main/group management"]
+script = ExtResource("7_otbhq")
 
-[node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("7_sno18")
+[node name="initialize groups" type="Node" parent="Admiral/AdmiralAI/main/group management"]
+script = ExtResource("5_dpyjf")
+
+[node name="tactics" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("4_5naox")
+
+[node name="direct attack" type="Node" parent="Admiral/AdmiralAI/main/tactics"]
+script = ExtResource("7_0at63")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -392,7 +400,73 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(500, 19500)
+position = Vector2(7394, 9971)
 
-[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(500, 900)
+[node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7758, 9967)
+
+[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8131, 9979)
+
+[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8495, 9975)
+
+[node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8854, 9977)
+
+[node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9218, 9973)
+
+[node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9591, 9985)
+
+[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9955, 9981)
+
+[node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7240, 5157)
+collision_layer = 4
+
+[node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7566, 5157)
+collision_layer = 4
+
+[node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7902, 5162)
+collision_layer = 4
+
+[node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8228, 5162)
+collision_layer = 4
+
+[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8573, 5164)
+collision_layer = 4
+
+[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8899, 5164)
+collision_layer = 4
+
+[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9235, 5169)
+collision_layer = 4
+
+[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9561, 5169)
+collision_layer = 4
+
+[node name="TestShip8" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7904, 5514)
+collision_layer = 4
+
+[node name="TestShip9" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8230, 5514)
+collision_layer = 4
+
+[node name="TestShip10" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8566, 5519)
+collision_layer = 4
+
+[node name="TestShip11" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8892, 5519)
+collision_layer = 4
