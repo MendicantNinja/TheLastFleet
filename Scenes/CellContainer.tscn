@@ -1,4 +1,6 @@
-[gd_scene format=3 uid="uid://c60tcqjeqli07"]
+[gd_scene load_steps=2 format=3 uid="uid://c60tcqjeqli07"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_50v8t"]
 
 [node name="CellContainer" type="PanelContainer"]
 anchors_preset = 15
@@ -9,6 +11,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxEmpty_50v8t")
 
 [node name="Value" type="Label" parent="."]
 texture_filter = 3

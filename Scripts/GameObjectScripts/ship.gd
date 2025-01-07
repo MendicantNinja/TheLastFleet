@@ -166,25 +166,44 @@ func _ready() -> void:
 	#ShipSprite.modulate = self_modulate
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
+	var occupancy_radius: int = 1
+	var threat_radius: int = 3
 	add_to_group(&"agent")
 	if collision_layer == 1:
-		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
-		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
-		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[3]
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
 		CombatBehaviorTree.toggle_root(false)
 	else:
-		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[1]
-		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
-		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[3]
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2
 	
+	
+	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	for map in template_maps.values():
+		var center_val: int = threat_radius
+		composite_influence.add_map(map, center_val, center_val, 1.0)
+		invert_composite.add_map(map, center_val, center_val, -1.0)
+	
+	composite_influence.normalize_template_map()
+	composite_influence.map_type = imap_manager.MapType.INFLUENCE_MAP
+	template_maps[composite_influence.map_type] = composite_influence
+	invert_composite.normalize_template_map()
+	invert_composite.map_type = imap_manager.MapType.TENSION_MAP
+	if is_friendly == true:
+		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
+	else:
+		template_maps[invert_composite.map_type] = invert_composite
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:

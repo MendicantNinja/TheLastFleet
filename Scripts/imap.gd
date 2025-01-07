@@ -83,24 +83,25 @@ func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 			set_cell_value(n, m, prop_value)
 
 @warning_ignore("integer_division")
-func propagate_influence_as_ring(magnitude: float = 1.0) -> void:
+func propagate_influence_as_ring(magnitude: float = 1.0, sigma: float = 1.0) -> void:
 	var radius: int = height
 	var center: Vector2 = Vector2(((radius - 1) / 2), ((radius - 1) / 2))
 	for m in range(-radius, radius, 1):
 		for n in range(-radius, radius, 1):
 			var cell_vector: Vector2 = Vector2(n, m)
 			var distance: float = center.distance_to(cell_vector)
-			var prop_value: float = magnitude * sin(PI*(distance - (radius - 1)) / center.x)
+			var prop_value: float = (magnitude / ( sigma * sqrt(2 * PI))) * exp(-(distance - center.x / 2)**2 / (2 * sigma**2))
+			#var prop_value: float = magnitude * sin(PI*(distance - (radius - 1)) / center.x)
+			
 			set_cell_value(n, m, prop_value)
 
 @warning_ignore("integer_division")
 func add_map(source_map: Imap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
 	if source_map == null:
 		assert(source_map != null, "source map required for adding maps together is null")
-	print(source_map.width / 2)
-	print()
-	var start_column: int = center_column + offset_column - (source_map.width / 2)
-	var start_row: int = center_row + offset_row - (source_map.height / 2)
+	
+	var start_column: int = center_column + offset_column - source_map.width / 2
+	var start_row: int = center_row + offset_row - source_map.height / 2
 	for m in range(0, source_map.height, 1):
 		for n in range(0, source_map.width, 1):
 			var target_row: int = m + start_row
@@ -141,3 +142,10 @@ func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitu
 		for n in range(min_n, max_n, 1):
 			var source_col: int = n + start_column - neg_adj_col
 			target_map.add_value(m, n, map_grid[source_col][source_row] * magnitude)
+
+func normalize_template_map() -> void:
+	var center: int = (height - 1) / 2
+	var maximum: float = abs(map_grid[center][center])
+	for m in range(0, height):
+		for n in range(0, width):
+			map_grid[m][n] = map_grid[m][n] / maximum

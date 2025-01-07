@@ -1,10 +1,10 @@
 extends Node
 class_name ImapManager
 
-var arena_width: int = 18000
+var arena_width: int = 17000
 var arena_height: int = 20000
-var default_cell_size: int = 200
-var max_cell_size: int = 2000
+var default_cell_size: int = 250
+var max_cell_size: int = 1500
 
 enum TemplateType {
 	OCCUPANCY_TEMPLATE, # Occupancy indicates the space a unit occupies and its zone of influence.
@@ -16,7 +16,9 @@ enum TemplateType {
 enum MapType {
 	OCCUPANCY_MAP,
 	THREAT_MAP,
+	INFLUENCE_MAP,
 	TENSION_MAP,
+	VULNERABILITY_MAP,
 }
 
 var agent_registry: Dictionary = {}
@@ -56,37 +58,30 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 	for imap_type in current_maps:
 		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
-		var agent_position: Vector2i = Vector2i(agent.global_position)
-		var cell_column: int = agent_position.x / map.cell_size
-		var cell_row: int = agent_position.y / map.cell_size
-		var test_distrance: float = Vector2.ZERO.distance_to(agent.position)
+		var cell_column: int = agent.global_position.x / map.cell_size
+		var cell_row: int = agent.global_position.y / map.cell_size
 		var current_cell_index: Vector2i = Vector2i(cell_row, cell_column)
-		print(current_cell_index)
-		print(agent_position.x / map.cell_size)
-		print(agent_position.y / map.cell_size)
 		#var adjust_imap: Imap = map.correct_influence(template_map, current_cell_index, agent.global_position)
 		var prev_cell_index: Vector2i = Vector2i.ZERO
 		var distance_to: float = 0.0
 		if agent.template_cell_indices.has(imap_type):
-			
 			prev_cell_index = agent.template_cell_indices[imap_type]
 			var center_cell_pos: Vector2 = Vector2(prev_cell_index.y, prev_cell_index.x) * map.cell_size
-			center_cell_pos.x = center_cell_pos.x + map.cell_size / 2
-			center_cell_pos.y = center_cell_pos.y + map.cell_size / 2
+			center_cell_pos.x = center_cell_pos.x + map.cell_size / 2.0
+			center_cell_pos.y = center_cell_pos.y + map.cell_size / 2.0
 			distance_to = center_cell_pos.distance_to(agent.global_position)
-			print(distance_to)
 		
-		if distance_to < map.cell_size / 2 and prev_position != Vector2.ZERO:
+		var start_index: Vector2i = Vector2i(cell_row - template_map.width / 2, cell_column - template_map.height / 2)
+		var end_index: Vector2i = Vector2i(cell_row + template_map.width / 2, cell_column + template_map.height / 2)
+		registered_cells[imap_type] = [start_index, end_index]
+		
+		if distance_to < map.cell_size / 2.0 and prev_position != Vector2.ZERO:
 			continue
 		
 		if agent.template_cell_indices.has(imap_type):
 			map.add_map(template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
 		map.add_map(template_map, current_cell_index.x, current_cell_index.y,  1.0)
 		agent.template_cell_indices[imap_type] = current_cell_index
-		
-		var start_index: Vector2i = Vector2i(cell_row - template_map.width / 2, cell_column - template_map.height / 2)
-		var end_index: Vector2i = Vector2i(cell_row + template_map.width / 2, cell_column + template_map.height / 2)
-		registered_cells[imap_type] = [start_index, end_index]
 	
 	var prev_registry_index: Vector2i = Vector2i(prev_position.y / max_cell_size, prev_position.x / max_cell_size)
 	var current_registry_index: Vector2i = Vector2i(agent.global_position.y / max_cell_size, agent.global_position.x / max_cell_size)
@@ -112,7 +107,6 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _on_agent_destroyed(agent: Ship) -> void:
-	var agent_position: Vector2 = agent.global_position
 	for imap_type in current_maps:
 		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]

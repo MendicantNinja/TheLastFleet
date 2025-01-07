@@ -68,6 +68,8 @@ mouse_filter = 2
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 40.0
+theme_override_constants/h_separation = -1
+theme_override_constants/v_separation = -1
 
 [node name="Music" type="AudioStreamPlayer2D" parent="."]
 bus = &"Music"
@@ -392,7 +394,8 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(500, 19500)
+position = Vector2(1125, 1125)
 
-[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(500, 900)
+[node name="TestShip" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(3125, 1125)
+collision_layer = 4
