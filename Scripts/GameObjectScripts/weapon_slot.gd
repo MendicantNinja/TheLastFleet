@@ -10,7 +10,7 @@ class_name WeaponSlot
 @onready var rate_of_fire_timer: Timer = $ROFTimer
 # Important Stuff
 #@export var assigned_ship: Ship
-
+@export var weapon_system_group: int = -1
 @export var weapon: Weapon:
 	set(value):
 		weapon = value
@@ -25,7 +25,7 @@ class_name WeaponSlot
 			weapon_mount_image.texture = value.image
 		else:
 			return
-@export var weapon_system_group = null
+
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
@@ -87,6 +87,8 @@ func fire(ship_id: int) -> void:
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
 	weapon_mount = p_weapon_mount
 	weapon = p_weapon
+	if settings.dev_mode == true:
+		weapon_system_group = 1
 
 func _draw() -> void:
 	if not manual_aim and not display_aim:

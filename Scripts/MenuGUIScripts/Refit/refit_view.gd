@@ -10,10 +10,12 @@ extends Control
 @onready var player_fleet_stats: FleetStats = player_fleet.fleet_stats
 
 var ship_weapons_display: Array[TextureButton]
-var displayed_ship: int
+var currently_viewed_ship: Ship
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	settings.swizzle(RefitPanel, settings.gui_color)
+	settings.swizzle(%OptionsMenuPanel)
+	settings.swizzle(%MainMenuButton)
 	update_refit_list()
 	update_weapon_list()
 	
@@ -22,12 +24,22 @@ func _process(delta):
 	pass
 
 # Hide the weapon list if left clicked in an empty area AKA no GUI element handled it
-func _gui_input(event):
+func _gui_input(event) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		if get_viewport().gui_get_focus_owner() is WeaponSlotDisplay:
 			get_viewport().gui_get_focus_owner().release_focus()
 	pass
 
+func _unhandled_input(event) -> void:
+	if event is InputEventKey:
+		if (event.keycode == KEY_ESCAPE and event.pressed):
+			toggle_options_menu()
+
+func toggle_options_menu() -> void:
+	if %OptionsMenuPanel.visible == false:
+		%OptionsMenuPanel.visible = true
+	else:
+		%OptionsMenuPanel.visible = false
 # Create the ships in the list and the ability to scroll down
 func update_refit_list() -> void:
 	var scene_path: String = "res://Scenes/GUIScenes/OtherGUIScenes/FleetGUIShipIcon.tscn"
@@ -74,7 +86,9 @@ func update_weapon_list() -> void:
 		weapon_item.WeaponCount.text = str(weapon_count.number_of_items) + " in inventory"
 		weapon_item.OrdinancePointCount.text = str(data.item_dictionary.get(weapon_count.type_of_item).armament_points)
 		weapon_item.item_slot = weapon_count
-
+	# Update the Weapon System
+	%WeaponSystemDisplay.update_weapon_systems(currently_viewed_ship)
+	
 func display_weapon_list(this_weapon_display: Panel) -> void:
 	InventoryScrollContainer.visible = true
 	InventoryScrollContainer.global_position.y = this_weapon_display.global_position.y - this_weapon_display.size.y
@@ -91,6 +105,7 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 		#print("Ship stats equals")
 	#else:
 		#print("Ship stats unequal")
+	currently_viewed_ship = ship
 	for child in ShipView.get_children():
 		child.queue_free()
 	ship_weapons_display.clear()
@@ -107,12 +122,13 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 		ShipView.add_child(weapon_slot_selection)
 		weapon_slot_selection.global_position = ship.all_weapons[i].global_position
 		weapon_slot_selection.custom_minimum_size = weapon_slot_selection.ship_weapon_slot.weapon_mount_image.texture.get_size() * .6
-		weapon_slot_selection.size = weapon_slot_selection.custom_minimum_size
+		#weapon_slot_selection.size = weapon_slot_selection.custom_minimum_size
 		weapon_slot_selection.position -= weapon_slot_selection.size/2
 		weapon_slot_selection.WeaponSelectedRect.custom_minimum_size = weapon_slot_selection.ship_weapon_slot.weapon_mount_image.texture.get_size()
 		weapon_slot_selection.root = self
 		
 	ship.CenterCombatHUD.visible = false
+
 
 func _draw() -> void: 
 	var weapon_slot_display: WeaponSlotDisplay

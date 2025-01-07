@@ -8,10 +8,8 @@ func _ready() -> void:
 	settings.swizzle(self, settings.gui_color)
 
 func _unhandled_key_input(event):
-	if event.keycode == KEY_ESCAPE and WeaponSystemDisplayPanel.visible == true:
-		WeaponSystemDisplayPanel.visible = false
 	if event.keycode == KEY_W and event.is_pressed():
-		emit_signal("pressed")
+		on_button_pressed
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
 	pass

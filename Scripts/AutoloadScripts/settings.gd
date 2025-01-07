@@ -1,5 +1,9 @@
 extends Node
 
+# If dev mode is true, railgun weapons are added to the ship.gd automatically and assigned a slot. Rather than grabbing and assigning weapons from ship stats.
+@onready var dev_mode = false
+
+
 var player_color: Color = Color8(25, 125, 255, 255)
 var enemy_color: Color = Color8(255, 50, 50, 255)
 var gui_color: Color = Color8(50, 50, 255, 255)
@@ -30,6 +34,7 @@ func swizzle_and_brighten(swizzled: CanvasItem, color: Color = gui_color) -> voi
 	swizzled.self_modulate.b = color.b + 40
 	
 func _ready():
+	print("Developer Mode = ", dev_mode)
 	pass # Replace with function body.
 
 

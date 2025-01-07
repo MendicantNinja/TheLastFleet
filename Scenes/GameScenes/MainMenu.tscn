@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://825w50grrkcp"]
+[gd_scene load_steps=12 format=3 uid="uid://825w50grrkcp"]
 
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/main_menu.gd" id="1_a5rc2"]
 [ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/new_game.gd" id="4_k0np7"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="6_4abs8"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/skirmish_button.gd" id="8_jhx2c"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/fleet_refit_button.gd" id="11_laxuc"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -127,6 +128,25 @@ grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("4_dnp8m")
 text = "SKIRMISH"
+scroll_active = false
+
+[node name="RefitButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("11_laxuc")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/RefitButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "FLEET REFITTING"
 scroll_active = false
 
 [node name="SettingsButton" type="TextureButton" parent="ListContainer"]

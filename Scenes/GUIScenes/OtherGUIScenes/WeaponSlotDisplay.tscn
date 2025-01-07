@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://6g7rb5th8r0v" path="res://Art/CombatGUIArt/tac_map_player_ship.png" id="2_562b6"]
 
 [node name="WeaponSlotDisplay" type="Panel"]
+self_modulate = Color(1, 1, 1, 0.00392157)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0

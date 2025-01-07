@@ -191,12 +191,17 @@ func _ready() -> void:
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
+
+	for i in ship_stats.weapon_slots.size():
+		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon)
 	
-	for i in range(all_weapons.size()):
-		# Placeholder
-		all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
-		#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
-		#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
+	if settings.dev_mode == true:
+		for i in range(all_weapons.size()):
+			# Placeholder
+			all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
+			all_weapons[i].weapon_system_group = 1
+			#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
+			#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
 	
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:

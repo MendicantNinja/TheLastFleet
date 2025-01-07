@@ -4,19 +4,11 @@
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="2_mkakt"]
 [ext_resource type="Texture2D" uid="uid://blbr2v8ctmjnv" path="res://Art/GUIArt/checkerbox_30x30.png" id="3_pwbw3"]
 [ext_resource type="Texture2D" uid="uid://d2yi5yhs03wvg" path="res://Art/GUIArt/checkerbox_filled_30x30_2.png" id="4_ssqnl"]
-[ext_resource type="Texture2D" uid="uid://cx4j1uwybbjf8" path="res://Art/GUIArt/blank_box_30x30.png" id="5_jkb2i"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/weapon_system_check_box.gd" id="6_cj5gp"]
 
 [node name="WeaponRow" type="HBoxContainer"]
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1.0
-offset_right = -1385.0
-offset_bottom = -972.0
-grow_horizontal = 2
-grow_vertical = 2
-scale = Vector2(0.7, 0.7)
-theme_override_constants/separation = 6
+offset_right = 488.0
+offset_bottom = 30.0
 script = ExtResource("1_sccvc")
 
 [node name="AutofireLabel" type="RichTextLabel" parent="."]
@@ -32,48 +24,64 @@ autowrap_mode = 0
 
 [node name="CheckBox" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox2" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox3" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox4" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox5" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox6" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox7" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
 
 [node name="CheckBox8" type="TextureButton" parent="."]
 layout_mode = 2
+toggle_mode = true
+keep_pressed_outside = true
 texture_normal = ExtResource("3_pwbw3")
 texture_pressed = ExtResource("4_ssqnl")
-texture_hover = ExtResource("5_jkb2i")
+script = ExtResource("6_cj5gp")
