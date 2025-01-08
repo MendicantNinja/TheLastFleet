@@ -25,6 +25,8 @@ var agent_registry: Dictionary = {}
 var template_maps: Dictionary = {}
 var current_maps: Dictionary = {}
 var registry_map: Dictionary = {}
+var vulnerability_map: Imap
+var tension_map: Imap
 
 func _init():
 	var occupancy_templates: ImapTemplate = ImapTemplate.new()
@@ -79,7 +81,8 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 			continue
 		
 		if agent.template_cell_indices.has(imap_type):
-			map.add_map(template_map, prev_cell_index.x, prev_cell_index.y, -1.0)
+			map.add_map(template_map, prev_cell_index.x, prev_cell_index.y,  -1.0)
+		
 		map.add_map(template_map, current_cell_index.x, current_cell_index.y,  1.0)
 		agent.template_cell_indices[imap_type] = current_cell_index
 	
@@ -107,11 +110,10 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _on_agent_destroyed(agent: Ship) -> void:
+	agent_registry.erase(agent)
+	var cell_column: int = agent.global_position.x / default_cell_size
+	var cell_row: int = agent.global_position.y / default_cell_size
 	for imap_type in current_maps:
 		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
-		var cell_column: int = agent.global_position.x / map.cell_size
-		var cell_row: int = agent.global_position.y / map.cell_size
-		var cell_index: Vector2i = Vector2i(cell_column, cell_row)
-		agent_registry.erase(agent)
-		map.add_map(template_map, cell_index.x, cell_index.y, -1.0)
+		map.add_map(template_map, cell_row, cell_column, -1.0)

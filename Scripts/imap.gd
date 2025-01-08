@@ -108,12 +108,30 @@ func add_map(source_map: Imap, center_row: int, center_column: int, magnitude: f
 			var target_col: int = n + start_column
 			var value: float = 0.0
 			if (target_col >= 0 && target_col < width && target_row >= 0 && target_row < height):
-				value = map_grid[target_row][target_col] + source_map.map_grid[n][m] * magnitude
+				value = map_grid[target_row][target_col] + source_map.map_grid[m][n] * magnitude
 				if snappedf(value, 0.1) == 0.0:
 					value = 0.0
 				map_grid[target_row][target_col] = value
 				update_grid_value.emit(target_row, target_col, map_grid[target_row][target_col])
-		pass
+
+@warning_ignore("integer_division")
+func subtract_map(source_map: Imap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
+	if source_map == null:
+		assert(source_map != null, "source map required for adding maps together is null")
+	
+	var start_column: int = center_column + offset_column - source_map.width / 2
+	var start_row: int = center_row + offset_row - source_map.height / 2
+	for m in range(0, source_map.height, 1):
+		for n in range(0, source_map.width, 1):
+			var target_row: int = m + start_row
+			var target_col: int = n + start_column
+			var value: float = 0.0
+			if (target_col >= 0 && target_col < width && target_row >= 0 && target_row < height):
+				value = map_grid[target_row][target_col] + source_map.map_grid[m][n] * magnitude
+				if snappedf(value, 0.1) == 0.0:
+					value = 0.0
+				map_grid[target_row][target_col] = value
+				update_grid_value.emit(target_row, target_col, map_grid[target_row][target_col])
 
 @warning_ignore("integer_division")
 func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
@@ -141,7 +159,7 @@ func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitu
 		var source_row: int = m + start_row - neg_adj_row
 		for n in range(min_n, max_n, 1):
 			var source_col: int = n + start_column - neg_adj_col
-			target_map.add_value(m, n, map_grid[source_col][source_row] * magnitude)
+			target_map.add_value(m, n, map_grid[source_row][source_col] * magnitude)
 
 func normalize_template_map() -> void:
 	var center: int = (height - 1) / 2

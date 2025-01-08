@@ -166,8 +166,8 @@ func _ready() -> void:
 	#ShipSprite.modulate = self_modulate
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
-	var occupancy_radius: int = 1
-	var threat_radius: int = 3
+	var occupancy_radius: int = 2
+	var threat_radius: int = 4
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
@@ -196,14 +196,12 @@ func _ready() -> void:
 		invert_composite.add_map(map, center_val, center_val, -1.0)
 	
 	composite_influence.normalize_template_map()
-	composite_influence.map_type = imap_manager.MapType.INFLUENCE_MAP
-	template_maps[composite_influence.map_type] = composite_influence
+	template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
 	invert_composite.normalize_template_map()
-	invert_composite.map_type = imap_manager.MapType.TENSION_MAP
 	if is_friendly == true:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
-		template_maps[invert_composite.map_type] = invert_composite
+		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:

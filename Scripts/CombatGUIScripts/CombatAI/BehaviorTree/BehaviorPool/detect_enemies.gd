@@ -12,6 +12,8 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	for cell in registry_cells.keys():
 		var registered_agents: Array = registry_cells[cell]
 		for n_agent in registered_agents:
+			if n_agent == null:
+				continue
 			if n_agent.is_friendly == true:
 				enemy_presence.push_back(cell)
 				break

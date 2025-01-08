@@ -17,11 +17,6 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 
 # Imap values and goodies
 var debug_imap: bool = true
-#var occupancy_map: Imap
-#var threat_map: Imap
-var influence_map: Imap
-var tension_map: Imap
-var vulnerability_map: Imap
 var imap_debug_grid: Array
 
 func _ready() -> void:
@@ -36,18 +31,22 @@ func _ready() -> void:
 	#threat_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	#occupancy_map.map_type = imap_manager.MapType.OCCUPANCY_MAP
 	#threat_map.map_type = imap_manager.MapType.THREAT_MAP
-	influence_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	tension_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	vulnerability_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	var fake_tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	var tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	var vulnerability_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	influence_map.map_type = imap_manager.MapType.INFLUENCE_MAP
-	tension_map.map_type = imap_manager.MapType.TENSION_MAP
+	fake_tension_map.map_type = imap_manager.MapType.TENSION_MAP
 	vulnerability_map.map_type = imap_manager.MapType.VULNERABILITY_MAP
-	var register_maps: Array = [tension_map, influence_map]
+	tension_map.map_type = imap_manager.MapType.TENSION_MAP
+	imap_manager.tension_map = tension_map
+	imap_manager.vulnerability_map = vulnerability_map
+	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:
-		tension_map.update_grid_value.connect(_on_grid_value_changed)
-		var grid_row_size: int = tension_map.map_grid.size()
-		var grid_column_size: int = tension_map.map_grid[0].size()
+		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
+		var grid_row_size: int = vulnerability_map.map_grid.size()
+		var grid_column_size: int = vulnerability_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -55,7 +54,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(tension_map.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
@@ -105,13 +104,15 @@ func _on_switch_maps() -> void:
 	
 	get_viewport().set_input_as_handled()
 
-func _on_grid_value_changed(x, y, value) -> void:
+func _on_grid_value_changed(m, n, value) -> void:
 	var adj_value: float = snappedf(value, 0.001)
-	if adj_value != 0.0:
-		imap_debug_grid[x][y].get_child(0).visible = true
-		imap_debug_grid[x][y].get_child(0).text = str(adj_value)
-	else:
-		imap_debug_grid[x][y].get_child(0).visible = false
+	imap_debug_grid[m][n].get_child(0).visible = true
+	imap_debug_grid[m][n].get_child(0).text = str(adj_value)
+	#if adj_value != 0.0:
+		#imap_debug_grid[x][y].get_child(0).visible = true
+		#imap_debug_grid[x][y].get_child(0).text = str(adj_value)
+	#else:
+		#imap_debug_grid[x][y].get_child(0).visible = false
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.
