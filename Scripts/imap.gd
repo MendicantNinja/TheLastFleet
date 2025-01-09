@@ -8,7 +8,8 @@ var width: int # width of the map
 var map_grid: Array # 2D Array
 var map_type: int
 
-signal update_grid_value(n, m, value)
+signal update_grid_value(m, n, value)
+signal update_row_value(m, values)
 
 @warning_ignore("integer_division")
 func _init(new_width: int, new_height: int, x: float = 0.0, y: float = 0.0, new_cell_size: int = 1) -> void:

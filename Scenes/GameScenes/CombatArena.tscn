@@ -1,4 +1,4 @@
-[gd_scene load_steps=23 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=24 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/target_enemy.gd" id="8_kqeb8"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 
@@ -54,6 +55,9 @@ script = ExtResource("6_jorw7")
 
 [node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("7_sno18")
+
+[node name="target enemy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("8_kqeb8")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -394,20 +398,57 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3209, 508)
+position = Vector2(7250, 5125)
+
+[node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8250, 5125)
+
+[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9250, 5125)
+
+[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(12000, 6000)
+
+[node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(3500, 5125)
+
+[node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(4500, 5125)
+
+[node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9250, 6250)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4089, 508)
+position = Vector2(7930, 1000)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3928, 6670)
+position = Vector2(8430, 1000)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4234, 7643)
+position = Vector2(8930, 1000)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3107, 5414)
+position = Vector2(9430, 1000)
 collision_layer = 4
+
+[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7930, 1500)
+collision_layer = 4
+
+[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8430, 1500)
+collision_layer = 4
+
+[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8930, 1500)
+collision_layer = 4
+
+[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9430, 1500)
+collision_layer = 4
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(9036, 5233)

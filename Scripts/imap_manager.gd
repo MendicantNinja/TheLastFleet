@@ -4,7 +4,7 @@ class_name ImapManager
 var arena_width: int = 17000
 var arena_height: int = 20000
 var default_cell_size: int = 250
-var max_cell_size: int = 1500
+var max_cell_size: int = 2000
 
 enum TemplateType {
 	OCCUPANCY_TEMPLATE, # Occupancy indicates the space a unit occupies and its zone of influence.
@@ -57,12 +57,12 @@ func register_agents(agents: Array) -> void:
 @warning_ignore("narrowing_conversion", "integer_division")
 func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 	var registered_cells: Dictionary = {}
+	var cell_column: int = agent.global_position.x / default_cell_size
+	var cell_row: int = agent.global_position.y / default_cell_size
+	var current_cell_index: Vector2i = Vector2i(cell_row, cell_column)
 	for imap_type in current_maps:
 		var template_map: Imap = agent.template_maps[imap_type]
 		var map: Imap = current_maps[imap_type]
-		var cell_column: int = agent.global_position.x / map.cell_size
-		var cell_row: int = agent.global_position.y / map.cell_size
-		var current_cell_index: Vector2i = Vector2i(cell_row, cell_column)
 		#var adjust_imap: Imap = map.correct_influence(template_map, current_cell_index, agent.global_position)
 		var prev_cell_index: Vector2i = Vector2i.ZERO
 		var distance_to: float = 0.0
@@ -72,10 +72,6 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 			center_cell_pos.x = center_cell_pos.x + map.cell_size / 2.0
 			center_cell_pos.y = center_cell_pos.y + map.cell_size / 2.0
 			distance_to = center_cell_pos.distance_to(agent.global_position)
-		
-		var start_index: Vector2i = Vector2i(cell_row - template_map.width / 2, cell_column - template_map.height / 2)
-		var end_index: Vector2i = Vector2i(cell_row + template_map.width / 2, cell_column + template_map.height / 2)
-		registered_cells[imap_type] = [start_index, end_index]
 		
 		if distance_to < map.cell_size / 2.0 and prev_position != Vector2.ZERO:
 			continue
@@ -106,7 +102,7 @@ func _on_agent_influence_changed(prev_position: Vector2, agent: Ship) -> void:
 		registered_agents.push_back(agent)
 	
 	registry_map[current_registry_index] = registered_agents
-	agent_registry[agent] = registered_cells
+	agent_registry[current_cell_index] = agent
 
 @warning_ignore("narrowing_conversion")
 func _on_agent_destroyed(agent: Ship) -> void:

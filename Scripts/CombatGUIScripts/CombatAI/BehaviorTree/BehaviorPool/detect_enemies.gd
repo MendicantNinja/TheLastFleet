@@ -1,11 +1,13 @@
 extends LeafAction
 
-var clusters: Array = []
-var visited: Array = []
+
 
 func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 120 != 0:
 		return FAILURE
+	
+	var clusters: Array = []
+	var visited: Array = []
 	
 	var registry_cells: Dictionary = imap_manager.registry_map
 	var enemy_presence: Array = []
@@ -22,13 +24,13 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 		return SUCCESS
 	
 	for cell in enemy_presence:
+		var cluster = []
 		if cell not in visited:
-			var cluster = []
-			clusters.append(flood_fill(cell, visited, cluster, enemy_presence))
+			cluster = flood_fill(cell, visited, cluster, enemy_presence)
+		for n_cluster in cluster:
+			clusters.push_back(n_cluster)
 	
 	agent.enemy_clusters = clusters
-	clusters = []
-	visited = []
 	return FAILURE
 
 func flood_fill(cell, visited, cluster, enemy_presence) -> Array: 

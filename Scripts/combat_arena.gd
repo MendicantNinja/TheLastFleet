@@ -45,6 +45,7 @@ func _ready() -> void:
 	
 	if debug_imap == true:
 		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
+		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
 		var grid_row_size: int = vulnerability_map.map_grid.size()
 		var grid_column_size: int = vulnerability_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
@@ -104,15 +105,22 @@ func _on_switch_maps() -> void:
 	
 	get_viewport().set_input_as_handled()
 
-func _on_grid_value_changed(m, n, value) -> void:
+func _on_grid_value_changed(m: int, n: int, value: float) -> void:
 	var adj_value: float = snappedf(value, 0.001)
-	imap_debug_grid[m][n].get_child(0).visible = true
-	imap_debug_grid[m][n].get_child(0).text = str(adj_value)
-	#if adj_value != 0.0:
-		#imap_debug_grid[x][y].get_child(0).visible = true
-		#imap_debug_grid[x][y].get_child(0).text = str(adj_value)
-	#else:
-		#imap_debug_grid[x][y].get_child(0).visible = false
+	if adj_value != 0.0:
+		imap_debug_grid[m][n].get_child(0).visible = true
+		imap_debug_grid[m][n].get_child(0).text = str(adj_value)
+	else:
+		imap_debug_grid[m][n].get_child(0).visible = false
+
+func _on_grid_row_changed(m: int, value_array: Array) -> void:
+	for n in range(0, value_array.size()):
+		var adj_value: float = snappedf(value_array[n], 0.001)
+		imap_debug_grid[m][n].get_child(0).text = str(adj_value)
+		if adj_value == 0.0:
+			imap_debug_grid[m][n].get_child(0).visible = false
+		else:
+			imap_debug_grid[m][n].get_child(0).visible = true
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.
