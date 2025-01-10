@@ -5,13 +5,11 @@ class_name Star
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass # Replace with function body.
-
 	
-func _on_mouse_entered() -> void:
+func neighboring_tiles() -> Array:
 	var cols = $"../../..".columns;
 	var rows = $"../../..".rows;
 	var idx = int(str(get_parent().name));
-	print("star.gd: %s" % idx);
 	var neighboring_tiles = [
 		idx - cols, # up
 		idx + cols, # down
@@ -32,7 +30,13 @@ func _on_mouse_entered() -> void:
 	if idx % cols != 0: neighboring_tiles.append_array(neighboring_tiles_left);
 	if idx % cols != 5: neighboring_tiles.append_array(neighboring_tiles_right);
 	
-	for tile in neighboring_tiles:
+	return neighboring_tiles;
+
+	
+func _on_mouse_entered() -> void:
+	var cols = $"../../..".columns;
+	var rows = $"../../..".rows;
+	for tile in neighboring_tiles():
 		if tile < 0 or tile >= cols * rows:
 			continue;
 		var target_startile = $"../..".get_child(tile);
@@ -52,4 +56,4 @@ func _on_mouse_exited():
 
 
 func _on_pressed() -> void:
-	$"../../../Ship".target_position = global_position;
+	$"../../../Ship".move_to_idx(int(str(get_parent().name)));
