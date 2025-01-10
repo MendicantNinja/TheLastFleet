@@ -49,3 +49,7 @@ func _on_mouse_entered() -> void:
 func _on_mouse_exited():
 	for child in $"../../../LineOverlay".get_children():
 		child.queue_free();
+
+
+func _on_pressed() -> void:
+	$"../../../Ship".target_position = global_position;

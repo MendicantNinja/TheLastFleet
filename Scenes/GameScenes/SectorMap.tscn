@@ -1,6 +1,13 @@
-[gd_scene load_steps=2 format=3 uid="uid://cktjylm2g4cjb"]
+[gd_scene load_steps=5 format=3 uid="uid://cktjylm2g4cjb"]
 
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/sector_map.gd" id="1_7tr0u"]
+[ext_resource type="Script" path="res://Scripts/SectorMapScripts/ship.gd" id="2_jxk1p"]
+
+[sub_resource type="Gradient" id="Gradient_noc7r"]
+colors = PackedColorArray(0.183333, 1, 0, 1, 0.184314, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_w0h0p"]
+gradient = SubResource("Gradient_noc7r")
 
 [node name="SectorMap" type="Control"]
 layout_mode = 3
@@ -25,3 +32,10 @@ columns = 6
 layout_mode = 1
 anchors_preset = 0
 offset_bottom = 1080.0
+
+[node name="Ship" type="TextureRect" parent="."]
+offset_right = 64.0
+offset_bottom = 64.0
+scale = Vector2(0.274778, 0.274778)
+texture = SubResource("GradientTexture2D_w0h0p")
+script = ExtResource("2_jxk1p")
