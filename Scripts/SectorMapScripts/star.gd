@@ -1,4 +1,5 @@
-extends ColorRect
+extends TextureButton
+class_name Star
 
 
 # Called when the node enters the scene tree for the first time.
@@ -7,7 +8,8 @@ func _ready() -> void:
 
 	
 func _on_mouse_entered() -> void:
-	var cols = $"../..".columns;
+	var cols = $"../../..".columns;
+	var rows = $"../../..".rows;
 	var idx = int(str(get_parent().name));
 	print("star.gd: %s" % idx);
 	var neighboring_tiles = [
@@ -31,7 +33,7 @@ func _on_mouse_entered() -> void:
 	if idx % cols != 5: neighboring_tiles.append_array(neighboring_tiles_right);
 	
 	for tile in neighboring_tiles:
-		if tile < 0 or tile > 23:
+		if tile < 0 or tile >= cols * rows:
 			continue;
 		var target_startile = $"../..".get_child(tile);
 		var start : Vector2 = global_position;

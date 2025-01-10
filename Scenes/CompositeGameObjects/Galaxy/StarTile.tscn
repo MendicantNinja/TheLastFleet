@@ -1,17 +1,40 @@
-[gd_scene load_steps=3 format=3 uid="uid://4tnk0av7f6mh"]
+[gd_scene load_steps=9 format=3 uid="uid://4tnk0av7f6mh"]
 
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star_tile.gd" id="1_ncju2"]
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star.gd" id="2_k5bq0"]
+
+[sub_resource type="Gradient" id="Gradient_kw1qc"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_gm4l7"]
+gradient = SubResource("Gradient_kw1qc")
+
+[sub_resource type="Gradient" id="Gradient_feed6"]
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_jn37y"]
+gradient = SubResource("Gradient_feed6")
+fill_from = Vector2(1, 0)
+fill_to = Vector2(0, 0)
+
+[sub_resource type="Gradient" id="Gradient_61cyi"]
+offsets = PackedFloat32Array(0, 0.510251, 1)
+colors = PackedColorArray(0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vkfyj"]
+gradient = SubResource("Gradient_61cyi")
 
 [node name="StarTile1" type="ColorRect"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_ncju2")
 
-[node name="Star" type="ColorRect" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
-color = Color(1, 0.04, 0.04, 1)
+[node name="Star" type="TextureButton" parent="."]
+layout_mode = 0
+offset_right = 64.0
+offset_bottom = 64.0
+scale = Vector2(0.5, 0.5)
+texture_normal = SubResource("GradientTexture2D_gm4l7")
+texture_pressed = SubResource("GradientTexture2D_jn37y")
+texture_hover = SubResource("GradientTexture2D_vkfyj")
 script = ExtResource("2_k5bq0")
 
 [connection signal="mouse_entered" from="Star" to="Star" method="_on_mouse_entered"]

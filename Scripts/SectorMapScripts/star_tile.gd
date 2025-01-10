@@ -7,9 +7,12 @@ func _ready() -> void:
 	var max_x : int = get_viewport_rect().size.x - padding * 2;
 	var max_y : int = get_viewport_rect().size.y - padding * 2;
 	
+	var cols = $"../..".columns;
+	var rows = $"../..".rows;
+	
 	$Star.position = Vector2(
-		randi() % (max_x / 6 - padding), 
-		randi() % (max_y / 6 - padding)
+		randi() % (max_x / cols - padding), 
+		randi() % (max_y / rows - padding)
 	) + position
 
 
