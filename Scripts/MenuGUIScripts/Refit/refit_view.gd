@@ -115,7 +115,7 @@ func view_ship(ship: Ship, ship_stats: ShipStats) -> void:
 	%WeaponSystemDisplay.update_weapon_systems(ship)
 	# Display and Hide Appropriate GUI
 	for i in ship.all_weapons.size():
-		#print("Ship_stats weapon as of this view_ship is ", ship.ship_stats.weapon_slots[i].weapon.weapon_name)
+		#print("Weapon System 2 (index 1) contains the following number of weapons ", ship.ship_stats.weapon_systems[1].weapons)
 		var weapon_slot_selection: WeaponSlotDisplay = load("res://Scenes/GUIScenes/OtherGUIScenes/WeaponSlotDisplay.tscn").instantiate()
 		weapon_slot_selection.ship_weapon_slot = ship.all_weapons[i]
 		weapon_slot_selection.ship_stats_weapon_slot = ship.ship_stats.weapon_slots[i]

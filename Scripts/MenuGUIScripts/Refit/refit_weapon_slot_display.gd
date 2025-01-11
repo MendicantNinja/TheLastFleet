@@ -23,7 +23,7 @@ func _on_input_event(event):
 		root.player_fleet.add_item(ship_weapon_slot.weapon)
 		ship_weapon_slot.weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)
 		ship_stats_weapon_slot.weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)
-		print("The ship_stats weapon at position 0 in refit_weapon is/is not equal to the one in player fleet ", ship_stats_weapon_slot == game_state.player_fleet.fleet_stats.ships[0].weapon_slots[0])
+		#print("The ship_stats weapon at position 0 in refit_weapon is/is not equal to the one in player fleet ", ship_stats_weapon_slot == game_state.player_fleet.fleet_stats.ships[0].weapon_slots[0])
 		root.update_weapon_list()
 		
 	

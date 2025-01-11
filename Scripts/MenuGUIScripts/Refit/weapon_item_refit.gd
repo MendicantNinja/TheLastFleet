@@ -20,8 +20,8 @@ func _on_input_event(event):
 		# Set the weapon slot and update list
 		focused_weapon_slot.ship_weapon_slot.weapon = data.item_dictionary.get(item_slot.type_of_item)
 		focused_weapon_slot.ship_stats_weapon_slot.weapon = data.item_dictionary.get(item_slot.type_of_item)
-		print("The ship_stats weapon is now ", focused_weapon_slot.ship_stats_weapon_slot.weapon.weapon_name)
-		print("The weapon slot in weapon_item is/is not equal to the one in player fleet ", focused_weapon_slot.ship_stats_weapon_slot == game_state.player_fleet.fleet_stats.ships[0].weapon_slots[0])
+		#print("The ship_stats weapon is now ", focused_weapon_slot.ship_stats_weapon_slot.weapon.weapon_name)
+		#print("The weapon slot in weapon_item is/is not equal to the one in player fleet ", focused_weapon_slot.ship_stats_weapon_slot == game_state.player_fleet.fleet_stats.ships[0].weapon_slots[0])
 		get_tree().get_current_scene().RefitView.update_weapon_list()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

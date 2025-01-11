@@ -130,4 +130,5 @@ layout_mode = 1
 
 [node name="RefitView" parent="." instance=ExtResource("7_qqfk0")]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1

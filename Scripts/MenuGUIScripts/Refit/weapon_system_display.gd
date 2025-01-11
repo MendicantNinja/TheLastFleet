@@ -14,8 +14,8 @@ func update_weapon_systems(ship: Ship) -> void:
 			else:
 				child.button_pressed = false
 			iterator += 1
-	# Assigns weapons to the appropriate weapon system assignment.
 	
+	# Assigns weapons to the appropriate weapon system assignment.	
 	for child in WeaponDisplayRows.get_children():
 		child.queue_free()
 	
@@ -23,7 +23,7 @@ func update_weapon_systems(ship: Ship) -> void:
 		if ship.all_weapons[i].weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 			continue
 		var weapon_row_instance: HBoxContainer = weapon_row_scene.instantiate()
-		weapon_row_instance.initialize(ship.ship_stats.weapon_slots[i])
+		weapon_row_instance.initialize(ship.ship_stats.weapon_slots[i], ship.ship_stats)
 		WeaponDisplayRows.add_child(weapon_row_instance)
 		weapon_row_instance.AutofireLabel.custom_minimum_size = $AutofireLabel.custom_minimum_size
 		

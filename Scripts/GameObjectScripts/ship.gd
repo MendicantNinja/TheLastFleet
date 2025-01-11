@@ -7,10 +7,10 @@ class_name Ship
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
 
-# Needed for GUI scaling and some other things, signaling up is difficult. Would have to involve passing (all of them, they all need gui scaling) the ships as a parameter and would be called repeatedly in process.
+# Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
-
+@onready var ManualControlHUD = null
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
 @onready var SoftFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/SoftFluxIndicator
@@ -51,11 +51,11 @@ var is_friendly: bool = false # For friendly NPC ships (I love three-party comba
 var manual_control: bool = false:
 	set(value):
 		if value == false:
-			ManualControlIndicator.visible = false
 			manual_control = false
+			ManualControlIndicator.visible = false
 		elif value == true:
-			ManualControlIndicator.visible = true
 			manual_control = true
+			ManualControlIndicator.visible = true
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 
@@ -119,11 +119,12 @@ func deploy_ship() -> void:
 	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 	
-	# Needed to know the zoom level for GUI scaling.
+	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	if get_tree().current_scene.name == "CombatArena":
 		CombatCamera = $"../CombatMap/CombatCamera"
 		TacticalCamera = $"../TacticalMap/TacticalCamera"
-		
+		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
+	
 	if is_friendly == true:
 		TacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
@@ -192,20 +193,16 @@ func _ready() -> void:
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
 
-	for i in ship_stats.weapon_slots.size():
-		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon)
-	
-	if settings.dev_mode == true:
-		for i in range(all_weapons.size()):
+# Assign weapon system groups and weapons based on ship_stats.
+	for i in range(all_weapons.size()):
 			# Placeholder
-			all_weapons[i].set_weapon_slot(data.weapon_dictionary.get(data.weapon_enum.RAILGUN))
-			all_weapons[i].weapon_system_group = 1
-			#Gets data from ship_stats, may need to be moved to initialize(p_ship_stats). 
-			#all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i].weapon) 
-	
+			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+	print(ship_stats.weapon_systems[0].weapons.is_empty())
+# Turn on and off autofire as the refit system and ship stats demand.
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:
 		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
+	
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
 
@@ -232,6 +229,8 @@ func process_damage(projectile: Projectile) -> void:
 	HullIntegrityIndicator.value = hull_integrity
 	if hull_integrity <= 0.0:
 		destroy_ship()
+	if ManualControlHUD.current_ship == self:
+		ManualControlHUD.update_hud()
 	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
 
@@ -294,6 +293,9 @@ func update_flux_indicators() -> void:
 	SoftFluxIndicator.value = floor(flux_rate * soft_flux)
 	SoftFluxIndicator.position.x = HardFluxIndicator.value
 	FluxPip.position.x = HardFluxIndicator.value - 2
+	if ManualControlHUD.current_ship == self:
+		ManualControlHUD.update_hud()
+
 func display_icon(value: bool) -> void:
 	TacticalMapIcon.visible = value
 
@@ -358,7 +360,8 @@ func _input(event: InputEvent) -> void:
 			elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				toggle_auto_fire(all_weapons)
 			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
-				#toggle_manual_control()
+				toggle_manual_control()
+				ManualControlHUD.toggle_visible()
 				camera_removed.emit()
 		elif not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
@@ -407,15 +410,20 @@ func toggle_manual_control() -> void:
 	
 	if CombatBehaviorTree.enabled == true:
 		CombatBehaviorTree.toggle_root(false)
-	
 	if manual_control == false:
 		manual_control = true
 		ship_select = false
+		ManualControlHUD.set_ship(self)
 		CombatCamera.position_smoothing_enabled = false
 		CombatCamera.global_position = self.global_position
 	elif manual_control == true:
 		manual_control = false
 		ship_select = false
+		#for weapon_system in ship_stats.weapon_systems:
+			#if weapon_system.auto_fire_start == true:
+				#toggle_auto_aim(weapon_system.weapons)
+				#toggle_auto_fire(weapon_system.weapons)
+		ManualControlHUD.set_ship(null)
 		_on_mouse_exited()
 	toggle_manual_aim(all_weapons, manual_control)
 	
