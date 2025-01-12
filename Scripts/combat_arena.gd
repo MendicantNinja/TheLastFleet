@@ -32,15 +32,18 @@ func _ready() -> void:
 	#occupancy_map.map_type = imap_manager.MapType.OCCUPANCY_MAP
 	#threat_map.map_type = imap_manager.MapType.THREAT_MAP
 	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
+	var weighted_imap: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var fake_tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var vulnerability_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	influence_map.map_type = imap_manager.MapType.INFLUENCE_MAP
+	weighted_imap.map_type = imap_manager.MapType.INFLUENCE_MAP
 	fake_tension_map.map_type = imap_manager.MapType.TENSION_MAP
 	vulnerability_map.map_type = imap_manager.MapType.VULNERABILITY_MAP
 	tension_map.map_type = imap_manager.MapType.TENSION_MAP
 	imap_manager.tension_map = tension_map
 	imap_manager.vulnerability_map = vulnerability_map
+	imap_manager.weighted_imap = weighted_imap
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:

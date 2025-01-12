@@ -1,45 +1,33 @@
 extends LeafAction
 
-
-
 func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 120 != 0:
 		return FAILURE
 	
-	var clusters: Array = []
-	var visited: Array = []
-	
-	var registry_cells: Dictionary = imap_manager.registry_map
-	var enemy_presence: Array = []
-	for cell in registry_cells.keys():
-		var registered_agents: Array = registry_cells[cell]
-		for n_agent in registered_agents:
-			if n_agent == null:
-				continue
-			if n_agent.is_friendly == true:
-				enemy_presence.push_back(cell)
-				break
+	var enemy_presence: Array = get_tree().get_nodes_in_group(&"friendly")
 	
 	if enemy_presence.is_empty():
 		return SUCCESS
 	
-	for cell in enemy_presence:
-		var cluster = []
-		if cell not in visited:
-			cluster = flood_fill(cell, visited, cluster, enemy_presence)
-		for n_cluster in cluster:
-			clusters.push_back(n_cluster)
+	enemy_presence = []
+	var enemy_density: Dictionary = {}
+	var registry_map: Dictionary = imap_manager.registry_map
+	for cell in registry_map:
+		var influence_density: float = 0.0
+		var registered_agents: Array = registry_map[cell]
+		for unit in registered_agents:
+			if unit.is_friendly == true:
+				influence_density += unit.approx_influence
+			if unit.is_friendly == true and not enemy_presence.has(cell):
+				enemy_presence.push_back(cell)
+		if influence_density > 0.0:
+			enemy_density[cell] = influence_density
 	
-	agent.enemy_clusters = clusters
+	var max_density: float = enemy_density.values().max()
+	for cluster in enemy_density:
+		var density_weight: float = enemy_density[cluster] / max_density
+		enemy_density[cluster] = density_weight
+	
+	agent.cluster_density = enemy_density
+	agent.enemy_clusters = enemy_density.keys()
 	return FAILURE
-
-func flood_fill(cell, visited, cluster, enemy_presence) -> Array: 
-	if cell in visited: 
-		return cluster
-	 
-	visited.append(cell) 
-	cluster.append(cell) 
-	for n_cell in enemy_presence: 
-		if cell.distance_squared_to(n_cell) == 1: 
-			flood_fill(n_cell, visited, cluster, enemy_presence)
-	return cluster

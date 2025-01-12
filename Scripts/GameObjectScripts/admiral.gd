@@ -20,6 +20,9 @@ var group_targets_key_suffix: StringName = &" targets"
 var target_key: StringName = &"target"
 
 var enemy_clusters: Array = []
+var cluster_density: Dictionary = {}
+var enemy_vulnerability: Array = []
+var vulnerable_targets: Dictionary = {}
 
 func _ready() -> void:
 	pass

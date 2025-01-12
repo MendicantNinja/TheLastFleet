@@ -72,7 +72,11 @@ var idle: bool = true
 var template_maps: Dictionary = {}
 var template_cell_indices: Dictionary = {}
 var target_in_range: bool = false
-var prev_position: Vector2 = Vector2.ZERO
+var imap_cell: Vector2i = Vector2i.ZERO
+var registry_cell: Vector2i = Vector2i.ZERO
+var weigh_influence: Imap
+var approx_influence: float = 0.0
+
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation
@@ -100,7 +104,8 @@ signal camera_removed()
 signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
-signal update_agent_influence(last_position)
+signal update_agent_influence(prev_imap_cell, imap_cell)
+signal update_registry_cell(prev_registry_cell, registry_cell)
 
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -167,7 +172,7 @@ func _ready() -> void:
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
 	var occupancy_radius: int = 2
-	var threat_radius: int = 4
+	var threat_radius: int = 3
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
@@ -195,9 +200,13 @@ func _ready() -> void:
 		composite_influence.add_map(map, center_val, center_val, 1.0)
 		invert_composite.add_map(map, center_val, center_val, -1.0)
 	
-	composite_influence.normalize_template_map()
+	weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
+
+	for m in range(0, composite_influence.height):
+		for n in range(0, composite_influence.width):
+			approx_influence += composite_influence.map_grid[m][n]
+
 	template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
-	invert_composite.normalize_template_map()
 	if is_friendly == true:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
@@ -238,6 +247,14 @@ func process_damage(projectile: Projectile) -> void:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
 
 func destroy_ship() -> void:
+	# REMOVE IMAP MANAGER REFERENCES HERE
+	var agents_registered: Array = imap_manager.registry_map[registry_cell]
+	agents_registered.erase(self)
+	if agents_registered.is_empty():
+		imap_manager.registry_map.erase(registry_cell)
+	else:
+		imap_manager.registry_map[registry_cell] = agents_registered
+	
 	destroyed.emit()
 	remove_from_group(group_name)
 	remove_from_group(&"agent")
@@ -337,6 +354,20 @@ func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
 		zoom_value = zoom_out_limit
 	elif n_zoom_value < zoom_in_limit:
 		zoom_value = zoom_in_limit
+
+func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
+	if weigh_influence != null:
+		imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
+	var weight: float = 0.0
+	for cluster in neighborhood_density:
+		if registry_cell in cluster:
+			weight = 1 / neighborhood_density[cluster]
+	
+	var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
+	for m in range(0, composite_influence.height):
+		for n in range(0, composite_influence.width):
+			weigh_influence.map_grid[m][n] = composite_influence.map_grid[m][n] * abs(weight)
+	imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, 1.0)
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -494,6 +525,7 @@ func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 	group_velocity = n_velocity
 	group_transform = next_transform
 
+@warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
@@ -509,10 +541,16 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
-	if Engine.get_physics_frames() % 60 == 0 and global_position != prev_position:
-		update_agent_influence.emit(prev_position)
-		prev_position = global_position
+	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
+		update_agent_influence.emit(imap_cell, current_imap_cell)
+		imap_cell = current_imap_cell
 
+	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
+		update_registry_cell.emit(registry_cell, current_registry_cell)
+		registry_cell = current_registry_cell
+	
 	if movement_delta == 0.0 or rotational_delta == 0.0:
 		movement_delta = speed * delta
 		rotational_delta = ship_stats.turn_rate * delta
