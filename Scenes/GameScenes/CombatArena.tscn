@@ -160,7 +160,6 @@ debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
-visible = false
 script = ExtResource("5_ojmr4")
 
 [node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
@@ -259,27 +258,26 @@ layout_mode = 0
 offset_left = -5.0
 offset_top = -187.0
 offset_right = 435.0
-offset_bottom = 69.0
+offset_bottom = 3.0
 texture = ExtResource("9_lucm6")
-stretch_mode = 2
 
-[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper"]
+[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
 layout_mode = 0
-offset_left = 66.0
-offset_top = -178.0
-offset_right = 219.0
-offset_bottom = -138.0
+offset_left = 71.0
+offset_top = 9.0
+offset_right = 224.0
+offset_bottom = 49.0
 theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 text = "WEAPON SYSTEMS"
 
-[node name="WeaponList" type="VBoxContainer" parent="ManualControlHUD/HUDWrapper"]
+[node name="WeaponList" type="VBoxContainer" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
 layout_mode = 0
-offset_left = 59.0
-offset_top = -160.0
-offset_right = 434.0
-offset_bottom = 3.0
+offset_left = 62.0
+offset_top = 36.0
+offset_right = 437.0
+offset_bottom = 192.0
 mouse_filter = 2
 
 [node name="OptionsMenu" type="CanvasLayer" parent="."]

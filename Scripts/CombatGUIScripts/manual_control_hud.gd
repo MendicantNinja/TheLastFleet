@@ -8,7 +8,7 @@ var current_ship: Ship = null
 @onready var FluxPip = $HUDWrapper/HardFluxIndicator/FluxPip
 @onready var HullIntegrityIndicator = $HUDWrapper/HullIntegrityIndicator
 
-@onready var WeaponList = $HUDWrapper/WeaponList
+@onready var WeaponList = $HUDWrapper/IndicatorDecor/WeaponList
 @onready var weapon_system_scene = load("res://Scenes/GUIScenes/CombatGUIScenes/ManualHUDWeaponElement.tscn")
 
 func set_ship(ship: Ship) -> void:
@@ -22,9 +22,7 @@ func set_ship(ship: Ship) -> void:
 
 func setup_weapon_systems() -> void:
 	for weapon_system in current_ship.ship_stats.weapon_systems:
-		print("setup called")
 		if weapon_system.weapons.is_empty() == false:
-			print("is not empty true")
 			var weapon_system_instance: GridContainer = weapon_system_scene.instantiate()
 			weapon_system_instance.initialize(weapon_system)
 			WeaponList.add_child(weapon_system_instance)

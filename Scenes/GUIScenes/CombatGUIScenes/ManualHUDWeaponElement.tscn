@@ -16,6 +16,7 @@ layout_mode = 2
 [node name="Number" type="RichTextLabel" parent="Row1"]
 layout_mode = 2
 theme = ExtResource("2_35cnu")
+theme_override_font_sizes/normal_font_size = 12
 bbcode_enabled = true
 text = "0"
 fit_content = true
@@ -25,14 +26,13 @@ autowrap_mode = 0
 layout_mode = 2
 theme = ExtResource("2_35cnu")
 bbcode_enabled = true
-text = "WEAPONNAME"
+text = "1X WEAPONNAME"
 fit_content = true
 autowrap_mode = 0
 
 [node name="Autofire" type="RichTextLabel" parent="Row1"]
 layout_mode = 2
 theme = ExtResource("2_35cnu")
-theme_override_font_sizes/normal_font_size = 12
 text = "AUTOFIRE:"
 fit_content = true
 autowrap_mode = 0
