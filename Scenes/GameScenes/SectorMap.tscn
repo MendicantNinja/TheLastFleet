@@ -1,7 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://cktjylm2g4cjb"]
+[gd_scene load_steps=8 format=3 uid="uid://cktjylm2g4cjb"]
 
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/sector_map.gd" id="1_7tr0u"]
+[ext_resource type="Texture2D" uid="uid://ch7cqohsydlge" path="res://Art/Backgrounds/Very Large/hubble_orion_nebula.jpg" id="2_asqed"]
+[ext_resource type="Script" path="res://Scripts/SectorMapScripts/grid_container.gd" id="2_hsfyj"]
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/ship.gd" id="2_jxk1p"]
+[ext_resource type="Theme" uid="uid://dmjchh3dcnesd" path="res://ThemesandFonts/Themes/FleetOverviewTheme.tres" id="3_22nve"]
 
 [sub_resource type="Gradient" id="Gradient_noc7r"]
 colors = PackedColorArray(0.183333, 1, 0, 1, 0.184314, 1, 0, 1)
@@ -19,6 +22,15 @@ grow_vertical = 2
 size_flags_horizontal = 4
 script = ExtResource("1_7tr0u")
 
+[node name="TextureRect" type="TextureRect" parent="."]
+self_modulate = Color(1, 1, 1, 0.72549)
+layout_mode = 0
+offset_left = -35.0
+offset_top = -555.0
+offset_right = 1945.0
+offset_bottom = 1425.0
+texture = ExtResource("2_asqed")
+
 [node name="GridContainer" type="GridContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
@@ -27,6 +39,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 columns = 6
+script = ExtResource("2_hsfyj")
 
 [node name="LineOverlay" type="Control" parent="."]
 layout_mode = 1
@@ -34,8 +47,23 @@ anchors_preset = 0
 offset_bottom = 1080.0
 
 [node name="Ship" type="TextureRect" parent="."]
+layout_mode = 0
 offset_right = 64.0
 offset_bottom = 64.0
 scale = Vector2(0.274778, 0.274778)
 texture = SubResource("GradientTexture2D_w0h0p")
 script = ExtResource("2_jxk1p")
+
+[node name="ExitStar" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme = ExtResource("3_22nve")
+text = "EXIT"
+
+[node name="EntranceStar" type="RichTextLabel" parent="."]
+layout_mode = 0
+offset_right = 92.0
+offset_bottom = 40.0
+theme = ExtResource("3_22nve")
+text = "ENTRANCE"

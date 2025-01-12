@@ -1,6 +1,8 @@
 extends TextureButton
 class_name Star
 
+@export var line_overlay_offset = Vector2(28, 23);
+
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -40,15 +42,16 @@ func _on_mouse_entered() -> void:
 		if tile < 0 or tile >= cols * rows:
 			continue;
 		var target_startile = $"../..".get_child(tile);
-		var start : Vector2 = global_position;
-		var end : Vector2 = target_startile.get_child(0).global_position;
+		var start : Vector2 = global_position + line_overlay_offset;
+		var end : Vector2 = target_startile.get_child(0).global_position + line_overlay_offset;
 		var line : Line2D = Line2D.new();
 		$"../../../LineOverlay".add_child(line);
 		line.add_point(start - line.position);
 		line.add_point(end - line.position);
-		line.width = 3;
+		line.antialiased = true;
+		line.width = 1;
 		line.position = Vector2(20, 20);
-		line.default_color = Color.DARK_GREEN;
+		line.default_color = Color.WHITE;
 		
 func _on_mouse_exited():
 	for child in $"../../../LineOverlay".get_children():
