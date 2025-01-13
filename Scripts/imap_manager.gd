@@ -108,7 +108,6 @@ func _on_agent_registry_changed(prev_registry_cell, registry_cell, agent: Ship) 
 
 @warning_ignore("narrowing_conversion")
 func _on_agent_destroyed(agent: Ship) -> void:
-	
 	var cell_column: int = agent.global_position.x / default_cell_size
 	var cell_row: int = agent.global_position.y / default_cell_size
 	for imap_type in agent_maps:

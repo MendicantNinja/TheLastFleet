@@ -86,7 +86,7 @@ func _unhandled_input(event) -> void:
 			toggle_options_menu()
 
 func _physics_process(delta):
-	if Engine.get_physics_frames() % 70 == 0:
+	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 70 == 0:
 		imap_manager.weigh_force_density()
 
 func toggle_fleet_deployment_panel() -> void:

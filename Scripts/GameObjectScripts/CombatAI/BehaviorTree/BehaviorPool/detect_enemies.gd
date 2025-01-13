@@ -23,11 +23,5 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 		if influence_density > 0.0:
 			enemy_density[cell] = influence_density
 	
-	var max_density: float = enemy_density.values().max()
-	for cluster in enemy_density:
-		var density_weight: float = enemy_density[cluster] / max_density
-		enemy_density[cluster] = density_weight
-	
-	agent.cluster_density = enemy_density
 	agent.enemy_clusters = enemy_density.keys()
 	return FAILURE

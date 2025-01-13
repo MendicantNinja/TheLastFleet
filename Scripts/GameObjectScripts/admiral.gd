@@ -24,10 +24,11 @@ var cluster_density: Dictionary = {}
 var enemy_vulnerability: Array = []
 var vulnerable_targets: Dictionary = {}
 
-func _ready() -> void:
-	pass
-
 func _physics_process(_delta) -> void:
+	if imap_manager.registry_map.is_empty() and AdmiralAI.enabled == true:
+		AdmiralAI.enabled = false
+	elif not imap_manager.registry_map.is_empty() and AdmiralAI.enabled == false:
+		AdmiralAI.enabled = true
 	if available_units.is_empty():
 		available_units = get_tree().get_nodes_in_group(&"enemy")
 		initial_unit_count = available_units.size()
