@@ -243,10 +243,10 @@ func _ready() -> void:
 
 	var max_range: float = weapon_ranges.keys().max()
 	var min_range: float = weapon_ranges.keys().min()
-	longest_range_weapon = weapon_ranges[max_range]
-	shortest_range_weapon = weapon_ranges[min_range]
-	furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
-	furthest_safe_distance += longest_range_weapon.weapon.range
+	#longest_range_weapon = weapon_ranges[max_range]
+	#shortest_range_weapon = weapon_ranges[min_range]
+	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
+	#furthest_safe_distance += longest_range_weapon.weapon.range
 
 	deploy_ship()
 	self.input_event.connect(_on_input_event)
@@ -369,18 +369,6 @@ func set_group_leader(leader_value: bool) -> void:
 
 func set_idle_flag(value: bool) -> void:
 	idle = value
-
-func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
-	if not ship_select:
-		return
-	add_child(camera)
-	ManualControlCamera = camera
-	ManualControlCamera.enabled = true
-	zoom_value = n_zoom_value
-	if n_zoom_value > zoom_out_limit:
-		zoom_value = zoom_out_limit
-	elif n_zoom_value < zoom_in_limit:
-		zoom_value = zoom_in_limit
 
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 	if weigh_influence != null:
