@@ -46,10 +46,6 @@ func _init():
 	template_maps[invert_occupancy_templates.type] = invert_occupancy_templates
 	template_maps[invert_threat_templates.type] = invert_threat_templates
 
-func _physics_process(delta):
-	if Engine.get_physics_frames() % 70 == 0:
-		weigh_force_density()
-
 func register_map(map: Imap) -> void:
 	agent_maps[map.map_type] = map
 

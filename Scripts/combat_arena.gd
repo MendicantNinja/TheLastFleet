@@ -87,6 +87,10 @@ func _unhandled_input(event) -> void:
 		if (event.keycode == KEY_ESCAPE and event.pressed):
 			toggle_options_menu()
 
+func _physics_process(delta):
+	if Engine.get_physics_frames() % 70 == 0:
+		imap_manager.weigh_force_density()
+
 func toggle_fleet_deployment_panel() -> void:
 	if FleetDeploymentPanel.visible == false:
 		FleetDeploymentPanel.visible = true
