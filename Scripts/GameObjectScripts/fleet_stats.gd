@@ -22,7 +22,7 @@ var fuel: int:
 @export var thrust: int = 0
 func _init():
 	if inventory.is_empty():
-		inventory.append(ItemSlot.new(data.item_enum.RAILGUN, 2))
+		inventory.append(ItemSlot.new(data.item_enum.RAILGUN, 8))
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass

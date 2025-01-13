@@ -1,0 +1,43 @@
+[remap]
+
+importer="font_data_dynamic"
+type="FontFile"
+uid="uid://dl2lt8pten02n"
+path="res://.godot/imported/Orbitron-VariableFont_wght.ttf-da87fa24cb1fcb81e716e5a526c55d14.fontdata"
+
+[deps]
+
+source_file="res://ThemesandFonts/Fonts/Orbitron-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/Orbitron-VariableFont_wght.ttf-da87fa24cb1fcb81e716e5a526c55d14.fontdata"]
+
+[params]
+
+Rendering=null
+antialiasing=1
+generate_mipmaps=true
+disable_embedded_bitmaps=false
+multichannel_signed_distance_field=false
+msdf_pixel_range=8
+msdf_size=48
+allow_system_fallback=true
+force_autohinter=false
+hinting=0
+subpixel_positioning=1
+oversampling=10.0
+Fallbacks=null
+fallbacks=[]
+Compress=null
+compress=false
+preload=[{
+"chars": [],
+"glyphs": [],
+"name": "OrbitronGUI",
+"size": Vector2i(16, 0),
+"variation_embolden": 0.0,
+"variation_opentype": {
+2003265652: 600
+}
+}]
+language_support={}
+script_support={}
+opentype_features={}

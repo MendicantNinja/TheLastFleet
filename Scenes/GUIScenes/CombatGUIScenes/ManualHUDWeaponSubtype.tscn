@@ -1,0 +1,34 @@
+[gd_scene load_steps=4 format=3 uid="uid://bfx23mlsmkp4v"]
+
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/manual_hud_weapon_subtype.gd" id="1_malee"]
+[ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="2_rkhg0"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_lqloe"]
+
+[node name="ManualHudWeaponSubtype" type="HBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1808.0
+offset_bottom = -1064.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_malee")
+
+[node name="HSeparator" type="HSeparator" parent="."]
+custom_minimum_size = Vector2(20, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 0.0
+theme_override_styles/separator = SubResource("StyleBoxEmpty_lqloe")
+
+[node name="NameCount" type="RichTextLabel" parent="."]
+layout_mode = 2
+theme = ExtResource("2_rkhg0")
+theme_override_font_sizes/normal_font_size = 11
+bbcode_enabled = true
+text = "1X WEAPONAME"
+fit_content = true
+autowrap_mode = 0

@@ -114,11 +114,13 @@ var weapon_dictionary: Dictionary = {
 	}
 
 enum weapon_mount_enum {
-	SMALL_BALLISTIC
+	SMALL_BALLISTIC,
+	MEDIUM_BALLISTIC
 }
 
 var weapon_mount_dictionary: Dictionary = {
-	weapon_mount_enum.SMALL_BALLISTIC: load("res://Resources/WeaponMounts/SmallBallistic.tres")
+	weapon_mount_enum.SMALL_BALLISTIC: load("res://Resources/WeaponMounts/SmallBallistic.tres"),
+	weapon_mount_enum.MEDIUM_BALLISTIC: load("res://Resources/WeaponMounts/MediumBallistic.tres"),
 }
 
 enum weapon_mount_type_enum {

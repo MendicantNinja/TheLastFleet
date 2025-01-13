@@ -24,7 +24,6 @@ func _unhandled_input(event) -> void:
 		elif (event.keycode == KEY_I and event.is_pressed()):
 			swap_gui()
 			indicate_selected_button(Inventory)
-
 # Hide all GUI
 func indicate_selected_button(p_control: Control) -> void:
 	settings.swizzle(Fleet)

@@ -1,0 +1,43 @@
+[remap]
+
+importer="font_data_dynamic"
+type="FontFile"
+uid="uid://83pqy8tgutmt"
+path="res://.godot/imported/Oxanium-VariableFont_wght.ttf-19779b1aed157ea421dd293461421f10.fontdata"
+
+[deps]
+
+source_file="res://ThemesandFonts/Fonts/Oxanium-VariableFont_wght.ttf"
+dest_files=["res://.godot/imported/Oxanium-VariableFont_wght.ttf-19779b1aed157ea421dd293461421f10.fontdata"]
+
+[params]
+
+Rendering=null
+antialiasing=1
+generate_mipmaps=true
+disable_embedded_bitmaps=false
+multichannel_signed_distance_field=false
+msdf_pixel_range=8
+msdf_size=48
+allow_system_fallback=true
+force_autohinter=false
+hinting=2
+subpixel_positioning=0
+oversampling=0.0
+Fallbacks=null
+fallbacks=[]
+Compress=null
+compress=false
+preload=[{
+"chars": [],
+"glyphs": [],
+"name": "OxaniumGUI",
+"size": Vector2i(0, 0),
+"variation_embolden": 0.0,
+"variation_opentype": {
+2003265652: 700
+}
+}]
+language_support={}
+script_support={}
+opentype_features={}

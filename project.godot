@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="The Last Fleet"
-run/main_scene="res://Scenes/GameScenes/MainMenu.tscn"
+run/main_scene="res://Scenes/GameScenes/CombatArena.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -42,11 +42,13 @@ shapes/paths/geometry_color=Color(0.101961, 1, 0.701961, 0.188235)
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=2
-window/size/resizable=false
+window/size/mode=3
 window/size/window_width_override=1280
 window/size/window_height_override=720
-window/stretch/mode="viewport"
+window/energy_saving/keep_screen_on=false
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/stretch/scale_mode="integer"
 
 [global_group]
 
@@ -129,6 +131,7 @@ m2={
 2d_physics/layer_2="Obstacle"
 2d_physics/layer_3="EnemyShip"
 2d_physics/layer_4="Projectile"
+2d_physics/layer_8="Inputs (e.g. WeaponSlotRefitting)"
 avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"

@@ -1,41 +1,96 @@
-[gd_resource type="Resource" script_class="Ship" load_steps=2 format=3 uid="uid://c66bn0sl01mcg"]
+[gd_resource type="Resource" script_class="ShipHull" load_steps=12 format=3 uid="uid://c66bn0sl01mcg"]
 
 [ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_5mct8"]
+[ext_resource type="Texture2D" uid="uid://bpdt55pm4f7di" path="res://Art/ShipArt/prototype9_v2.png" id="2_6dcpi"]
+[ext_resource type="PackedScene" uid="uid://c2noldww8g5st" path="res://Scenes/CompositeGameObjects/Ships/Lion.tscn" id="2_86be7"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="3_xjw0g"]
+[ext_resource type="Texture2D" uid="uid://pjfcs0okkcpp" path="res://Art/WeaponArt/weapon_mount.png" id="4_cr8ra"]
+
+[sub_resource type="Resource" id="Resource_s38fq"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 1
+image = ExtResource("4_cr8ra")
+firing_arc = 90
+is_fixed = false
+
+[sub_resource type="Resource" id="Resource_8tgro"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 1
+image = ExtResource("4_cr8ra")
+firing_arc = 90
+is_fixed = false
+
+[sub_resource type="Resource" id="Resource_4g8e1"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 1
+image = ExtResource("4_cr8ra")
+firing_arc = 90
+is_fixed = false
+
+[sub_resource type="Resource" id="Resource_u4b3v"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 0
+image = ExtResource("4_cr8ra")
+firing_arc = 180
+is_fixed = false
+
+[sub_resource type="Resource" id="Resource_bssog"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 0
+image = ExtResource("4_cr8ra")
+firing_arc = 180
+is_fixed = false
+
+[sub_resource type="Resource" id="Resource_id6g2"]
+script = ExtResource("3_xjw0g")
+weapon_mount_type = 0
+weapon_mount_size = 0
+image = ExtResource("4_cr8ra")
+firing_arc = 180
+is_fixed = false
 
 [resource]
 script = ExtResource("1_5mct8")
-ship_type_name = ""
+ship_type_name = "Lion"
 ship_description = ""
-ship_type = 0
-ship_size = 0
+ship_type = 4
+ship_size = 2
+ship_tech = 1
+ship_packed_scene = ExtResource("2_86be7")
 ship_system = 0
+weapon_mounts = Array[ExtResource("3_xjw0g")]([SubResource("Resource_s38fq"), SubResource("Resource_8tgro"), SubResource("Resource_4g8e1"), SubResource("Resource_u4b3v"), SubResource("Resource_bssog"), SubResource("Resource_id6g2"), SubResource("Resource_4g8e1")])
 base_mods = []
-weapon_slots = []
+ship_sprite = ExtResource("2_6dcpi")
 ship_scaling = 1
-width_offset = 0.0
-height_offset = 0.0
-hull_integrity = 0
-armor = 0
-shield_efficiency = 0.0
-flux = 0
-flux_dissipation = 0
-top_speed = 0
-acceleration = 0.0
-deceleration = 0.0
-turn_rate = 0.0
+hull_integrity = 3000
+armor = 1000
+shield_efficiency = 1.0
+shield_upkeep = 2.0
+flux = 4000
+flux_dissipation = 40
+top_speed = 500
+acceleration = 0.8
+deceleration = 0.4
+turn_rate = 0.2
 mass = 0.0
-cargo_capacity = 0
-supplies_per_month = 0.0
-supplies_per_deployment = 0.0
-fuel_capacity = 0
-fuel_usage_per_lightyear = 0.0
-crew_capacity = 0
-skeleton_crew = 0
-fighter_bays = 0
+drive_field = 10
+deployment_points = 8.0
 base_cr = 65.0
 cr_recovery_rate = 2.0
 cr_deployment_cost = 0.0
-deployment_points = 0
-sensor_strength = 0.0
-stealth = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 8.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 100
+skeleton_crew = 40
+fighter_bays = 0
+sensor_strength = 0
+sensor_profile = 0
 repair_rate = 0.0

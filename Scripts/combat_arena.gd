@@ -4,12 +4,12 @@ extends Node2D
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
 @onready var OptionsMenuPanel = %OptionsMenuPanel 
+@onready var ManualControlHUD = %ManualControlHUD
 @onready var TacticalMap = %TacticalMap
 @onready var All = %All
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
-
 # groups
 
 func _ready() -> void:

@@ -8,8 +8,9 @@ class_name WeaponSlot
 @onready var effective_range: Area2D = $EffectiveRange
 @onready var weapon_node: Node2D = $WeaponNode
 @onready var rate_of_fire_timer: Timer = $ROFTimer
+
 # Important Stuff
-#@export var assigned_ship: Ship
+@export var weapon_system_group: int = -1
 
 @export var weapon: Weapon:
 	set(value):
@@ -25,6 +26,7 @@ class_name WeaponSlot
 			weapon_mount_image.texture = value.image
 		else:
 			return
+
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
@@ -92,7 +94,7 @@ func _draw() -> void:
 		range_display_color = Color(range_display_color, 0.4)
 		return
 	
-	var divisor: float = 100.0
+	var divisor: float = weapon.range # Change to effective range later from shipmods? Firing arcs need a bit of a rework sometime.
 	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
 	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
 	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))
@@ -100,12 +102,14 @@ func _draw() -> void:
 	var end_transform: Vector2 = default_direction.x.rotated(end_angle)
 	start_angle = start_transform.angle()
 	end_angle = end_transform.angle()
-	for i in range(0, subdivisions):
-		draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
+	if display_aim == true:
+		for i in range(0, subdivisions):
+			draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
 
 func _ready():
 	weapon_mount_image.texture = weapon_mount.image
 	weapon_image.texture = weapon.image
+	
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	can_fire = true
@@ -117,14 +121,28 @@ func _ready():
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
 
-func set_weapon_slot(p_weapon: Weapon) -> void:
-	weapon = p_weapon
+func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
+	weapon_system_group = 0 # Index of 0 = weapon system 1
+	# Give everything railguns in dev mode
+	if settings.dev_mode == true:
+		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
+		
+		var new_shape: Shape2D = CircleShape2D.new()
+		new_shape.radius = weapon.range
+		effective_range_shape.shape = new_shape
+		
+		var interval_in_seconds: float = 1.0 / weapon.fire_rate
+		rate_of_fire_timer.wait_time = interval_in_seconds
+		return
+	
+	weapon = p_weapon_slot.weapon
+	weapon_system_group = p_weapon_slot.weapon_system_group
 	
 	var new_shape: Shape2D = CircleShape2D.new()
-	new_shape.radius = weapon.range
+	new_shape.radius = p_weapon_slot.weapon.range
 	effective_range_shape.shape = new_shape
 	
-	var interval_in_seconds: float = 1.0 / weapon.fire_rate
+	var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
 	rate_of_fire_timer.wait_time = interval_in_seconds
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
@@ -133,7 +151,7 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> 
 	owner_rid = owner_value
 	if not is_friendly:
 		auto_aim = true
-	set_weapon_size_and_color()
+	#set_weapon_size_and_color()
 
 func set_auto_fire(fire_value: bool) -> void:
 	auto_fire = fire_value
@@ -182,38 +200,6 @@ func set_target_unit(unit) -> void:
 	target_unit = unit.get_rid()
 	if not available_targets.has(target_unit):
 		target_in_range.emit(false)
-
-func set_weapon_size_and_color():
-	if is_friendly:
-		weapon_mount_image.modulate = settings.player_color
-	elif not is_friendly:
-		weapon_mount_image.modulate = get_parent().self_modulate
-	#weapon_image.self_modulate = settings.player_color
-	match weapon_mount.weapon_mount_size:
-		data.size_enum.SMALL:
-			weapon_mount_image.scale = Vector2(.2, .2)#/assigned_ship.scale # Important to scale weapon slots so that the size is constant.
-		data.size_enum.MEDIUM:
-			weapon_mount_image.scale = Vector2(.4, .4)#/assigned_ship.scale
-		data.size_enum.LARGE:
-			weapon_mount_image.scale = Vector2(.7, .7)#/assigned_ship.scale
-		data.size_enum.SPINAL:
-			weapon_mount_image.scale = Vector2(1, 1)#/assigned_ship.scale
-		_:
-			print("Unknown weapon size.")
-	
-	#match weapon_mount.weapon_mount_type:
-		#data.weapon_mount_type_enum.BALLISTIC:
-			#weapon_mount_image.self_modulate = Color8(255, 100, 20, 255)
-		#data.weapon_mount_type_enum.ENERGY:
-			#weapon_mount_image.self_modulate = Color8(0, 212, 255, 255)
-		#data.weapon_mount_type_enum.HYBRID:
-			#weapon_mount_image.self_modulate = Color8(0, 255, 123, 255)
-		#data.weapon_mount_type_enum.MISSILE:
-			#weapon_mount_image.self_modulate = Color8(255, 51, 0, 255)
-		#data.weapon_mount_type_enum.UNIVERSAL:
-			#weapon_mount_image.self_modulate = Color8(255, 198, 184, 255)
-		#_:
-			#print("Unknown weapon type.")
 
 func toggle_display_aim(toggle: bool) -> void:
 	display_aim = toggle

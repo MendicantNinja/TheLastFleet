@@ -7,6 +7,7 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_82o22"]
 
 [node name="WeaponSlot" type="Node2D"]
+z_index = 2
 z_as_relative = false
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")
@@ -15,9 +16,10 @@ weapon_mount = ExtResource("3_d4mge")
 [node name="WeaponNode" type="Node2D" parent="."]
 
 [node name="WeaponMountSprite" type="Sprite2D" parent="WeaponNode"]
+unique_name_in_owner = true
+rotation = 1.5708
 
 [node name="WeaponSprite" type="Sprite2D" parent="WeaponNode/WeaponMountSprite"]
-rotation = 1.5708
 
 [node name="WeaponSFX" type="AudioStreamPlayer2D" parent="WeaponNode"]
 bus = &"SFX"
