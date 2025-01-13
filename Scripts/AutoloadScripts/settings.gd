@@ -1,7 +1,7 @@
 extends Node
 
 # If dev mode is true, railgun weapons are added to the ship.gd automatically and assigned a slot. Rather than grabbing and assigning weapons from ship stats.
-@onready var dev_mode = false
+@onready var dev_mode = true
 
 
 var player_color: Color = Color8(25, 125, 255, 255)

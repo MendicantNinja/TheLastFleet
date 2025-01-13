@@ -197,7 +197,6 @@ func _ready() -> void:
 	for i in range(all_weapons.size()):
 			# Placeholder
 			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
-	print(ship_stats.weapon_systems[0].weapons.is_empty())
 # Turn on and off autofire as the refit system and ship stats demand.
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:
