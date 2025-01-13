@@ -151,7 +151,6 @@ text = "FLEET REFITTING"
 scroll_active = false
 
 [node name="GalacticMap" type="TextureButton" parent="ListContainer"]
-visible = false
 layout_mode = 2
 texture_normal = ExtResource("3_x54xu")
 texture_hover = ExtResource("6_4abs8")
