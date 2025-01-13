@@ -38,6 +38,15 @@ func add_value(n: int, m: int, value: float) -> void:
 	map_grid[n][m] += value
 	update_grid_value.emit(n, m, map_grid[n][m])
 
+func clear_map() -> void:
+	for m in range(0, height):
+		var row_reset: Array = []
+		row_reset.resize(width)
+		row_reset.fill(0.0)
+		map_grid[m] = row_reset
+		#update_row_value() 
+		# Might need that for debugging but unlikely
+
 @warning_ignore("integer_division", "narrowing_conversion")
 func find_cell_index_from_position(position: Vector2) -> Vector2:
 	var indices: Vector2i = Vector2i.ZERO

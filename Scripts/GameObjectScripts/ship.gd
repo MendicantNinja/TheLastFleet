@@ -277,16 +277,13 @@ func destroy_ship() -> void:
 		imap_manager.registry_map.erase(registry_cell)
 	else:
 		imap_manager.registry_map[registry_cell] = agents_registered
-	
+	remove_from_group(&"agent")
+	if is_friendly == true:
+		remove_from_group(&"friendly")
+	elif is_friendly == false:
+		remove_from_group(&"enemy")
 	destroyed.emit()
 	remove_from_group(group_name)
-	remove_from_group(&"agent")
-	var group: Array = get_tree().get_nodes_in_group(group_name)
-	if group_leader == true and group.size() > 1:
-		var unit_range: int = group.size() - 1
-		var pick_leader: int = randi_range(0, unit_range)
-		var new_leader: Ship = group[pick_leader]
-		new_leader.set_group_leader(true)
 	ShipTargetIcon.visible = false
 	queue_free()
 

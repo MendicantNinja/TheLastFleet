@@ -65,6 +65,7 @@ func _ready() -> void:
 				imap_debug_grid[i].append(cell_instance)
 	
 	imap_manager.register_agents(get_tree().get_nodes_in_group(&"agent"))
+	
 	for map in register_maps:
 		imap_manager.register_map(map)
 	FleetDeploymentList.setup_deployment_screen()
@@ -76,9 +77,6 @@ func _ready() -> void:
 	settings.swizzle(Cancel)
 	#%BlackenBackground.size = PlayableAreaBounds.shape.size
 	FleetDeploymentList.units_deployed.connect(TacticalMap.connect_unit_signals)
-	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
-	for friendly_ship in friendly_group:
-		connect_ship_signals(friendly_ship)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
@@ -139,3 +137,7 @@ func connect_ship_signals(friendly_ship: Ship) -> void:
 	#for ship in enemy_group:
 		#ship.ship_targeted.connect(friendly_ship._on_ship_targeted)
 	pass
+
+
+func _on_tree_exiting():
+	imap_manager._on_CombatArena_exiting()

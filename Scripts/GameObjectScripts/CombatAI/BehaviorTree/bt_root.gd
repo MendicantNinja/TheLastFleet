@@ -2,7 +2,7 @@
 extends BehaviorTree
 class_name BehaviorTreeRoot
 
-const BLACKBOARD = preload("res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/blackboard.gd")
+const BLACKBOARD = preload("res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/blackboard.gd")
 
 @export var enabled: bool = true
 

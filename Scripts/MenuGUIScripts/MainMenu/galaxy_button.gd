@@ -15,7 +15,7 @@ func _process(delta: float) -> void:
 
 # Not actually new game, I just copy paste code.
 func on_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/GameScenes/GalacticMap.tscn")
+	get_tree().change_scene_to_file("res://Scenes/GameScenes/SectorMap.tscn")
 
 func on_focus_entered() -> void:
 	pass

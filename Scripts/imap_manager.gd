@@ -116,6 +116,19 @@ func _on_agent_destroyed(agent: Ship) -> void:
 		var map: Imap = agent_maps[imap_type]
 		map.add_map(template_map, cell_row, cell_column, -1.0)
 
+func _on_CombatArena_exiting() -> void:
+	var available_agents: Array = get_tree().get_nodes_in_group(&"agent")
+	for agent: Ship in available_agents:
+		agent.remove_from_group(&"agent")
+		agent.update_agent_influence.disconnect(_on_agent_influence_changed)
+		agent.destroyed.disconnect(_on_agent_destroyed)
+		agent.update_registry_cell.disconnect(_on_agent_registry_changed)
+	registry_map = {}
+	vulnerability_map.clear_map()
+	tension_map.clear_map()
+	for map in agent_maps:
+		agent_maps[map].clear_map()
+
 func weigh_force_density() -> void:
 	var friendly_cluster: Dictionary = {}
 	var enemy_cluster: Dictionary = {}
