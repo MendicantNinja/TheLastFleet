@@ -76,7 +76,8 @@ func process_move(to_position: Vector2) -> void:
 	# input, process_move, IF already existing move_unit, 
 	# else if not already existing: move_new_unit, reset_group_affiliation, move_unit
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
+	if highlighted_group.size() == 0:
+		return
 	
 	var group_leaders: Array = []
 	for unit in highlighted_group:
@@ -90,11 +91,12 @@ func process_move(to_position: Vector2) -> void:
 			move_unit(group_leaders[0], to_position)
 			return
 	
-	if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
-		var leader = group_leaders[0]
-		if leader in prev_group and leader in highlighted_group:
-			move_unit(leader, to_position)
-			return
+	#var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
+	#if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
+		#var leader = group_leaders[0]
+		#if leader in prev_group and leader in highlighted_group:
+			#move_unit(leader, to_position)
+			#return
 	
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
@@ -106,20 +108,25 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	unit_leader.set_navigation_position(to_position)
 	get_viewport().set_input_as_handled()
 
-
 func move_new_unit(to_position: Vector2) -> void:
 	# 1) Create an array of ships (nodes) from the ships the player currently has selected
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	# Delete this to fix left click?
-	if highlighted_group.is_empty():
-		get_viewport().set_input_as_handled()
-		return
 	
-	# 2) Pick the group leader ship at random
-	var unit_range: int = highlighted_group.size() - 1
-	var pick_leader: int = randi_range(0, unit_range)
-	var new_leader: Ship = highlighted_group[pick_leader]
-	new_leader.set_group_leader(true)
+	# 2) Assign group leader
+	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.
+	var new_leader = null
+	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
+		new_leader = highlighted_group[0]
+	
+	# 2b) Find the geometric median of all unit positions and assign the nearest
+	# neighoring ship to the median.
+	if highlighted_group.size() > 2:
+		var unit_positions: Dictionary = {}
+		for unit in highlighted_group:
+			unit_positions[unit.global_position] = unit
+		
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		new_leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.
 	var new_group_name: StringName 
@@ -131,15 +138,14 @@ func move_new_unit(to_position: Vector2) -> void:
 		group_iterator += 1
 	
 	taken_group_names.push_back(new_group_name)
-	#available_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
-	#taken_group_names.sort_custom(func(a, b): return a.naturalnocasecmp_to(b) < 0)
 	
 	# 4) create the group from the currently selected ships. Current_selected_group is full of unique references to ships. Any changes made will not back propagate to highlighted_group and vice versa.
 	var current_selected_group: Array = highlighted_group.duplicate()
 	current_groups[new_group_name] = current_selected_group
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
-
+	new_leader.set_group_leader(true)
+	
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 
@@ -166,30 +172,26 @@ func attack_targets() -> void:
 		var key_copy: StringName = leader.group_name + target_group_key
 		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
 		if targeted_group == targets_available:
-			get_tree().call_group(leader.group_name, "set_combat_ai", true)
 			return
 	
 	var group_leaders: Array = []
 	for unit in highlighted_group:
-		#var key_copy: StringName = unit.group_name + target_group_key
-		#unit.remove_blackboard_data(key_copy)
-		#unit.remove_blackboard_data(target_key)
 		if unit.group_leader:
 			group_leaders.push_back(unit)
 	
 	reset_group_affiliation(highlighted_group)
 	
 	var leader: Ship = null
-	var unit_range: int = highlighted_group.size() - 1
-	var pick_leader: int = randi_range(0, unit_range)
-	var new_leader: Ship = highlighted_group[pick_leader]
-	if group_leaders.size() == 0:
-		leader = new_leader
-	elif group_leaders.size() == 1:
-		leader = group_leaders[0]
-	elif group_leaders.size() > 1:
-		leader = new_leader
-	leader.set_group_leader(true)
+	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
+		leader = highlighted_group[0]
+	
+	if highlighted_group.size() > 2:
+		var unit_positions: Dictionary = {}
+		for unit in highlighted_group:
+			unit_positions[unit.global_position] = unit
+		
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.
 	var new_group_name: StringName 
@@ -211,8 +213,9 @@ func attack_targets() -> void:
 			targeted_group.remove_at(target_idx)
 		target_idx += 1
 	
+	leader.set_group_leader(true)
 	leader.set_blackboard_data(target_group_key, targeted_group)
-	leader.set_combat_ai(true)
+	get_tree().call_group(new_group_name, "set_combat_ai", true)
 
 func select_units() -> void:
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
@@ -254,7 +257,6 @@ func select_units() -> void:
 	
 	if attack_group:
 		attack_targets()
-		return
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 
 # Takes a group of recently selected ships and creates a new group for them.
@@ -264,7 +266,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 		unit.remove_from_group(unit.group_name)
 		var affiliated_group: Array = get_tree().get_nodes_in_group(unit.group_name)
 		if unit.group_leader == true and affiliated_group.size() > 0:
-			reset_group_leader(unit)
+			globals.reset_group_leader(unit)
 		elif unit.group_leader == true:
 			unit.set_group_leader(false)
 		unit.group_name = &""
@@ -275,22 +277,6 @@ func reset_group_affiliation(group_select: Array) -> void:
 		if group.is_empty():
 			taken_group_names.remove_at(group_idx)
 			available_group_names.push_back(group_name)
-			#available_group_names.push_back(group_name)
-
-func reset_group_leader(unit: Ship) -> void:
-	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
-	var group_range: int = group.size() - 1
-	var rand_select_leader: int = randi_range(0, group_range)
-	var new_leader: Ship = group[rand_select_leader]
-	if not unit.ShipNavigationAgent.is_navigation_finished():
-		var distance_to_position: float = unit.position.distance_to(unit.target_position)
-		var angle_to_position: float = unit.position.angle_to(unit.target_position)
-		var rotate_direction: Vector2 = new_leader.transform.x.rotated(angle_to_position)
-		var delta_position: Vector2 = rotate_direction * distance_to_position
-		var relative_position: Vector2 = new_leader.position + delta_position
-		new_leader.set_group_leader(true)
-		new_leader.set_navigation_position(relative_position)
-	unit.set_group_leader(false)
 
 func reset_box_selection() -> void:
 	box_selection_start = Vector2.ZERO
@@ -358,10 +344,12 @@ func _on_alt_select(ship: Ship) -> void:
 	ship.highlight_selection(highlight_value)
 
 func _on_unit_selected(unit: Ship) -> void:
+	get_viewport().set_input_as_handled()
+	
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:
 		if unit.group_leader == true:
-			reset_group_leader(unit)
+			globals.reset_group_leader(unit)
 	
 	get_tree().call_group(highlight_group_name, "highlight_selection", false)
 	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)

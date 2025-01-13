@@ -26,27 +26,30 @@ func _on_target_destroyed(target, target_group_key: StringName, target_key: Stri
 	if target == current_target:
 		remove_data(target_key)
 	
+	if not has_data(target_group_key):
+		return
+	
 	var available_targets: Array = ret_data(target_group_key)
 	available_targets.erase(target)
 	set_data(target_group_key, available_targets)
 
-func _on_threat_detected(threats: Array, threat_key: StringName) -> void:
-	var current_threats: Array = ret_data(threat_key)
-	for new_threat in threats:
-		if not new_threat in current_threats:
-			current_threats.push_back(new_threat)
-	
-	set_data(threat_key, current_threats)
+func _on_threat_detected(threat_detected, threat_key: StringName, targets_key: StringName) -> void:
+	var current_threats_detected: Array = []
+	if has_data(threat_key):
+		current_threats_detected = ret_data(threat_key)
 
-func _on_threat_exited(threats: Array, threat_key: StringName) -> void:
-	var target_key: StringName = &"target"
-	var target = null
-	if has_data(target_key):
-		target = ret_data(target_key)
+	var available_targets: Array = []
+	if has_data(targets_key):
+		available_targets = ret_data(targets_key)
+
+	if not threat_detected in available_targets and not threat_detected in current_threats_detected:
+		current_threats_detected.push_back(threat_detected)
 	
-	var current_threats: Array = ret_data(threat_key)
-	for exited_threat in threats:
-		if exited_threat in current_threats:
-			current_threats.erase(exited_threat)
-	
-	set_data(threat_key, current_threats)
+	set_data(threat_key, current_threats_detected)
+
+func _on_threat_exited(threat_detected, threat_key: StringName, targets_key: StringName) -> void:
+	if not has_data(threat_key):
+		return
+	var current_threats_detected: Array = ret_data(threat_key)
+	current_threats_detected.erase(threat_detected)
+	set_data(threat_key, current_threats_detected)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=23 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -10,18 +10,12 @@
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_vrrkk"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/manual_control_hud.gd" id="5_ojmr4"]
-[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/detect_enemies.gd" id="6_jorw7"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="6_ftacq"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/find_enemy_weakness.gd" id="7_sno18"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/CombatAI/BehaviorTree/BehaviorPool/find_vulnerable_targets.gd" id="8_7nviv"]
-[ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
-[ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/indicator_upscale.png" id="9_lucm6"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 
@@ -36,22 +30,6 @@ agent_radius = 50.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nv86b"]
 size = Vector2(17000, 20000)
-
-[sub_resource type="Gradient" id="Gradient_nks55"]
-offsets = PackedFloat32Array(0.237705, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_va1as"]
-gradient = SubResource("Gradient_nks55")
-width = 10
-
-[sub_resource type="Gradient" id="Gradient_lqjnm"]
-offsets = PackedFloat32Array(1)
-colors = PackedColorArray(1, 1, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_gaw57"]
-gradient = SubResource("Gradient_lqjnm")
-width = 10
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
@@ -76,9 +54,6 @@ script = ExtResource("6_jorw7")
 
 [node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("7_sno18")
-
-[node name="find vulnerable targets" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("8_7nviv")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -108,6 +83,8 @@ playback_type = 1
 script = ExtResource("2_moq8i")
 
 [node name="CombatCamera" type="Camera2D" parent="CombatMap"]
+anchor_mode = 0
+ignore_rotation = false
 process_callback = 0
 limit_left = 0
 limit_top = 0
@@ -201,128 +178,6 @@ unique_name_in_owner = true
 position = Vector2(8500.5, 10049)
 shape = SubResource("RectangleShape2D_nv86b")
 debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
-
-[node name="ManualControlHUD" type="CanvasLayer" parent="."]
-unique_name_in_owner = true
-script = ExtResource("5_ojmr4")
-
-[node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
-modulate = Color(0.486275, 0.843137, 0.294118, 0.784314)
-z_index = 3
-z_as_relative = false
-layout_mode = 3
-anchors_preset = 0
-offset_left = 4.0
-offset_top = 1076.0
-offset_right = 4.0
-offset_bottom = 1076.0
-
-[node name="HardFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_left = 105.0
-offset_top = -220.0
-offset_right = 205.0
-offset_bottom = -210.0
-scale = Vector2(0.75, 0.75)
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_va1as")
-
-[node name="SoftFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
-physics_interpolation_mode = 0
-show_behind_parent = true
-texture_filter = 1
-layout_mode = 0
-offset_right = 100.0
-offset_bottom = 10.0
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_va1as")
-
-[node name="BarOutliner" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
-layout_mode = 0
-offset_top = -2.0
-offset_right = 102.0
-offset_bottom = 12.0
-texture = ExtResource("5_wtw0b")
-stretch_mode = 2
-
-[node name="FluxPip" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
-layout_mode = 0
-offset_left = -2.0
-offset_top = -4.0
-offset_right = 4.0
-offset_bottom = 14.0
-texture = ExtResource("6_ftacq")
-
-[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -54.6667
-offset_top = -2.66667
-offset_right = 4.33333
-offset_bottom = 18.3333
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/font_size = 10
-text = "FLUX"
-
-[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_left = 105.0
-offset_top = -202.0
-offset_right = 205.0
-offset_bottom = -192.0
-scale = Vector2(0.75, 0.75)
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_gaw57")
-
-[node name="BarOutLiner2" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HullIntegrityIndicator"]
-layout_mode = 0
-offset_top = -2.0
-offset_right = 104.0
-offset_bottom = 12.0
-texture = ExtResource("5_wtw0b")
-stretch_mode = 2
-
-[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/HullIntegrityIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -54.6667
-offset_top = -2.66667
-offset_right = 5.33329
-offset_bottom = 21.3333
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/font_size = 10
-text = "HULL"
-
-[node name="IndicatorDecor" type="TextureRect" parent="ManualControlHUD/HUDWrapper"]
-layout_mode = 0
-offset_left = -5.0
-offset_top = -187.0
-offset_right = 435.0
-offset_bottom = 3.0
-texture = ExtResource("9_lucm6")
-
-[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
-layout_mode = 0
-offset_left = 71.0
-offset_top = 9.0
-offset_right = 224.0
-offset_bottom = 49.0
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 16
-bbcode_enabled = true
-text = "WEAPON SYSTEMS"
-
-[node name="WeaponList" type="VBoxContainer" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
-layout_mode = 0
-offset_left = 62.0
-offset_top = 36.0
-offset_right = 437.0
-offset_bottom = 192.0
-mouse_filter = 2
 
 [node name="OptionsMenu" type="CanvasLayer" parent="."]
 
@@ -539,90 +394,20 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7250, 5125)
-
-[node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8250, 5125)
-
-[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8281, 6180)
-
-[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(12670, 4301)
-
-[node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3500, 5125)
-
-[node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4500, 5125)
-
-[node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9250, 6250)
-
-[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9250, 12000)
-
-[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8000, 12000)
-
-[node name="PlayerShip9" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2467, 8794)
+position = Vector2(2917, 3172)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7930, 1000)
+position = Vector2(3736, 2907)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8430, 1000)
+position = Vector2(1988, 2791)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8930, 1000)
+position = Vector2(2294, 3764)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9430, 1000)
+position = Vector2(1167, 1535)
 collision_layer = 4
-
-[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7930, 1500)
-collision_layer = 4
-
-[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8430, 1500)
-collision_layer = 4
-
-[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8930, 1500)
-collision_layer = 4
-
-[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4926, 5113)
-collision_layer = 4
-
-[node name="Marker2D" type="Marker2D" parent="."]
-position = Vector2(9036, 5233)
-
-[node name="PlayerShip10" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3964, 11918)
-
-[node name="PlayerShip11" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4964, 11918)
-
-[node name="PlayerShip12" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5964, 11918)
-
-[node name="PlayerShip13" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(12607, 9219)
-
-[node name="PlayerShip14" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5271, 7996)
-
-[node name="PlayerShip15" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5872, 9478)
-
-[node name="PlayerShip16" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6872, 9478)
-
-[node name="PlayerShip17" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 9520)

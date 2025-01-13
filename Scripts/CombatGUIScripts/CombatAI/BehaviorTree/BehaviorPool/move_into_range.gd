@@ -18,4 +18,4 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.rotational_delta)
 	agent.acceleration = new_velocity - agent.linear_velocity
 	
-	return RUNNING
+	return FAILURE

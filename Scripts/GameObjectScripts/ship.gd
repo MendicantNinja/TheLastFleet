@@ -40,9 +40,6 @@ var total_flux: float = 0.0
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
-var longest_range_weapon = null
-var shortest_range_weapon = null
-var furthest_safe_distance: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
@@ -76,9 +73,18 @@ var group_leader: bool = false
 var group_transform: Transform2D = Transform2D.IDENTITY
 var group_velocity: Vector2 = Vector2.ZERO
 var posture: StringName = &""
+var idle: bool = true
 
-# Used for combat
+# Used for combat AI / behavior tree / influence map
+var template_maps: Dictionary = {}
+var template_cell_indices: Dictionary = {}
 var target_in_range: bool = false
+var imap_cell: Vector2i = Vector2i.ZERO
+var registry_cell: Vector2i = Vector2i.ZERO
+var weigh_influence: Imap
+var approx_influence: float = 0.0
+
+#var adj_template_maps: Dictionary = {}
 
 # Used for navigation
 var final_target_position: Vector2 = Vector2.ZERO
@@ -105,6 +111,8 @@ signal switch_to_manual()
 signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
+signal update_agent_influence(prev_imap_cell, imap_cell)
+signal update_registry_cell(prev_registry_cell, registry_cell)
 
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
@@ -171,20 +179,48 @@ func _ready() -> void:
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
-	
+	var occupancy_template: ImapTemplate
+	var threat_template: ImapTemplate
+	var occupancy_radius: int = 2
+	var threat_radius: int = 3
+	add_to_group(&"agent")
 	if collision_layer == 1:
-		add_to_group("friendly")
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
+		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
 		CombatBehaviorTree.toggle_root(false)
 	else:
-		add_to_group("enemy")
-		group_name = StringName("NPC %s" % [name])
+		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
+		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
+		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
+		add_to_group(&"enemy")
 		CombatBehaviorTree.toggle_root(true)
-		set_group_leader(true)
-		add_to_group(group_name)
 		rotation += PI/2
 	
+	
+	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	for map in template_maps.values():
+		var center_val: int = threat_radius
+		composite_influence.add_map(map, center_val, center_val, 1.0)
+		invert_composite.add_map(map, center_val, center_val, -1.0)
+	
+	weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
+
+	for m in range(0, composite_influence.height):
+		for n in range(0, composite_influence.width):
+			approx_influence += composite_influence.map_grid[m][n]
+
+	template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
+	if is_friendly == true:
+		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
+	else:
+		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:
@@ -234,11 +270,20 @@ func process_damage(projectile: Projectile) -> void:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
 
 func destroy_ship() -> void:
+	# REMOVE IMAP MANAGER REFERENCES HERE
+	var agents_registered: Array = imap_manager.registry_map[registry_cell]
+	agents_registered.erase(self)
+	if agents_registered.is_empty():
+		imap_manager.registry_map.erase(registry_cell)
+	else:
+		imap_manager.registry_map[registry_cell] = agents_registered
+	
 	destroyed.emit()
 	remove_from_group(group_name)
+	remove_from_group(&"agent")
 	var group: Array = get_tree().get_nodes_in_group(group_name)
-	if group_leader and group.size() > 1:
-		var unit_range: int = group.size() - 2
+	if group_leader == true and group.size() > 1:
+		var unit_range: int = group.size() - 1
 		var pick_leader: int = randi_range(0, unit_range)
 		var new_leader: Ship = group[pick_leader]
 		new_leader.set_group_leader(true)
@@ -266,7 +311,7 @@ func set_shields(value: bool) -> void:
 	else:
 		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
-	
+
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
 	update_flux_indicators()
@@ -319,19 +364,37 @@ func group_add(n_group_name: StringName) -> void:
 	add_to_group(group_name)
 
 func set_group_leader(leader_value: bool) -> void:
+	print("%s made leader of %s" % [name, group_name])
 	group_leader = leader_value
 
-#func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
-	#if not ship_select:
-		#return
-	#add_child(camera)
-	#ManualControlCamera = camera
-	#ManualControlCamera.enabled = true
-	#zoom_value = n_zoom_value
-	#if n_zoom_value > zoom_out_limit:
-		#zoom_value = zoom_out_limit
-	#elif n_zoom_value < zoom_in_limit:
-		#zoom_value = zoom_in_limit
+func set_idle_flag(value: bool) -> void:
+	idle = value
+
+func add_manual_camera(camera: Camera2D, n_zoom_value: Vector2) -> void:
+	if not ship_select:
+		return
+	add_child(camera)
+	ManualControlCamera = camera
+	ManualControlCamera.enabled = true
+	zoom_value = n_zoom_value
+	if n_zoom_value > zoom_out_limit:
+		zoom_value = zoom_out_limit
+	elif n_zoom_value < zoom_in_limit:
+		zoom_value = zoom_in_limit
+
+func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
+	if weigh_influence != null:
+		imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
+	var weight: float = 0.0
+	for cluster in neighborhood_density:
+		if registry_cell in cluster:
+			weight = 1 / neighborhood_density[cluster]
+	
+	var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
+	for m in range(0, composite_influence.height):
+		for n in range(0, composite_influence.width):
+			weigh_influence.map_grid[m][n] = composite_influence.map_grid[m][n] * abs(weight)
+	imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, 1.0)
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -397,7 +460,7 @@ func _on_mouse_exited() -> void:
 		weapon_slot.toggle_display_aim(mouse_hover)
 
 func highlight_selection(select_value: bool = false) -> void:
-	print("%s is highlighted? %s" % [name, select_value])
+	#print("%s is highlighted? %s" % [name, select_value])
 	TacticalMapIcon.toggle_mode = select_value
 	TacticalMapIcon.button_pressed = select_value
 	get_viewport().set_input_as_handled()
@@ -405,6 +468,7 @@ func highlight_selection(select_value: bool = false) -> void:
 func toggle_manual_control() -> void:
 	if ship_select == false:
 		manual_control = false
+		CombatBehaviorTree.toggle_root(true)
 		return
 	
 	if CombatBehaviorTree.enabled == true:
@@ -424,6 +488,7 @@ func toggle_manual_control() -> void:
 				#toggle_auto_fire(weapon_system.weapons)
 		ManualControlHUD.set_ship(null)
 		_on_mouse_exited()
+	
 	toggle_manual_aim(all_weapons, manual_control)
 	
 	if manual_control == true and group_leader:
@@ -433,6 +498,7 @@ func toggle_manual_control() -> void:
 		group_name = &""
 	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
 		ShipNavigationAgent.set_target_position(position)
+	
 	if manual_control == true:
 		switch_to_manual.emit() # Calls to Tactical Map to swap Camera and give a ship
 		request_manual_camera.emit() # Calls to combat map to switch the current/prev selected unit.
@@ -499,6 +565,7 @@ func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 	group_velocity = n_velocity
 	group_transform = next_transform
 
+@warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
 
 	# Needs to be per second.
@@ -547,9 +614,20 @@ func _physics_process(delta: float) -> void:
 	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		ShipNavigationAgent.set_target_position(position)
 	
+	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
+		update_agent_influence.emit(imap_cell, current_imap_cell)
+		imap_cell = current_imap_cell
+
+	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
+		update_registry_cell.emit(registry_cell, current_registry_cell)
+		registry_cell = current_registry_cell
+	
 	if movement_delta == 0.0 or rotational_delta == 0.0:
 		movement_delta = speed * delta
 		rotational_delta = ship_stats.turn_rate * delta
+		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	if manual_control and Input.is_action_pressed("vent flux"):
 		if soft_flux > 0.0:
@@ -574,40 +652,6 @@ func _physics_process(delta: float) -> void:
 		rotate_angle = rotate_direction.angle()
 		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
 		Input.get_action_strength("E") - Input.get_action_strength("Q"))
-	
-	if ShipNavigationAgent.get_max_speed() != movement_delta:
-		ShipNavigationAgent.set_max_speed(movement_delta)
-	
-	var ship_query: Dictionary = {}
-	if not ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		ship_query = collision_raycast(global_position, target_position, 7, true, false)
-	
-	var sweep_vectors: Array[Vector2] = []
-	if not ship_query.is_empty():
-		var collider_instance: Node = instance_from_id(ship_query["collider_id"])
-		var collider_center: Vector2 = collider_instance.global_position
-		var target_query: Dictionary = collision_raycast(target_position, collider_center, 7, true, false)
-		var start_angle: float = -PI/4
-		var increment_angle: float = PI/16
-		var sweep_range: int = 8
-		if collider_instance.collision_layer != collision_layer:
-			sweep_vectors = radial_vector_sweep(ship_query, target_query, start_angle, increment_angle, sweep_range)
-	
-	# raycast_sweep() returns an empty array if sweep_vectors is empty
-	var valid_paths: Array[Vector2] = raycast_sweep(sweep_vectors, target_position)
-	if not sweep_vectors.is_empty() and valid_paths.is_empty():
-		valid_paths = raycast_sweep(sweep_vectors, global_position)
-	
-	if intermediate_pathing == false and not valid_paths.is_empty() and not ShipNavigationAgent.is_navigation_finished():
-		intermediate_pathing = true
-		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
-		final_target_position = target_position
-		NavigationTimer.start()
-	# Do this after finishing the intermediate pathing.
-	elif intermediate_pathing == true and ShipNavigationAgent.is_navigation_finished():
-		target_position = final_target_position
-		ShipNavigationAgent.set_target_position(target_position)
-		intermediate_pathing = false
 	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():
@@ -694,6 +738,8 @@ func update_available_target_connections(target_group_key: StringName) -> void:
 	
 	available_targets = blackboard.ret_data(target_group_key)
 	for target in available_targets:
+		if target == null:
+			continue
 		if not target.destroyed.is_connected(blackboard._on_target_destroyed):
 			target.destroyed.connect(blackboard._on_target_destroyed.bind(target, target_group_key, target_key))
 
@@ -716,10 +762,6 @@ func find_closest_target(available_targets: Array) -> Ship:
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
 	var results: Dictionary = {}
-	# If there are bizarre pathing issues, this may be part of the reason why. Review _physics_process for
-	# any potential edge case issues.
-	#if intermediate_pathing == false and ShipNavigationAgent.is_navigation_finished():
-	#	return results
 	
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(from, to, collision_bitmask, [self])
@@ -818,8 +860,7 @@ func _on_NavigationTimer_timeout() -> void:
 	elif not valid_paths.is_empty():
 		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
 
-# if this fails to fix the problem with avoidance, oh well
-# somebody else can code this because im pretty much burnt on this stuff
+
 func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
 	if safe_velocity != Vector2.ZERO:
 		linear_velocity += safe_velocity / 2.0
