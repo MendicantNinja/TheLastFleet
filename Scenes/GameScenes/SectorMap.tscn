@@ -40,11 +40,6 @@ grow_vertical = 2
 columns = 6
 script = ExtResource("2_hsfyj")
 
-[node name="LineOverlay" type="Control" parent="."]
-layout_mode = 1
-anchors_preset = 0
-offset_bottom = 1080.0
-
 [node name="Ship" type="Control" parent="."]
 anchors_preset = 0
 offset_right = 40.0

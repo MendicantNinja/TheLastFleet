@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://4tnk0av7f6mh"]
+[gd_scene load_steps=10 format=3 uid="uid://4tnk0av7f6mh"]
 
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star_tile.gd" id="1_ncju2"]
 [ext_resource type="Texture2D" uid="uid://dq6tocumognpw" path="res://Art/GUIArt/sector_map_star.png" id="2_diab4"]
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star.gd" id="2_k5bq0"]
 [ext_resource type="Texture2D" uid="uid://cw43wamtdu4nn" path="res://Art/GUIArt/sector_map_dashed_line.png" id="4_h6cgs"]
 [ext_resource type="Texture2D" uid="uid://c7xdrpdidqa6o" path="res://Art/GUIArt/sector_map_targeting_reticle.png" id="5_ogtcp"]
+[ext_resource type="Script" path="res://Scripts/SectorMapScripts/line_overlay.gd" id="6_lasyr"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ll7np"]
 blend_mode = 1
@@ -12,10 +13,16 @@ blend_mode = 1
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mckvg"]
 blend_mode = 1
 
+[sub_resource type="Curve" id="Curve_8ygr6"]
+min_value = 0.5
+max_value = 3.0
+_data = [Vector2(0, 3), 0.0, 0.0, 0, 0, Vector2(1, 0.5), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [node name="StarTile1" type="ColorRect"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
-color = Color(0.1025, 0.2665, 0.41, 0)
+color = Color(0.1025, 0.2665, 0.41, 0.352941)
 script = ExtResource("1_ncju2")
 
 [node name="Star" type="TextureRect" parent="."]
@@ -27,13 +34,25 @@ texture = ExtResource("2_diab4")
 script = ExtResource("2_k5bq0")
 metadata/_edit_use_anchors_ = true
 
-[node name="Line2D" type="Line2D" parent="."]
+[node name="Dashed" type="Line2D" parent="."]
 visible = false
 self_modulate = Color(0.66, 0.801667, 1, 0.658824)
 texture_repeat = 2
 material = SubResource("CanvasItemMaterial_mckvg")
 points = PackedVector2Array(0, 0, 500, 500)
+width = 1.0
+width_curve = SubResource("Curve_8ygr6")
 texture = ExtResource("4_h6cgs")
+texture_mode = 1
+
+[node name="Solid" type="Line2D" parent="."]
+visible = false
+self_modulate = Color(0.66, 0.801667, 1, 0.545098)
+texture_repeat = 2
+material = SubResource("CanvasItemMaterial_mckvg")
+points = PackedVector2Array(0, 0, 500, 500)
+width = 1.0
+width_curve = SubResource("Curve_8ygr6")
 texture_mode = 1
 
 [node name="Reticle" type="TextureRect" parent="."]
@@ -44,3 +63,17 @@ offset_right = 40.0
 offset_bottom = 40.0
 scale = Vector2(0.08, 0.08)
 texture = ExtResource("5_ogtcp")
+
+[node name="LineOverlay" type="Control" parent="." node_paths=PackedStringArray("line_prototype")]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("6_lasyr")
+line_prototype = NodePath("../Dashed")
+
+[node name="LineOverlaySelected" type="Control" parent="." node_paths=PackedStringArray("line_prototype")]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("6_lasyr")
+line_prototype = NodePath("../Solid")

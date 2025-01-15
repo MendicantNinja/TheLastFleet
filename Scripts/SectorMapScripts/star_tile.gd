@@ -1,7 +1,10 @@
 extends Control
+class_name StarTile
 
 @export var padding : float = 10;
 @export var texture = -1;
+
+@onready var star = $Star;
 
 const STARS = [
 	{
@@ -11,18 +14,22 @@ const STARS = [
 		rotation = 0,
 	},
 	{
-		pivot_offset = Vector2(1180, 950),
+		pivot_offset = Vector2(1186, 953),
 		image = preload("res://Art/GUIArt/sector_map_star_2.png"),
 		scale = 0.051,
 		rotation = -15 * PI / 180,
 	},
 	{
-		pivot_offset = Vector2(1005, 815),
+		pivot_offset = Vector2(1032, 827),
 		image = preload("res://Art/GUIArt/sector_map_star_3.png"),
 		scale = 0.051,
 		rotation = -15 * PI / 180,
 	}
 ];
+
+func initialize() -> void:
+	$LineOverlay.initialize();
+	$LineOverlaySelected.initialize();
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -48,6 +55,34 @@ func randomize_star() -> void:
 	
 	var ret = $Reticle;
 	ret.pivot_offset = ret.size / 2.;
+	
+
+func neighboring_tiles() -> Array:
+	var cols = $"../..".columns;
+	var rows = $"../..".rows;
+	
+	var idx = int(str(name));
+	var neighboring_tiles = [
+		idx - cols, # up
+		idx + cols, # down
+	];
+	
+	var neighboring_tiles_left = [
+		idx - 1 + cols, # lower left
+		idx - 1, # left
+		idx - 1 - cols, # upper left
+	];
+	
+	var neighboring_tiles_right = [
+		idx + 1 - cols, # upper right
+		idx + 1, # right
+		idx + 1 + cols, # lower right
+	];
+	
+	if idx % cols != 0: neighboring_tiles.append_array(neighboring_tiles_left);
+	if idx % cols != (cols - 1): neighboring_tiles.append_array(neighboring_tiles_right);
+	
+	return neighboring_tiles;
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

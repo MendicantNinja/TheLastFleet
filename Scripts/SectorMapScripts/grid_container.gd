@@ -8,6 +8,8 @@ func _ready() -> void:
 		var st = preload("res://Scenes/CompositeGameObjects/Galaxy/StarTile.tscn").instantiate();
 		st.name = str(i);
 		add_child(st);
+	for i in get_children():
+		i.initialize();
 		#st.randomize_star();
 
 
