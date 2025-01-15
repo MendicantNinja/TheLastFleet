@@ -17,7 +17,7 @@ const STARS = [
 		rotation = -15 * PI / 180,
 	},
 	{
-		pivot_offset = Vector2(995, 820),
+		pivot_offset = Vector2(1005, 815),
 		image = preload("res://Art/GUIArt/sector_map_star_3.png"),
 		scale = 0.051,
 		rotation = -15 * PI / 180,
@@ -45,6 +45,9 @@ func randomize_star() -> void:
 		randf_range(padding, size.x - padding),
 		randf_range(padding, size.y - padding),
 	) - $Star.pivot_offset; # + global_position;
+	
+	var ret = $Reticle;
+	ret.pivot_offset = ret.size / 2.;
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

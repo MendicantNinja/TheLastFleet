@@ -20,6 +20,10 @@ func _ready() -> void:
 	pass
 	
 func _process(_delta: float) -> void:
+	var ret : TextureRect = $"../Reticle";
+	#var ret_center = ret.pivot_offset * get_global_transform();
+	ret.global_position = star_center - ret.pivot_offset * ret.scale;
+	ret.visible = hovered;
 	star_center = get_global_transform() * pivot_offset;
 	var old_hovered = hovered;
 	if (get_viewport().get_mouse_position() - star_center).length() < radius:
@@ -62,7 +66,6 @@ func neighboring_tiles() -> Array:
 	if idx % cols != (cols - 1): neighboring_tiles.append_array(neighboring_tiles_right);
 	
 	return neighboring_tiles;
-
 	
 func _on_mouse_entered() -> void:
 	var cols = $"../../..".columns;
@@ -74,10 +77,11 @@ func _on_mouse_entered() -> void:
 		var target_star = target_startile.get_child(0);
 		var start : Vector2 = star_center - line_overlay_offset;
 		var end : Vector2 = target_star.star_center - line_overlay_offset;
-		var line : Line2D = Line2D.new();
+		var line : Line2D = $"../Line2D".duplicate();
 		$"../../../LineOverlay".add_child(line);
-		line.add_point(start - line.position);
-		line.add_point(end - line.position);
+		line.points[0] = start - line.position;
+		line.points[1] = end - line.position;
+		line.visible = true;
 		line.antialiased = true;
 		line.width = 1;
 		line.position = Vector2(20, 20);

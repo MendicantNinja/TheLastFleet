@@ -66,7 +66,7 @@ offset_bottom = 40.0
 theme = ExtResource("6_6wooc")
 theme_override_font_sizes/normal_font_size = 13
 bbcode_enabled = true
-text = "[right]EXIT[/right]"
+text = "[color=#88aaff][right]EXIT[/right][/color]"
 
 [node name="EntranceStar" type="RichTextLabel" parent="."]
 layout_mode = 0
@@ -74,7 +74,8 @@ offset_right = 116.0
 offset_bottom = 40.0
 theme = ExtResource("6_6wooc")
 theme_override_font_sizes/normal_font_size = 13
-text = "ENTRANCE"
+bbcode_enabled = true
+text = "[color=#88aaff]ENTRANCE[/color]"
 
 [node name="NebulaType" type="RichTextLabel" parent="."]
 layout_mode = 0
@@ -84,7 +85,8 @@ offset_right = 552.0
 offset_bottom = 124.0
 theme = ExtResource("6_6wooc")
 theme_override_font_sizes/normal_font_size = 21
-text = "Adjective Sector"
+bbcode_enabled = true
+text = "[color=#88aaff]Adjective Sector[/color]"
 script = ExtResource("7_xr001")
 
 [node name="NebulaName" type="RichTextLabel" parent="."]
@@ -94,6 +96,7 @@ offset_top = 18.0
 offset_right = 584.0
 offset_bottom = 89.0
 theme = ExtResource("6_6wooc")
-text = "Noun Nebula"
+bbcode_enabled = true
+text = "[color=#88aaff]Noun Nebula[/color]"
 script = ExtResource("7_xr001")
 factor = 0.03

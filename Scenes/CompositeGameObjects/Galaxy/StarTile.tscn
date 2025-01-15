@@ -1,10 +1,15 @@
-[gd_scene load_steps=5 format=3 uid="uid://4tnk0av7f6mh"]
+[gd_scene load_steps=8 format=3 uid="uid://4tnk0av7f6mh"]
 
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star_tile.gd" id="1_ncju2"]
 [ext_resource type="Texture2D" uid="uid://dq6tocumognpw" path="res://Art/GUIArt/sector_map_star.png" id="2_diab4"]
 [ext_resource type="Script" path="res://Scripts/SectorMapScripts/star.gd" id="2_k5bq0"]
+[ext_resource type="Texture2D" uid="uid://cw43wamtdu4nn" path="res://Art/GUIArt/sector_map_dashed_line.png" id="4_h6cgs"]
+[ext_resource type="Texture2D" uid="uid://c7xdrpdidqa6o" path="res://Art/GUIArt/sector_map_targeting_reticle.png" id="5_ogtcp"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ll7np"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mckvg"]
 blend_mode = 1
 
 [node name="StarTile1" type="ColorRect"]
@@ -21,3 +26,21 @@ offset_bottom = 1722.0
 texture = ExtResource("2_diab4")
 script = ExtResource("2_k5bq0")
 metadata/_edit_use_anchors_ = true
+
+[node name="Line2D" type="Line2D" parent="."]
+visible = false
+self_modulate = Color(0.66, 0.801667, 1, 0.658824)
+texture_repeat = 2
+material = SubResource("CanvasItemMaterial_mckvg")
+points = PackedVector2Array(0, 0, 500, 500)
+texture = ExtResource("4_h6cgs")
+texture_mode = 1
+
+[node name="Reticle" type="TextureRect" parent="."]
+visible = false
+self_modulate = Color(0.66, 0.801667, 1, 0.85098)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("5_ogtcp")
