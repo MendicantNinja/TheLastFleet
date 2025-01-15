@@ -9,6 +9,10 @@ extends Control
 @export var entrance: Star;
 @export var exit: Star;
 
+@export var label_offset = Vector2(5, 10);
+
+var initialized = false;
+
 func get_star_xy(x: int, y: int) -> Star:
 	return get_star_id(x % columns + (y % rows) * columns);
 	
@@ -29,13 +33,12 @@ func _ready() -> void:
 	entrance = get_star_xy(0, entrance_row);
 	exit = get_star_xy(columns - 1, exit_row);
 	
-	$EntranceStar.global_position = entrance.global_position;
-	$ExitStar.global_position = exit.global_position;
-	
 	$Ship.move_to_idx_unchecked(int(str(entrance.get_parent().name)));
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:
-	# I have no idea why this is necessary... the bug should have been fixed already, but its not?
-	$EntranceStar.global_position = entrance.global_position;
-	$ExitStar.global_position = exit.global_position;
+	if not initialized:
+		$GridContainer.randomize_stars();
+		initialized = true;
+	$EntranceStar.global_position = entrance.star_center + label_offset;
+	$ExitStar.global_position = exit.star_center + label_offset;

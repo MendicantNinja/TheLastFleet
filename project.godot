@@ -49,7 +49,6 @@ window/size/window_height_override=720
 window/energy_saving/keep_screen_on=false
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
-window/stretch/scale_mode="integer"
 
 [global_group]
 
