@@ -1,5 +1,12 @@
 extends Node
 
+enum Strategy{
+	NEUTRAL,
+	DEFENSIVE,
+	OFFENSIVE,
+	EVASIVE
+}
+
 func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	# Universal Setup
 	var audio_stream_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
@@ -14,11 +21,11 @@ func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	add_child(audio_stream_player)
 	audio_stream_player.finished.connect(audio_stream_player.queue_free)
 
-func geometric_median_of_objects(object_positions: Dictionary, epsilon: float = 1e-5) -> Vector2:
+func geometric_median_of_objects(object_positions: Array, epsilon: float = 1e-5) -> Vector2:
 	var sum_x: float = 0.0
 	var sum_y: float = 0.0
-	var number_of_objects: int = object_positions.keys().size()
-	for position in object_positions.keys():
+	var number_of_objects: int = object_positions.size()
+	for position in object_positions:
 		sum_x += position.x
 		sum_y += position.y
 	
@@ -81,7 +88,7 @@ func reset_group_leader(unit: Ship) -> void:
 		for n_unit in group:
 			unit_positions[n_unit.global_position] = n_unit
 		
-		var median: Vector2 = geometric_median_of_objects(unit_positions)
+		var median: Vector2 = geometric_median_of_objects(unit_positions.keys())
 		new_leader = find_unit_nearest_to_median(median, unit_positions)
 	
 	if not unit.ShipNavigationAgent.is_navigation_finished():

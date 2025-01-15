@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=36 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
@@ -27,8 +27,6 @@
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/move_units.gd" id="12_71ucf"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/issue_orders.gd" id="13_o57mr"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
@@ -76,6 +74,9 @@ script = ExtResource("4_5naox")
 [node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
 script = ExtResource("5_vrrkk")
 
+[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("11_iyhuv")
+
 [node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("6_jorw7")
 
@@ -85,23 +86,14 @@ script = ExtResource("7_sno18")
 [node name="find vulnerable targets" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("8_7nviv")
 
-[node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("9_sdjo6")
-
-[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("11_iyhuv")
-
 [node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
 script = ExtResource("5_vrrkk")
 
 [node name="set targets" type="Node" parent="Admiral/AdmiralAI/main/macro"]
 script = ExtResource("9_t8sgw")
 
-[node name="move units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("12_71ucf")
-
-[node name="issue orders" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("13_o57mr")
+[node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("9_sdjo6")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3

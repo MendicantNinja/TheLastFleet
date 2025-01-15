@@ -4,25 +4,28 @@ class_name Admiral
 @onready var AdmiralAI: BehaviorTreeRoot = $AdmiralAI
 @onready var available_units: Array = []
 
+var heuristic_strat: globals.Strategy
+
+var unit_clusters: Array = []
+var enemy_clusters: Array = []
+var enemy_vulnerability: Dictionary = {}
+var vulnerable_targets: Dictionary = {}
+var isolated_targets: Array = []
+
+var group_key_prefix: StringName = &"Enemy Group "
+var assign_new_leader_group: StringName = &""
+var iterator: int = 0
+
 var available_groups: Dictionary = {}
-var group_leaders: Dictionary = {}
-var order_groups: Array = []
-var group_targets: Dictionary = {}
+var awaiting_orders: Array = []
+var queue_orders: Dictionary = {}
+var move_key: StringName = &"move"
+var target_key: StringName = &"target"
+var posture_key: StringName = &"posture"
 
 var initial_unit_count: int = 0
 var units_destroyed: int = 0
 var groups_destroyed: int = 0
-var assign_new_leader_group: StringName = &""
-
-var iterator: int = 0
-var enemy_group_key_prefix: StringName = &"Enemy Group "
-var group_targets_key_suffix: StringName = &" targets"
-var target_key: StringName = &"target"
-
-var enemy_clusters: Array = []
-var cluster_density: Dictionary = {}
-var enemy_vulnerability: Array = []
-var vulnerable_targets: Dictionary = {}
 
 func _physics_process(_delta) -> void:
 	if imap_manager.registry_map.is_empty() and AdmiralAI.enabled == true:
@@ -48,7 +51,3 @@ func _on_leader_destroyed(unit, group_name: StringName) -> void:
 		available_groups.erase(group_name)
 	else:
 		assign_new_leader_group = available_groups[group_name]
-
-func _on_target_destroyed(group_name: StringName) -> void:
-	group_targets.erase(group_name)
-	get_tree().call_group(group_name, "set_idle_flag", true)

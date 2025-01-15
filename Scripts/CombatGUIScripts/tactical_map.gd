@@ -125,7 +125,7 @@ func move_new_unit(to_position: Vector2) -> void:
 		for unit in highlighted_group:
 			unit_positions[unit.global_position] = unit
 		
-		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		new_leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.
@@ -190,7 +190,7 @@ func attack_targets() -> void:
 		for unit in highlighted_group:
 			unit_positions[unit.global_position] = unit
 		
-		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.

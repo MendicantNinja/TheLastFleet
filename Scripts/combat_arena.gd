@@ -47,7 +47,7 @@ func _ready() -> void:
 	imap_manager.weighted_imap = weighted_imap
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
-	if debug_imap == true:
+	if debug_imap == false:
 		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
 		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
 		var grid_row_size: int = vulnerability_map.map_grid.size()

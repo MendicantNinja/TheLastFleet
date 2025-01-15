@@ -4,7 +4,7 @@ class_name ImapManager
 var arena_width: int = 17000
 var arena_height: int = 20000
 var default_cell_size: int = 250
-var max_cell_size: int = 2500
+var max_cell_size: int = 2250
 
 enum TemplateType {
 	OCCUPANCY_TEMPLATE, # Occupancy indicates the space a unit occupies and its zone of influence.
@@ -27,6 +27,9 @@ var agent_maps: Dictionary = {}
 var vulnerability_map: Imap
 var tension_map: Imap
 var weighted_imap: Imap
+var weighted_friendly: Dictionary = {}
+var weighted_enemy: Dictionary = {}
+var visited: Array = []
 
 func _init():
 	var occupancy_templates: ImapTemplate = ImapTemplate.new()
@@ -147,7 +150,7 @@ func weigh_force_density() -> void:
 	
 	
 	var enemy_neighborhood_density: Dictionary = {}
-	var visited: Array = []
+	visited = []
 	for cell in enemy_cluster:
 		var cluster: Array = []
 		if cell not in visited:
@@ -155,10 +158,11 @@ func weigh_force_density() -> void:
 		var density: float = 0.0
 		for n_cluster in cluster:
 			density += enemy_cluster[n_cluster]
-		enemy_neighborhood_density[cluster] = density
+		if density < 0.0:
+			enemy_neighborhood_density[cluster] = density
 	
 	var friendly_neighborhood_density: Dictionary = {}
-	visited = []
+	
 	for cell in friendly_cluster:
 		var cluster: Array = []
 		if cell not in visited:
@@ -166,7 +170,8 @@ func weigh_force_density() -> void:
 		var density: float = 0.0
 		for n_cluster in cluster:
 			density += friendly_cluster[n_cluster]
-		friendly_neighborhood_density[cluster] = density
+		if density > 0.0:
+			friendly_neighborhood_density[cluster] = density
 	
 	var max_fren_density: float = friendly_neighborhood_density.values().max()
 	for cell in friendly_neighborhood_density:
@@ -175,19 +180,23 @@ func weigh_force_density() -> void:
 	
 	var max_enemy_density: float = enemy_neighborhood_density.values().max()
 	for cell in enemy_neighborhood_density:
-		var weight_density: float = enemy_neighborhood_density[cell] / max_fren_density
+		var weight_density: float = enemy_neighborhood_density[cell] / max_enemy_density
 		enemy_neighborhood_density[cell] = weight_density
 	
-	get_tree().call_group(&"friendly", "weigh_composite_influence", friendly_neighborhood_density)
-	get_tree().call_group(&"enemy", "weigh_composite_influence", enemy_neighborhood_density)
+	if weighted_enemy.values() != enemy_neighborhood_density.values() or weighted_enemy.keys() != enemy_neighborhood_density.keys():
+		get_tree().call_group(&"friendly", "weigh_composite_influence", friendly_neighborhood_density)
+		weighted_enemy = enemy_neighborhood_density
+	if weighted_friendly.values() != friendly_neighborhood_density.values() or weighted_friendly.keys() != friendly_neighborhood_density.keys():
+		get_tree().call_group(&"enemy", "weigh_composite_influence", enemy_neighborhood_density)
+		weighted_friendly = friendly_neighborhood_density
 
-func flood_fill(cell, visited, cluster, enemy_presence) -> Array: 
+func flood_fill(cell, visited, cluster, object_presence) -> Array: 
 	if cell in visited: 
 		return cluster
 	 
 	visited.append(cell) 
 	cluster.append(cell) 
-	for n_cell in enemy_presence: 
+	for n_cell in object_presence: 
 		if cell.distance_squared_to(n_cell) == 1: 
-			flood_fill(n_cell, visited, cluster, enemy_presence)
+			flood_fill(n_cell, visited, cluster, object_presence)
 	return cluster

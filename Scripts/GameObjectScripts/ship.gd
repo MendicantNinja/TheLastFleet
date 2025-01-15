@@ -72,12 +72,13 @@ var group_name: StringName = &""
 var group_leader: bool = false
 var group_transform: Transform2D = Transform2D.IDENTITY
 var group_velocity: Vector2 = Vector2.ZERO
-var posture: StringName = &""
+var posture: globals.Strategy = globals.Strategy.NEUTRAL
 var idle: bool = true
 
 # Used for combat AI / behavior tree / influence map
 var template_maps: Dictionary = {}
 var template_cell_indices: Dictionary = {}
+var hueristic_strat: int = 0
 var target_in_range: bool = false
 var imap_cell: Vector2i = Vector2i.ZERO
 var registry_cell: Vector2i = Vector2i.ZERO
@@ -211,7 +212,7 @@ func _ready() -> void:
 		invert_composite.add_map(map, center_val, center_val, -1.0)
 	
 	weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
-
+	
 	for m in range(0, composite_influence.height):
 		for n in range(0, composite_influence.width):
 			approx_influence += composite_influence.map_grid[m][n]
@@ -282,8 +283,8 @@ func destroy_ship() -> void:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
-	destroyed.emit()
 	remove_from_group(group_name)
+	destroyed.emit()
 	ShipTargetIcon.visible = false
 	queue_free()
 
@@ -360,12 +361,15 @@ func group_add(n_group_name: StringName) -> void:
 	group_name = n_group_name
 	add_to_group(group_name)
 
-func set_group_leader(leader_value: bool) -> void:
+func set_group_leader(value: bool) -> void:
 	print("%s made leader of %s" % [name, group_name])
-	group_leader = leader_value
+	group_leader = value
 
 func set_idle_flag(value: bool) -> void:
 	idle = value
+
+func set_posture(value: globals.Strategy) -> void:
+	posture = value
 
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 	if weigh_influence != null:
