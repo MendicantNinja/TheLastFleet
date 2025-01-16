@@ -227,7 +227,6 @@ debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
-visible = false
 script = ExtResource("5_ojmr4")
 
 [node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
