@@ -1,12 +1,12 @@
 [gd_scene load_steps=8 format=3 uid="uid://cktjylm2g4cjb"]
 
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/sector_map.gd" id="1_7tr0u"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/sector_map.gd" id="1_7tr0u"]
 [ext_resource type="Texture2D" uid="uid://ch7cqohsydlge" path="res://Art/Backgrounds/Very Large/hubble_orion_nebula.jpg" id="2_asqed"]
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/grid_container.gd" id="2_hsfyj"]
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/ship.gd" id="2_jxk1p"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/grid_container.gd" id="2_hsfyj"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/ship.gd" id="2_jxk1p"]
 [ext_resource type="Texture2D" uid="uid://cdfm6vdba6pnn" path="res://Art/ShipArt/fighter.png" id="4_k0v5o"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="6_6wooc"]
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/lerp_opacity.gd" id="7_xr001"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/lerp_opacity.gd" id="7_xr001"]
 
 [node name="SectorMap" type="Control"]
 layout_mode = 3

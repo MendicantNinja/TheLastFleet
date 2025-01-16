@@ -10,7 +10,7 @@ func _ready() -> void:
 		add_child(st);
 	for i in get_children():
 		i.initialize();
-		#st.randomize_star();
+		#i.randomize_star();
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -18,5 +18,6 @@ func _process(delta: float) -> void:
 	pass
 
 func randomize_stars() -> void:
+	print("Randomizing Stars!");
 	for i in range($"..".columns * $"..".rows):
 		get_child(i).randomize_star();

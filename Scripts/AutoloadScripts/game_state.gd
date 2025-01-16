@@ -3,6 +3,7 @@ extends Node
 
 var player_name: String = "Joe_Fleet"
 var player_fleet: Fleet = Fleet.new()
+var galaxy_map: GalaxyMap = GalaxyMap.new();
 
 func _ready():
 	#for when user names are implemented ResourceLoader.load("user://"+get_child(0, true).text+".res")

@@ -48,6 +48,7 @@ func _ready() -> void:
 	$Star.scale *= randf_range(0.6, 1.3);
 	
 func randomize_star() -> void:
+	print("Randomizing Star %s, " % name, "Bounds: ", size);
 	$Star.position = Vector2(
 		randf_range(padding, size.x - padding),
 		randf_range(padding, size.y - padding),
@@ -62,27 +63,40 @@ func neighboring_tiles() -> Array:
 	var rows = $"../..".rows;
 	
 	var idx = int(str(name));
+	
 	var neighboring_tiles = [
 		idx - cols, # up
 		idx + cols, # down
 	];
 	
-	var neighboring_tiles_left = [
-		idx - 1 + cols, # lower left
-		idx - 1, # left
-		idx - 1 - cols, # upper left
-	];
+	var neighboring_tiles_diag = [];
 	
-	var neighboring_tiles_right = [
-		idx + 1 - cols, # upper right
-		idx + 1, # right
-		idx + 1 + cols, # lower right
-	];
+	if idx % cols != 0: 
+		neighboring_tiles.append(idx - 1); # left
+		neighboring_tiles_diag.append_array([idx - 1 + cols, idx - 1 - cols]); # upper left, lower left
+	if idx % cols != (cols - 1): 
+		neighboring_tiles.append(idx + 1); # right
+		neighboring_tiles_diag.append_array([idx + 1 - cols, idx + 1 + cols]); # upper right, lower right
 	
-	if idx % cols != 0: neighboring_tiles.append_array(neighboring_tiles_left);
-	if idx % cols != (cols - 1): neighboring_tiles.append_array(neighboring_tiles_right);
+	neighboring_tiles.append_array(neighboring_tiles_diag);
 	
 	return neighboring_tiles;
+	
+func diagonal_neighboring_tiles() -> Array:
+	var cols = $"../..".columns;
+	var rows = $"../..".rows;
+	
+	var idx = int(str(name));
+	
+	var neighboring_tiles_diag = [];
+	
+	if idx % cols != 0: 
+		neighboring_tiles_diag.append_array([idx - 1 + cols, idx - 1 - cols]); # upper left, lower left
+	if idx % cols != (cols - 1): 
+		neighboring_tiles_diag.append_array([idx + 1 - cols, idx + 1 + cols]); # upper right, lower right
+	
+	return neighboring_tiles_diag;
+	
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

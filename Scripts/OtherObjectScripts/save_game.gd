@@ -3,13 +3,16 @@ class_name SaveGame
 
 @export var player_fleet_stats: FleetStats
 @export var player_name: String
+@export var player_galaxy_map_stats: GalaxyMapStats
 #remove assignemnt operator later
 var save_game: SaveGame = ResourceLoader.load("user://Joe_Fleet.res")
 #for when user names are implemented ResourceLoader.load("user://"+get_child(0, true).text+".res")
 func save(image_to_save: ImageTexture = null) -> void:
 	# Do what you need to do with player and NPC data (Will need to do a for loop later). 
+	player_galaxy_map_stats = game_state.galaxy_map.galaxy_map_stats
 	player_fleet_stats = game_state.player_fleet.fleet_stats
 	player_name = game_state.player_name
+	
 	# Do what you need to do with the image. 
 	#save_image = image_to_save
 	
@@ -23,6 +26,7 @@ func save(image_to_save: ImageTexture = null) -> void:
 func load() -> void:
 	# Handle the data from the savegame class after calling ResourceLoader. Import them into the appropriate categories. 
 	# Data for the player and NPC's.
+	game_state.galaxy_map.galaxy_map_stats = player_galaxy_map_stats
 	game_state.player_fleet.fleet_stats = player_fleet_stats 
 	game_state.player_name = player_name
 # Called when the node enters the scene tree for the first time.

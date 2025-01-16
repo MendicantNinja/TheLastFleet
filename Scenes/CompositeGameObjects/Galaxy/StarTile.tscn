@@ -1,11 +1,11 @@
 [gd_scene load_steps=10 format=3 uid="uid://4tnk0av7f6mh"]
 
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/star_tile.gd" id="1_ncju2"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/star_tile.gd" id="1_ncju2"]
 [ext_resource type="Texture2D" uid="uid://dq6tocumognpw" path="res://Art/GUIArt/sector_map_star.png" id="2_diab4"]
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/star.gd" id="2_k5bq0"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/star.gd" id="2_k5bq0"]
 [ext_resource type="Texture2D" uid="uid://cw43wamtdu4nn" path="res://Art/GUIArt/sector_map_dashed_line.png" id="4_h6cgs"]
 [ext_resource type="Texture2D" uid="uid://c7xdrpdidqa6o" path="res://Art/GUIArt/sector_map_targeting_reticle.png" id="5_ogtcp"]
-[ext_resource type="Script" path="res://Scripts/SectorMapScripts/line_overlay.gd" id="6_lasyr"]
+[ext_resource type="Script" path="res://Scripts/MapScripts/line_overlay.gd" id="6_lasyr"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ll7np"]
 blend_mode = 1
@@ -22,7 +22,7 @@ point_count = 2
 [node name="StarTile1" type="ColorRect"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
-color = Color(0.1025, 0.2665, 0.41, 0.352941)
+color = Color(0.1025, 0.2665, 0.41, 0)
 script = ExtResource("1_ncju2")
 
 [node name="Star" type="TextureRect" parent="."]

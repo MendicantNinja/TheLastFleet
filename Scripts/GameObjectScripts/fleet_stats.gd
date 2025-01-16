@@ -10,6 +10,9 @@ class_name FleetStats
 @export var ships: Array[ShipStats] = []
 @export_storage var inventory: Array[ItemSlot] = []
 
+var star_id: int = -1;
+var sector_id: int = 0;
+
 var supplies: int:
 	get:
 		return 1
