@@ -32,6 +32,9 @@ func move_to_idx_unchecked(idx: int) -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	pass
+	
+func initialize() -> void:
 	var loaded_idx = game_state.player_fleet.fleet_stats.star_id;
 	if loaded_idx == -1:
 		move_to_idx_unchecked(int(str($"..".entrance.get_parent().name)));

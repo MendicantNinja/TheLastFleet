@@ -7,12 +7,15 @@ var galaxy_map_stats : GalaxyMapStats = GalaxyMapStats.new();
 func _on_sector_button_pressed(i: int):
 	game_state.player_fleet.fleet_stats.sector_id = i;
 	var active_sector : SectorMap = galaxy_map_stats.sectors[i];
+	var new = false;
 	if active_sector == null:
+		new = true;
 		active_sector = sector_map.instantiate();
 		galaxy_map_stats.sectors[i] = active_sector;
-		active_sector.call_deferred("randomize_stars");
 	$ActiveSector.add_child(active_sector);
 	$ActiveSector.visible = true;
+	if new:
+		active_sector.call_deferred("randomize_stars");
 	
 
 # Called when the node enters the scene tree for the first time.

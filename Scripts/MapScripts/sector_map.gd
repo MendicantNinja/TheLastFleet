@@ -31,7 +31,7 @@ func _ready() -> void:
 	entrance = get_star_xy(0, entrance_row);
 	exit = get_star_xy(columns - 1, exit_row);
 	
-	#$Ship.move_to_idx_unchecked(int(str(entrance.get_parent().name)));
+	$Ship.initialize();
 	
 func randomize_stars() -> void:
 	$GridContainer.randomize_stars();
