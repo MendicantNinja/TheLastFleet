@@ -57,6 +57,10 @@ var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 
 # Used for targeting and weapons.
+var weapon_systems: Array[WeaponSystem] = [
+	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(),
+	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new()
+]
 var all_weapons: Array[WeaponSlot]
 var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
@@ -229,24 +233,29 @@ func _ready() -> void:
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
 
+		
 # Assign weapon system groups and weapons based on ship_stats.
 	for i in range(all_weapons.size()):
-			# Placeholder
-			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+		if all_weapons[i].weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+			weapon_systems[all_weapons[i].weapon_system_group].add_weapon(all_weapons[i])
+	for i in ship_stats.weapon_systems.size():
+		if ship_stats.weapon_systems[i].auto_fire_start == true:
+			weapon_systems[i].auto_fire_start = true
+
+
 # Turn on and off autofire as the refit system and ship stats demand.
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:
 		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
 	
+	# Useful for AI 
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
 
 	var max_range: float = weapon_ranges.keys().max()
 	var min_range: float = weapon_ranges.keys().min()
-	#longest_range_weapon = weapon_ranges[max_range]
-	#shortest_range_weapon = weapon_ranges[min_range]
-	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
-	#furthest_safe_distance += longest_range_weapon.weapon.range
+
 
 	deploy_ship()
 	self.input_event.connect(_on_input_event)
@@ -267,7 +276,7 @@ func process_damage(projectile: Projectile) -> void:
 	if ManualControlHUD.current_ship == self:
 		ManualControlHUD.update_hud()
 	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
-		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.position)
+		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
 
 func destroy_ship() -> void:
 	# REMOVE IMAP MANAGER REFERENCES HERE
@@ -402,10 +411,10 @@ func _input(event: InputEvent) -> void:
 		if is_friendly:
 			if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
 				toggle_manual_control()
-			elif (event.keycode == KEY_C and event.pressed) and manual_control:
-				toggle_auto_aim(all_weapons)
-			elif (event.keycode == KEY_V and event.pressed) and manual_control:
-				toggle_auto_fire(all_weapons)
+			#elif (event.keycode == KEY_C and event.pressed) and manual_control:
+				#toggle_auto_aim(all_weapons)
+			#elif (event.keycode == KEY_V and event.pressed) and manual_control:
+				#toggle_auto_fire(all_weapons)
 			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
 				toggle_manual_control()
 				ManualControlHUD.toggle_visible()
@@ -467,10 +476,8 @@ func toggle_manual_control() -> void:
 	elif manual_control == true:
 		manual_control = false
 		ship_select = false
-		#for weapon_system in ship_stats.weapon_systems:
-			#if weapon_system.auto_fire_start == true:
-				#toggle_auto_aim(weapon_system.weapons)
-				#toggle_auto_fire(weapon_system.weapons)
+		for weapon_system in self.weapon_systems:
+			weapon_system.set_autofire(true)
 		ManualControlHUD.set_ship(null)
 		_on_mouse_exited()
 	

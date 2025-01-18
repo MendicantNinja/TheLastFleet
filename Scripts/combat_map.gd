@@ -42,6 +42,7 @@ func _unhandled_input(event):
 	elif event is InputEventKey:
 		if event.keycode == KEY_TAB and event.pressed:
 			switch_maps.emit()
+
 func _physics_process(delta) -> void:
 	if CombatCamera.zoom != zoom_value:
 		CombatCamera.zoom = lerp(CombatCamera.zoom, zoom_value, 0.5)
