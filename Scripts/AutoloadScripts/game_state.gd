@@ -9,7 +9,7 @@ func _ready():
 	if player_fleet.fleet_stats.ships.is_empty():
 		for i in range (4):
 			player_fleet.add_ship(ShipStats.new(data.ship_type_enum.LION))
-
+		player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))	
 
 # Saving/Loading the player and their fleet
 func save_game() -> void:

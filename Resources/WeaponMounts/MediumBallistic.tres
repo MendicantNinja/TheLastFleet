@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="WeaponMount" load_steps=3 format=3 uid="uid://ljuoksbuwwam"]
 
-[ext_resource type="Texture2D" uid="uid://d1oqdmtt1ow4n" path="res://Art/WeaponArt/weapon_mount_medium.png" id="1_gd13l"]
+[ext_resource type="Texture2D" uid="uid://dwukygav05jqv" path="res://Art/WeaponArt/slot_med.png" id="1_gd13l"]
 [ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_n4v52"]
 
 [resource]

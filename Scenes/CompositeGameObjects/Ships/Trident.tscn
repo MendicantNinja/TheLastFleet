@@ -42,7 +42,7 @@ colors = PackedColorArray(1, 1, 1, 1)
 gradient = SubResource("Gradient_lqjnm")
 width = 10
 
-[node name="TestShip" type="RigidBody2D"]
+[node name="Trident" type="RigidBody2D"]
 z_as_relative = false
 collision_mask = 15
 input_pickable = true
@@ -91,7 +91,6 @@ rotation = 1.5708
 texture = ExtResource("11_byh25")
 
 [node name="ShipLivery" type="Sprite2D" parent="."]
-modulate = Color(1, 0.33, 0.33, 0.419608)
 texture_filter = 1
 rotation = 1.5708
 texture = ExtResource("12_eskgy")
@@ -113,6 +112,36 @@ debug_color = Color(0, 0.6, 0.701961, 0.0823529)
 position = Vector2(9, -18)
 
 [node name="WeaponSlot1" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot2" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot3" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot4" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot5" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot6" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot7" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot8" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot9" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot10" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(9, 18)
+
+[node name="WeaponSlot11" parent="." instance=ExtResource("13_kiy6n")]
 position = Vector2(9, 18)
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
@@ -146,7 +175,6 @@ shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 
 [node name="CenterCombatHUD" type="Control" parent="."]
-visible = false
 top_level = true
 layout_mode = 3
 anchors_preset = 0

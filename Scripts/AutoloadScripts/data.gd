@@ -39,6 +39,7 @@ enum ship_type_enum {
 	# Cruisers (Suggestion: Nouns that are strong actions or suggest grand scale, so that they almost come off as verbs. )
 	MARATHON, # Also the name of a famous battle! :D
 	INFINITY, 
+	TRIDENT,
 	
 	# Capitals (Suggestion: strong adjectives. Because capital ships do things.)
 	ASTRAL,
@@ -64,9 +65,11 @@ var ship_type_dictionary: Dictionary = {
 	# Cruisers
 	ship_type_enum.MARATHON: load("res://Resources/ShipHulls/Cruisers/Marathon.tres"),
 	
+	ship_type_enum.TRIDENT: load("res://Resources/ShipHulls/Cruisers/Trident.tres"),
+
 	# Capitals
 	ship_type_enum.ASTRAL: load("res://Resources/ShipHulls/Capitals/Astral.tres"),
-	
+
 	# Test
 	ship_type_enum.TEST: load("res://Resources/ShipHulls/TestHull.tres"),
 }
