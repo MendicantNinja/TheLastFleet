@@ -1,0 +1,67 @@
+extends LeafAction
+
+var target: Ship = null
+var final_position: Vector2 = Vector2.ZERO
+var target_position: Vector2 = Vector2.ZERO
+var target_cell: Vector2i = Vector2i.ZERO
+var default_radius: int = 10
+
+func tick(agent: Ship, blackboard: Blackboard) -> int:
+	var velocity: Vector2 = Vector2.ZERO
+	agent.heur_velocity = velocity
+	
+	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_cell == Vector2i.ZERO and agent.target_ship == null:
+		agent.target_position = Vector2.ZERO
+		final_position = Vector2.ZERO
+		target_position = Vector2.ZERO
+		target = null
+		return SUCCESS
+	
+	if agent.group_leader == false and (agent.target_cell != Vector2i.ZERO or agent.target_cell != target_cell):
+		target_position = agent.target_position
+		target_cell = agent.target_cell
+	elif agent.ShipNavigationAgent.is_navigation_finished() == false and final_position != agent.target_position:
+		target_position = agent.ShipNavigationAgent.get_next_path_position()
+		
+		if final_position != agent.ShipNavigationAgent.get_final_position():
+			globals.generate_group_target_positions(agent)
+		
+		if final_position != agent.ShipNavigationAgent.get_final_position() and imap_manager.working_maps.has(agent.group_name):
+			imap_manager.working_maps.erase(agent.group_name)
+			var cell = Vector2i(agent.target_position.y / imap_manager.default_cell_size, agent.target_position.x / imap_manager.default_cell_size)
+			var height: int = default_radius * imap_manager.default_cell_size
+			var width: int = default_radius * imap_manager.default_cell_size
+			var working_map: Imap = Imap.new(width, height, 0.0, 0.0, imap_manager.default_cell_size)
+			working_map.map_type = imap_manager.MapType.INFLUENCE_MAP
+			imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP].add_into_map(working_map, cell.y, cell.x)
+			imap_manager.working_maps[agent.group_name] = working_map
+		
+		final_position = agent.target_position
+	elif agent.target_ship != null and (target != agent.target_Ship):
+		target = agent.target_ship
+	
+	if Engine.get_physics_frames() % 15 == 0 and agent.ShipNavigationAgent.is_navigation_finished() == false and final_position == agent.target_position:
+		target_position = agent.ShipNavigationAgent.get_next_path_position()
+	
+	if target != null:
+		target_position = target.global_position
+	
+	var direction_to_path: Vector2 = agent.global_position.direction_to(target_position)
+	velocity = direction_to_path * agent.movement_delta
+	var ease_velocity: Vector2 = Vector2.ZERO
+	var normalize_velocity_x: float = agent.linear_velocity.x / velocity.x
+	var normalize_velocity_y: float = agent.linear_velocity.y / velocity.y
+	if velocity.x == 0.0:
+		normalize_velocity_x = 0.0
+	if velocity.y == 0.0:
+		normalize_velocity_y = 0.0
+	ease_velocity.x = (velocity.x + agent.linear_velocity.x) * ease(normalize_velocity_x, agent.ship_stats.acceleration)
+	ease_velocity.y = (velocity.y + agent.linear_velocity.y) * ease(normalize_velocity_y, agent.ship_stats.acceleration)
+	velocity += ease_velocity
+	
+	var transform_look_at: Transform2D = agent.transform.looking_at(target_position)
+	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.rotational_delta)
+	
+	agent.heur_velocity = velocity
+	
+	return FAILURE

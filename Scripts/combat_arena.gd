@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = true
+var debug_imap: bool = false
 var imap_debug_grid: Array
 
 func _ready() -> void:
@@ -28,10 +28,6 @@ func _ready() -> void:
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	
-	#occupancy_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	#threat_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	#occupancy_map.map_type = imap_manager.MapType.OCCUPANCY_MAP
-	#threat_map.map_type = imap_manager.MapType.THREAT_MAP
 	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var weighted_imap: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var fake_tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
@@ -47,11 +43,11 @@ func _ready() -> void:
 	imap_manager.weighted_imap = weighted_imap
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
-	if debug_imap == false:
-		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
-		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = vulnerability_map.map_grid.size()
-		var grid_column_size: int = vulnerability_map.map_grid[0].size()
+	if debug_imap == true:
+		influence_map.update_grid_value.connect(_on_grid_value_changed)
+		influence_map.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = influence_map.map_grid.size()
+		var grid_column_size: int = influence_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -59,7 +55,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(influence_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)

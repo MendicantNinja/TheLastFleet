@@ -1,15 +1,10 @@
-[gd_scene load_steps=28 format=3 uid="uid://c2noldww8g5st"]
+[gd_scene load_steps=23 format=3 uid="uid://c2noldww8g5st"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_6jg18"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_2s0ta"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="3_22nr0"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_us7ks"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/is_target_available.gd" id="5_52fvx"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/initialize_threat_detection.gd" id="5_c5frp"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/face_target.gd" id="7_dy2uw"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/move_into_range.gd" id="8_238fx"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/toggle_shields.gd" id="9_65omj"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="11_jlol5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/pathfinding.gd" id="5_ofwj6"]
 [ext_resource type="Texture2D" uid="uid://bpdt55pm4f7di" path="res://Art/ShipArt/prototype9_v2.png" id="12_gfp81"]
 [ext_resource type="Texture2D" uid="uid://c750umbh4ihc6" path="res://Art/ShipArt/prototype9v1_livery.png" id="13_yfhmf"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="14_b3w6e"]
@@ -57,35 +52,14 @@ script = ExtResource("1_6jg18")
 [node name="CombatBehaviorTree" type="Node" parent="."]
 script = ExtResource("2_2s0ta")
 
-[node name="main2" type="Node" parent="CombatBehaviorTree"]
-script = ExtResource("3_22nr0")
-
-[node name="threat detection" type="Node" parent="CombatBehaviorTree/main2"]
+[node name="main" type="Node" parent="CombatBehaviorTree"]
 script = ExtResource("4_us7ks")
 
-[node name="initialize threat detection" type="Node" parent="CombatBehaviorTree/main2/threat detection"]
-script = ExtResource("5_c5frp")
-
-[node name="target enemy" type="Node" parent="CombatBehaviorTree/main2"]
-script = ExtResource("4_us7ks")
-
-[node name="is target available" type="Node" parent="CombatBehaviorTree/main2/target enemy"]
-script = ExtResource("5_52fvx")
-
-[node name="choose target" type="Node" parent="CombatBehaviorTree/main2/target enemy"]
-script = ExtResource("11_jlol5")
-
-[node name="attack enemy" type="Node" parent="CombatBehaviorTree/main2/target enemy"]
+[node name="navigation" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("3_22nr0")
 
-[node name="face target" type="Node" parent="CombatBehaviorTree/main2/target enemy/attack enemy"]
-script = ExtResource("7_dy2uw")
-
-[node name="move into range" type="Node" parent="CombatBehaviorTree/main2/target enemy/attack enemy"]
-script = ExtResource("8_238fx")
-
-[node name="toggle shields" type="Node" parent="CombatBehaviorTree/main2/target enemy/attack enemy"]
-script = ExtResource("9_65omj")
+[node name="move to position" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("5_ofwj6")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708

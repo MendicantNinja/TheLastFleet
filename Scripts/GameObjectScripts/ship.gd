@@ -6,6 +6,8 @@ class_name Ship
 @onready var RepathArea = $RepathArea
 @onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
+@onready var AvoidanceArea = $AvoidanceArea
+@onready var AvoidanceShape = $AvoidanceArea/AvoidanceShape
 
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
@@ -84,13 +86,16 @@ var imap_cell: Vector2i = Vector2i.ZERO
 var registry_cell: Vector2i = Vector2i.ZERO
 var weigh_influence: Imap
 var approx_influence: float = 0.0
+var heur_velocity: Vector2 = Vector2.ZERO
+var target_ship: Ship = null
+var neighbor_units: Array = []
+var incoming_projectiles: Array = []
 
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation
+var target_cell: Vector2i = Vector2i.ZERO
 var final_target_position: Vector2 = Vector2.ZERO
-var next_path_position: Vector2 = Vector2.ZERO
-var intermediate_pathing: bool = false
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var movement_delta: float = 0.0
@@ -118,13 +123,12 @@ signal update_registry_cell(prev_registry_cell, registry_cell)
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
-	
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
 	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
 	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
-	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
+	var minimum_size = Vector2(ShipNavigationAgent.radius, ShipNavigationAgent.radius) * 2.0
 	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
 	
@@ -155,16 +159,7 @@ func _ready() -> void:
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
-
-	
-	var repath_shape: Shape2D = CircleShape2D.new()
-	repath_shape.radius = ShipNavigationAgent.radius
-	RepathShape.shape = repath_shape
-	RepathArea.collision_layer = collision_layer
-	RepathArea.collision_mask = collision_mask
-	
 	shield_radius = ShipNavigationAgent.radius
-	
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
@@ -172,7 +167,6 @@ func _ready() -> void:
 	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
 	ShipTargetIcon.position = target_ship_offset
 	ManualControlIndicator.position = manual_control_offset
-	
 	ManualControlIndicator.visible = false
 	ShipTargetIcon.visible = false
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
@@ -203,7 +197,6 @@ func _ready() -> void:
 		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2
 	
-	
 	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	for map in template_maps.values():
@@ -212,16 +205,16 @@ func _ready() -> void:
 		invert_composite.add_map(map, center_val, center_val, -1.0)
 	
 	weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
-	
 	for m in range(0, composite_influence.height):
 		for n in range(0, composite_influence.width):
 			approx_influence += composite_influence.map_grid[m][n]
-
+	
 	template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
 	if is_friendly == true:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
 		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
+	
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:
@@ -229,15 +222,22 @@ func _ready() -> void:
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
-	
-# Assign weapon system groups and weapons based on ship_stats.
+	# Assign weapon system groups and weapons based on ship_stats.
 	for i in range(all_weapons.size()):
 			# Placeholder
 			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
-# Turn on and off autofire as the refit system and ship stats demand.
+	# Turn on and off autofire as the refit system and ship stats demand.
 	var weapon_ranges: Dictionary = {}
 	for weapon_slot in all_weapons:
 		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
+	
+	var avoidance_shape: Shape2D = CircleShape2D.new()
+	avoidance_shape.radius = imap_manager.default_cell_size * occupancy_radius * 2
+	AvoidanceShape.shape = avoidance_shape
+	AvoidanceArea.collision_layer = collision_layer
+	AvoidanceArea.collision_mask = collision_mask
+	AvoidanceArea.body_entered.connect(_on_AvoidanceShape_body_entered)
+	AvoidanceArea.body_exited.connect(_on_AvoidanceShape_body_exited)
 	
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
@@ -276,6 +276,8 @@ func destroy_ship() -> void:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
+	if group_leader == true:
+		globals.reset_group_leader(self)
 	remove_from_group(group_name)
 	destroyed.emit()
 	ShipTargetIcon.visible = false
@@ -453,8 +455,6 @@ func toggle_manual_control() -> void:
 		CombatBehaviorTree.toggle_root(true)
 		return
 	
-	if CombatBehaviorTree.enabled == true:
-		CombatBehaviorTree.toggle_root(false)
 	if manual_control == false:
 		manual_control = true
 		ship_select = false
@@ -464,14 +464,15 @@ func toggle_manual_control() -> void:
 	elif manual_control == true:
 		manual_control = false
 		ship_select = false
-		#for weapon_system in ship_stats.weapon_systems:
-			#if weapon_system.auto_fire_start == true:
-				#toggle_auto_aim(weapon_system.weapons)
-				#toggle_auto_fire(weapon_system.weapons)
 		ManualControlHUD.set_ship(null)
 		_on_mouse_exited()
 	
 	toggle_manual_aim(all_weapons, manual_control)
+	
+	if manual_control == true:
+		CombatBehaviorTree.toggle_root(false)
+	elif manual_control == false:
+		CombatBehaviorTree.toggle_root(true)
 	
 	if manual_control == true and group_leader:
 		set_group_leader(false)
@@ -522,34 +523,15 @@ func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_fire()
-
-#ooooo      ooo       .o.       oooooo     oooo ooooo   .oooooo.          .o.       ooooooooooooo ooooo   .oooooo.   ooooo      ooo 
-#`888b.     `8'      .888.       `888.     .8'  `888'  d8P'  `Y8b        .888.      8'   888   `8 `888'  d8P'  `Y8b  `888b.     `8' 
- #8 `88b.    8      .8"888.       `888.   .8'    888  888               .8"888.          888       888  888      888  8 `88b.    8  
- #8   `88b.  8     .8' `888.       `888. .8'     888  888              .8' `888.         888       888  888      888  8   `88b.  8  
- #8     `88b.8    .88ooo8888.       `888.8'      888  888     ooooo   .88ooo8888.        888       888  888      888  8     `88b.8  
- #8       `888   .8'     `888.       `888'       888  `88.    .88'   .8'     `888.       888       888  `88b    d88'  8       `888  
-#o8o        `8  o88o     o8888o       `8'       o888o  `Y8bood8P'   o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  
-																																   
+																														   
 func set_navigation_position(to_position: Vector2) -> void:
-	intermediate_pathing = false
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
 
-func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
-	if CombatBehaviorTree.enabled == true:
-		set_combat_ai(false)
-	if group_leader:
-		return
-	if not ShipNavigationAgent.is_navigation_finished():
-		ShipNavigationAgent.set_target_position(position)
-	group_velocity = n_velocity
-	group_transform = next_transform
-
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
-
+	
 	# Needs to be per second.
 	#if soft_flux == 0:
 		#hard_flux -= ship_stats.flux_dissipation
@@ -561,9 +543,15 @@ func _physics_process(delta: float) -> void:
 	#else: 
 		#soft_flux -= ship_stats.flux_dissipation
 	#update_flux_indicators()
+	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
-		
+	
+	if movement_delta == 0.0 or rotational_delta == 0.0:
+		movement_delta = speed * delta
+		rotational_delta = ship_stats.turn_rate * delta
+		ShipNavigationAgent.set_max_speed(movement_delta)
+	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
 		update_agent_influence.emit(imap_cell, current_imap_cell)
@@ -573,16 +561,18 @@ func _physics_process(delta: float) -> void:
 	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
 		update_registry_cell.emit(registry_cell, current_registry_cell)
 		registry_cell = current_registry_cell
+	
+	if Engine.get_physics_frames() % 60 == 0:
+		var area_registry = AvoidanceArea.get_overlapping_bodies()
+		for body in area_registry:
+			if body not in neighbor_units:
+				neighbor_units.append(body)
+	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
 	ConstantSizedGUI.scale = Vector2.ONE
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
-	
-	if movement_delta == 0.0 or rotational_delta == 0.0:
-		movement_delta = speed * delta
-		rotational_delta = ship_stats.turn_rate * delta
-		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	var velocity = Vector2.ZERO
 	if manual_control == false:
@@ -637,17 +627,7 @@ func _physics_process(delta: float) -> void:
 		velocity = rotate_movement * movement_delta
 		velocity += ease_velocity(velocity)
 	
-	#if group_leader and not ShipNavigationAgent.is_navigation_finished():
-		#get_tree().call_group(group_name, "move_follower", velocity, transform)
-	
-	if not group_leader and not group_name.is_empty() and group_velocity != Vector2.ZERO:
-		velocity = group_velocity
-		group_velocity = Vector2.ZERO
-		var rotate_to: float = transform.x.angle_to(group_transform.x)
-		var transform_look_at: Transform2D = transform.rotated_local(rotate_to)
-		transform = transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
-	
-	#acceleration = velocity - linear_velocity
+	acceleration = velocity - linear_velocity
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
@@ -797,6 +777,20 @@ func pick_path(valid_paths: Array[Vector2]) -> Vector2:
 	var valid_path_range: int = valid_paths.size() - 1
 	var random_entry: int = randi_range(0, valid_path_range)
 	return valid_paths[random_entry]
+
+func _on_AvoidanceShape_body_entered(body) -> void:
+	if body == self:
+		return
+	neighbor_units.append(body)
+
+func _on_AvoidanceShape_body_exited(body) -> void:
+	neighbor_units.erase(body)
+
+func _on_AvoidanceShape_area_entered(area) -> void:
+	incoming_projectiles.append(area)
+
+func _on_AvoidanceShape_area_exited(area) -> void:
+	incoming_projectiles.erase(area)
 
 func _on_NavigationTimer_timeout() -> void:
 	if ShipNavigationAgent.is_navigation_finished():

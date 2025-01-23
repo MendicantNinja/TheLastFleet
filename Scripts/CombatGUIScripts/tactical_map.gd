@@ -91,13 +91,6 @@ func process_move(to_position: Vector2) -> void:
 			move_unit(group_leaders[0], to_position)
 			return
 	
-	#var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
-	#if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
-		#var leader = group_leaders[0]
-		#if leader in prev_group and leader in highlighted_group:
-			#move_unit(leader, to_position)
-			#return
-	
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
 
@@ -111,7 +104,7 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 func move_new_unit(to_position: Vector2) -> void:
 	# 1) Create an array of ships (nodes) from the ships the player currently has selected
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	
+	var leader_key: StringName = &"leader"
 	# 2) Assign group leader
 	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.
 	var new_leader = null
@@ -145,7 +138,7 @@ func move_new_unit(to_position: Vector2) -> void:
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	new_leader.set_group_leader(true)
-	
+	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 
@@ -213,9 +206,11 @@ func attack_targets() -> void:
 			targeted_group.remove_at(target_idx)
 		target_idx += 1
 	
+	var leader_key: StringName = &"leader"
+	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, leader)
 	leader.set_group_leader(true)
 	leader.set_blackboard_data(target_group_key, targeted_group)
-	get_tree().call_group(new_group_name, "set_combat_ai", true)
+
 
 func select_units() -> void:
 	var size: Vector2 = abs(box_selection_end - box_selection_start)

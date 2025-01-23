@@ -167,9 +167,18 @@ func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitu
 	var max_m: int = min(target_map.height, height - start_row + neg_adj_row)
 	for m in range(min_m, max_m, 1):
 		var source_row: int = m + start_row - neg_adj_row
+		var source_min: float = map_grid[source_row].min()
+		var source_max: float = map_grid[source_row].max()
+		if source_min == 0 and source_max == 0:
+			var fill_zero: Array = []
+			fill_zero.resize(target_map.map_grid[0].size())
+			fill_zero.fill(0.0)
+			target_map.map_grid[m] = fill_zero
+			continue
+		
 		for n in range(min_n, max_n, 1):
 			var source_col: int = n + start_column - neg_adj_col
-			target_map.add_value(m, n, map_grid[source_row][source_col] * magnitude)
+			target_map.map_grid[m][n] = map_grid[source_row][source_col] * magnitude
 
 func normalize_template_map() -> void:
 	var center: int = (height - 1) / 2

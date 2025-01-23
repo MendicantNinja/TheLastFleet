@@ -81,6 +81,7 @@ func find_unit_nearest_to_median(median: Vector2, unit_positions: Dictionary):
 func reset_group_leader(unit: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
 	var new_leader = null
+	var leader_key = &"leader"
 	if group.size() > 0 and group.size() <= 2:
 		new_leader = group[0]
 	elif group.size() > 2:
@@ -90,6 +91,9 @@ func reset_group_leader(unit: Ship) -> void:
 		
 		var median: Vector2 = geometric_median_of_objects(unit_positions.keys())
 		new_leader = find_unit_nearest_to_median(median, unit_positions)
+	
+	get_tree().call_group(unit.group_name, &"set_blackboard_data", leader_key, new_leader)
+	# maybe shift orders to new leader here
 	
 	if not unit.ShipNavigationAgent.is_navigation_finished():
 		var distance_to_position: float = unit.position.distance_to(unit.target_position)
@@ -101,10 +105,56 @@ func reset_group_leader(unit: Ship) -> void:
 		new_leader.set_navigation_position(relative_position)
 	unit.set_group_leader(false)
 
+@warning_ignore("integer_division")
+func generate_group_target_positions(leader: Ship) -> void:
+	var group: Array = get_tree().get_nodes_in_group(leader.group_name)
+	var occupancy_sizes: Array = []
+	var average_size: Vector2i = Vector2i.ZERO
+	for unit: Ship in group:
+		var occupancy: Imap = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP]
+		var size: int = occupancy.width
+		occupancy_sizes.append(size)
+		average_size += Vector2i(size, size)
+	
+	average_size = Vector2i(average_size.x / group.size(), average_size.y / group.size())
+	var max_size: int = occupancy_sizes.max()
+	var min_size: int = occupancy_sizes.min()
+	var unit_distance: int = 0
+	if max_size == min_size and (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
+		unit_distance = max_size / 2
+	
+	var unit_slots: Array = []
+	if leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL:
+		unit_slots = box_formation(leader, group, unit_distance)
+	
+	for unit: Ship in group:
+		if unit.group_leader == true:
+			continue
+		unit.target_cell = unit_slots.pop_back()
+
+
+@warning_ignore("narrowing_conversion", "integer_division")
+func box_formation(leader: Ship, group: Array, slot_distance: int) -> Array:
+	var target_cell: Vector2i = Vector2i(leader.target_position.y / imap_manager.default_cell_size, leader.target_position.x / imap_manager.default_cell_size)
+	var group_size: int = group.size()
+	var radius: int =  (slot_distance * group_size - slot_distance) / 2
+	if radius <= 0:
+		radius = group_size
+	var iter_distance: int = slot_distance + 1
+	var slots: Array = []
+	for m in range(-radius, radius, iter_distance):
+		var target_m: int = target_cell.x - m
+		for n in range(-radius, radius, iter_distance):
+			var target_n: int = target_cell.y - n
+			var cell: Vector2i = Vector2i(target_m, target_n)
+			if cell == target_cell:
+				continue
+			slots.append(cell)
+	return slots
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
