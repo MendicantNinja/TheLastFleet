@@ -432,7 +432,7 @@ func _input(event: InputEvent) -> void:
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
 	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
 	if event is InputEventMouseButton:
-		if Input.is_action_pressed("alt select") and Input.is_action_just_pressed("select"):
+		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
 			alt_select.emit()
 			return
 		if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
@@ -621,7 +621,7 @@ func _physics_process(delta: float) -> void:
 		rotational_delta = ship_stats.turn_rate * delta
 		ShipNavigationAgent.set_max_speed(movement_delta)
 	
-	if manual_control and Input.is_action_pressed("vent flux"):
+	if manual_control and Input.is_action_pressed("vent_flux"):
 		if soft_flux > 0.0:
 			soft_flux -= ship_stats.flux_dissipation
 		elif hard_flux > 0.0:
@@ -640,10 +640,10 @@ func _physics_process(delta: float) -> void:
 	if manual_control:
 		#if ManualControlCamera.zoom != zoom_value:
 			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
-		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
+		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
 		rotate_angle = rotate_direction.angle()
-		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-		Input.get_action_strength("E") - Input.get_action_strength("Q"))
+		move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
+		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left"))
 	
 	# Normal Pathing
 	if not ShipNavigationAgent.is_navigation_finished():

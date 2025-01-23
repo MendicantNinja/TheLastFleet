@@ -43,7 +43,7 @@ func _unhandled_input(event) -> void:
 			box_selection_start = get_global_mouse_position()
 		elif Input.is_action_just_released("select") and box_selection_end != Vector2.ZERO:
 			select_units()
-		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt select")):
+		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt_select")):
 			var to_position: Vector2 = get_global_mouse_position()
 			process_move(to_position)
 		elif Input.is_action_just_pressed("zoom in") and TacticalCamera.zoom < zoom_in_limit:
@@ -61,11 +61,11 @@ func _unhandled_input(event) -> void:
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 		if event.keycode == KEY_TAB and event.pressed:
 			switch_maps.emit()
-		if Input.is_action_pressed("alt select") and  Input.is_action_pressed("select") and highlighted_group.size() > 0:
+		if Input.is_action_pressed("alt_select") and  Input.is_action_pressed("select") and highlighted_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
 			queue_redraw()
-		elif Input.is_action_just_released("alt select"):
+		elif Input.is_action_just_released("alt_select"):
 			if highlighted_group.size() > 0 and highlighted_enemy_group.size() > 0:
 				attack_targets()
 			attack_group = false

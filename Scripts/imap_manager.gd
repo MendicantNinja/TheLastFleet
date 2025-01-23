@@ -4,7 +4,7 @@ class_name ImapManager
 var arena_width: int = 17000
 var arena_height: int = 20000
 var default_cell_size: int = 250
-var max_cell_size: int = 2500
+var max_cell_size: int = 2498
 
 enum TemplateType {
 	OCCUPANCY_TEMPLATE, # Occupancy indicates the space a unit occupies and its zone of influence.
