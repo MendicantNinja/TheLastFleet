@@ -133,6 +133,7 @@ m2={
 2d_physics/layer_3="EnemyShip"
 2d_physics/layer_4="Projectile"
 2d_physics/layer_8="Inputs (e.g. WeaponSlotRefitting)"
+2d_physics/layer_9="Misc. Stuff (Raycast Intersections for Proximity Warnings)"
 avoidance/layer_1="PlayerShip"
 avoidance/layer_2="Obstacles"
 avoidance/layer_3="EnemyShip"

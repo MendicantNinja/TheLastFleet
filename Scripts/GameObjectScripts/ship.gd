@@ -225,6 +225,16 @@ func _ready() -> void:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
 		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
+	
+	if imap_manager.registry_map.has(registry_cell):
+		var this_cell: Array = imap_manager.registry_map[registry_cell]
+		this_cell.append(self)
+		imap_manager.registry_map[registry_cell] = this_cell
+	else:
+		imap_manager.registry_map[registry_cell] = [self]
+	
+	
+	
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:

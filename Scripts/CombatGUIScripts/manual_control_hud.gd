@@ -22,8 +22,9 @@ var current_ship: Ship = null
 @onready var ship_registry: Array[Ship]
 @onready var active_proximity_indicators: Dictionary = {}
 @onready var ProxWarningContainer: Control = $HUDWrapper/ProxWarningContainer
+@onready var screen = settings.screen_size
 @onready var proximity_indicator_max: int = 4000 #maximum allowable distnce
-@onready var proximity_indicator_min: Vector2  = Vector2(2000, 1150) # minimum camera zoom approximation in pixels
+@onready var proximity_indicator_min: Vector2  = Vector2(screen.x+50, screen.y+50) # minimum camera zoom approximation in pixels
 @onready var proximity_indicator_icon = load("res://Scenes/GUIScenes/CombatGUIScenes/ProximityIndicator.tscn")
 func set_ship(ship: Ship) -> void:
 	print(ship)
@@ -125,39 +126,84 @@ func _physics_process(delta) -> void:
 		for ship in ship_registry:
 			for child in ProxWarningContainer.get_children():
 				child.queue_free()
-			print("The current ship and queuered ships positions are", current_ship.position, ship.position)
-			var diff: Vector2 = current_ship.global_position - ship.global_position  
+			#print("The current ship and queuered ships positions are", current_ship.position, ship.position)
+			var diff: Vector2 = - ship.global_position - current_ship.global_position  
 			var distance: int = diff.length()
 			var direction: Vector2 = diff.normalized()
-			print("The diff and distance for this ship is ", diff, distance)
+			#print("The diff and distance for this ship is ", diff, distance)
 			if abs(diff.x) > proximity_indicator_min.x and abs(distance) < proximity_indicator_max or abs(diff.y) >= proximity_indicator_min.y and abs(distance) <= proximity_indicator_max:
-				
 				var proximity_indicator: Control = proximity_indicator_icon.instantiate()
 				proximity_indicator.setup(ship)
 				proximity_indicator.update_distance(Vector2(diff).length())
 				
-				ProxWarningContainer.add_child(proximity_indicator)
-				# Direction
-				print(direction.angle())
-				proximity_indicator.position = get_screen_edge_intersection(direction)
+				self.add_child(proximity_indicator)
+				var right_boundary_intercept: bool = false
+				var top_boundary_intercept: bool = false 
+				var left_boundary_intercept: bool = false
+				var bottom_boundary_intercept: bool = false
+				if sign(direction.x) == 1:
+					right_boundary_intercept = true
+				elif sign(direction.x) == -1:
+					left_boundary_intercept = true
+				if sign(direction.y) == 1:
+					bottom_boundary_intercept = true
+				elif sign(direction.y) == -1:
+					top_boundary_intercept = true
+				# Determine right intersection position (if any)
+					# y = .963, x = .265
+				#var slope_x = 960 + screen.x/direction.x
+				#var slope_y = 540 + screen.y/direction.y
+				var right_intercept: int
+				var left_intercept: int
+				var top_intercept: int
+				var bottom_intercept: int
+				if right_boundary_intercept == true:
+					right_intercept = (screen.x-screen.x/2)/direction.x
+					left_intercept = 10000
+				if left_boundary_intercept == true:
+					left_intercept = (0 - screen.x/2)/direction.x
+					right_intercept = 10000
+				if top_boundary_intercept == true:
+					top_intercept = (0 - screen.y/2)/direction.y
+					bottom_intercept = 10000
+				if bottom_boundary_intercept == true:
+					bottom_intercept = (screen.y - screen.y/2)/direction.y
+					top_intercept = 10000
+				var intercept: Vector2 = Vector2(0, 0)
+				var coordinate_1: int = min(right_intercept, left_intercept, bottom_intercept, top_intercept)
+				var coordinate_2: int = (screen.x/2)+coordinate_1*0.265
+				if coordinate_1 == left_intercept or coordinate_1 == right_intercept:
+					intercept.x = coordinate_1
+					intercept.y = screen.y - 50
+				else:
+					intercept.y = coordinate_1
+					intercept.x = screen.x - 50
 				
-				#var intersect: Vector2 = 
-				#proximity_indicator.global_position = intersect
+				proximity_indicator.position = intercept
+				print("the intercept on the boundary box is ", intercept)
+				# Calculate the position of the prox warning as though the centered ship is position (0,0)
+				#var cosine: float = cos(direction.angle())
+				#var axis_length: int = screen.x/2
+				#var x_exists: bool = true
+				#if direction.x == 0:
+					#axis_length = screen.y/2
+					#x_exists = false
+				#if sign(direction.x) == -1 and x_exists == true:
+					#axis_length *= -1
+				#if sign(direction.y) == -1 and x_exists == false:
+					#axis_length*= -1
+				#var hypotenuse: int = axis_length / cosine
+				#var missing_side: int = sqrt(pow(hypotenuse, 2) - pow(axis_length, 2))
+				#if x_exists == true:
+					#proximity_indicator.position = Vector2(screen.x/2+axis_length, screen.y/2+missing_side)
+					#print("angle cosine axis_length.x hypotenuse missing_side.y ", direction.angle(), ", ", cosine,", ", axis_length,", ", hypotenuse,", ", missing_side)
+					#print("x exists, the proximity indicators position is", proximity_indicator.position)
+				#elif x_exists == false:
+					#pass
 				#active_proximity_indicators[ship] = proximity_indicator
-			#else:
-				#if active_proximity_indicators.has(ship):
-					#active_proximity_indicators.erase(ship)
-		print(active_proximity_indicators.values().size())
-		# Move these positions to where they need to go on the screen.
-		# Create directional indicator
-
-func get_screen_edge_intersection(normalized_vector: Vector2) -> Vector2:
-	var screen_size: Vector2 = settings.screen_size
-	var ship_position: Vector2 = settings.screen_size/2 # ship is centered on screen for the purposes of this calculation
-	
-	# 1920x1080 * .5
-	# Our ship is at
-	return Vector2()  # Return (0, 0) if no valid intersection found
+			else:
+				if active_proximity_indicators.has(ship):
+					active_proximity_indicators.erase(ship)
 
 
 func _process(delta):
