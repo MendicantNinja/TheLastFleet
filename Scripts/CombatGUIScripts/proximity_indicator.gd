@@ -10,10 +10,10 @@ func setup(ship: Ship) -> void:
 	IndicatorTexture = $IndicatorSprite
 	Distance = $IndicatorSprite/RichTextLabel
 	IndicatorTexture.texture = ship.ShipSprite.texture
-	#if ship.is_friendly:
-		#IndicatorTexture.modulate = settings.player_color
-	#else:
-		#IndicatorTexture.modulate = settings.enemy_color
+	if ship.is_friendly:
+		Distance.modulate = settings.player_color
+	else:
+		Distance.modulate = settings.enemy_color
 
 func update_distance(distance: int) -> void:
 	proximity = distance

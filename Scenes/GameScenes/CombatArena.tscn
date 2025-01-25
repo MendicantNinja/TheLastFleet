@@ -59,6 +59,10 @@ bg_color = Color(0, 0, 0, 0.588235)
 [node name="CombatArena" type="Node2D"]
 script = ExtResource("1_fx56v")
 
+[node name="OnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="."]
+unique_name_in_owner = true
+rect = Rect2(0, 0, 100, 100)
+
 [node name="Admiral" type="Node2D" parent="."]
 script = ExtResource("2_shfex")
 
@@ -206,6 +210,12 @@ debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 unique_name_in_owner = true
 script = ExtResource("5_ojmr4")
 
+[node name="ProxWarningContainer" type="Control" parent="ManualControlHUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
 modulate = Color(0.486275, 0.843137, 0.294118, 0.784314)
 z_index = 3
@@ -313,11 +323,6 @@ theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 text = "WEAPON SYSTEMS"
-
-[node name="ProxWarningContainer" type="Control" parent="ManualControlHUD/HUDWrapper"]
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [node name="OptionsMenu" type="CanvasLayer" parent="."]
 
@@ -534,6 +539,7 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(100, 100)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(8212, 5722)
@@ -563,15 +569,15 @@ position = Vector2(8000, 12000)
 position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(1500, 1500)
+position = Vector2(3400, 100)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(176, 1305)
+position = Vector2(344, 2406)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2118, 201)
+position = Vector2(3252, 1030)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
