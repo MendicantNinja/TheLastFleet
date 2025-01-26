@@ -21,7 +21,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		var r: float = agent.ShipNavigationAgent.radius + unit.ShipNavigationAgent.radius
 		var w: Vector2 = (unit.global_position - agent.global_position)
 		var c: float = unit.global_position.distance_to(agent.global_position) - r # c
-		if c <= 0:
+		if c <= 0.0:
 			continue
 		c = w.dot(w) - r * r
 		var v: Vector2 = agent.heur_velocity - unit.heur_velocity
@@ -30,7 +30,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		var a: float = v.dot(v) # dot product of difference in velocities
 		var b: float = 2.0 * w.dot(v) # dot product of the differences in position and difference in velocities
 		var disrc: float = b * b - a * c # b^2 - a*c
-		if disrc <= 0:
+		if disrc <= 0.0:
 			continue
 		tau1 = (b - sqrt(disrc)) / a
 		tau2 = (b + sqrt(disrc)) / a
@@ -51,10 +51,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		if unit.heur_velocity == Vector2.ZERO:
 			avoid_direction = agent.global_position + agent.heur_velocity * tau - unit.global_position - unit.linear_velocity * tau
 		avoid_direction = avoid_direction.normalized()
-		var mag: float = 0.0
-		mag = agent.movement_delta
-		net_force += (avoid_direction * mag)
-	
+		net_force += avoid_direction * agent.speed
+	net_force /= avoid_unit.size() + 1
 	agent.heur_velocity = Vector2.ONE
 	agent.acceleration = net_force
 	return FAILURE

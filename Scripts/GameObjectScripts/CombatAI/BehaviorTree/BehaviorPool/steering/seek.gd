@@ -37,21 +37,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		target_position = target.global_position
 	
 	var direction_to_path: Vector2 = agent.global_position.direction_to(target_position)
-	velocity = direction_to_path * agent.movement_delta
-	var ease_velocity: Vector2 = Vector2.ZERO
-	var normalize_velocity_x: float = agent.linear_velocity.x / velocity.x
-	var normalize_velocity_y: float = agent.linear_velocity.y / velocity.y
-	if velocity.x == 0.0:
-		normalize_velocity_x = 0.0
-	if velocity.y == 0.0:
-		normalize_velocity_y = 0.0
-	ease_velocity.x = (velocity.x) * ease(normalize_velocity_x, agent.ship_stats.acceleration)
-	ease_velocity.y = (velocity.y) * ease(normalize_velocity_y, agent.ship_stats.acceleration)
-	velocity += ease_velocity
-
+	velocity = direction_to_path * agent.speed
 	var transform_look_at: Transform2D = agent.transform.looking_at(target_position)
 	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.rotational_delta)
-	
 	agent.heur_velocity = velocity
-	
 	return FAILURE

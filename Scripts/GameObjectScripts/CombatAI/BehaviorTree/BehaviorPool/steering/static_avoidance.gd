@@ -68,13 +68,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		avoid_direction = avoid_direction.normalized()
 		var funny = avoid_direction.dot(avoid_direction)
 		avoid_direction = avoid_direction.rotated(funny)
-		var mag: float = 0.0
-		if tau >= 0.0 and tau < time_horizon:
-			mag = (time_horizon - tau) / (tau + 0.001)
-		if mag > agent.movement_delta or floor(mag) == 0.0:
-			mag = agent.movement_delta
-		net_force += avoid_direction * agent.movement_delta
-	
+		net_force += avoid_direction * agent.speed
+	net_force /= avoid_unit.size()
 	agent.sleeping = false
 	agent.acceleration = net_force
 	return RUNNING

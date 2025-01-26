@@ -531,7 +531,6 @@ func set_navigation_position(to_position: Vector2) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
-	
 	# Needs to be per second.
 	#if soft_flux == 0:
 		#hard_flux -= ship_stats.flux_dissipation
@@ -577,34 +576,31 @@ func _physics_process(delta: float) -> void:
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 	
-	var velocity = Vector2.ZERO
 	if manual_control == false:
 		return
-	
 	#if TacticalCamera != null and TacticalCamera.enabled:
 		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
 	#if ManualControlCamera != null and ManualControlCamera.enabled:
 		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
 	
-	if manual_control == true: 
-		if manual_camera_freelook == false:
-			CombatCamera.global_position = self.global_position
-		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-		# if one wants to make the manually controlled hud less transparent than friendly ships
-		#var current_color: Color = ConstantSizedGUI.modulate
-		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
+	if manual_camera_freelook == false:
+		CombatCamera.global_position = self.global_position
+	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	# if one wants to make the manually controlled hud less transparent than friendly ships
+	#var current_color: Color = ConstantSizedGUI.modulate
+	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	#if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		#ShipNavigationAgent.set_target_position(position)
 	
-	if manual_control and Input.is_action_pressed("vent flux"):
+	if Input.is_action_pressed("vent flux"):
 		if soft_flux > 0.0:
 			soft_flux -= ship_stats.flux_dissipation
 		elif hard_flux > 0.0:
 			hard_flux -= ship_stats.flux_dissipation
 		update_flux_indicators()
 	
-	if manual_control and Input.is_action_pressed("select") and not flux_overload:
+	if Input.is_action_pressed("select") and not flux_overload:
 		fire_weapon_system(all_weapons)
 	
 	if shield_toggle and not flux_overload:
@@ -613,33 +609,26 @@ func _physics_process(delta: float) -> void:
 	elif shield_toggle and flux_overload:
 		toggle_shield()
 	
-	if manual_control:
-		#if ManualControlCamera.zoom != zoom_value:
-			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
-		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
-		rotate_angle = rotate_direction.angle()
-		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-		Input.get_action_strength("E") - Input.get_action_strength("Q"))
+	#if ManualControlCamera.zoom != zoom_value:
+		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
+	var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
+	rotate_angle = rotate_direction.angle()
+	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
+	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
 	
-	if rotate_angle != 0.0:
-		var adjust_mass: float = (mass * 1000)
-		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+	var adjust_mass: float = (mass * 1000)
+	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
+	var velocity = Vector2.ZERO
+	velocity = rotate_movement * speed
 	
-	if move_direction != Vector2.ZERO:
-		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-		velocity = rotate_movement * movement_delta
-		velocity += ease_velocity(velocity)
-	
-	acceleration = velocity - linear_velocity
+	acceleration = velocity
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	var force: Vector2 = acceleration
-	
-	#if force == Vector2.ZERO:
-		#linear_velocity = linear_velocity
+	var force: Vector2 = acceleration * state.step
 	
 	if force.abs().floor() != Vector2.ZERO and not manual_control:
 		apply_torque(rotate_angle)
