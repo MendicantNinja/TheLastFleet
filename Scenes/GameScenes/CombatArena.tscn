@@ -61,7 +61,7 @@ script = ExtResource("1_fx56v")
 
 [node name="OnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="."]
 unique_name_in_owner = true
-rect = Rect2(0, 0, 100, 100)
+rect = Rect2(0, 0, 1, 1)
 
 [node name="Admiral" type="Node2D" parent="."]
 script = ExtResource("2_shfex")
@@ -569,15 +569,15 @@ position = Vector2(8000, 12000)
 position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3400, 100)
+position = Vector2(2339, 249)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(344, 2406)
+position = Vector2(204, 1467)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3252, 1030)
+position = Vector2(2340, 1094)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]

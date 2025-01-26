@@ -6,7 +6,7 @@ const ManualControlCamera = preload("res://Scenes/GUIScenes/CombatGUIScenes/Manu
 @onready var Cancel = %Cancel
 var manually_controlled_unit: Ship = null # Different from prev selected unit in tac map. Closer meaning is "manually controlled unit"
 var zoom_in_limit: Vector2 = Vector2(1.5, 1.5)
-var zoom_out_limit: Vector2 = Vector2(0.3, 0.3)
+var zoom_out_limit: Vector2 = Vector2(0.4, 0.4)
 var camera_position: Vector2 = Vector2.ZERO
 var zoom_min: Vector2 = Vector2(1.5, 1.5)
 var zoom_value: Vector2 = Vector2.ONE
@@ -34,8 +34,9 @@ func _unhandled_input(event):
 		if Input.is_action_just_released("camera action") and CombatCamera.enabled and manually_controlled_unit != null:
 			manually_controlled_unit.toggle_manual_camera_freelook(false)
 	elif event is InputEventMouseMotion:
+		#Middle Mouse Button Scrolling
 		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
-			CombatCamera.position -= event.relative / CombatCamera.zoom
+			CombatCamera.global_position -= event.relative / CombatCamera.zoom
 			if manually_controlled_unit != null:
 				manually_controlled_unit.toggle_manual_camera_freelook(true)
 	#on middle mouse button released

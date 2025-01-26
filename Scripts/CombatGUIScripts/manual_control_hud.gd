@@ -23,9 +23,10 @@ var current_ship: Ship = null
 @onready var active_proximity_indicators: Dictionary = {}
 @onready var OnScreenNotifier: VisibleOnScreenNotifier2D = %OnScreenNotifier
 @onready var ProxWarningContainer: Control = $ProxWarningContainer
-@onready var screen = settings.screen_size
+@onready var CombatCamera: Camera2D = $"../CombatMap/CombatCamera"
+@onready var screen_size: Vector2 = settings.screen_size
 @onready var proximity_indicator_max: int = 4500 #maximum allowable distnce
-@onready var proximity_indicator_min: Vector2  = Vector2(1920, 1080) # minimum camera zoom approximation in pixels
+@onready var proximity_indicator_min: Vector2  = Vector2(screen_size.x/2, screen_size.y/2) # minimum camera zoom approximation in pixels
 @onready var proximity_indicator_icon = load("res://Scenes/GUIScenes/CombatGUIScenes/ProximityIndicator.tscn")
 func set_ship(ship: Ship) -> void:
 	print(ship)
@@ -123,22 +124,25 @@ func update_hud() -> void:
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta) -> void:
 	if Engine.get_physics_frames() % 5 == 0 and current_ship != null:
-		# Create filtered list of ship positions and creare proximity indicators
+		# Create filtered list of ship positions and create proximity indicators
+		var screen: Vector2 = screen_size / CombatCamera.zoom
+		if CombatCamera.zoom.x > 1:
+			screen = screen_size
+		print(screen, CombatCamera.zoom)
 		for child in ProxWarningContainer.get_children():
-			child.queue_free()
+			child.free()
 		for ship in ship_registry:
-			#$"../CombatMap/CombatCamera".global_position
-			var diff: Vector2 = ship.global_position - current_ship.global_position  
+			var diff: Vector2 = ship.global_position - CombatCamera.global_position #current_ship.global_position
+			#print($"../CombatMap".CombatCamera.global_position, diff )
 			var distance: int = diff.length()
 			var direction: Vector2 = diff.normalized()
 			if abs(diff.x) >= proximity_indicator_min.x and abs(distance) < proximity_indicator_max or abs(diff.y) >= proximity_indicator_min.y and abs(distance) <= proximity_indicator_max:
-				#OnScreenNotifier.rect.position = ship.global_position
-				#if OnScreenNotifier.is_on_screen() == true:
-					#return
+				OnScreenNotifier.global_position = ship.global_position
+				if OnScreenNotifier.is_on_screen() == true:
+					return
 				var proximity_indicator: Control = proximity_indicator_icon.instantiate()
 				proximity_indicator.setup(ship)
-				proximity_indicator.update_distance(distance)
-				
+				#proximity_indicator.update_distance(distance)
 				ProxWarningContainer.add_child(proximity_indicator)
 				var right_boundary_intercept: bool = false
 				var top_boundary_intercept: bool = false 
@@ -180,10 +184,11 @@ func _physics_process(delta) -> void:
 					bottom_intercept = 10000
 				var intercept: Vector2 = Vector2(0, 0)
 				var coordinate_1: int = min(right_intercept, left_intercept, bottom_intercept, top_intercept)
-				var coordinate_2: int = (screen.x/2)+coordinate_1*0.265
+				var half_screen_distance: int
 				if coordinate_1 == right_intercept:
 					intercept.x = screen.x
 					intercept.y = screen.y/2+coordinate_1*direction.y
+					half_screen_distance = screen.x/2
 					proximity_indicator.position = Vector2(intercept.x - 40, intercept.y)
 				elif coordinate_1 == left_intercept:
 					intercept.x = 0
@@ -199,8 +204,9 @@ func _physics_process(delta) -> void:
 					intercept.y = 0
 					intercept.x = screen.x / 2 + coordinate_1 * direction.x
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
-				
-				#active_proximity_indicators[ship] = proximity_indicator
+				proximity_indicator.update_distance((CombatCamera.global_position - ship.global_position).length() - half_screen_distance)
+				#Vector2(0,screen_size.x/2)
+				active_proximity_indicators[ship] = proximity_indicator
 			#else:
 				#if active_proximity_indicators.has(ship):
 					#active_proximity_indicators.erase(ship)
