@@ -552,7 +552,7 @@ func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
-
+	
 	# Needs to be per second.
 	#if soft_flux == 0:
 		#hard_flux -= ship_stats.flux_dissipation
@@ -568,36 +568,6 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	var velocity = Vector2.ZERO
-
-	
-	#if TacticalCamera != null and TacticalCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
-	#if ManualControlCamera != null and ManualControlCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
-	
-	# Rare GUI Updates
-	CenterCombatHUD.position = position
-	ConstantSizedGUI.scale = Vector2.ONE
-	if CombatCamera != null and CombatCamera.enabled:
-		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
-	
-	if manual_control == true: 
-		if manual_camera_freelook == false:
-			CombatCamera.global_position = self.global_position
-		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-		# if one wants to make the manually controlled hud less transparent than friendly ships
-		#var current_color: Color = ConstantSizedGUI.modulate
-		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
-		pass
-	
-	
-	if ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		if rotate_angle != 0.0 and move_direction != Vector2.ZERO:
-			rotate_angle = 0.0
-			move_direction = Vector2.ZERO
-	
-	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
-		ShipNavigationAgent.set_target_position(position)
 	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
@@ -609,19 +579,27 @@ func _physics_process(delta: float) -> void:
 		update_registry_cell.emit(registry_cell, current_registry_cell)
 		registry_cell = current_registry_cell
 	
-	if movement_delta == 0.0 or rotational_delta == 0.0:
-		movement_delta = speed * delta
-		rotational_delta = ship_stats.turn_rate * delta
-		ShipNavigationAgent.set_max_speed(movement_delta)
+	#if TacticalCamera != null and TacticalCamera.enabled:
+		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
+	#if ManualControlCamera != null and ManualControlCamera.enabled:
+		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
 	
-	if manual_control and Input.is_action_pressed("vent flux"):
+	CenterCombatHUD.position = position
+	ConstantSizedGUI.scale = Vector2.ONE
+	if CombatCamera != null and CombatCamera.enabled:
+		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
+	
+	if manual_control == false:
+		return
+	
+	if Input.is_action_pressed("vent flux"):
 		if soft_flux > 0.0:
 			soft_flux -= ship_stats.flux_dissipation
 		elif hard_flux > 0.0:
 			hard_flux -= ship_stats.flux_dissipation
 		update_flux_indicators()
 	
-	if manual_control and Input.is_action_pressed("select") and not flux_overload:
+	if Input.is_action_pressed("select") and not flux_overload:
 		fire_weapon_system(all_weapons)
 	
 	if shield_toggle and not flux_overload:
@@ -630,43 +608,26 @@ func _physics_process(delta: float) -> void:
 	elif shield_toggle and flux_overload:
 		toggle_shield()
 	
-	if manual_control:
-		#if ManualControlCamera.zoom != zoom_value:
-			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
-		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
-		rotate_angle = rotate_direction.angle()
-		move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-		Input.get_action_strength("E") - Input.get_action_strength("Q"))
+	#if ManualControlCamera.zoom != zoom_value:
+		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
+	var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
+	rotate_angle = rotate_direction.angle()
+	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
+	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
 	
-	# Normal Pathing
-	if not ShipNavigationAgent.is_navigation_finished():
-		next_path_position = ShipNavigationAgent.get_next_path_position()
-		var direction_to_path: Vector2 = global_position.direction_to(next_path_position)
-		velocity = direction_to_path * movement_delta
-		velocity += ease_velocity(velocity)
-		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
-		transform = transform.interpolate_with(transform_look_at, rotational_delta)
-	
-	if rotate_angle != 0.0:
-		var adjust_mass: float = (mass * 1000)
-		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-	
-	if move_direction != Vector2.ZERO:
-		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-		velocity = rotate_movement * movement_delta
-		velocity += ease_velocity(velocity)
-	
-	if group_leader and not ShipNavigationAgent.is_navigation_finished():
-		get_tree().call_group(group_name, "move_follower", velocity, transform)
-	
-	if not group_leader and not group_name.is_empty() and group_velocity != Vector2.ZERO:
-		velocity = group_velocity
-		group_velocity = Vector2.ZERO
-		var rotate_to: float = transform.x.angle_to(group_transform.x)
-		var transform_look_at: Transform2D = transform.rotated_local(rotate_to)
-		transform = transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
+	var adjust_mass: float = (mass * 1000)
+	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
+	velocity = rotate_movement * speed
 	
 	acceleration = velocity - linear_velocity
+	
+	if manual_camera_freelook == false:
+		CombatCamera.global_position = self.global_position
+	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	# if one wants to make the manually controlled hud less transparent than friendly ships
+	#var current_color: Color = ConstantSizedGUI.modulate
+	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
@@ -690,14 +651,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 
 func ease_velocity(velocity: Vector2) -> Vector2:
 	var new_velocity: Vector2 = Vector2.ZERO
-	var normalize_velocity_x: float = linear_velocity.x / velocity.x
-	var normalize_velocity_y: float = linear_velocity.y / velocity.y
-	if velocity.x == 0.0:
-		normalize_velocity_x = 0.0
-	if velocity.y == 0.0:
-		normalize_velocity_y = 0.0
-	new_velocity.x = (velocity.x + linear_velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
-	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
+	var normalize_velocity_x = abs(velocity.x / speed)
+	var normalize_velocity_y = abs(velocity.y / speed)
+	new_velocity.x = (velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
+	new_velocity.y = (velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
 	return new_velocity
 
 func _on_target_in_range(value: bool) -> void:
