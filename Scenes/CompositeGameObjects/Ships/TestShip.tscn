@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=26 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
@@ -21,9 +21,6 @@
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="20_n3gvt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_4lqs1"]
-radius = 0.01
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
@@ -98,15 +95,6 @@ texture = ExtResource("13_bdbdv")
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(54, 0, -18, -73, -19, 77)
 
-[node name="RepathArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 0
-priority = 1
-
-[node name="RepathShape" type="CollisionShape2D" parent="RepathArea"]
-shape = SubResource("CircleShape2D_4lqs1")
-debug_color = Color(0, 0.6, 0.701961, 0.0823529)
-
 [node name="WeaponSlot0" parent="." instance=ExtResource("3_b8p4t")]
 position = Vector2(9, -18)
 
@@ -118,7 +106,7 @@ path_desired_distance = 50.0
 target_desired_distance = 50.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 75.0
+radius = 70.0
 max_neighbors = 4
 time_horizon_agents = 5.0
 time_horizon_obstacles = 1.0

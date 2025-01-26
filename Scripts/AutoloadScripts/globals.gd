@@ -109,48 +109,82 @@ func reset_group_leader(unit: Ship) -> void:
 func generate_group_target_positions(leader: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(leader.group_name)
 	var occupancy_sizes: Array = []
-	var average_size: Vector2i = Vector2i.ZERO
+	var average_size: Vector2 = Vector2.ZERO
+	var unit_positions: Dictionary = {}
 	for unit: Ship in group:
-		var occupancy: Imap = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP]
-		var size: int = occupancy.width
+		unit_positions[unit.global_position] = unit
+		var size: float = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width
 		occupancy_sizes.append(size)
-		average_size += Vector2i(size, size)
+		average_size += Vector2(size, size)
 	
-	average_size = Vector2i(average_size.x / group.size(), average_size.y / group.size())
+	average_size /= group.size()
 	var max_size: int = occupancy_sizes.max()
 	var min_size: int = occupancy_sizes.min()
-	var unit_distance: int = 0
+	var unit_separation: Vector2 = Vector2.ZERO
 	if max_size == min_size and (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
-		unit_distance = max_size / 2
+		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.default_cell_size / 2)
 	
-	var unit_slots: Array = []
+	var geo_mean: Vector2 = Vector2.ZERO
+	var offsets: Array = []
 	if leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL:
-		unit_slots = box_formation(leader, group, unit_distance)
+		var radius: int = ceil(sqrt(group.size()))
+		offsets = box_formation_offset_positions(leader, radius, unit_separation)
+		geo_mean = geometric_median_of_objects(offsets)
 	
-	for unit: Ship in group:
+	unit_positions.clear()
+	for unit in group:
+		var distance_to: float = geo_mean.distance_to(unit.global_position)
+		unit_positions[distance_to] = unit
+	
+	var sort_positions: Array = unit_positions.keys()
+	sort_positions.sort()
+	# get geo mean of offset positions
+	# iterate through units to get furthest from geo mean
+	var visited: Array = []
+	for i in range(sort_positions.size() - 1, -1, -1):
+		var dist: float = sort_positions[i]
+		var unit: Ship = unit_positions[dist]
+		var slot_distances: Dictionary = {}
+		for slot in offsets:
+			if slot in visited:
+				continue
+			var distance_to: float = unit.global_position.distance_to(slot)
+			slot_distances[distance_to] = slot
+		var min_dist: float = slot_distances.keys().min()
+		var target_position: Vector2 = slot_distances[min_dist]
 		if unit.group_leader == true:
-			continue
-		unit.target_cell = unit_slots.pop_back()
-
+			unit.set_navigation_position(unit.global_position)
+		unit.target_position = target_position
+		print(unit.name, unit.target_position)
+		visited.append(target_position)
+		if visited.size() == group.size():
+			return
 
 @warning_ignore("narrowing_conversion", "integer_division")
-func box_formation(leader: Ship, group: Array, slot_distance: int) -> Array:
-	var target_cell: Vector2i = Vector2i(leader.target_position.y / imap_manager.default_cell_size, leader.target_position.x / imap_manager.default_cell_size)
-	var group_size: int = group.size()
-	var radius: int =  (slot_distance * group_size - slot_distance) / 2
-	if radius <= 0:
-		radius = group_size
-	var iter_distance: int = slot_distance + 1
-	var slots: Array = []
-	for m in range(-radius, radius, iter_distance):
-		var target_m: int = target_cell.x - m
-		for n in range(-radius, radius, iter_distance):
-			var target_n: int = target_cell.y - n
-			var cell: Vector2i = Vector2i(target_m, target_n)
-			if cell == target_cell:
-				continue
-			slots.append(cell)
-	return slots
+func box_formation_offset_positions(leader, radius, separation) -> Array:
+	var target_position: Vector2 = leader.target_position
+	var offsets: Array = [] 
+	for m in range(0, radius * separation.y, separation.y):
+		for n in range(0, radius * separation.x, separation.x):
+			var pos: Vector2 = Vector2(target_position.x + n, target_position.y + m)
+			offsets.append(pos)
+			if offsets.size() >= get_tree().get_node_count_in_group(leader.group_name):
+				return offsets
+	return offsets
+	
+#func box_formation(leader: Ship, radius: int, slot_distance: int) -> Array:
+	#var target_cell: Vector2i = Vector2i(leader.target_position.y / imap_manager.default_cell_size, leader.target_position.x / imap_manager.default_cell_size)
+	#var iter_distance: int = slot_distance + 1
+	#var slots: Array = []
+	#for m in range(-radius, radius, iter_distance):
+		#var target_m: int = target_cell.x - m
+		#for n in range(-radius, radius, iter_distance):
+			#var target_n: int = target_cell.y - n
+			#var cell: Vector2i = Vector2i(target_m, target_n)
+			#if cell == target_cell:
+				#continue
+			#slots.append(cell)
+	#return slots
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

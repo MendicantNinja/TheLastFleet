@@ -38,7 +38,8 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 		var min_distance: float = target_distances.keys().min()
 		target_cell = target_distances[min_distance]
 	elif agent.heuristic_strat == globals.Strategy.OFFENSIVE:
-		pass
+		pass # A lone island, trapped, distant from every landmass "worth living on"
+		# According to someone who doesn't matter
 	
 	agent.queue_orders[agent.target_key] = [isolated_registry[target_cell]]
 	

@@ -3,8 +3,6 @@ class_name Ship
 
 @onready var ShipNavigationAgent = $ShipNavigationAgent
 @onready var NavigationTimer = $NavigationTimer
-@onready var RepathArea = $RepathArea
-@onready var RepathShape = $RepathArea/RepathShape
 @onready var ShipSprite = $ShipSprite
 @onready var AvoidanceArea = $AvoidanceArea
 @onready var AvoidanceShape = $AvoidanceArea/AvoidanceShape
@@ -90,6 +88,8 @@ var heur_velocity: Vector2 = Vector2.ZERO
 var target_ship: Ship = null
 var neighbor_units: Array = []
 var incoming_projectiles: Array = []
+
+var avoid_flag: bool = false
 
 #var adj_template_maps: Dictionary = {}
 
@@ -232,7 +232,7 @@ func _ready() -> void:
 		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
 	
 	var avoidance_shape: Shape2D = CircleShape2D.new()
-	avoidance_shape.radius = imap_manager.default_cell_size * occupancy_radius * 2
+	avoidance_shape.radius = imap_manager.default_cell_size * (occupancy_radius) * 2
 	AvoidanceShape.shape = avoidance_shape
 	AvoidanceArea.collision_layer = collision_layer
 	AvoidanceArea.collision_mask = collision_mask
@@ -562,11 +562,14 @@ func _physics_process(delta: float) -> void:
 		update_registry_cell.emit(registry_cell, current_registry_cell)
 		registry_cell = current_registry_cell
 	
-	if Engine.get_physics_frames() % 60 == 0:
-		var area_registry = AvoidanceArea.get_overlapping_bodies()
-		for body in area_registry:
-			if body not in neighbor_units:
-				neighbor_units.append(body)
+	#if Engine.get_physics_frames() % 30 == 0:
+		#var area_registry = AvoidanceArea.get_overlapping_bodies()
+		#neighbor_units.clear()
+		#for body in area_registry:
+			#if body == self:
+				#continue
+			#if body not in neighbor_units:
+				#neighbor_units.append(body)
 	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
