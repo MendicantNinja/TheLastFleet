@@ -620,7 +620,7 @@ func _physics_process(delta: float) -> void:
 	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
 	velocity = rotate_movement * speed
 	
-	acceleration = velocity - linear_velocity
+	acceleration = velocity
 	
 	if manual_camera_freelook == false:
 		CombatCamera.global_position = self.global_position
