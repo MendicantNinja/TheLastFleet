@@ -29,7 +29,6 @@ var current_ship: Ship = null
 @onready var proximity_indicator_min: Vector2  = Vector2(screen_size.x/2, screen_size.y/2) # minimum camera zoom approximation in pixels
 @onready var proximity_indicator_icon = load("res://Scenes/GUIScenes/CombatGUIScenes/ProximityIndicator.tscn")
 func set_ship(ship: Ship) -> void:
-	print(ship)
 	current_ship = ship
 	if current_ship == null:
 		self.visible = false
@@ -125,21 +124,22 @@ func update_hud() -> void:
 func _physics_process(delta) -> void:
 	if Engine.get_physics_frames() % 5 == 0 and current_ship != null:
 		# Create filtered list of ship positions and create proximity indicators
-		var screen: Vector2 = screen_size / CombatCamera.zoom
-		if CombatCamera.zoom.x > 1:
-			screen = screen_size
-		print(screen, CombatCamera.zoom)
+		var screen: Vector2 = screen_size #/ CombatCamera.zoom
+		#if CombatCamera.zoom.x > 1:
+			#screen = screen_size
+		#print(CombatCamera.zoom)
 		for child in ProxWarningContainer.get_children():
 			child.free()
 		for ship in ship_registry:
 			var diff: Vector2 = ship.global_position - CombatCamera.global_position #current_ship.global_position
-			#print($"../CombatMap".CombatCamera.global_position, diff )
 			var distance: int = diff.length()
 			var direction: Vector2 = diff.normalized()
+			
 			if abs(diff.x) >= proximity_indicator_min.x and abs(distance) < proximity_indicator_max or abs(diff.y) >= proximity_indicator_min.y and abs(distance) <= proximity_indicator_max:
-				OnScreenNotifier.global_position = ship.global_position
-				if OnScreenNotifier.is_on_screen() == true:
-					return
+				#OnScreenNotifier.global_position = ship.global_position
+				#if OnScreenNotifier.is_on_screen() == true:
+					#return
+				#print("Screen and diff is", screen, diff)
 				var proximity_indicator: Control = proximity_indicator_icon.instantiate()
 				proximity_indicator.setup(ship)
 				#proximity_indicator.update_distance(distance)
@@ -165,16 +165,16 @@ func _physics_process(delta) -> void:
 				var top_intercept: int
 				var bottom_intercept: int
 				if right_boundary_intercept == true:
-					right_intercept = (screen.x-(screen.x/2))/direction.x
+					right_intercept = (screen_size.x-(screen_size.x/2))/direction.x
 					left_intercept = 10000
 				if left_boundary_intercept == true:
-					left_intercept = (0 - (screen.x/2))/direction.x
+					left_intercept = (0 - (screen_size.x/2))/direction.x
 					right_intercept = 10000
 				if top_boundary_intercept == true:
-					top_intercept = (0 - (screen.y/2))/direction.y
+					top_intercept = (0 - (screen_size.y/2))/direction.y
 					bottom_intercept = 10000
 				if bottom_boundary_intercept == true:
-					bottom_intercept = (screen.y - (screen.y/2))/direction.y
+					bottom_intercept = (screen_size.y - (screen_size.y/2))/direction.y
 					top_intercept = 10000
 				if direction.x == 0:
 					right_intercept = 10000
@@ -185,26 +185,36 @@ func _physics_process(delta) -> void:
 				var intercept: Vector2 = Vector2(0, 0)
 				var coordinate_1: int = min(right_intercept, left_intercept, bottom_intercept, top_intercept)
 				var half_screen_distance: int
+				var scale: float = diff.x/diff.y
 				if coordinate_1 == right_intercept:
-					intercept.x = screen.x
-					intercept.y = screen.y/2+coordinate_1*direction.y
-					half_screen_distance = screen.x/2
+					intercept.x = screen_size.x
+					intercept.y = screen_size.y/2+coordinate_1*direction.y
+					half_screen_distance = screen_size.x/2 #+ intercept.y * scale #960 + 
+					if ship.global_position.x == 2340:
+						print("diff direction and scale:  ", diff, "    ", direction, "     ", scale )
 					proximity_indicator.position = Vector2(intercept.x - 40, intercept.y)
 				elif coordinate_1 == left_intercept:
 					intercept.x = 0
-					intercept.y = screen.y/2+coordinate_1*direction.y
+					intercept.y = screen_size.y/2+coordinate_1*direction.y
+					half_screen_distance = screen_size.x/2
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
 				elif coordinate_1 == bottom_intercept:
-					intercept.y = screen.y
-					intercept.x = screen.x / 2 + coordinate_1 * direction.x
+					intercept.y = screen_size.y
+					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
+					half_screen_distance = screen_size.y/2
 					# Flip text for bottom intercept to draw on top
 					proximity_indicator.Distance.position = Vector2(6, -20)
 					proximity_indicator.position = Vector2(intercept.x, intercept.y - 35)
 				elif coordinate_1 == top_intercept:
 					intercept.y = 0
-					intercept.x = screen.x / 2 + coordinate_1 * direction.x
+					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
+					half_screen_distance = screen_size.y/2
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
-				proximity_indicator.update_distance((CombatCamera.global_position - ship.global_position).length() - half_screen_distance)
+				#var distance_mod: int = 2.05 * scale * (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance
+				proximity_indicator.update_distance((CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
+				if ship.global_position.x == 2340:
+					print("Distance is", (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
+
 				#Vector2(0,screen_size.x/2)
 				active_proximity_indicators[ship] = proximity_indicator
 			#else:

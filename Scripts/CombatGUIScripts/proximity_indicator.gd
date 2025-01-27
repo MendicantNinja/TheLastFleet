@@ -16,9 +16,12 @@ func setup(ship: Ship) -> void:
 		Distance.modulate = settings.enemy_color
 
 func update_distance(distance: int) -> void:
+	if distance < 5:
+		self.visible = false
+	else:
+		self.visible = true
 	proximity = snapped(distance, 10)
 	Distance.text = str(proximity)
-
 func _ready():
 	pass # Replace with function body.
 
