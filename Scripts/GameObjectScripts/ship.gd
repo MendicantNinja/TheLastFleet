@@ -624,13 +624,13 @@ func _physics_process(delta: float) -> void:
 	
 	acceleration = velocity
 	
-	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
+	if (acceleration.abs().floor() != Vector2.ZERO or manual_control == true) and sleeping:
 		sleeping = false
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	var force: Vector2 = acceleration * state.step
+	var force: Vector2 = acceleration
 	
-	if force.abs().floor() != Vector2.ZERO and not manual_control:
+	if force.abs().floor() != Vector2.ZERO and manual_control == false:
 		apply_torque(rotate_angle)
 		apply_force(force)
 	
@@ -657,7 +657,7 @@ func _on_target_in_range(value: bool) -> void:
 	target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
-	if value == true and group_leader == true and not ShipNavigationAgent.is_navigation_finished():
+	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
 	CombatBehaviorTree.toggle_root(value)
 
