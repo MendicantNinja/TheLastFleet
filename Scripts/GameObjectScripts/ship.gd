@@ -638,7 +638,7 @@ func _physics_process(delta: float) -> void:
 	# ain't wasting my time with it
 	
 	velocity *= rotate_movement
-	if move_direction == Vector2.ZERO or velocity.length() >= speed:
+	if move_direction == Vector2.ZERO:
 		time = 0.0
 	elif velocity.length() <= speed:
 		time += delta
