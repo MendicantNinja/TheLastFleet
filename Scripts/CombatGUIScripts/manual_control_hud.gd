@@ -185,37 +185,41 @@ func _physics_process(delta) -> void:
 				var intercept: Vector2 = Vector2(0, 0)
 				var coordinate_1: int = min(right_intercept, left_intercept, bottom_intercept, top_intercept)
 				var half_screen_distance: int
-				var scale: float = diff.x/diff.y
+				var ultimate_distance: int
 				if coordinate_1 == right_intercept:
 					intercept.x = screen_size.x
 					intercept.y = screen_size.y/2+coordinate_1*direction.y
-					var y_bonus: int = abs(screen_size.y/2+coordinate_1*direction.y) - ship.global_position.y  
-					
-					half_screen_distance = screen_size.x/2 #+ y_bonus #- abs(diff.y * (screen_size.x / screen_size.y)) #* CombatCamera.zoom.y #+ ( intercept.y/2 + CombatCamera.global_position.y )#960 + 
-					if ship.global_position.x == 2340:
-						print("y_bonus is", y_bonus)
-						print("HSD, intercept.y, zoom, and distance is: ", half_screen_distance, "      ", diff.y, "      ", CombatCamera.zoom.y, "     ", distance - half_screen_distance)
-						#print("diff direction and scale:  ", diff, "    ", direction, "     ", scale )
+					# D =  point where the prox indicator (intercept) is, but in global coordinates.
+					var d: Vector2 = CombatCamera.global_position + Vector2(intercept.x/2,  (screen_size.y / 2 + coordinate_1 * abs(direction.y) )/2)
+					half_screen_distance = (d - CombatCamera.global_position).length()
 					proximity_indicator.position = Vector2(intercept.x - 40, intercept.y)
 				elif coordinate_1 == left_intercept:
 					intercept.x = 0
 					intercept.y = screen_size.y/2+coordinate_1*direction.y
-					half_screen_distance = screen_size.x/2
+					var d: Vector2 = CombatCamera.global_position + Vector2(-screen_size.x/2,  (screen_size.y / 2 + coordinate_1 * abs(direction.y))/2)
+					half_screen_distance = (CombatCamera.global_position - d).length()
+					#half_screen_distance = screen_size.x/2
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
+					
 				elif coordinate_1 == bottom_intercept:
 					intercept.y = screen_size.y
 					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
-					half_screen_distance = screen_size.y/2
+					var d: Vector2 = CombatCamera.global_position + Vector2( (screen_size.x / 2 + coordinate_1 * abs(direction.x) )/2, intercept.y / 2) # working formula
+					half_screen_distance = (d - CombatCamera.global_position).length()
+					if ship.global_position.x == 2783:
+						print(d,"     ", CombatCamera.global_position, "     ", half_screen_distance)
 					# Flip text for bottom intercept to draw on top
 					proximity_indicator.Distance.position = Vector2(6, -20)
 					proximity_indicator.position = Vector2(intercept.x, intercept.y - 35)
 				elif coordinate_1 == top_intercept:
 					intercept.y = 0
 					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
-					half_screen_distance = screen_size.y/2
+					var d: Vector2 = CombatCamera.global_position + Vector2((intercept.y / 2 + coordinate_1 * abs(direction.x)) / 2, intercept.y / 2) 
+					half_screen_distance = (CombatCamera.global_position - d).length()
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
 				#var distance_mod: int = 2.05 * scale * (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance
 				proximity_indicator.update_distance((diff).length() * CombatCamera.zoom.x - half_screen_distance) # - (CombatCamera.global_position-intercept).length())
+				#proximity_indicator.update_distance(ultimate_distance)
 				#if ship.global_position.x == 2340:
 					#print("Distance is", (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
 

@@ -539,7 +539,7 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(100, 100)
+position = Vector2(3358, 2192)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(8212, 5722)
@@ -569,15 +569,15 @@ position = Vector2(8000, 12000)
 position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2339, 249)
+position = Vector2(3733, 3201)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(204, 1467)
+position = Vector2(2783, 3145)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2340, 1094)
+position = Vector2(3311, 3149)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
