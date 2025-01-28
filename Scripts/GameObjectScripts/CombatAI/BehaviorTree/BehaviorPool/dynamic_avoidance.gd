@@ -55,4 +55,4 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	net_force /= avoid_unit.size() + 1
 	agent.heur_velocity = Vector2.ONE
 	agent.acceleration = net_force
-	return FAILURE
+	return SUCCESS

@@ -43,6 +43,7 @@ var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
+var time: float = 0.0
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -615,15 +616,40 @@ func _physics_process(delta: float) -> void:
 	rotate_angle = rotate_direction.angle()
 	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
 	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
+	var velocity = Vector2.ZERO
+	
 	
 	var adjust_mass: float = (mass * 1000)
 	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-	var velocity = Vector2.ZERO
-	velocity = rotate_movement * speed
+	
+	# linear
+	#velocity = ship_stats.acceleration * time 
+	
+	# quadratic
+	#velocity = ship_stats.acceleration * time ** 2 
+	
+	# cubic
+	#velocity = ship_stats.acceleration * time ** 3 # cubic
+	
+	# exponential
+	velocity = ship_stats.acceleration * 2 ** (10 * (time - 1)) # exponential
+	
+	# sigmoid
+	#velocity = ship_stats.acceleration / (1 + exp(-time)) #sigmoid
+	
+	# If you want to figure out how to integrate bezier curves, do it your damn self I
+	# ain't wasting my time with it
+	
+	velocity *= rotate_movement
+	if move_direction == Vector2.ZERO or velocity.length() >= speed:
+		time = 0.0
+	elif velocity.length() <= speed:
+		time += delta
 	
 	acceleration = velocity
 	
+	print(acceleration.length())
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control == true) and sleeping:
 		sleeping = false
 
