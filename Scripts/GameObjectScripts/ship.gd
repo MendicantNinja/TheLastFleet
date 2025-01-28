@@ -43,6 +43,7 @@ var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
+var time: float = 0.0
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -567,8 +568,6 @@ func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
-	var velocity = Vector2.ZERO
-	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
 		update_agent_influence.emit(imap_cell, current_imap_cell)
@@ -618,8 +617,31 @@ func _physics_process(delta: float) -> void:
 	var adjust_mass: float = (mass * 1000)
 	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-	velocity = rotate_movement * speed
+	var velocity = 0.0
 	
+	# linear
+	#velocity = ship_stats.acceleration * time 
+	
+	# quadratic
+	#velocity = ship_stats.acceleration * time ** 2 
+	
+	# cubic
+	velocity = ship_stats.acceleration * time ** 3
+	
+	# exponential
+	#velocity = ship_stats.acceleration * 2 ** (10 * (time - 1))
+	
+	# sigmoid
+	#velocity = ship_stats.acceleration / (1 + exp(-time)) #sigmoid
+	
+	# If you want to figure out how to integrate bezier curves, do it your damn self I
+	# ain't wasting my time with it
+	
+	velocity *= rotate_movement
+	if move_direction == Vector2.ZERO or velocity.length() >= speed:
+		time = 0.0
+	elif velocity.length() <= speed:
+		time += delta
 	acceleration = velocity
 	
 	if manual_camera_freelook == false:
