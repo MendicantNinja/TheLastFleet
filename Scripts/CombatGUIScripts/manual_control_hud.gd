@@ -189,9 +189,13 @@ func _physics_process(delta) -> void:
 				if coordinate_1 == right_intercept:
 					intercept.x = screen_size.x
 					intercept.y = screen_size.y/2+coordinate_1*direction.y
-					half_screen_distance = screen_size.x/2 #+ intercept.y * scale #960 + 
+					var y_bonus: int = abs(screen_size.y/2+coordinate_1*direction.y) - ship.global_position.y  
+					
+					half_screen_distance = screen_size.x/2 #+ y_bonus #- abs(diff.y * (screen_size.x / screen_size.y)) #* CombatCamera.zoom.y #+ ( intercept.y/2 + CombatCamera.global_position.y )#960 + 
 					if ship.global_position.x == 2340:
-						print("diff direction and scale:  ", diff, "    ", direction, "     ", scale )
+						print("y_bonus is", y_bonus)
+						print("HSD, intercept.y, zoom, and distance is: ", half_screen_distance, "      ", diff.y, "      ", CombatCamera.zoom.y, "     ", distance - half_screen_distance)
+						#print("diff direction and scale:  ", diff, "    ", direction, "     ", scale )
 					proximity_indicator.position = Vector2(intercept.x - 40, intercept.y)
 				elif coordinate_1 == left_intercept:
 					intercept.x = 0
@@ -211,9 +215,9 @@ func _physics_process(delta) -> void:
 					half_screen_distance = screen_size.y/2
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
 				#var distance_mod: int = 2.05 * scale * (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance
-				proximity_indicator.update_distance((CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
-				if ship.global_position.x == 2340:
-					print("Distance is", (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
+				proximity_indicator.update_distance((diff).length() * CombatCamera.zoom.x - half_screen_distance) # - (CombatCamera.global_position-intercept).length())
+				#if ship.global_position.x == 2340:
+					#print("Distance is", (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
 
 				#Vector2(0,screen_size.x/2)
 				active_proximity_indicators[ship] = proximity_indicator
