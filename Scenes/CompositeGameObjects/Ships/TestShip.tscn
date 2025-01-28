@@ -50,6 +50,9 @@ gravity_scale = 0.0
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
+linear_damp_mode = 1
+angular_damp_mode = 1
+angular_damp = 1.0
 script = ExtResource("1_sc1ei")
 
 [node name="CombatBehaviorTree" type="Node" parent="."]
@@ -283,5 +286,4 @@ action_mode = 0
 button_mask = 0
 stretch_mode = 0
 
-[connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]
