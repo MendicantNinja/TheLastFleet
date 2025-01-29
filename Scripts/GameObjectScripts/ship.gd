@@ -283,8 +283,6 @@ func process_damage(projectile: Projectile) -> void:
 	HullIntegrityIndicator.value = hull_integrity
 	if hull_integrity <= 0.0:
 		destroy_ship()
-	if ManualControlHUD.current_ship == self:
-		ManualControlHUD.update_hud()
 	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
 
@@ -353,8 +351,6 @@ func update_flux_indicators() -> void:
 	SoftFluxIndicator.value = floor(flux_rate * soft_flux)
 	SoftFluxIndicator.position.x = HardFluxIndicator.value
 	FluxPip.position.x = HardFluxIndicator.value - 2
-	if ManualControlHUD.current_ship == self:
-		ManualControlHUD.update_hud()
 
 func display_icon(value: bool) -> void:
 	TacticalMapIcon.visible = value
@@ -599,6 +595,8 @@ func _physics_process(delta: float) -> void:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 	
 	if manual_control == true: 
+		if ManualControlHUD.current_ship == self:
+			ManualControlHUD.update_hud()
 		if manual_camera_freelook == false:
 			CombatCamera.global_position = self.global_position
 		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.

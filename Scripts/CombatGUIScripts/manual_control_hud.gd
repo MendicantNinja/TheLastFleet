@@ -5,11 +5,13 @@ var current_ship: Ship = null
 #Root Wrapper
 @onready var HUDWrapper: Control = $HUDWrapper
 
-# Weapon System Display Above
+# Flux Hull and Speed Indicators
 @onready var HardFluxIndicator = $HUDWrapper/HardFluxIndicator
 @onready var SoftFluxIndicator = $HUDWrapper/HardFluxIndicator/SoftFluxIndicator
 @onready var FluxPip = $HUDWrapper/HardFluxIndicator/FluxPip
 @onready var HullIntegrityIndicator = $HUDWrapper/HullIntegrityIndicator
+@onready var SpeedIndicator = $HUDWrapper/SpeedIndicator
+@onready var Speedometer = $HUDWrapper/SpeedIndicator/Speedometer
 
 
 # Weapon System Display
@@ -35,6 +37,7 @@ func set_ship(ship: Ship) -> void:
 		return
 	setup_ship_registry()
 	setup_weapon_systems()
+	SpeedIndicator.max_value = current_ship.speed
 	update_hud()
 
 func setup_ship_registry() -> void: 
@@ -106,23 +109,23 @@ func toggle_visible() -> void:
 		self.visible = true
 
 func update_hud() -> void:
-	if current_ship != null:
-		self.visible = true
-		var current_flux: float = current_ship.soft_flux + current_ship.hard_flux
-		var flux_rate: float = 100 /  current_ship.total_flux # Returns a factor multiplier of the total flux that can be used to get a percentage. e.g 100/2000 = .05. 
-		HardFluxIndicator.value = floor(flux_rate * current_ship.hard_flux)
-		SoftFluxIndicator.value = floor(flux_rate * current_ship.soft_flux)
-		SoftFluxIndicator.position.x = HardFluxIndicator.value
-		FluxPip.position.x = HardFluxIndicator.value - 2
-		
-		HullIntegrityIndicator.max_value = current_ship.ship_stats.hull_integrity
-		HullIntegrityIndicator.value = current_ship.hull_integrity
+	self.visible = true
+	var current_flux: float = current_ship.soft_flux + current_ship.hard_flux
+	var flux_rate: float = 100 /  current_ship.total_flux # Returns a factor multiplier of the total flux that can be used to get a percentage. e.g 100/2000 = .05. 
+	HardFluxIndicator.value = floor(flux_rate * current_ship.hard_flux)
+	SoftFluxIndicator.value = floor(flux_rate * current_ship.soft_flux)
+	SoftFluxIndicator.position.x = HardFluxIndicator.value
+	FluxPip.position.x = HardFluxIndicator.value - 2
+	HullIntegrityIndicator.max_value = current_ship.ship_stats.hull_integrity
+	HullIntegrityIndicator.value = current_ship.hull_integrity
+	SpeedIndicator.value = current_ship.linear_velocity.length()
+	Speedometer.text = str(int(current_ship.linear_velocity.length()))
 		
 		# snatch ships from IMapManager, then display and modulate sprites and relative facing, then display and modulate ranges
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta) -> void:
-	if Engine.get_physics_frames() % 5 == 0 and current_ship != null:
+	if Engine.get_physics_frames() % 10 == 0 and current_ship != null:
 		# Create filtered list of ship positions and create proximity indicators
 		var screen: Vector2 = screen_size #/ CombatCamera.zoom
 		#if CombatCamera.zoom.x > 1:
@@ -156,10 +159,6 @@ func _physics_process(delta) -> void:
 					bottom_boundary_intercept = true
 				elif sign(direction.y) == -1:
 					top_boundary_intercept = true
-				# Determine right intersection position (if any)
-					# y = .963, x = .265
-				#var slope_x = 960 + screen.x/direction.x
-				#var slope_y = 540 + screen.y/direction.y
 				var right_intercept: int
 				var left_intercept: int
 				var top_intercept: int
@@ -185,37 +184,41 @@ func _physics_process(delta) -> void:
 				var intercept: Vector2 = Vector2(0, 0)
 				var coordinate_1: int = min(right_intercept, left_intercept, bottom_intercept, top_intercept)
 				var half_screen_distance: int
-				var ultimate_distance: int
 				if coordinate_1 == right_intercept:
 					intercept.x = screen_size.x
 					intercept.y = screen_size.y/2+coordinate_1*direction.y
 					# D =  point where the prox indicator (intercept) is, but in global coordinates.
-					var d: Vector2 = CombatCamera.global_position + Vector2(intercept.x/2,  (screen_size.y / 2 + coordinate_1 * abs(direction.y) )/2)
+					var d: Vector2 = CombatCamera.global_position + Vector2(screen_size.x/2,  (screen_size.y / 2 + coordinate_1 * abs(direction.y) )/2)
 					half_screen_distance = (d - CombatCamera.global_position).length()
+					#if ship.global_position.x == 4561:
+						#print(CombatCamera.zoom.x, " RIGHT SIDE     D: ", d,"     CCAM: ", CombatCamera.global_position, "   Intercept: ", intercept, "     HSD ", half_screen_distance)
 					proximity_indicator.position = Vector2(intercept.x - 40, intercept.y)
 				elif coordinate_1 == left_intercept:
 					intercept.x = 0
 					intercept.y = screen_size.y/2+coordinate_1*direction.y
 					var d: Vector2 = CombatCamera.global_position + Vector2(-screen_size.x/2,  (screen_size.y / 2 + coordinate_1 * abs(direction.y))/2)
-					half_screen_distance = (CombatCamera.global_position - d).length()
+					half_screen_distance = (CombatCamera.global_position - d).length() 
 					#half_screen_distance = screen_size.x/2
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
-					
+				
+				# Bottom and Top Intercept Wonky. Why are they always ship_sprite height levels of off? 
+				# Why are the prox indicators at a very the negative x direction still offset? I will find out later. For now it's accurate to within 50 pixels?
 				elif coordinate_1 == bottom_intercept:
 					intercept.y = screen_size.y
-					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
-					var d: Vector2 = CombatCamera.global_position + Vector2( (screen_size.x / 2 + coordinate_1 * abs(direction.x) )/2, intercept.y / 2) # working formula
-					half_screen_distance = (d - CombatCamera.global_position).length()
-					if ship.global_position.x == 2783:
-						print(d,"     ", CombatCamera.global_position, "     ", half_screen_distance)
+					intercept.x = screen_size.x/2 + coordinate_1*direction.x
+					var d: Vector2 = CombatCamera.global_position + Vector2((screen_size.x / 2 + coordinate_1 * abs(direction.x))/2, screen_size.y / 2) # working formula
+					half_screen_distance = (d - CombatCamera.global_position).length() - ship.ShipSprite.texture.get_height() #bullshit hack
+					#half_screen_distance = screen_size.y/2
+					if ship.global_position.x == 3464:
+						print(CombatCamera.zoom.x, " BOTTOM SIDE     D: ", d,"     CCAM: ", CombatCamera.global_position, "   Intercept: ", intercept, "     HSD ", half_screen_distance)
 					# Flip text for bottom intercept to draw on top
 					proximity_indicator.Distance.position = Vector2(6, -20)
 					proximity_indicator.position = Vector2(intercept.x, intercept.y - 35)
 				elif coordinate_1 == top_intercept:
 					intercept.y = 0
 					intercept.x = screen_size.x / 2 + coordinate_1 * direction.x
-					var d: Vector2 = CombatCamera.global_position + Vector2((intercept.y / 2 + coordinate_1 * abs(direction.x)) / 2, intercept.y / 2) 
-					half_screen_distance = (CombatCamera.global_position - d).length()
+					var d: Vector2 = CombatCamera.global_position + Vector2((screen_size.x / 2 + coordinate_1 * abs(direction.x))/2, -screen_size.y/2)
+					half_screen_distance = (CombatCamera.global_position - d).length() - ship.ShipSprite.texture.get_height()
 					proximity_indicator.position = Vector2(intercept.x, intercept.y)
 				#var distance_mod: int = 2.05 * scale * (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance
 				proximity_indicator.update_distance((diff).length() * CombatCamera.zoom.x - half_screen_distance) # - (CombatCamera.global_position-intercept).length())

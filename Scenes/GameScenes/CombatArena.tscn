@@ -202,12 +202,13 @@ navigation_polygon = SubResource("NavigationPolygon_ooheh")
 
 [node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
 unique_name_in_owner = true
-position = Vector2(8500.5, 10049)
+position = Vector2(8484, 9990)
 shape = SubResource("RectangleShape2D_nv86b")
 debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
+visible = false
 script = ExtResource("5_ojmr4")
 
 [node name="ProxWarningContainer" type="Control" parent="ManualControlHUD"]
@@ -304,6 +305,49 @@ offset_bottom = 21.3333
 theme = ExtResource("7_u21w5")
 theme_override_font_sizes/font_size = 10
 text = "HULL"
+
+[node name="SpeedIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_left = 1844.0
+offset_top = -17.0
+offset_right = 1944.0
+offset_bottom = -7.0
+scale = Vector2(0.75, 0.75)
+rounded = true
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_gaw57")
+
+[node name="BarOutLiner2" type="TextureRect" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 104.0
+offset_bottom = 12.0
+texture = ExtResource("5_wtw0b")
+stretch_mode = 2
+
+[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -66.6667
+offset_top = -2.66667
+offset_right = -6.66671
+offset_bottom = 21.3333
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "SPEED"
+
+[node name="Speedometer" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -0.000193238
+offset_top = -26.6667
+offset_right = 59.9998
+offset_bottom = -2.6667
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "0"
 
 [node name="IndicatorDecor" type="TextureRect" parent="ManualControlHUD/HUDWrapper"]
 layout_mode = 0
@@ -577,7 +621,7 @@ position = Vector2(2783, 3145)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3311, 3149)
+position = Vector2(3464, 3174)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
@@ -585,15 +629,15 @@ position = Vector2(9430, 1000)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7930, 1500)
+position = Vector2(4561, 1977)
 collision_layer = 4
 
 [node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8430, 1500)
+position = Vector2(2836, 1348)
 collision_layer = 4
 
 [node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8930, 1500)
+position = Vector2(3497, 1204)
 collision_layer = 4
 
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
