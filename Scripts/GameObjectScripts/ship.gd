@@ -84,9 +84,10 @@ var approx_influence: float = 0.0
 
 #var adj_template_maps: Dictionary = {}
 
-# Used for navigation
+# Used for movement and navigation
 var time: float = 0.0
-var time_coefficient: float = 10.0
+var zero_flux_bonus: float = 50.0
+var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 var acceleration: Vector2 = Vector2.ZERO
@@ -613,13 +614,18 @@ func _physics_process(delta: float) -> void:
 	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
+	var speed_modifier: float = 0.0
+	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
+		speed_modifier += zero_flux_bonus
+	
 	velocity = ship_stats.acceleration * time
 	velocity *= true_direction
 	if move_direction == Vector2.ZERO:
 		time = 0.0
-	elif velocity.length() <= speed:
+	elif velocity.length() < (speed + speed_modifier):
 		time += delta + time_coefficient
 	
+	velocity = velocity.limit_length(speed + speed_modifier)
 	acceleration = velocity
 	
 	if manual_camera_freelook == false:
@@ -644,10 +650,7 @@ func _physics_process(delta: float) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
-	
-	#if force == Vector2.ZERO:
-		#linear_velocity = linear_velocity
-	
+
 	if force.abs().floor() != Vector2.ZERO and not manual_control:
 		apply_torque(rotate_angle)
 		apply_force(force)
@@ -655,6 +658,8 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if manual_control:
 		apply_torque(rotate_angle)
 		apply_force(force)
+	
+	state.linear_velocity = state.linear_velocity.limit_length(speed + zero_flux_bonus)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot

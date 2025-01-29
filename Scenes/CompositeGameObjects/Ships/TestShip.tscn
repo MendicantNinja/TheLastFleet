@@ -50,9 +50,6 @@ gravity_scale = 0.0
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
-linear_damp_mode = 1
-angular_damp_mode = 1
-angular_damp = 1.0
 script = ExtResource("1_sc1ei")
 
 [node name="CombatBehaviorTree" type="Node" parent="."]
