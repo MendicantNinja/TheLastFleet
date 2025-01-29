@@ -618,8 +618,9 @@ func _physics_process(delta: float) -> void:
 	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
 		speed_modifier += zero_flux_bonus
 	
-	velocity = ship_stats.acceleration * time
+	velocity = ship_stats.acceleration * time * 10
 	velocity *= true_direction
+	
 	if move_direction == Vector2.ZERO:
 		time = 0.0
 	elif velocity.length() < (speed + speed_modifier):
