@@ -53,8 +53,6 @@ var manual_control: bool = false:
 		elif value == true:
 			manual_control = true
 			ManualControlIndicator.visible = true
-var rotate_angle: float = 0.0
-var move_direction: Vector2 = Vector2.ZERO
 
 # Used for targeting and weapons.
 var weapon_systems: Array[WeaponSystem] = [
@@ -90,14 +88,14 @@ var approx_influence: float = 0.0
 
 #var adj_template_maps: Dictionary = {}
 
-# Used for navigation
-var final_target_position: Vector2 = Vector2.ZERO
-var next_path_position: Vector2 = Vector2.ZERO
-var intermediate_pathing: bool = false
+# Used for movement and navigation
+var time: float = 0.0
+var zero_flux_bonus: float = 50.0
+var time_coefficient: float = 0.1
+var rotate_angle: float = 0.0
+var move_direction: Vector2 = Vector2.ZERO
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
-var movement_delta: float = 0.0
-var rotational_delta: float = 0.0
 var ship_select: bool = false:
 	set(value):
 		if value == true: 
@@ -548,7 +546,6 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 #o8o        `8  o88o     o8888o       `8'       o888o  `Y8bood8P'   o88o     o8888o     o888o     o888o  `Y8bood8P'  o8o        `8  
 																																   
 func set_navigation_position(to_position: Vector2) -> void:
-	intermediate_pathing = false
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
@@ -565,7 +562,6 @@ func move_follower(n_velocity: Vector2, next_transform: Transform2D) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
-
 	# Needs to be per second.
 	#if soft_flux == 0:
 		#hard_flux -= ship_stats.flux_dissipation
@@ -580,15 +576,21 @@ func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
-	var velocity = Vector2.ZERO
+	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
+		update_agent_influence.emit(imap_cell, current_imap_cell)
+		imap_cell = current_imap_cell
 
+	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
+	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
+		update_registry_cell.emit(registry_cell, current_registry_cell)
+		registry_cell = current_registry_cell
 	
 	#if TacticalCamera != null and TacticalCamera.enabled:
 		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
 	#if ManualControlCamera != null and ManualControlCamera.enabled:
 		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
 	
-	# Rare GUI Updates
 	CenterCombatHUD.position = position
 	ConstantSizedGUI.scale = Vector2.ONE
 	if CombatCamera != null and CombatCamera.enabled:
@@ -606,28 +608,6 @@ func _physics_process(delta: float) -> void:
 		pass
 	
 	
-	if ShipNavigationAgent.is_navigation_finished() and not manual_control:
-		if rotate_angle != 0.0 and move_direction != Vector2.ZERO:
-			rotate_angle = 0.0
-			move_direction = Vector2.ZERO
-	
-	if not ShipNavigationAgent.is_navigation_finished() and manual_control:
-		ShipNavigationAgent.set_target_position(position)
-	
-	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
-	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
-		update_agent_influence.emit(imap_cell, current_imap_cell)
-		imap_cell = current_imap_cell
-
-	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
-	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
-		update_registry_cell.emit(registry_cell, current_registry_cell)
-		registry_cell = current_registry_cell
-	
-	if movement_delta == 0.0 or rotational_delta == 0.0:
-		movement_delta = speed * delta
-		rotational_delta = ship_stats.turn_rate * delta
-		ShipNavigationAgent.set_max_speed(movement_delta)
 	
 	if manual_control and Input.is_action_pressed("vent_flux"):
 		if soft_flux > 0.0:
@@ -636,7 +616,7 @@ func _physics_process(delta: float) -> void:
 			hard_flux -= ship_stats.flux_dissipation
 		update_flux_indicators()
 	
-	if manual_control and Input.is_action_pressed("select") and not flux_overload:
+	if Input.is_action_pressed("select") and not flux_overload:
 		fire_weapon_system(all_weapons)
 	
 	if shield_toggle and not flux_overload:
@@ -653,45 +633,59 @@ func _physics_process(delta: float) -> void:
 		move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
 		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left"))
 	
-	# Normal Pathing
-	if not ShipNavigationAgent.is_navigation_finished():
-		next_path_position = ShipNavigationAgent.get_next_path_position()
-		var direction_to_path: Vector2 = global_position.direction_to(next_path_position)
-		velocity = direction_to_path * movement_delta
-		velocity += ease_velocity(velocity)
-		var transform_look_at: Transform2D = transform.looking_at(next_path_position)
-		transform = transform.interpolate_with(transform_look_at, rotational_delta)
+
 	
-	if rotate_angle != 0.0:
-		var adjust_mass: float = (mass * 1000)
-		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 	
-	if move_direction != Vector2.ZERO:
-		var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
-		velocity = rotate_movement * movement_delta
-		velocity += ease_velocity(velocity)
+	#if ManualControlCamera.zoom != zoom_value:
+		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
 	
-	if group_leader and not ShipNavigationAgent.is_navigation_finished():
-		get_tree().call_group(group_name, "move_follower", velocity, transform)
+	var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
+	rotate_angle = rotate_direction.angle()
+	var adjust_mass: float = (mass * 1000)
+	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 	
-	if not group_leader and not group_name.is_empty() and group_velocity != Vector2.ZERO:
-		velocity = group_velocity
-		group_velocity = Vector2.ZERO
-		var rotate_to: float = transform.x.angle_to(group_transform.x)
-		var transform_look_at: Transform2D = transform.rotated_local(rotate_to)
-		transform = transform.interpolate_with(transform_look_at, ship_stats.turn_rate)
+	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
+	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
+	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
+	var velocity = 0.0
+	var speed_modifier: float = 0.0
+	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
+		speed_modifier += zero_flux_bonus
 	
-	acceleration = velocity - linear_velocity
+	velocity = ship_stats.acceleration * time * 10
+	velocity *= true_direction
+	
+	if move_direction == Vector2.ZERO:
+		time = 0.0
+	elif velocity.length() < (speed + speed_modifier):
+		time += delta + time_coefficient
+	
+	velocity = velocity.limit_length(speed + speed_modifier)
+	acceleration = velocity
+	
+	if manual_camera_freelook == false:
+		CombatCamera.global_position = global_position
+	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	# if one wants to make the manually controlled hud less transparent than friendly ships
+	#var current_color: Color = ConstantSizedGUI.modulate
+	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
+	
+	# Storing this in a dark, dark corner, just in case
+	# quadratic
+	#velocity = ship_stats.acceleration * time ** 2 
+	# cubic
+	#velocity = ship_stats.acceleration * time ** 3
+	# exponential
+	#velocity = ship_stats.acceleration * 2 ** (10 * (time - 1))
+	# sigmoid
+	#velocity = ship_stats.acceleration / (1 + exp(-time))
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
-	
-	#if force == Vector2.ZERO:
-		#linear_velocity = linear_velocity
-	
+
 	if force.abs().floor() != Vector2.ZERO and not manual_control:
 		apply_torque(rotate_angle)
 		apply_force(force)
@@ -700,19 +694,17 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		apply_torque(rotate_angle)
 		apply_force(force)
 	
+	state.linear_velocity = state.linear_velocity.limit_length(speed + zero_flux_bonus)
+	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
 
 func ease_velocity(velocity: Vector2) -> Vector2:
 	var new_velocity: Vector2 = Vector2.ZERO
-	var normalize_velocity_x: float = linear_velocity.x / velocity.x
-	var normalize_velocity_y: float = linear_velocity.y / velocity.y
-	if velocity.x == 0.0:
-		normalize_velocity_x = 0.0
-	if velocity.y == 0.0:
-		normalize_velocity_y = 0.0
-	new_velocity.x = (velocity.x + linear_velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
-	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
+	var normalize_velocity_x = abs(velocity.x / speed)
+	var normalize_velocity_y = abs(velocity.y / speed)
+	new_velocity.x = (velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
+	new_velocity.y = (velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
 	return new_velocity
 
 func _on_target_in_range(value: bool) -> void:
@@ -859,8 +851,3 @@ func _on_NavigationTimer_timeout() -> void:
 		valid_paths = raycast_sweep(sweep_vectors, global_position)
 	elif not valid_paths.is_empty():
 		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
-
-
-func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
-	if safe_velocity != Vector2.ZERO:
-		linear_velocity += safe_velocity / 2.0
