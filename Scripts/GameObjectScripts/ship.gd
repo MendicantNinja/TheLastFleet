@@ -600,11 +600,10 @@ func _physics_process(delta: float) -> void:
 		if ManualControlHUD.current_ship == self:
 			ManualControlHUD.update_hud()
 		if manual_camera_freelook == false:
+			
 			CombatCamera.global_position = self.global_position
 		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
 		# if one wants to make the manually controlled hud less transparent than friendly ships
-		#var current_color: Color = ConstantSizedGUI.modulate
-		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 		pass
 	
 	
@@ -626,26 +625,12 @@ func _physics_process(delta: float) -> void:
 		toggle_shield()
 	
 	if manual_control:
-		#if ManualControlCamera.zoom != zoom_value:
-			#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
 		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
 		rotate_angle = rotate_direction.angle()
+		var adjust_mass: float = (mass * 1000)
+		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
 		move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
-		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left"))
-	
-
-	
-	
-	#if ManualControlCamera.zoom != zoom_value:
-		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
-	
-	var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
-	rotate_angle = rotate_direction.angle()
-	var adjust_mass: float = (mass * 1000)
-	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-	
-	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
+		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0
@@ -663,10 +648,8 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity.limit_length(speed + speed_modifier)
 	acceleration = velocity
 	
-	if manual_camera_freelook == false:
-		CombatCamera.global_position = global_position
-	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	# if one wants to make the manually controlled hud less transparent than friendly ships
+
+	# if one wants to make the manually controlled hud less transparent or a different color than friendly ships
 	#var current_color: Color = ConstantSizedGUI.modulate
 	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
