@@ -43,7 +43,6 @@ var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
-var time: float = 0.0
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -54,8 +53,6 @@ var manual_control: bool = false:
 		elif value == true:
 			manual_control = true
 			ManualControlIndicator.visible = true
-var rotate_angle: float = 0.0
-var move_direction: Vector2 = Vector2.ZERO
 
 # Used for targeting and weapons.
 var all_weapons: Array[WeaponSlot]
@@ -91,16 +88,17 @@ var neighbor_units: Array = []
 var incoming_projectiles: Array = []
 
 var avoid_flag: bool = false
-
+var brake_flag: bool = false
 #var adj_template_maps: Dictionary = {}
 
-# Used for navigation
-var target_cell: Vector2i = Vector2i.ZERO
-var final_target_position: Vector2 = Vector2.ZERO
+# Used for navigation and movement
+var time: float = 0.0
+var zero_flux_bonus: float = 50.0
+var time_coefficient: float = 0.1
+var rotate_angle: float = 0.0
+var move_direction: Vector2 = Vector2.ZERO
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
-var movement_delta: float = 0.0
-var rotational_delta: float = 0.0
 var ship_select: bool = false:
 	set(value):
 		if value == true: 
@@ -110,6 +108,7 @@ var ship_select: bool = false:
 			TacticalMapIcon.button_pressed = false
 			ship_select = value
 		ship_selected.emit()
+var collision_flag: bool = false
 
 # Custom signals.
 signal alt_select()
@@ -155,6 +154,7 @@ func _ready() -> void:
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
+	ShipNavigationAgent.max_speed = speed
 	
 	var ship_hull = ship_stats.ship_hull
 	ShipSprite.texture = ship_hull.ship_sprite
@@ -547,11 +547,6 @@ func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
-	if movement_delta == 0.0 or rotational_delta == 0.0:
-		movement_delta = speed * delta
-		rotational_delta = ship_stats.turn_rate * delta
-		ShipNavigationAgent.set_max_speed(movement_delta)
-	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
 		update_agent_influence.emit(imap_cell, current_imap_cell)
@@ -576,6 +571,18 @@ func _physics_process(delta: float) -> void:
 	ConstantSizedGUI.scale = Vector2.ONE
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
+	
+	if collision_flag == true:
+		acceleration -= linear_velocity * ship_stats.deceleration * time
+	
+	if linear_damp == 1.0 and sleeping == true:
+		linear_damp = 0.0
+		if collision_flag == true:
+			collision_flag = false
+		if avoid_flag == true:
+			avoid_flag = false
+		if brake_flag == true:
+			brake_flag == false
 	
 	if manual_control == false:
 		return
@@ -612,57 +619,66 @@ func _physics_process(delta: float) -> void:
 	
 	#if ManualControlCamera.zoom != zoom_value:
 		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
+	
 	var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("D") - Input.get_action_strength("A"))
 	rotate_angle = rotate_direction.angle()
-	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
-	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
-	var velocity = Vector2.ZERO
-	
-	
 	var adjust_mass: float = (mass * 1000)
 	rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-	var rotate_movement: Vector2 = move_direction.rotated(transform.x.angle())
 	
-	# linear
-	#velocity = ship_stats.acceleration * time 
+	move_direction = Vector2(Input.get_action_strength("W") - Input.get_action_strength("S"),
+	Input.get_action_strength("E") - Input.get_action_strength("Q")).normalized()
+	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
+	var velocity = 0.0
+	var speed_modifier: float = 0.0
+	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
+		speed_modifier += zero_flux_bonus
 	
-	# quadratic
-	#velocity = ship_stats.acceleration * time ** 2 
-	
-	# cubic
-	#velocity = ship_stats.acceleration * time ** 3 # cubic
-	
-	# exponential
-	velocity = ship_stats.acceleration * 2 ** (10 * (time - 1)) # exponential
-	
-	# sigmoid
-	#velocity = ship_stats.acceleration / (1 + exp(-time)) #sigmoid
-	
-	# If you want to figure out how to integrate bezier curves, do it your damn self I
-	# ain't wasting my time with it
-	
-	velocity *= rotate_movement
+	velocity = ship_stats.acceleration * time
+	velocity *= true_direction
 	if move_direction == Vector2.ZERO:
 		time = 0.0
-	elif velocity.length() <= speed:
-		time += delta
+	elif velocity.length() < (speed + speed_modifier):
+		time += delta + time_coefficient
 	
+	velocity = velocity.limit_length(speed + speed_modifier)
 	acceleration = velocity
 	
-	print(acceleration.length())
-	if (acceleration.abs().floor() != Vector2.ZERO or manual_control == true) and sleeping:
+	if manual_camera_freelook == false:
+		CombatCamera.global_position = global_position
+	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	# if one wants to make the manually controlled hud less transparent than friendly ships
+	#var current_color: Color = ConstantSizedGUI.modulate
+	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
+	
+	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false
+	
+	# Storing this in a dark, dark corner, just in case
+	# quadratic
+	#velocity = ship_stats.acceleration * time ** 2 
+	# cubic
+	#velocity = ship_stats.acceleration * time ** 3
+	# exponential
+	#velocity = ship_stats.acceleration * 2 ** (10 * (time - 1))
+	# sigmoid
+	#velocity = ship_stats.acceleration / (1 + exp(-time))
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
 	
-	if force.abs().floor() != Vector2.ZERO and manual_control == false:
-		apply_torque(rotate_angle)
-		apply_force(force)
+	if collision_flag == true and state.linear_velocity.length() < (speed + zero_flux_bonus):
+		collision_flag == false
+		linear_damp = 0.0
+	elif collision_flag == true and state.linear_velocity.length() > (speed + zero_flux_bonus):
+		linear_damp = 1.0
 	
-	if manual_control:
+	if avoid_flag == true:
+		pass
+	
+	if collision_flag == false and (target_position != Vector2.ZERO or manual_control):
 		apply_torque(rotate_angle)
 		apply_force(force)
+		state.linear_velocity = state.linear_velocity.limit_length(speed + zero_flux_bonus)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
@@ -838,7 +854,14 @@ func _on_NavigationTimer_timeout() -> void:
 	elif not valid_paths.is_empty():
 		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
 
-
 func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
-	if safe_velocity != Vector2.ZERO:
-		linear_velocity += safe_velocity / 2.0
+	if safe_velocity == Vector2.ZERO:
+		return
+	var lol = linear_velocity
+	pass
+
+func _on_body_entered(body):
+	if target_position != Vector2.ZERO:
+		return
+	collision_flag = true
+	linear_damp = 1.0

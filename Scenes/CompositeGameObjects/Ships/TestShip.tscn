@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=24 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
@@ -8,11 +8,9 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/pathfinding.gd" id="5_n4kdd"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek.gd" id="6_w7a0v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/dynamic_avoidance.gd" id="7_3duk1"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/arrival.gd" id="7_36e0p"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/static_avoidance.gd" id="9_k2ujh"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
@@ -67,20 +65,11 @@ script = ExtResource("4_qjhaj")
 [node name="pathfinding" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("5_n4kdd")
 
-[node name="seek" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("6_w7a0v")
-
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("7_3duk1")
 
-[node name="arrival" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("7_36e0p")
-
-[node name="steering" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_qjhaj")
-
-[node name="static avoidance" type="Node" parent="CombatBehaviorTree/main/steering"]
-script = ExtResource("9_k2ujh")
+[node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("9_w68pg")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -106,9 +95,9 @@ path_desired_distance = 50.0
 target_desired_distance = 50.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 70.0
-max_neighbors = 4
-time_horizon_agents = 5.0
+radius = 80.0
+neighbor_distance = 1000.0
+time_horizon_agents = 8.0
 time_horizon_obstacles = 1.0
 max_speed = 1000.0
 debug_use_custom = true
@@ -271,5 +260,6 @@ action_mode = 0
 button_mask = 0
 stretch_mode = 0
 
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

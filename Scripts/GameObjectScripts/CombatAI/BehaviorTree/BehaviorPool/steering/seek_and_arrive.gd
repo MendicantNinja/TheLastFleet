@@ -1,23 +1,29 @@
 extends LeafAction
 
+var target_key: StringName = &"target"
 var target: Ship = null
 var target_position: Vector2 = Vector2.ZERO
-var default_radius: int = 10
+var threat_radius: float = 0.0
 var delta: float = 0.0
 var time: float = 0.0
 
+var default_radius: int = 10
+var time_to_target: float = 0.8
+var target_coefficient: float = 0.95
+
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var velocity: Vector2 = Vector2.ZERO
+	agent.heur_velocity = velocity
+	
+	if threat_radius == 0.0:
+		var radius: int = agent.template_maps[imap_manager.MapType.THREAT_MAP].width
+		threat_radius = (radius * imap_manager.default_cell_size) * target_coefficient
 	
 	if delta == 0.0:
 		delta = get_physics_process_delta_time()
 	
-	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO and agent.target_ship == null:
-		agent.target_position = Vector2.ZERO
-		target_position = Vector2.ZERO
-		target = null
+	if target != agent.target_ship or agent.target_position != target_position:
 		time = 0.0
-		return SUCCESS
 	
 	if target != agent.target_ship:
 		target = agent.target_ship
@@ -53,10 +59,27 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if velocity.length() < (agent.speed + speed_modifier):
 		time += delta + agent.time_coefficient
 	
-	#if time > delta + agent.time_coefficient and velocity > agent.heur_velocity:
-		#velocity = agent.heur_velocity
+	var distance_to: float = agent.global_position.distance_to(agent.target_position)
+	if agent.target_position != Vector2.ZERO and agent.target_ship == null:
+		if distance_to < 10.0:
+			agent.target_position = Vector2.ZERO
+			agent.heur_velocity = Vector2.ZERO
+			agent.acceleration = Vector2.ZERO
+			agent.linear_damp = 1.0
+			return SUCCESS
+		
+		var brake_distance: float = (agent.linear_velocity.length() ** 2) / (2.0 * agent.ship_stats.deceleration)
+		if distance_to <= brake_distance:
+			agent.brake_flag = true
+			velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
+	
+	elif agent.target_ship != null:
+		target_position = agent.target_ship.global_position
+		if distance_to < threat_radius:
+			velocity *= time_to_target
 	
 	velocity = velocity.limit_length(agent.speed + speed_modifier)
 	agent.heur_velocity = velocity
 	agent.time = time
+	agent.acceleration = velocity
 	return FAILURE

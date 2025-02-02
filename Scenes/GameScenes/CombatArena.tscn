@@ -574,7 +574,7 @@ position = Vector2(7710, 5469)
 position = Vector2(12670, 6000)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3500, 5125)
+position = Vector2(3500, 4750)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(4500, 5125)

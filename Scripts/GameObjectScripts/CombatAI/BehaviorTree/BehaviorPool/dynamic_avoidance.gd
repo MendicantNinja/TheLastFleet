@@ -1,58 +1,47 @@
 extends LeafAction
 
 var time_horizon: float = 4.0
+var time: float = 0.0
+var delta: float = 0.0
+var debug: bool = false
 
 @warning_ignore("confusable_local_declaration")
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.heur_velocity == Vector2.ZERO:
+	if agent.linear_velocity == Vector2.ZERO:
 		return FAILURE
 	
 	var neighbor_units: Array = agent.neighbor_units
 	if neighbor_units.is_empty():
 		return FAILURE
 	
-	var time_to_collision: float = INF
-	var avoid_unit: Dictionary = {}
-	var tau1: float = 0.0
-	var tau2: float = 0.0
-	for unit: Ship in neighbor_units:
-		if unit == agent:
-			continue
-		var r: float = agent.ShipNavigationAgent.radius + unit.ShipNavigationAgent.radius
-		var w: Vector2 = (unit.global_position - agent.global_position)
-		var c: float = unit.global_position.distance_to(agent.global_position) - r # c
-		if c <= 0.0:
-			continue
-		c = w.dot(w) - r * r
-		var v: Vector2 = agent.heur_velocity - unit.heur_velocity
-		if unit.heur_velocity == Vector2.ZERO:
-			v = agent.heur_velocity - unit.linear_velocity
-		var a: float = v.dot(v) # dot product of difference in velocities
-		var b: float = 2.0 * w.dot(v) # dot product of the differences in position and difference in velocities
-		var disrc: float = b * b - a * c # b^2 - a*c
-		if disrc <= 0.0:
-			continue
-		tau1 = (b - sqrt(disrc)) / a
-		tau2 = (b + sqrt(disrc)) / a
-		if tau1 <= 0.0 and tau2 <= 0.0:
-			continue
-		var min_tau: float = min(tau1, tau2)
-		if min_tau > time_horizon:
-			continue
-		avoid_unit[min_tau] = unit
+	var direction_to_path: Vector2 = agent.global_position.direction_to(agent.target_position)
+	var transform_look_at: Transform2D = agent.transform.looking_at(agent.target_position)
+	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.ship_stats.turn_rate * delta)
 	
-	if avoid_unit.is_empty():
+	var group: Array = get_tree().get_nodes_in_group(agent.group_name)
+	var avoid_vel: Dictionary = {}
+	for neighbor in neighbor_units:
+		if neighbor in group and neighbor.brake_flag == true:
+			continue
+		var p: Vector2 = neighbor.global_position - agent.global_position
+		var v: Vector2 = agent.linear_velocity - neighbor.linear_velocity
+		var r: float = agent.ShipNavigationAgent.radius + neighbor.ShipNavigationAgent.radius
+		var cone: float = v.dot(v) * (p.dot(p) - r**2)
+		var rel_v: float = v.dot(p) ** 2
+		if rel_v <= cone:
+			continue
+		var projection: Vector2 = v.dot(p) / p.dot(p) * p
+		var translation: Vector2 = agent.linear_velocity + (v - projection)
+		var avoid_direction: Vector2 = translation.normalized()
+		var avoid_velocity: Vector2 = avoid_direction * agent.ship_stats.deceleration * agent.time
+		var test_avoid: float = avoid_velocity.dot(p) ** 2
+		if test_avoid >= cone:
+			continue
+		avoid_vel[avoid_velocity.dot(avoid_velocity)] = avoid_velocity
+	
+	if avoid_vel.is_empty():
 		return FAILURE
 	
-	var net_force: Vector2 = agent.heur_velocity
-	for tau in avoid_unit:
-		var unit = avoid_unit[tau]
-		var avoid_direction: Vector2 = agent.global_position + agent.heur_velocity * tau - unit.global_position - unit.heur_velocity * tau
-		if unit.heur_velocity == Vector2.ZERO:
-			avoid_direction = agent.global_position + agent.heur_velocity * tau - unit.global_position - unit.linear_velocity * tau
-		avoid_direction = avoid_direction.normalized()
-		net_force += avoid_direction * agent.speed
-	net_force /= avoid_unit.size() + 1
-	agent.heur_velocity = Vector2.ONE
-	agent.acceleration = net_force
-	return SUCCESS
+	var new_velocity: Vector2 = avoid_vel[avoid_vel.keys().min()]
+	agent.acceleration = new_velocity
+	return RUNNING

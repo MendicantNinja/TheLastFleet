@@ -1,19 +1,9 @@
 extends LeafAction
 
-var default_radius: int = 10
-var target_cell: Vector2i = Vector2i.ZERO
-
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	var velocity = Vector2.ZERO
-	
-	if agent.avoid_flag == true:
-		return SUCCESS
-	
 	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO:
 		if agent.group_leader == true and imap_manager.working_maps.has(agent.group_name):
 			imap_manager.working_maps.erase(agent.group_name)
-		agent.rotate_angle = 0.0
-		agent.acceleration = velocity - agent.linear_velocity
 		return SUCCESS
 	
 	var cell: Vector2i = Vector2i.ZERO
