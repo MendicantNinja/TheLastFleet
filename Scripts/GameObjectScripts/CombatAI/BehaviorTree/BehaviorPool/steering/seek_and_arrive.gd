@@ -1,7 +1,5 @@
 extends LeafAction
 
-var target_key: StringName = &"target"
-var target: Ship = null
 var target_position: Vector2 = Vector2.ZERO
 var threat_radius: float = 0.0
 var delta: float = 0.0
@@ -22,12 +20,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if delta == 0.0:
 		delta = get_physics_process_delta_time()
 	
-	if target != agent.target_ship or agent.target_position != target_position:
-		time = 0.0
-	
-	if target != agent.target_ship:
-		target = agent.target_ship
-	elif agent.group_leader == false and agent.target_position != target_position:
+	if agent.group_leader == false and agent.target_position != target_position:
 		target_position = agent.target_position
 	elif agent.group_leader == true and target_position != agent.target_position:
 		if imap_manager.working_maps.has(agent.group_name):
@@ -44,9 +37,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			imap_manager.working_maps[agent.group_name] = working_map
 		target_position = agent.target_position
 	
-	if target != null:
-		target_position = target.global_position
-	
 	var direction_to_path: Vector2 = agent.global_position.direction_to(target_position)
 	var transform_look_at: Transform2D = agent.transform.looking_at(target_position)
 	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.ship_stats.turn_rate * delta)
@@ -60,23 +50,19 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		time += delta + agent.time_coefficient
 	
 	var distance_to: float = agent.global_position.distance_to(agent.target_position)
-	if agent.target_position != Vector2.ZERO and agent.target_ship == null:
+	if agent.target_position != Vector2.ZERO and agent.target_unit == null:
 		if distance_to < 10.0:
 			agent.target_position = Vector2.ZERO
 			agent.heur_velocity = Vector2.ZERO
 			agent.acceleration = Vector2.ZERO
 			agent.linear_damp = 1.0
+			time = 0.0
 			return SUCCESS
 		
 		var brake_distance: float = (agent.linear_velocity.length() ** 2) / (2.0 * agent.ship_stats.deceleration)
 		if distance_to <= brake_distance:
 			agent.brake_flag = true
 			velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
-	
-	elif agent.target_ship != null:
-		target_position = agent.target_ship.global_position
-		if distance_to < threat_radius:
-			velocity *= time_to_target
 	
 	velocity = velocity.limit_length(agent.speed + speed_modifier)
 	agent.heur_velocity = velocity

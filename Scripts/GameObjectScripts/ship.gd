@@ -83,12 +83,15 @@ var registry_cell: Vector2i = Vector2i.ZERO
 var weigh_influence: Imap
 var approx_influence: float = 0.0
 var heur_velocity: Vector2 = Vector2.ZERO
-var target_ship: Ship = null
+var target_unit: Ship = null
+var targeted_units: Array = []
 var neighbor_units: Array = []
 var incoming_projectiles: Array = []
+var targeted_by: Array = []
 
 var avoid_flag: bool = false
 var brake_flag: bool = false
+var retreat_flag: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
@@ -164,9 +167,9 @@ func _ready() -> void:
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
 	
-	var target_ship_offset: Vector2 = Vector2(-shield_radius, shield_radius)
+	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)
 	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
-	ShipTargetIcon.position = target_ship_offset
+	ShipTargetIcon.position = target_unit_offset
 	ManualControlIndicator.position = manual_control_offset
 	ManualControlIndicator.visible = false
 	ShipTargetIcon.visible = false
@@ -272,14 +275,21 @@ func destroy_ship() -> void:
 		imap_manager.registry_map.erase(registry_cell)
 	else:
 		imap_manager.registry_map[registry_cell] = agents_registered
+	
 	remove_from_group(&"agent")
 	if is_friendly == true:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
+	
+	for unit in targeted_by:
+		unit.targeted_units.erase(self)
+		unit.target_unit = null
+	
+	remove_from_group(group_name)
 	if group_leader == true:
 		globals.reset_group_leader(self)
-	remove_from_group(group_name)
+	
 	destroyed.emit()
 	ShipTargetIcon.visible = false
 	queue_free()
@@ -498,8 +508,6 @@ func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 
-
-
 func set_target_for_weapons(unit) -> void:
 	for weapon in all_weapons:
 		weapon.set_target_unit(unit)
@@ -524,7 +532,7 @@ func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_fire()
-																														   
+
 func set_navigation_position(to_position: Vector2) -> void:
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
@@ -557,6 +565,11 @@ func _physics_process(delta: float) -> void:
 		update_registry_cell.emit(registry_cell, current_registry_cell)
 		registry_cell = current_registry_cell
 	
+	if Engine.get_physics_frames() % 120 == 0 and targeted_by.is_empty() == false:
+		for unit in targeted_by:
+			if unit == null:
+				targeted_by.erase(unit)
+
 	#if Engine.get_physics_frames() % 30 == 0:
 		#var area_registry = AvoidanceArea.get_overlapping_bodies()
 		#neighbor_units.clear()
@@ -582,7 +595,7 @@ func _physics_process(delta: float) -> void:
 		if avoid_flag == true:
 			avoid_flag = false
 		if brake_flag == true:
-			brake_flag == false
+			brake_flag = false
 	
 	if manual_control == false:
 		return
@@ -672,28 +685,13 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	elif collision_flag == true and state.linear_velocity.length() > (speed + zero_flux_bonus):
 		linear_damp = 1.0
 	
-	if avoid_flag == true:
-		pass
-	
-	if collision_flag == false and (target_position != Vector2.ZERO or manual_control):
+	if collision_flag == false:
 		apply_torque(rotate_angle)
 		apply_force(force)
 		state.linear_velocity = state.linear_velocity.limit_length(speed + zero_flux_bonus)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
-
-func ease_velocity(velocity: Vector2) -> Vector2:
-	var new_velocity: Vector2 = Vector2.ZERO
-	var normalize_velocity_x: float = linear_velocity.x / velocity.x
-	var normalize_velocity_y: float = linear_velocity.y / velocity.y
-	if velocity.x == 0.0:
-		normalize_velocity_x = 0.0
-	if velocity.y == 0.0:
-		normalize_velocity_y = 0.0
-	new_velocity.x = (velocity.x + linear_velocity.x) * ease(normalize_velocity_x, ship_stats.acceleration)
-	new_velocity.y = (velocity.y + linear_velocity.y) * ease(normalize_velocity_y, ship_stats.acceleration)
-	return new_velocity
 
 func _on_target_in_range(value: bool) -> void:
 	target_in_range = value
@@ -722,6 +720,9 @@ func update_available_target_connections(target_group_key: StringName) -> void:
 			continue
 		if not target.destroyed.is_connected(blackboard._on_target_destroyed):
 			target.destroyed.connect(blackboard._on_target_destroyed.bind(target, target_group_key, target_key))
+
+func set_targets(targets) -> void:
+	targeted_units = targets
 
 func find_closest_target(available_targets: Array) -> Ship:
 	var closest_target: Ship = null
@@ -857,8 +858,6 @@ func _on_NavigationTimer_timeout() -> void:
 func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
 	if safe_velocity == Vector2.ZERO:
 		return
-	var lol = linear_velocity
-	pass
 
 func _on_body_entered(body):
 	if target_position != Vector2.ZERO:

@@ -146,8 +146,6 @@ func move_new_unit(to_position: Vector2) -> void:
 func attack_targets() -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var targeted_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
-	var target_group_key: StringName = &" targets"
-	var target_key: StringName = &"target"
 	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
 	
 	var funny_pair: Array = current_groups.values()
@@ -156,25 +154,23 @@ func attack_targets() -> void:
 		if highlighted_group == pair:
 			existing_group = pair
 	
+	var leader = null
 	# Alt select and select_units causes a multitude of problems I can't bother to fix.
 	if not existing_group.is_empty():
-		var leader = null
 		for unit in existing_group:
 			if unit.group_leader == true:
 				leader = unit
-		var key_copy: StringName = leader.group_name + target_group_key
-		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
-		if targeted_group == targets_available:
+				break
+		var targets_available: Array = leader.targeted_units
+		if targets_available == targeted_group:
 			return
 	
-	var group_leaders: Array = []
 	for unit in highlighted_group:
-		if unit.group_leader:
-			group_leaders.push_back(unit)
+		if unit.group_leader == true:
+			unit.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
 	
-	var leader: Ship = null
 	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
 		leader = highlighted_group[0]
 	
@@ -185,7 +181,7 @@ func attack_targets() -> void:
 		
 		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		leader = globals.find_unit_nearest_to_median(median, unit_positions)
-	
+
 	# 3) Generate and assign a name. Sort the name arrays.
 	var new_group_name: StringName 
 	if available_group_names.size() > 0:
@@ -196,20 +192,10 @@ func attack_targets() -> void:
 		group_iterator += 1
 	
 	taken_group_names.push_back(new_group_name)
-	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	current_groups[new_group_name] = highlighted_group
-	
-	target_group_key = leader.group_name + &" targets" 
-	var target_idx: int = 0
-	for target in targeted_group:
-		if target == null:
-			targeted_group.remove_at(target_idx)
-		target_idx += 1
-	
-	var leader_key: StringName = &"leader"
-	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, leader)
+	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	get_tree().call_group(new_group_name, &"set_targets", targeted_group)
 	leader.set_group_leader(true)
-	leader.set_blackboard_data(target_group_key, targeted_group)
 
 
 func select_units() -> void:

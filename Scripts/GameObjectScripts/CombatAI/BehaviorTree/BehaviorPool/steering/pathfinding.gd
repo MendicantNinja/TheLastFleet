@@ -1,6 +1,9 @@
 extends LeafAction
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
+	if agent.target_unit != null:
+		return SUCCESS
+	
 	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO:
 		if agent.group_leader == true and imap_manager.working_maps.has(agent.group_name):
 			imap_manager.working_maps.erase(agent.group_name)

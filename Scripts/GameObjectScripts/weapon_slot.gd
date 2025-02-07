@@ -331,7 +331,7 @@ func update_killcast(delta) -> void:
 	if collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
 		can_look_at = false
 		return
-
+	
 	current_target_id = collider.get_rid()
 	var ship_position: Vector2 = to_local(collider.global_position)
 	if target_engaged and current_target_id != target_unit:
@@ -343,7 +343,7 @@ func update_killcast(delta) -> void:
 		killcast.target_position = ship_position
 		killcast.force_raycast_update()
 		return
-
+	
 	killcast.target_position = ship_position
 	
 	if (auto_aim or auto_fire):

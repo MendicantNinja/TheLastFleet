@@ -4,7 +4,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_2s0ta"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="3_22nr0"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_us7ks"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/pathfinding.gd" id="5_ofwj6"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pathfinding.gd" id="5_ofwj6"]
 [ext_resource type="Texture2D" uid="uid://bpdt55pm4f7di" path="res://Art/ShipArt/prototype9_v2.png" id="12_gfp81"]
 [ext_resource type="Texture2D" uid="uid://c750umbh4ihc6" path="res://Art/ShipArt/prototype9v1_livery.png" id="13_yfhmf"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="14_b3w6e"]

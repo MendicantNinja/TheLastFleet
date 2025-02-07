@@ -1,7 +1,6 @@
 extends LeafAction
 
 var time_horizon: float = 4.0
-var time: float = 0.0
 var delta: float = 0.0
 var debug: bool = false
 
@@ -31,7 +30,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		if rel_v <= cone:
 			continue
 		var projection: Vector2 = v.dot(p) / p.dot(p) * p
-		var translation: Vector2 = agent.linear_velocity + (v - projection)
+		var translation: Vector2 = (agent.heur_velocity - agent.linear_velocity) + (v - projection)
 		var avoid_direction: Vector2 = translation.normalized()
 		var avoid_velocity: Vector2 = avoid_direction * agent.ship_stats.deceleration * agent.time
 		var test_avoid: float = avoid_velocity.dot(p) ** 2
@@ -44,4 +43,4 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var new_velocity: Vector2 = avoid_vel[avoid_vel.keys().min()]
 	agent.acceleration = new_velocity
-	return RUNNING
+	return SUCCESS
