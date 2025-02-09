@@ -20,7 +20,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var group: Array = get_tree().get_nodes_in_group(agent.group_name)
 	var avoid_vel: Dictionary = {}
 	for neighbor in neighbor_units:
-		if neighbor in group and neighbor.brake_flag == true:
+		if neighbor in group and neighbor.brake_flag == true and neighbor.target_unit == null:
 			continue
 		var p: Vector2 = neighbor.global_position - agent.global_position
 		var v: Vector2 = agent.linear_velocity - neighbor.linear_velocity

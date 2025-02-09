@@ -283,6 +283,8 @@ func destroy_ship() -> void:
 		remove_from_group(&"enemy")
 	
 	for unit in targeted_by:
+		if unit == null:
+			continue
 		unit.targeted_units.erase(self)
 		unit.target_unit = null
 	
@@ -585,15 +587,10 @@ func _physics_process(delta: float) -> void:
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 	
-	if collision_flag == true:
-		acceleration -= linear_velocity * ship_stats.deceleration * time
-	
-	if linear_damp == 1.0 and sleeping == true:
+	if linear_damp > 0.0 and sleeping == true:
 		linear_damp = 0.0
 		if collision_flag == true:
 			collision_flag = false
-		if avoid_flag == true:
-			avoid_flag = false
 		if brake_flag == true:
 			brake_flag = false
 	
@@ -678,17 +675,29 @@ func _physics_process(delta: float) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
+	var speed_modifier: float = 0.0
+	if (soft_flux + hard_flux) == 0.0:
+		speed_modifier += zero_flux_bonus
 	
-	if collision_flag == true and state.linear_velocity.length() < (speed + zero_flux_bonus):
+	if collision_flag == true and state.linear_velocity.length() < (speed + speed_modifier):
 		collision_flag == false
 		linear_damp = 0.0
-	elif collision_flag == true and state.linear_velocity.length() > (speed + zero_flux_bonus):
+	elif collision_flag == true and state.linear_velocity.length() > (speed + speed_modifier):
 		linear_damp = 1.0
 	
 	if collision_flag == false:
 		apply_torque(rotate_angle)
 		apply_force(force)
-		state.linear_velocity = state.linear_velocity.limit_length(speed + zero_flux_bonus)
+		state.linear_velocity = state.linear_velocity.limit_length(speed + speed_modifier)
+	
+	if collision_flag == true and manual_control == true:
+		apply_torque(rotate_angle)
+		apply_force(force)
+	
+	if collision_flag == true and manual_control == false:
+		var decel: Vector2 = -linear_velocity.normalized() * ship_stats.deceleration
+		apply_torque(rotate_angle)
+		apply_force(decel)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot

@@ -38,9 +38,13 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		available_targets.append(target)
 	
 	for unit in erase_unit:
-		agent.targeted_units.erase(unit)
+		if unit in agent.targeted_units:
+			agent.targeted_units.erase(unit)
 	
-	if agent.targeted_units.is_empty() or available_targets.is_empty():
+	if agent.targeted_units.is_empty():
+		return SUCCESS
+	elif available_targets.is_empty():
+		agent.targeted_units = available_targets
 		return SUCCESS
 	
 	var min_dist: float = sq_dist.min()

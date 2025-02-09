@@ -12,8 +12,8 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/dynamic_avoidance.gd" id="7_3duk1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="8_nukju"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/strafe.gd" id="8_t5j2x"]
 [ext_resource type="Script" path="res://Scenes/CompositeGameObjects/Ships/pursue.gd" id="8_tdgqp"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="9_rp377"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
@@ -75,14 +75,14 @@ script = ExtResource("6_26ar5")
 [node name="combat steering" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
 
-[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("7_3duk1")
-
 [node name="pursue" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("8_tdgqp")
 
-[node name="strafe" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("8_t5j2x")
+[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("7_3duk1")
+
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("9_rp377")
 
 [node name="navigation" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")

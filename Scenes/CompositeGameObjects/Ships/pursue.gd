@@ -19,6 +19,10 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.target_unit != target:
 		target = agent.target_unit
 	
+	if agent.linear_damp > 0.0 and agent.brake_flag == true:
+		agent.brake_flag = false
+		agent.linear_damp = 0.0
+	
 	agent.sleeping = false
 	var direction_to_path: Vector2 = agent.global_position.direction_to(target.global_position)
 	var distance_to: float = agent.global_position.distance_to(target.global_position)
@@ -35,6 +39,10 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if distance_to <= threat_radius:
 		agent.brake_flag = true
 		velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
+	
+	if agent.brake_flag == true and floor(agent.linear_velocity.length()) == 0.0:
+		agent.brake_flag = false
+		time = 0.0
 	
 	var transform_look_at: Transform2D = agent.transform.looking_at(target.global_position)
 	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.ship_stats.turn_rate * delta)
