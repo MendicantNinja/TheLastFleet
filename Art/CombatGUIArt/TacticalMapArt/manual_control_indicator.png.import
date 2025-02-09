@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://qmfvy6lr688l"
-path="res://.godot/imported/bar_full_outline.png-68425ee2de6fdd27a8613067e769bcb3.ctex"
+uid="uid://cey2s4hiuicmi"
+path="res://.godot/imported/manual_control_indicator.png-2da3b37455afa154de1e6f3419e8f5c2.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/bar_full_outline.png"
-dest_files=["res://.godot/imported/bar_full_outline.png-68425ee2de6fdd27a8613067e769bcb3.ctex"]
+source_file="res://Art/CombatGUIArt/TacticalMapArt/manual_control_indicator.png"
+dest_files=["res://.godot/imported/manual_control_indicator.png-2da3b37455afa154de1e6f3419e8f5c2.ctex"]
 
 [params]
 

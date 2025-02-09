@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://rm0e3ydgek5"
-path="res://.godot/imported/tac_map_player_ship_selected.png-5579f09987bb0cc038191952f3ab53e9.ctex"
+uid="uid://jdm0cm46vaif"
+path="res://.godot/imported/weaponsystemcheckbox32x32.png-82dd4c10b5ba72084e49b12ea8bdbd72.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/tac_map_player_ship_selected.png"
-dest_files=["res://.godot/imported/tac_map_player_ship_selected.png-5579f09987bb0cc038191952f3ab53e9.ctex"]
+source_file="res://Art/CombatGUIArt/ManualControlHUDArt/weaponsystemcheckbox32x32.png"
+dest_files=["res://.godot/imported/weaponsystemcheckbox32x32.png-82dd4c10b5ba72084e49b12ea8bdbd72.ctex"]
 
 [params]
 

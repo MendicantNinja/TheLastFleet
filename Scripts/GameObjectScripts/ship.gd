@@ -115,7 +115,6 @@ signal ship_selected()
 signal destroyed()
 signal update_agent_influence(prev_imap_cell, imap_cell)
 signal update_registry_cell(prev_registry_cell, registry_cell)
-
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -123,8 +122,9 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
-	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/tac_map_player_ship.png")
-	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/tac_map_player_ship_selected.png")
+	#$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
+	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png")
+	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png")
 	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
 	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
 	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
@@ -132,7 +132,7 @@ func deploy_ship() -> void:
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	if get_tree().current_scene.name == "CombatArena":
 		CombatCamera = $"../CombatMap/CombatCamera"
-		TacticalCamera = $"../TacticalMap/TacticalCamera"
+		TacticalCamera = %TacticalMapCamera
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
 	
 	if is_friendly == true:
@@ -300,6 +300,7 @@ func destroy_ship() -> void:
 	destroyed.emit()
 	remove_from_group(group_name)
 	ShipTargetIcon.visible = false
+	#$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
 	queue_free()
 
 func toggle_shield() -> void:
@@ -605,8 +606,6 @@ func _physics_process(delta: float) -> void:
 		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
 		# if one wants to make the manually controlled hud less transparent than friendly ships
 		pass
-	
-	
 	
 	if manual_control and Input.is_action_pressed("vent_flux"):
 		if soft_flux > 0.0:

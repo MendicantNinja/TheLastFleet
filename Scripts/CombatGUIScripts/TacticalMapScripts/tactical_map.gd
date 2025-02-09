@@ -1,6 +1,6 @@
 extends Node2D
-
-@onready var TacticalCamera = $TacticalCamera
+@onready var TacticalMapLayer = %TacticalMapLayer
+@onready var TacticalCamera = %TacticalCamera
 var line_width: int = 30
 var line_color: Color = Color8(25, 90, 255, 75)
 var grid_drawn: bool = false
@@ -36,7 +36,7 @@ func _ready():
 	SelectionArea.set_collision_mask_value(3, true)
 
 func _unhandled_input(event) -> void:
-	if not visible:
+	if settings.dev_mode == false or not visible or TacticalMapLayer.visible:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("select"):
@@ -287,10 +287,11 @@ func display_map(map_value: bool) -> void:
 	# Show the Tac Map
 	if map_value == true:
 		visible = true
-		TacticalCamera.enabled = true
+		%TacticalMapCamera.enabled = true
 	# Hide the Tac Map
 	elif map_value == false:
 		TacticalCamera.enabled = false
+		visible = false
 		attack_group = false
 		visible = false
 	
@@ -401,16 +402,17 @@ func set_grid_parameters(size_x: float, size_y: float) -> void:
 	queue_redraw()
 
 func _draw():
-	if grid_size_x != 0.0 and grid_size_y != 0.0:
-		var grid_square_size: int = 2000
-		for i in range (grid_size_x/grid_square_size): #Draw Vertical N/S Lines
-			draw_line(Vector2(i*grid_square_size, 0), Vector2(i*grid_square_size, grid_size_y), line_color, line_width, true) 
-		
-		for i in range (grid_size_y/grid_square_size): #Draw Horizontal W/E Lines
-			draw_line(Vector2(0, i*grid_square_size), Vector2(grid_size_x, i*grid_square_size), line_color, line_width, true)
-	
+	#if grid_size_x != 0.0 and grid_size_y != 0.0:
+		#var grid_square_size: int = 2000
+		#for i in range (grid_size_x/grid_square_size+1): #Draw Vertical N/S Lines
+			#draw_line(Vector2(i*grid_square_size, 0), Vector2(i*grid_square_size, grid_size_y), line_color, line_width, true) 
+		#
+		#for i in range (grid_size_y/grid_square_size+1): #Draw Horizontal W/E Lines
+			#draw_line(Vector2(0, i*grid_square_size), Vector2(grid_size_x, i*grid_square_size), line_color, line_width, true)
+	#
 	if box_selection_start == Vector2.ZERO or visible == false: 
 		return
 	var end: Vector2 = get_global_mouse_position()
 	var start: Vector2 = box_selection_start
+	
 	draw_rect(Rect2(start, end - start), selection_line_color, false, 6, true) 

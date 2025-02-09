@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cey2s4hiuicmi"
-path="res://.godot/imported/manual_control_indicator.png-2aee33c82dc45880fdf6f2ef29a1357e.ctex"
+uid="uid://bw66f1712lt43"
+path="res://.godot/imported/flux_pip.png-0f50bad0a72c1a2b51bb2d40722267f9.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/manual_control_indicator.png"
-dest_files=["res://.godot/imported/manual_control_indicator.png-2aee33c82dc45880fdf6f2ef29a1357e.ctex"]
+source_file="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png"
+dest_files=["res://.godot/imported/flux_pip.png-0f50bad0a72c1a2b51bb2d40722267f9.ctex"]
 
 [params]
 

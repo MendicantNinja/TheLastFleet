@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://doewdp3hp2q71"
-path="res://.godot/imported/combatHUDdetail.png-7d6377f26b4b2b5307a53c3063b7134c.ctex"
+uid="uid://cfoq3cbd0amn1"
+path="res://.godot/imported/tactical_map_icon_thin.png-85285dcd6e6af025d321bf60cbaf7f98.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/combatHUDdetail.png"
-dest_files=["res://.godot/imported/combatHUDdetail.png-7d6377f26b4b2b5307a53c3063b7134c.ctex"]
+source_file="res://Art/CombatGUIArt/TacticalMapArt/tactical_map_icon_thin.png"
+dest_files=["res://.godot/imported/tactical_map_icon_thin.png-85285dcd6e6af025d321bf60cbaf7f98.ctex"]
 
 [params]
 

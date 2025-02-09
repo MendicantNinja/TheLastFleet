@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bw66f1712lt43"
-path="res://.godot/imported/flux_pip.png-32dbd42439d926ce06a8771f788dec07.ctex"
+uid="uid://2akl0jaf0y7m"
+path="res://.godot/imported/offweaponsystemcheckbox12x12.png-8b339df7544e0761c52bd2a7674af90b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/flux_pip.png"
-dest_files=["res://.godot/imported/flux_pip.png-32dbd42439d926ce06a8771f788dec07.ctex"]
+source_file="res://Art/CombatGUIArt/ManualControlHUDArt/offweaponsystemcheckbox12x12.png"
+dest_files=["res://.godot/imported/offweaponsystemcheckbox12x12.png-8b339df7544e0761c52bd2a7674af90b.ctex"]
 
 [params]
 

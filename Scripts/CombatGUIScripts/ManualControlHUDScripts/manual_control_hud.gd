@@ -30,6 +30,11 @@ var current_ship: Ship = null
 @onready var proximity_indicator_max: int = 4500 #maximum allowable distnce
 @onready var proximity_indicator_min: Vector2  = Vector2(screen_size.x/2, screen_size.y/2) # minimum camera zoom approximation in pixels
 @onready var proximity_indicator_icon = load("res://Scenes/GUIScenes/CombatGUIScenes/ProximityIndicator.tscn")
+func _ready() -> void:
+	pass
+	#if settings.dev_mode == true:
+		#current_ship = ship_registry[0]
+
 func set_ship(ship: Ship) -> void:
 	current_ship = ship
 	if current_ship == null:
@@ -41,12 +46,12 @@ func set_ship(ship: Ship) -> void:
 	update_hud()
 
 func setup_ship_registry() -> void: 
+	ship_registry.clear()
 	var ship_dictionary: Dictionary = imap_manager.registry_map
 	var ship_arrays: Array = ship_dictionary.values()
 	for array in ship_arrays:
 		for ship in array:
 			ship_registry.append(ship)
-	
 
 func _unhandled_key_input(event) -> void:
 	if self.visible == true:
@@ -209,8 +214,8 @@ func _physics_process(delta) -> void:
 					var d: Vector2 = CombatCamera.global_position + Vector2((screen_size.x / 2 + coordinate_1 * abs(direction.x))/2, screen_size.y / 2) # working formula
 					half_screen_distance = (d - CombatCamera.global_position).length() - ship.ShipSprite.texture.get_height() #bullshit hack
 					#half_screen_distance = screen_size.y/2
-					if ship.global_position.x == 3464:
-						print(CombatCamera.zoom.x, " BOTTOM SIDE     D: ", d,"     CCAM: ", CombatCamera.global_position, "   Intercept: ", intercept, "     HSD ", half_screen_distance)
+					#if ship.global_position.x == 3464:
+						#print(CombatCamera.zoom.x, " BOTTOM SIDE     D: ", d,"     CCAM: ", CombatCamera.global_position, "   Intercept: ", intercept, "     HSD ", half_screen_distance)
 					# Flip text for bottom intercept to draw on top
 					proximity_indicator.Distance.position = Vector2(6, -20)
 					proximity_indicator.position = Vector2(intercept.x, intercept.y - 35)
@@ -227,15 +232,7 @@ func _physics_process(delta) -> void:
 					#print("Distance is", (CombatCamera.global_position - ship.global_position).length() * CombatCamera.zoom.x - half_screen_distance)
 
 				#Vector2(0,screen_size.x/2)
-				active_proximity_indicators[ship] = proximity_indicator
+				#active_proximity_indicators[ship] = proximity_indicator
 			#else:
 				#if active_proximity_indicators.has(ship):
 					#active_proximity_indicators.erase(ship)
-
-func _process(delta):
-	pass
-		
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.

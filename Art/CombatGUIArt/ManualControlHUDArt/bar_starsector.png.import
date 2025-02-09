@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://jdm0cm46vaif"
-path="res://.godot/imported/weaponsystemcheckbox32x32.png-c836c8daf8aa95e90ac531cc85d81b4e.ctex"
+uid="uid://btjg68do6pthc"
+path="res://.godot/imported/bar_starsector.png-96038223d1b237e892cdbf692a538f35.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/weaponsystemcheckbox32x32.png"
-dest_files=["res://.godot/imported/weaponsystemcheckbox32x32.png-c836c8daf8aa95e90ac531cc85d81b4e.ctex"]
+source_file="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png"
+dest_files=["res://.godot/imported/bar_starsector.png-96038223d1b237e892cdbf692a538f35.ctex"]
 
 [params]
 

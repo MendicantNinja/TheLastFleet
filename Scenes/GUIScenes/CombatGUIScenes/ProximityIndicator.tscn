@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://vsucg73ktsl2"]
 
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/proximity_indicator.gd" id="1_fv70g"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/proximity_indicator.gd" id="1_fv70g"]
 [ext_resource type="Texture2D" uid="uid://clggcqnwmb0or" path="res://Art/MetaIcons/BehaviorTree/fail.svg" id="1_kkoky"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="2_2qavi"]
 

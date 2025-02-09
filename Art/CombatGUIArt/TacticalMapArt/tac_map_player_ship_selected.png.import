@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dbbeuyeghpl8e"
-path="res://.godot/imported/indicator_upscale.png-a64594536ccda02704d8394d30626a3a.ctex"
+uid="uid://rm0e3ydgek5"
+path="res://.godot/imported/tac_map_player_ship_selected.png-ab8866bbcbce5de716c5496d363ae060.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/indicator_upscale.png"
-dest_files=["res://.godot/imported/indicator_upscale.png-a64594536ccda02704d8394d30626a3a.ctex"]
+source_file="res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png"
+dest_files=["res://.godot/imported/tac_map_player_ship_selected.png-ab8866bbcbce5de716c5496d363ae060.ctex"]
 
 [params]
 

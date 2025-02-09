@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://b0foxj848a3ys"]
 
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/manual_hud_weapon_element.gd" id="1_wayjt"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_hud_weapon_element.gd" id="1_wayjt"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="2_35cnu"]
-[ext_resource type="Texture2D" uid="uid://2akl0jaf0y7m" path="res://Art/CombatGUIArt/offweaponsystemcheckbox12x12.png" id="3_jcu5v"]
-[ext_resource type="Texture2D" uid="uid://tnkh48own8ek" path="res://Art/CombatGUIArt/weaponsystemcheckbox12x12.png" id="4_0n8mn"]
+[ext_resource type="Texture2D" uid="uid://2akl0jaf0y7m" path="res://Art/CombatGUIArt/ManualControlHUDArt/offweaponsystemcheckbox12x12.png" id="3_jcu5v"]
+[ext_resource type="Texture2D" uid="uid://tnkh48own8ek" path="res://Art/CombatGUIArt/ManualControlHUDArt/weaponsystemcheckbox12x12.png" id="4_0n8mn"]
 
 [node name="ManualHUDWeaponElement" type="GridContainer"]
 offset_right = 174.0

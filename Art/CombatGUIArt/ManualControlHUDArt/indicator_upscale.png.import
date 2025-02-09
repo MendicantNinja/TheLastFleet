@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://btjg68do6pthc"
-path="res://.godot/imported/bar_starsector.png-d67870652f331851d23cd90aa60b8603.ctex"
+uid="uid://dbbeuyeghpl8e"
+path="res://.godot/imported/indicator_upscale.png-defc91da6e382bf4d1f3d9677cc8c719.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/bar_starsector.png"
-dest_files=["res://.godot/imported/bar_starsector.png-d67870652f331851d23cd90aa60b8603.ctex"]
+source_file="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png"
+dest_files=["res://.godot/imported/indicator_upscale.png-defc91da6e382bf4d1f3d9677cc8c719.ctex"]
 
 [params]
 
