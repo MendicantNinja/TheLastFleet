@@ -14,6 +14,17 @@ func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	add_child(audio_stream_player)
 	audio_stream_player.finished.connect(audio_stream_player.queue_free)
 
+# Useful for displaying hotkeys, especially ones the player has given a custom binding.
+func convert_input_to_string(action: StringName, color: String = "orange", use_custom_color: bool = false) -> String:
+	var custom_binding: InputEventKey = InputMap.action_get_events(action)[0] # If multiple inputs bound, grab the first input for display
+	var readable: String = OS.get_keycode_string(custom_binding.get_physical_keycode_with_modifiers())
+	var returned_bbcode: String = "[color=" + color + "]"+ readable + "[/color]"
+	if use_custom_color == true:
+		returned_bbcode = "[color=#%s]%s[/color]" % [settings.gui_color.to_html(), readable]
+	return returned_bbcode
+
+
+
 func geometric_median_of_objects(object_positions: Dictionary, epsilon: float = 1e-5) -> Vector2:
 	var sum_x: float = 0.0
 	var sum_y: float = 0.0

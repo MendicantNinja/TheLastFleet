@@ -1,4 +1,4 @@
-[gd_scene load_steps=38 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=43 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_map.gd" id="2_cwwbl"]
@@ -26,8 +26,13 @@
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_map_layer.gd" id="11_5entx"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
-[ext_resource type="Texture2D" uid="uid://cfoq3cbd0amn1" path="res://Art/CombatGUIArt/TacticalMapArt/tactical_map_icon_thin.png" id="13_hsij2"]
 [ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
+[ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
+[ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
+[ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
+[ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -226,27 +231,6 @@ position_smoothing_enabled = true
 unique_name_in_owner = true
 script = ExtResource("11_5entx")
 
-[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer"]
-offset_left = 1515.0
-offset_top = 957.0
-offset_right = 1615.0
-offset_bottom = 1057.0
-scale = Vector2(0.66, 0.66)
-focus_mode = 0
-
-[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer"]
-visible = false
-self_modulate = Color(0.533333, 1, 1, 1)
-offset_left = 1515.0
-offset_top = 957.0
-offset_right = 1615.0
-offset_bottom = 1057.0
-focus_mode = 0
-action_mode = 0
-texture_normal = ExtResource("13_hsij2")
-ignore_texture_size = true
-stretch_mode = 0
-
 [node name="TacticalViewportContainer" type="SubViewportContainer" parent="TacticalMapLayer"]
 offset_left = -3884.0
 offset_top = -3908.0
@@ -259,6 +243,7 @@ focus_mode = 0
 transparent_bg = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 2
+gui_snap_controls_to_pixels = false
 size = Vector2i(9600, 9600)
 render_target_update_mode = 4
 
@@ -292,6 +277,129 @@ material = SubResource("ShaderMaterial_lgtp0")
 offset_right = 5400.0
 offset_bottom = 6300.0
 mouse_filter = 2
+
+[node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
+offset_left = 1592.0
+offset_top = 950.0
+offset_right = 1656.0
+offset_bottom = 1014.0
+theme_override_constants/separation = 18
+
+[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+focus_mode = 0
+action_mode = 0
+texture_normal = ExtResource("13_w2mg8")
+texture_pressed = ExtResource("14_wbn2k")
+texture_hover = ExtResource("14_wbn2k")
+script = ExtResource("15_o3rb6")
+
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("16_dosly")
+
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = -1.0
+offset_right = 25.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "[color=green]T[/color]"
+
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = 38.0
+offset_right = 23.0
+offset_bottom = 78.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+bbcode_enabled = true
+text = "Take 
+Control"
+
+[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+focus_mode = 0
+action_mode = 0
+texture_normal = ExtResource("13_w2mg8")
+texture_pressed = ExtResource("14_wbn2k")
+texture_hover = ExtResource("14_wbn2k")
+script = ExtResource("20_ebklc")
+
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("19_1hyx4")
+
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = -1.0
+offset_right = 24.0
+offset_bottom = 25.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = 37.0
+offset_right = 28.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+bbcode_enabled = true
+text = "Camera Feed"
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -656,9 +764,10 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 layer = -1
 
 [node name="Background" type="TextureRect" parent="SpaceBackground"]
-offset_left = 2.0
-offset_right = 2209.0
-offset_bottom = 1924.0
+offset_left = 23.0
+offset_top = 3.0
+offset_right = 2230.0
+offset_bottom = 1927.0
 texture = ExtResource("10_uvm3m")
 stretch_mode = 4
 

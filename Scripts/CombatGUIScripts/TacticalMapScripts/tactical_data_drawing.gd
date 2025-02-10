@@ -86,8 +86,9 @@ func setup() -> void:
 				continue
 			else:
 				ship_registry.append(ship)
-				var tactical_map_icon: TextureButton = TacticalMapIconScene.instantiate()
+				var tactical_map_icon: TacticalMapIcon = TacticalMapIconScene.instantiate()
 				self.add_child(tactical_map_icon)
+				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
 	update()
@@ -101,8 +102,8 @@ func update() -> void:
 func _process(delta):
 	if self.visible == true and Engine.get_physics_frames() % 10 == 0:
 		update()
-		if Engine.get_physics_frames() % 60 == 0:
-			setup()
+		#if Engine.get_physics_frames() % 60 == 0:
+			#setup()
 
 func convert_position(global_pos: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
 	return Vector2(
@@ -152,8 +153,12 @@ func select_units() -> void:
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
-	var selection: Array[TacticalMapIcon] = get_icons_in_box_selection(Rect2(area_position, size))
+	var selection_icons: Array[TacticalMapIcon] = get_icons_in_box_selection(Rect2(area_position, size))
+	var selection: Array[Ship]
+	for icon in selection_icons:
+		selection.append(icon.assigned_ship)
 	reset_box_selection()
+	
 	if selection.size() == 0:
 		get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
 		get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
@@ -161,8 +166,7 @@ func select_units() -> void:
 		get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
 		current_group_name = &""
 		return
-		#for icon in selection:
-			#icon.Outline.button_pressed = false
+	
 	var past_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	for ship in past_group:
 		if not ship in selection and ship.is_friendly and attack_group == false:
@@ -183,9 +187,8 @@ func select_units() -> void:
 	#add in when adding back attack
 	#if attack_group:
 		#attack_targets()
+	# Whatever is still selected, highlight it.
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
-	for icon in selection:
-		icon.Outline.button_pressed = true
 	
 func get_rect_start_position() -> Vector2:
 	var new_position: Vector2

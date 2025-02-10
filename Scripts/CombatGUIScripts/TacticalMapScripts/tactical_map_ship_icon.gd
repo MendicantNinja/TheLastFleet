@@ -8,13 +8,12 @@ class_name TacticalMapIcon
 func _ready():
 	pass # Replace with function body.
 
-#func _toggled(toggled_on: bool) -> void:
-	#print("toggled called ", toggled_on)
-	#if toggled_on == true:
-		#Outline.button_pressed == true
-		#print("outline button pressed is ", Outline.button_pressed)
-	#else:
-		#Outline.button_pressed = false
+func _toggled(toggled_on: bool) -> void:
+	print("toggled called ", toggled_on)
+	if toggled_on == true:
+		Outline.button_pressed = true
+	else:
+		Outline.button_pressed = false
 
 func setup(ship: Ship) -> void:
 	assigned_ship = ship

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7hictbhxr4ku"
-path="res://.godot/imported/tilemap_packed.png-29fed73eb5ad4e156e6c651a9d8a6e50.ctex"
+uid="uid://cvd1axgyjtqu8"
+path="res://.godot/imported/TacticalMapButtonUnpressed.png-8d1f17137385b6576eb816cffce66e97.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/CombatGUIArt/tilemap_packed.png"
-dest_files=["res://.godot/imported/tilemap_packed.png-29fed73eb5ad4e156e6c651a9d8a6e50.ctex"]
+source_file="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png"
+dest_files=["res://.godot/imported/TacticalMapButtonUnpressed.png-8d1f17137385b6576eb816cffce66e97.ctex"]
 
 [params]
 

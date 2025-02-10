@@ -19,7 +19,8 @@ class_name Ship
 @onready var FluxPip = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/FluxPip
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
-@onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
+@onready var OldTacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
+var tactical_map_icon: TacticalMapIcon
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 
@@ -99,10 +100,13 @@ var target_position: Vector2 = Vector2.ZERO
 var ship_select: bool = false:
 	set(value):
 		if value == true: 
-			TacticalMapIcon.button_pressed = true # Pressed is solely for GUI effects (brighten) with regards to the TacMapIcon.
+			OldTacticalMapIcon.button_pressed = true # Pressed is solely for GUI effects (brighten) with regards to the TacMapIcon.
+			tactical_map_icon._toggled(value)
 			ship_select = value
+			
 		elif value == false:
-			TacticalMapIcon.button_pressed = false
+			OldTacticalMapIcon.button_pressed = false
+			tactical_map_icon._toggled(value)
 			ship_select = value
 		ship_selected.emit()
 
@@ -122,12 +126,13 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
-	#$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
-	TacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png")
-	TacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png")
+	print("deploy ship called")
+	$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
+	OldTacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png")
+	OldTacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png")
 	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
-	TacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
-	TacticalMapIcon.pivot_offset = Vector2(TacticalMapIcon.size.x/2, TacticalMapIcon.size.y/2)
+	OldTacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
+	OldTacticalMapIcon.pivot_offset = Vector2(OldTacticalMapIcon.size.x/2, OldTacticalMapIcon.size.y/2)
 	
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	if get_tree().current_scene.name == "CombatArena":
@@ -136,12 +141,12 @@ func deploy_ship() -> void:
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
 	
 	if is_friendly == true:
-		TacticalMapIcon.modulate = settings.player_color
+		OldTacticalMapIcon.modulate = settings.player_color
 		ManualControlIndicator.self_modulate = settings.player_color
 		settings.swizzle($ShipLivery, settings.player_color) 
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
-		TacticalMapIcon.modulate = settings.enemy_color
+		OldTacticalMapIcon.modulate = settings.enemy_color
 		settings.swizzle($ShipLivery, settings.enemy_color) 
 	
 func _ready() -> void:
@@ -352,7 +357,7 @@ func update_flux_indicators() -> void:
 	FluxPip.position.x = HardFluxIndicator.value - 2
 
 func display_icon(value: bool) -> void:
-	TacticalMapIcon.visible = value
+	OldTacticalMapIcon.visible = value
 
 # Units/Groups
 
@@ -460,8 +465,9 @@ func _on_mouse_exited() -> void:
 
 func highlight_selection(select_value: bool = false) -> void:
 	#print("%s is highlighted? %s" % [name, select_value])
-	TacticalMapIcon.toggle_mode = select_value
-	TacticalMapIcon.button_pressed = select_value
+	tactical_map_icon._toggled(select_value)
+	OldTacticalMapIcon.toggle_mode = select_value
+	OldTacticalMapIcon.button_pressed = select_value
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:

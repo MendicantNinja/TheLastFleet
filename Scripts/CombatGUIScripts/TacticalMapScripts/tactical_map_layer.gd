@@ -4,8 +4,8 @@ extends CanvasLayer
 #-> CenterContainer - Set Anchor Preset to Full Rect
 #--> Control # A control node that restrict to CenterContainer Parent to be centered on the middle
 #---> SubviewportContainer # Your subviewport here, now just move the camera inside like how you want to pan it 
-@onready var ManualControlButton = $ManualControlButton
-@onready var CameraFeedButton = $CameraFeedButton
+@onready var ManualControlButton = $ButtonList/ManualControlButton
+@onready var CameraFeedButton = $ButtonList/CameraFeedButton
 
 
 func _unhandled_input(event):
