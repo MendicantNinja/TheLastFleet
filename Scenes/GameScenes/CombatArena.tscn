@@ -1,7 +1,6 @@
 [gd_scene load_steps=43 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_map.gd" id="2_cwwbl"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/admiral.gd" id="2_shfex"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_xxm3d"]
@@ -31,6 +30,7 @@
 [ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
 [ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
+[ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 
@@ -153,18 +153,6 @@ editor_draw_drag_margin = true
 
 [node name="TacticalMap" type="Node2D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("2_cwwbl")
-
-[node name="Label" type="Label" parent="TacticalMap"]
-offset_left = 3.0
-offset_top = -61.0
-offset_right = 439.0
-offset_bottom = -15.0
-theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
-theme_override_fonts/font = ExtResource("3_urh14")
-theme_override_font_sizes/font_size = 32
-text = "TACTICAL DISPLAY"
-metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
 visible = false
@@ -278,6 +266,16 @@ offset_right = 5400.0
 offset_bottom = 6300.0
 mouse_filter = 2
 
+[node name="Label" type="Label" parent="TacticalMapLayer"]
+offset_left = 14.0
+offset_right = 450.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
+theme_override_fonts/font = ExtResource("3_urh14")
+theme_override_font_sizes/font_size = 32
+text = "TACTICAL DISPLAY"
+metadata/_edit_use_anchors_ = true
+
 [node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
 offset_left = 1592.0
 offset_top = 950.0
@@ -295,6 +293,7 @@ action_mode = 0
 texture_normal = ExtResource("13_w2mg8")
 texture_pressed = ExtResource("14_wbn2k")
 texture_hover = ExtResource("14_wbn2k")
+texture_disabled = ExtResource("16_dqw4y")
 script = ExtResource("15_o3rb6")
 
 [node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
@@ -323,7 +322,6 @@ mouse_filter = 2
 theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
-text = "[color=green]T[/color]"
 
 [node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
 layout_mode = 1
@@ -764,10 +762,8 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 layer = -1
 
 [node name="Background" type="TextureRect" parent="SpaceBackground"]
-offset_left = 23.0
-offset_top = 3.0
-offset_right = 2230.0
-offset_bottom = 1927.0
+offset_right = 2207.0
+offset_bottom = 1924.0
 texture = ExtResource("10_uvm3m")
 stretch_mode = 4
 

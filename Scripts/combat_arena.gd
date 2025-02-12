@@ -7,7 +7,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var FleetDeploymentList = %FleetDeploymentList
 @onready var OptionsMenuPanel = %OptionsMenuPanel 
 @onready var ManualControlHUD = %ManualControlHUD
-@onready var TacticalMap = %TacticalMap
+@onready var TacticalMap = %TacticalDataDrawing
 @onready var All = %All
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
@@ -24,7 +24,7 @@ func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
-	TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
+	#TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	

@@ -16,10 +16,10 @@ func _unhandled_input(event):
 
 func toggle_visible() -> void:
 	if visible == true:
-		%TacticalDataDrawing.display()
+		%TacticalDataDrawing.display_map(false)
 		visible = false
 	elif visible == false:
-		%TacticalDataDrawing.display()
+		%TacticalDataDrawing.display_map(true)
 		visible = true
 		$TacticalViewportContainer.grab_focus()
 		

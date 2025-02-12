@@ -22,6 +22,8 @@ func _ready() -> void:
 	CombatCamera.limit_left = -extra_bounds
 	CombatCamera.limit_right = map_bounds.x + extra_bounds
 	CombatCamera.limit_bottom = map_bounds.y + extra_bounds
+	if settings.dev_mode == true:
+		zoom_out_limit = Vector2(.01, .01)
 
 func _unhandled_input(event):
 	if not visible:

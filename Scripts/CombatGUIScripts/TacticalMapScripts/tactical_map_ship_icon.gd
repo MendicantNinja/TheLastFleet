@@ -9,7 +9,7 @@ func _ready():
 	pass # Replace with function body.
 
 func _toggled(toggled_on: bool) -> void:
-	print("toggled called ", toggled_on)
+	#print("toggled called ", toggled_on)
 	if toggled_on == true:
 		Outline.button_pressed = true
 	else:

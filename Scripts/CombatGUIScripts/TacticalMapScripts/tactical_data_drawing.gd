@@ -36,6 +36,7 @@ var highlight_group_name: StringName = &"friendly selection"
 var highlight_enemy_name: StringName = &"enemy selection"
 var current_group_name: StringName = &""
 var prev_selected_ship: Ship = null
+var single_ship: Ship = null # For manual control and vid feed
 var attack_group: bool = false
 
 signal switch_maps()
@@ -53,7 +54,6 @@ func _ready():
 
 func _unhandled_input(event) -> void:
 	if event is InputEventMouseButton:
-		
 		if Input.is_action_just_pressed("select"):
 			box_selection_start = get_global_mouse_position()
 		elif Input.is_action_just_released("select") and box_selection_end != Vector2.ZERO:
@@ -69,12 +69,44 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_pressed("camera action"):
 			#print("subviewport input event mouse button called to pan")
 			TacticalCamera.position -= event.relative / TacticalCamera.zoom
+	elif event is InputEventKey:
+		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
+		#if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
+				#toggle_manual_control()
+		if event.keycode == KEY_TAB and event.pressed:
+			switch_maps.emit()
+		if Input.is_action_pressed("alt_select") and  Input.is_action_pressed("select") and highlighted_group.size() > 0:
+			attack_group = true
+			selection_line_color = Color(Color.CRIMSON)
+			queue_redraw()
+		elif Input.is_action_just_released("alt_select"):
+			if highlighted_group.size() > 0 and highlighted_enemy_group.size() > 0:
+				attack_targets()
+			attack_group = false
+			selection_line_color = settings.gui_color
+			queue_redraw()
 
-
-func display() -> void:
-	TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
-	TacticalMapCamera.zoom = Vector2(.15, .15)
-	setup()
+func display_map(map_value: bool) -> void:
+	# Show the Tac Map
+	if map_value == true:
+		%TacticalMapLayer.visible = true
+		TacticalCamera.enabled = true
+		TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
+		TacticalMapCamera.zoom = Vector2(.15, .15)
+		setup()
+	# Hide the Tac Map
+	elif map_value == false:
+		%TacticalMapLayer.visible = false
+		TacticalCamera.enabled = false
+		attack_group = false
+	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
+	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
+	connect_unit_signals(friendly_group)
+	connect_unit_signals(enemy_group)
+	
+	get_tree().call_group("enemy", "display_icon", visible)
+	get_tree().call_group("friendly", "display_icon", visible)
 
 func setup() -> void:
 	#ship_registry.clear()
@@ -95,6 +127,10 @@ func setup() -> void:
 
 func update() -> void:
 	#print("update")
+	if prev_selected_ship != null: 
+		print("disabling buttons")
+		$"../../../ButtonList/ManualControlButton".disabled = true
+		$"../../../ButtonList/CameraFeedButton".disabled = true
 	for icon in icon_list:
 		icon.position = convert_position(icon.assigned_ship.global_position, map_bounds, grid_size)
 
@@ -149,7 +185,7 @@ func get_icons_in_box_selection(rect: Rect2) -> Array[TacticalMapIcon]:
 	return selected_controls
 	
 func select_units() -> void:
-	#print("select_units called")
+	print("select_units called")
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
@@ -185,8 +221,8 @@ func select_units() -> void:
 		elif ship.is_friendly and attack_group == false:
 			ship.add_to_group(highlight_group_name)
 	#add in when adding back attack
-	#if attack_group:
-		#attack_targets()
+	if attack_group:
+		attack_targets()
 	# Whatever is still selected, highlight it.
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 	
@@ -208,7 +244,150 @@ func reset_box_selection() -> void:
 	box_selection_end = Vector2.ZERO
 	queue_redraw()
 
-func stress_testing():
+func attack_targets() -> void:
+	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	var targeted_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
+	var target_group_key: StringName = &" targets"
+	var target_key: StringName = &"target"
+	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
+	
+	var funny_pair: Array = current_groups.values()
+	var existing_group: Array = []
+	for pair in funny_pair:
+		if highlighted_group == pair:
+			existing_group = pair
+	
+	# Alt select and select_units causes a multitude of problems I can't bother to fix.
+	if not existing_group.is_empty():
+		var leader = null
+		for unit in existing_group:
+			if unit.group_leader == true:
+				leader = unit
+		var key_copy: StringName = leader.group_name + target_group_key
+		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
+		if targeted_group == targets_available:
+			return
+	
+	var group_leaders: Array = []
+	for unit in highlighted_group:
+		if unit.group_leader:
+			group_leaders.push_back(unit)
+	
+	reset_group_affiliation(highlighted_group)
+	
+	var leader: Ship = null
+	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
+		leader = highlighted_group[0]
+	
+	if highlighted_group.size() > 2:
+		var unit_positions: Dictionary = {}
+		for unit in highlighted_group:
+			unit_positions[unit.global_position] = unit
+		
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		leader = globals.find_unit_nearest_to_median(median, unit_positions)
+
+# Takes a group of recently selected ships and creates a new group for them.
+func reset_group_affiliation(group_select: Array) -> void:
+	# removes them if they're already in a group. removes leader status ofc
+	for unit: Ship in group_select:
+		unit.remove_from_group(unit.group_name)
+		var affiliated_group: Array = get_tree().get_nodes_in_group(unit.group_name)
+		if unit.group_leader == true and affiliated_group.size() > 0:
+			globals.reset_group_leader(unit)
+		elif unit.group_leader == true:
+			unit.set_group_leader(false)
+		unit.group_name = &""
+	var count_down: int = taken_group_names.size() - 1
+	for group_idx in range(count_down, -1, -1):
+		var group_name: StringName = taken_group_names[group_idx]
+		var group: Array = get_tree().get_nodes_in_group(group_name)
+		if group.is_empty():
+			taken_group_names.remove_at(group_idx)
+			available_group_names.push_back(group_name)
+	
+func _on_alt_select(ship: Ship) -> void:
+	if not visible:
+		return
+	
+	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	var highlighted_enemies: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
+	
+	reset_box_selection()
+	var highlight_value: bool = false
+	if highlighted_group.is_empty() and ship.is_friendly: # initial set up
+		highlight_value = true
+		ship.highlight_selection(highlight_value)
+		ship.add_to_group(highlight_group_name)
+		return
+	elif highlighted_enemies.is_empty() and not ship.is_friendly:
+		highlight_value = true
+		ship.highlight_selection(highlight_value)
+		ship.add_to_group(highlight_enemy_name)
+		return
+	
+	if ship.is_friendly and not highlighted_group.is_empty():
+		if not highlighted_group.has(ship):
+			ship.add_to_group(highlight_group_name)
+			highlight_value = true
+		elif highlighted_group.has(ship):
+			ship.remove_from_group(highlight_group_name)
+	
+	if not ship.is_friendly and not highlighted_group.is_empty():
+		if not highlighted_enemies.has(ship):
+			ship.add_to_group(highlight_enemy_name)
+			highlight_value = true
+		elif highlighted_enemies.has(ship):
+			ship.remove_from_group(highlight_enemy_name)
+	
+	if highlighted_enemies.is_empty():
+		attack_group = false
+	elif not highlighted_enemies.is_empty():
+		attack_group = true
+	
+	ship.highlight_selection(highlight_value)
+
+func _on_unit_selected(unit: Ship) -> void:
+	print("unit selected called")
+	get_viewport().set_input_as_handled()
+	
+	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
+	if current_selection.size() > 1 and unit != prev_selected_ship:
+		if unit.group_leader == true:
+			globals.reset_group_leader(unit)
+	
+	get_tree().call_group(highlight_group_name, "highlight_selection", false)
+	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
+	
+	if prev_selected_ship == unit:
+		unit.highlight_selection(false)
+		prev_selected_ship = null
+		return
+	
+	unit.add_to_group(highlight_group_name)
+	unit.highlight_selection(true)
+	prev_selected_ship = unit
+	reset_box_selection()
+
+func connect_unit_signals(units: Array) -> void:
+	for n_unit in units:
+		if n_unit == null:
+			continue
+		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
+			n_unit.switch_to_manual.connect(_on_switched_to_manual)
+			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
+		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
+
+func _on_switched_to_manual() -> void:
+	if not visible:
+		return
+	switch_maps.emit()
+	reset_box_selection()
+
+# I could make this a global with a callable as the parameter.
+func performance_testing():
 	var start:int
 	var end:int
 	start = Time.get_ticks_msec()

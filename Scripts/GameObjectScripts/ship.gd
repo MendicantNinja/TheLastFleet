@@ -126,7 +126,7 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
-	print("deploy ship called")
+	#print("deploy ship called")
 	$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
 	OldTacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png")
 	OldTacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png")
@@ -161,7 +161,6 @@ func _ready() -> void:
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
-
 	
 	var repath_shape: Shape2D = CircleShape2D.new()
 	repath_shape.radius = ShipNavigationAgent.radius
@@ -366,7 +365,7 @@ func group_remove(n_group_name: StringName) -> void:
 		group_leader = false
 	if n_group_name == group_name:
 		group_name = &""
-	print("%s removed from %s" % [name, n_group_name])
+	#print("%s removed from %s" % [name, n_group_name])
 	remove_from_group(n_group_name)
 
 func group_add(n_group_name: StringName) -> void:
@@ -375,12 +374,12 @@ func group_add(n_group_name: StringName) -> void:
 			continue
 		weapon_slot.set_auto_aim(true)
 		weapon_slot.set_auto_fire(true)
-	print("%s added to %s" % [name, n_group_name])
+	#print("%s added to %s" % [name, n_group_name])
 	group_name = n_group_name
 	add_to_group(group_name)
 
 func set_group_leader(leader_value: bool) -> void:
-	print("%s made leader of %s" % [name, group_name])
+	#print("%s made leader of %s" % [name, group_name])
 	group_leader = leader_value
 
 func set_idle_flag(value: bool) -> void:
@@ -428,7 +427,7 @@ func _input(event: InputEvent) -> void:
 			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
 				toggle_manual_control()
 				ManualControlHUD.toggle_visible()
-				camera_removed.emit()
+				#camera_removed.emit()
 		elif not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
@@ -440,15 +439,16 @@ func _input(event: InputEvent) -> void:
 				ShipTargetIcon.visible = true
 
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	# This may end up disrupting drag by handling the input too early. Look for a manual "input == not handled" function later if needed.
-	if event is InputEventMouseButton:
-		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
-			alt_select.emit()
-			return
-		if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
-			ship_select = true # select ship
-		elif Input.is_action_just_pressed("select") and is_friendly and ship_select:
-			ship_select = false # deselect ship
+	#
+	#if event is InputEventMouseButton:
+		#if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
+			#alt_select.emit()
+			#return
+		##if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
+			##ship_select = true # select ship
+		##elif Input.is_action_just_pressed("select") and is_friendly and ship_select:
+			##ship_select = false # deselect ship
+	pass
 
 func _on_mouse_entered() -> void:
 	mouse_hover = true
@@ -471,6 +471,7 @@ func highlight_selection(select_value: bool = false) -> void:
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:
+	# NOTE: Toggle manual aim is set to false in combat_map.gd in set_manual_camera
 	if ship_select == false:
 		manual_control = false
 		CombatBehaviorTree.toggle_root(true)
@@ -607,11 +608,8 @@ func _physics_process(delta: float) -> void:
 		if ManualControlHUD.current_ship == self:
 			ManualControlHUD.update_hud()
 		if manual_camera_freelook == false:
-			
 			CombatCamera.global_position = self.global_position
 		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-		# if one wants to make the manually controlled hud less transparent than friendly ships
-		pass
 	
 	if manual_control and Input.is_action_pressed("vent_flux"):
 		if soft_flux > 0.0:
