@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=30 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
@@ -10,11 +10,13 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="6_26ar5"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/dynamic_avoidance.gd" id="7_3duk1"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="7_s3gj3"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="8_nukju"]
 [ext_resource type="Script" path="res://Scenes/CompositeGameObjects/Ships/pursue.gd" id="8_tdgqp"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="9_rp377"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
+[ext_resource type="Script" path="res://Scenes/CompositeGameObjects/Ships/chill.gd" id="10_c0vxc"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
@@ -66,11 +68,11 @@ script = ExtResource("4_yl4qo")
 [node name="combat" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
 
-[node name="choose target" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("8_nukju")
-
 [node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("6_26ar5")
+
+[node name="choose target" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("8_nukju")
 
 [node name="combat steering" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
@@ -78,11 +80,17 @@ script = ExtResource("4_qjhaj")
 [node name="pursue" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("8_tdgqp")
 
-[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("7_3duk1")
-
 [node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("9_rp377")
+
+[node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("7_s3gj3")
+
+[node name="chill" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("10_c0vxc")
+
+[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("7_3duk1")
 
 [node name="navigation" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
@@ -130,9 +138,6 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="NavigationTimer" type="Timer" parent="."]
-wait_time = 3.0
-
 [node name="ShieldSlot" type="Node2D" parent="."]
 script = ExtResource("5_v4g3k")
 
@@ -144,6 +149,10 @@ input_pickable = false
 [node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
 shape = SubResource("CircleShape2D_vu5jp")
 debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
+
+[node name="CombatTimer" type="Timer" parent="."]
+process_callback = 0
+wait_time = 2.0
 
 [node name="CenterCombatHUD" type="Control" parent="."]
 top_level = true
@@ -287,4 +296,4 @@ stretch_mode = 0
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
-[connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]
+[connection signal="timeout" from="CombatTimer" to="." method="_on_CombatTimer_timeout"]

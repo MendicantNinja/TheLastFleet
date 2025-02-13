@@ -6,13 +6,14 @@ var delta: float = 0.0
 var time: float = 0.0
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.target_unit == null:
-		return SUCCESS
+	if agent.retreat_flag == true:
+		return FAILURE
 	
-	if delta == 0.0:
-		delta = get_physics_process_delta_time()
+	if agent.target_unit == null:
+		return FAILURE
 	
 	if threat_radius == 0.0:
+		delta = get_physics_process_delta_time()
 		var radius: int = agent.template_maps[imap_manager.MapType.THREAT_MAP].width
 		threat_radius = (radius * imap_manager.default_cell_size) * 0.5
 	

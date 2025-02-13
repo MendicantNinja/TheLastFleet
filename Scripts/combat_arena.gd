@@ -17,7 +17,8 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = false
+var debug_imap: bool = true
+var battle_over: bool = false
 var imap_debug_grid: Array
 
 func _ready() -> void:
@@ -44,10 +45,10 @@ func _ready() -> void:
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:
-		influence_map.update_grid_value.connect(_on_grid_value_changed)
-		influence_map.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = influence_map.map_grid.size()
-		var grid_column_size: int = influence_map.map_grid[0].size()
+		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
+		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = vulnerability_map.map_grid.size()
+		var grid_column_size: int = vulnerability_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -55,7 +56,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(influence_map.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
@@ -82,7 +83,10 @@ func _unhandled_input(event) -> void:
 			toggle_options_menu()
 
 func _physics_process(delta):
-	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 70 == 0:
+	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):
+		battle_over = true
+	
+	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 70 == 0 and battle_over == false:
 		imap_manager.weigh_force_density()
 
 func toggle_fleet_deployment_panel() -> void:

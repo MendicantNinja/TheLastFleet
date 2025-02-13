@@ -2,6 +2,8 @@ extends LeafAction
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.target_unit != null:
+		if agent.target_position != Vector2.ZERO:
+			agent.target_position = Vector2.ZERO
 		return SUCCESS
 	
 	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO:

@@ -14,20 +14,16 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	agent.heur_velocity = velocity
 	
 	if threat_radius == 0.0:
+		delta = get_physics_process_delta_time()
 		var radius: int = agent.template_maps[imap_manager.MapType.THREAT_MAP].width
 		threat_radius = (radius * imap_manager.default_cell_size) * target_coefficient
-	
-	if delta == 0.0:
-		delta = get_physics_process_delta_time()
 	
 	if agent.group_leader == false and agent.target_position != target_position:
 		target_position = agent.target_position
 	elif agent.group_leader == true and target_position != agent.target_position:
-		if imap_manager.working_maps.has(agent.group_name):
-			imap_manager.working_maps.erase(agent.group_name)
+		target_position = agent.target_position
 		
 		if not imap_manager.working_maps.has(agent.group_name):
-			imap_manager.working_maps.erase(agent.group_name)
 			var cell = Vector2i(agent.target_position.y / imap_manager.default_cell_size, agent.target_position.x / imap_manager.default_cell_size)
 			var height: int = default_radius * imap_manager.default_cell_size
 			var width: int = default_radius * imap_manager.default_cell_size
@@ -35,7 +31,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			working_map.map_type = imap_manager.MapType.INFLUENCE_MAP
 			imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP].add_into_map(working_map, cell.y, cell.x)
 			imap_manager.working_maps[agent.group_name] = working_map
-		target_position = agent.target_position
 	
 	var direction_to_path: Vector2 = agent.global_position.direction_to(target_position)
 	var transform_look_at: Transform2D = agent.transform.looking_at(target_position)

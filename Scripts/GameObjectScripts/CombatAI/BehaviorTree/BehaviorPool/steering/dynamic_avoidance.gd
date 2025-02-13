@@ -9,13 +9,12 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.linear_velocity == Vector2.ZERO:
 		return FAILURE
 	
+	if delta == 0.0:
+		delta = get_physics_process_delta_time()
+	
 	var neighbor_units: Array = agent.neighbor_units
 	if neighbor_units.is_empty():
 		return FAILURE
-	
-	var direction_to_path: Vector2 = agent.global_position.direction_to(agent.target_position)
-	var transform_look_at: Transform2D = agent.transform.looking_at(agent.target_position)
-	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.ship_stats.turn_rate * delta)
 	
 	var group: Array = get_tree().get_nodes_in_group(agent.group_name)
 	var avoid_vel: Dictionary = {}
@@ -42,5 +41,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		return FAILURE
 	
 	var new_velocity: Vector2 = avoid_vel[avoid_vel.keys().min()]
+	agent.heur_velocity = new_velocity
 	agent.acceleration = new_velocity
 	return SUCCESS

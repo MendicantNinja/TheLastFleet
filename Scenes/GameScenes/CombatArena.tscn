@@ -562,25 +562,25 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7250, 5125)
+position = Vector2(6375, 3000)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8250, 5125)
+position = Vector2(6750, 3000)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7710, 5469)
+position = Vector2(6375, 3500)
 
 [node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(12670, 6000)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5989, 1615)
+position = Vector2(6000, 3000)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4500, 5125)
+position = Vector2(6000, 3500)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8679, 5539)
+position = Vector2(6750, 3500)
 
 [node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(9250, 12000)

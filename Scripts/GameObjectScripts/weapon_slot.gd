@@ -62,11 +62,11 @@ signal threat_exited(targets)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
-	if flux_overload or not can_fire:
+	if flux_overload or can_fire == false:
 		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return
-	if manual_aim and not can_look_at:
+	if manual_aim and can_look_at == false:
 		return
 	
 	if weapon.flux_per_shot > 0.0:
@@ -281,6 +281,7 @@ func acquire_new_target() -> void:
 	var rand_key_number: int = randi_range(0, taq_range)
 	var new_target_id: RID = ship_ids[rand_key_number]
 	var ship_instance: Ship = available_targets[new_target_id]
+	target_unit = ship_instance.get_rid()
 	killcast.target_position = to_local(ship_instance.global_position)
 	killcast.force_raycast_update()
 
@@ -308,7 +309,7 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	return target_transform
 
 func _physics_process(delta) -> void:
-	if flux_overload:
+	if flux_overload == true:
 		return
 	if manual_aim:
 		var mouse_position = to_local(get_global_mouse_position())
@@ -323,28 +324,18 @@ func _physics_process(delta) -> void:
 func update_killcast(delta) -> void:
 	if available_targets.is_empty():
 		killcast.queue_free()
-		return
+	
+	var target_position: Vector2 = Vector2.ZERO
+	if target_unit != null and available_targets.has(target_unit):
+		target_position = to_local(available_targets[target_unit].global_position)
+	
 	var collider = killcast.get_collider()
 	if not collider is Ship: # Do not shoot at obstacles
 		can_look_at = false
 		return
+	
 	if collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
-		can_look_at = false
 		return
-	
-	current_target_id = collider.get_rid()
-	var ship_position: Vector2 = to_local(collider.global_position)
-	if target_engaged and current_target_id != target_unit:
-		if not available_targets.has(target_unit):
-			return
-		var target_position: Vector2 = to_local(available_targets[target_unit].global_position)
-		ship_position = target_position
-		current_target_id = target_unit
-		killcast.target_position = ship_position
-		killcast.force_raycast_update()
-		return
-	
-	killcast.target_position = ship_position
 	
 	if (auto_aim or auto_fire):
 		var face_direction: Transform2D = face_weapon(killcast.target_position)
@@ -353,5 +344,9 @@ func update_killcast(delta) -> void:
 	if can_look_at and can_fire and auto_fire:
 		fire(owner_rid.get_id())
 	
-	if can_look_at == false and available_targets.size() > 1:
+	if target_unit == null and available_targets.size() > 1:
 		acquire_new_target()
+		return
+	
+	killcast.target_position = target_position
+	killcast.force_raycast_update()

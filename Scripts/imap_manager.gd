@@ -186,10 +186,10 @@ func weigh_force_density() -> void:
 		enemy_neighborhood_density[cell] = weight_density
 	
 	if weighted_enemy.values() != enemy_neighborhood_density.values() or weighted_enemy.keys() != enemy_neighborhood_density.keys():
-		get_tree().call_group(&"friendly", "weigh_composite_influence", friendly_neighborhood_density)
+		get_tree().call_group(&"enemy", "weigh_composite_influence", enemy_neighborhood_density)
 		weighted_enemy = enemy_neighborhood_density
 	if weighted_friendly.values() != friendly_neighborhood_density.values() or weighted_friendly.keys() != friendly_neighborhood_density.keys():
-		get_tree().call_group(&"enemy", "weigh_composite_influence", enemy_neighborhood_density)
+		get_tree().call_group(&"friendly", "weigh_composite_influence", friendly_neighborhood_density)
 		weighted_friendly = friendly_neighborhood_density
 
 func flood_fill(cell, visited, cluster, object_presence) -> Array: 

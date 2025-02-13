@@ -2,7 +2,6 @@ extends RigidBody2D
 class_name Ship
 
 @onready var ShipNavigationAgent = $ShipNavigationAgent
-@onready var NavigationTimer = $NavigationTimer
 @onready var ShipSprite = $ShipSprite
 @onready var AvoidanceArea = $AvoidanceArea
 @onready var AvoidanceShape = $AvoidanceArea/AvoidanceShape
@@ -22,6 +21,7 @@ class_name Ship
 @onready var TacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
+@onready var CombatTimer = $CombatTimer
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -71,11 +71,11 @@ var group_leader: bool = false
 var group_transform: Transform2D = Transform2D.IDENTITY
 var group_velocity: Vector2 = Vector2.ZERO
 var posture: globals.Strategy = globals.Strategy.NEUTRAL
-var idle: bool = true
 
 # Used for combat AI / behavior tree / influence map
 var template_maps: Dictionary = {}
 var template_cell_indices: Dictionary = {}
+var working_map: Imap = null
 var hueristic_strat: int = 0
 var target_in_range: bool = false
 var imap_cell: Vector2i = Vector2i.ZERO
@@ -92,6 +92,8 @@ var targeted_by: Array = []
 var avoid_flag: bool = false
 var brake_flag: bool = false
 var retreat_flag: bool = false
+var combat_flag: bool = false
+var vent_flux_flag: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
@@ -191,16 +193,15 @@ func _ready() -> void:
 		add_to_group(&"friendly")
 		is_friendly = true
 		rotation -= PI/2
-		CombatBehaviorTree.toggle_root(false)
 	else:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
 		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"enemy")
-		CombatBehaviorTree.toggle_root(true)
 		rotation += PI/2
-	
+
+	CombatBehaviorTree.toggle_root(true)
 	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	for map in template_maps.values():
@@ -252,9 +253,8 @@ func _ready() -> void:
 	self.mouse_exited.connect(_on_mouse_exited)
 
 func process_damage(projectile: Projectile) -> void:
-	if CombatBehaviorTree.enabled == false:
-		CombatBehaviorTree.enabled = true
-	
+	combat_flag = true
+	CombatTimer.start()
 	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
 	armor -= armor_damage_reduction
 	var hull_damage: float = armor_damage_reduction * projectile.damage
@@ -297,14 +297,16 @@ func destroy_ship() -> void:
 	queue_free()
 
 func toggle_shield() -> void:
-	if not shield_toggle and flux_overload:
+	if shield_toggle == false and flux_overload:
+		return
+	elif vent_flux_flag == true:
 		return
 	
-	if not shield_toggle:
+	if shield_toggle == false:
 		shield_toggle = true
 		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
 		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	elif shield_toggle:
+	elif shield_toggle == true:
 		shield_toggle = false
 		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
@@ -320,20 +322,24 @@ func set_shields(value: bool) -> void:
 
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
+	combat_flag = true
+	CombatTimer.start()
 	update_flux_indicators()
 
 func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 	hard_flux += damage * ship_stats.shield_efficiency
+	combat_flag = true
+	CombatTimer.start()
 	update_flux_indicators()
 
 func update_flux_indicators() -> void:
 	var current_flux: float = soft_flux + hard_flux
-	if current_flux >= total_flux and not flux_overload:
+	if current_flux >= total_flux and flux_overload == false:
 		flux_overload = true
 		for weapon in all_weapons:
 			weapon.update_flux_overload(flux_overload)
 		return
-	elif current_flux < total_flux and flux_overload:
+	elif current_flux < total_flux and flux_overload == true and vent_flux_flag == false:
 		flux_overload = false
 		for weapon in all_weapons:
 			weapon.update_flux_overload(flux_overload)
@@ -372,9 +378,6 @@ func group_add(n_group_name: StringName) -> void:
 func set_group_leader(value: bool) -> void:
 	print("%s made leader of %s" % [name, group_name])
 	group_leader = value
-
-func set_idle_flag(value: bool) -> void:
-	idle = value
 
 func set_posture(value: globals.Strategy) -> void:
 	posture = value
@@ -571,15 +574,14 @@ func _physics_process(delta: float) -> void:
 		for unit in targeted_by:
 			if unit == null:
 				targeted_by.erase(unit)
-
-	#if Engine.get_physics_frames() % 30 == 0:
-		#var area_registry = AvoidanceArea.get_overlapping_bodies()
-		#neighbor_units.clear()
-		#for body in area_registry:
-			#if body == self:
-				#continue
-			#if body not in neighbor_units:
-				#neighbor_units.append(body)
+	
+	if vent_flux_flag == true:
+		for weapon in all_weapons:
+			weapon.flux_overload = true
+	elif vent_flux_flag == false and flux_overload == false:
+		for weapon in all_weapons:
+			if weapon.flux_overload == true:
+				weapon.flux_overload = false
 	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
@@ -612,20 +614,23 @@ func _physics_process(delta: float) -> void:
 		#ShipNavigationAgent.set_target_position(position)
 	
 	if Input.is_action_pressed("vent flux"):
+		vent_flux_flag = true
 		if soft_flux > 0.0:
 			soft_flux -= ship_stats.flux_dissipation
 		elif hard_flux > 0.0:
 			hard_flux -= ship_stats.flux_dissipation
 		update_flux_indicators()
+	elif Input.is_action_just_released("vent flux"):
+		vent_flux_flag = false
 	
-	if Input.is_action_pressed("select") and not flux_overload:
+	if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
 		fire_weapon_system(all_weapons)
 	
-	if shield_toggle and not flux_overload:
+	if shield_toggle == true and flux_overload == false:
 		soft_flux += shield_upkeep
 		update_flux_indicators()
-	elif shield_toggle and flux_overload:
-		toggle_shield()
+	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
+		set_shields(false)
 	
 	#if ManualControlCamera.zoom != zoom_value:
 		#ManualControlCamera.zoom = lerp(ManualControlCamera.zoom, zoom_value, 0.5)
@@ -680,7 +685,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		speed_modifier += zero_flux_bonus
 	
 	if collision_flag == true and state.linear_velocity.length() < (speed + speed_modifier):
-		collision_flag == false
+		collision_flag = false
 		linear_damp = 0.0
 	elif collision_flag == true and state.linear_velocity.length() > (speed + speed_modifier):
 		linear_damp = 1.0
@@ -718,36 +723,8 @@ func remove_blackboard_data(key: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	blackboard.remove_data(key)
 
-func update_available_target_connections(target_group_key: StringName) -> void:
-	var blackboard = CombatBehaviorTree.blackboard
-	var target_key: StringName = &"target"
-	var available_targets: Array = []
-	
-	available_targets = blackboard.ret_data(target_group_key)
-	for target in available_targets:
-		if target == null:
-			continue
-		if not target.destroyed.is_connected(blackboard._on_target_destroyed):
-			target.destroyed.connect(blackboard._on_target_destroyed.bind(target, target_group_key, target_key))
-
 func set_targets(targets) -> void:
 	targeted_units = targets
-
-func find_closest_target(available_targets: Array) -> Ship:
-	var closest_target: Ship = null
-	var distances: Dictionary = {}
-	
-	for target in available_targets:
-		if target == null:
-			continue
-		var distance_to: float = position.distance_to(target.position)
-		distances[distance_to] = target
-	
-	if not distances.is_empty():
-		var shortest_distance: float = distances.keys().min()
-		closest_target = distances[shortest_distance]
-	
-	return closest_target
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
@@ -817,11 +794,6 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 	
 	return valid_paths
 
-func pick_path(valid_paths: Array[Vector2]) -> Vector2:
-	var valid_path_range: int = valid_paths.size() - 1
-	var random_entry: int = randi_range(0, valid_path_range)
-	return valid_paths[random_entry]
-
 func _on_AvoidanceShape_body_entered(body) -> void:
 	if body == self:
 		return
@@ -836,40 +808,11 @@ func _on_AvoidanceShape_area_entered(area) -> void:
 func _on_AvoidanceShape_area_exited(area) -> void:
 	incoming_projectiles.erase(area)
 
-func _on_NavigationTimer_timeout() -> void:
-	if ShipNavigationAgent.is_navigation_finished():
-		NavigationTimer.stop()
-		return
-	
-	var target_query: Dictionary = {}
-	var ship_query: Dictionary = {}
-	ship_query = collision_raycast(global_position, target_position, 7, true, false)
-	var sweep_vectors: Array[Vector2] = []
-	if not ship_query.is_empty():
-		var collider_instance: Node = instance_from_id(ship_query["collider_id"])
-		var collider_center: Vector2 = collider_instance.global_position
-		target_query = collision_raycast(target_position, collider_center, 7, true, false)
-		var start_angle: float = -PI/8
-		var increment_angle: float = PI/64
-		var sweep_range: int = 16
-		sweep_vectors = radial_vector_sweep(ship_query, target_query, start_angle, increment_angle, sweep_range)
-	
-	if sweep_vectors.is_empty():
-		ShipNavigationAgent.set_target_position(target_position)
-		return
-	
-	var valid_paths: Array[Vector2] = raycast_sweep(sweep_vectors, target_position)
-	if not ship_query.is_empty() and valid_paths.is_empty():
-		valid_paths = raycast_sweep(sweep_vectors, global_position)
-	elif not valid_paths.is_empty():
-		ShipNavigationAgent.set_target_position(pick_path(valid_paths))
-
-func _on_ShipNavigationAgent_velocity_computed(safe_velocity):
-	if safe_velocity == Vector2.ZERO:
-		return
-
 func _on_body_entered(body):
 	if target_position != Vector2.ZERO:
 		return
 	collision_flag = true
 	linear_damp = 1.0
+
+func _on_CombatTimer_timeout():
+	combat_flag = false

@@ -150,7 +150,8 @@ func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitu
 	
 	# Locate the upper left corner of where we are pushing into the new map
 	# Offset is to allow center points that are off this current map --
-	# This allows bleed over from adjacet influence maps
+	# This allows bleed over from adjacent influence maps
+	# The right shift operator essentially divides the length by a power of two
 	var start_column: int = center_column + offset_column - (target_map.width >> 1)
 	var start_row: int = center_row + offset_row - (target_map.height >> 1)
 	
