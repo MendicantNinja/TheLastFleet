@@ -139,6 +139,7 @@ shape = SubResource("RectangleShape2D_nv86b")
 debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="CombatMap" type="Node2D" parent="."]
+unique_name_in_owner = true
 script = ExtResource("2_moq8i")
 
 [node name="CombatCamera" type="Camera2D" parent="CombatMap"]
@@ -352,6 +353,7 @@ action_mode = 0
 texture_normal = ExtResource("13_w2mg8")
 texture_pressed = ExtResource("14_wbn2k")
 texture_hover = ExtResource("14_wbn2k")
+texture_disabled = ExtResource("16_dqw4y")
 script = ExtResource("20_ebklc")
 
 [node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]

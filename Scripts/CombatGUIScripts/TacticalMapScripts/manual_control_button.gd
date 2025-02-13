@@ -2,7 +2,7 @@ extends TextureButton
 @onready var KeyBinding: RichTextLabel = $Keybinding
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	var binding_name = globals.convert_input_to_string(&"take_control", "green")
+	var binding_name = globals.convert_input_to_string(&"take_manual_control", "green")
 	$Keybinding.text = binding_name
 
 func _pressed() -> void:

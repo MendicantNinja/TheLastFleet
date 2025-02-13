@@ -21,7 +21,7 @@ func toggle_visible() -> void:
 	elif visible == false:
 		%TacticalDataDrawing.display_map(true)
 		visible = true
-		$TacticalViewportContainer.grab_focus()
+		#$TacticalViewportContainer.grab_focus()
 		
 # Called when the node enters the scene tree for the first time.
 func _ready():

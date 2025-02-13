@@ -12,6 +12,7 @@ var zoom_min: Vector2 = Vector2(1.5, 1.5)
 var zoom_value: Vector2 = Vector2.ONE
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
+
 signal switch_maps()
 
 func _ready() -> void:
@@ -44,6 +45,7 @@ func _unhandled_input(event):
 	#on middle mouse button released
 	elif event is InputEventKey:
 		if event.keycode == KEY_TAB and event.pressed:
+			print("combat map tab key pressed")
 			switch_maps.emit()
 
 func _physics_process(delta) -> void:
@@ -69,9 +71,3 @@ func set_manual_camera(unit: Ship) -> void:
 		manually_controlled_unit.toggle_manual_control()
 		manually_controlled_unit.toggle_manual_aim(manually_controlled_unit.all_weapons, false) # Needed to shut off weapons because the code is fucked.
 	manually_controlled_unit = unit # Discards the old unit, brings in the new.
-#
-#func _on_camera_removed(n_zoom_value: Vector2, offset: Vector2, unit: Ship) -> void:
-	#CombatCamera.enabled = true
-	#CombatCamera.position = offset/2
-	#zoom_value = n_zoom_value
-	#unit.camera_removed.disconnect(_on_camera_removed)

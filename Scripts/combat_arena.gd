@@ -105,10 +105,9 @@ func _on_switch_maps() -> void:
 	if CombatMap.visible:
 		CombatMap.display_map(false)
 		TacticalMap.display_map(true)
-	elif TacticalMap.visible:
+	elif %TacticalMapLayer.visible:
 		CombatMap.display_map(true)
 		TacticalMap.display_map(false)
-	
 	get_viewport().set_input_as_handled()
 
 func _on_grid_value_changed(m: int, n: int, value: float) -> void:

@@ -26,6 +26,8 @@ var selection_line_color: Color = Color8(75, 225, 25) #settings.gui_color
 var zoom_in_limit: Vector2 = Vector2(1.0, 1.0)
 var zoom_out_limit: Vector2 = Vector2(0.15, 0.15) 
 @onready var TacticalCamera: Camera2D = %TacticalMapCamera
+var camera_feed_active: bool = false
+var camera_feed_ship: Ship = null # For vid feed
 
 # Group Creation
 var group_iterator: int = 0
@@ -35,8 +37,9 @@ var current_groups: Dictionary = {}
 var highlight_group_name: StringName = &"friendly selection"
 var highlight_enemy_name: StringName = &"enemy selection"
 var current_group_name: StringName = &""
-var prev_selected_ship: Ship = null
-var single_ship: Ship = null # For manual control and vid feed
+var prev_selected_ship: Ship = null  # Now for manual control 
+
+
 var attack_group: bool = false
 
 signal switch_maps()
@@ -67,16 +70,22 @@ func _unhandled_input(event) -> void:
 			box_selection_end = get_global_mouse_position()
 			queue_redraw()
 		elif Input.is_action_pressed("camera action"):
-			#print("subviewport input event mouse button called to pan")
 			TacticalCamera.position -= event.relative / TacticalCamera.zoom
 	elif event is InputEventKey:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
-		#if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
-				#toggle_manual_control()
-		if event.keycode == KEY_TAB and event.pressed:
+		if Input.is_action_pressed("take_manual_control") and TacticalCamera.enabled and prev_selected_ship != null:
+				prev_selected_ship.toggle_manual_control()
+		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null and self.visible == true:
+			print("Camera feed called")
 			switch_maps.emit()
-		if Input.is_action_pressed("alt_select") and  Input.is_action_pressed("select") and highlighted_group.size() > 0:
+			#prev_selected_ship.toggle_camera_feed()
+			toggle_camera_feed_active()
+			if camera_feed_active == true:
+				swap_camera_feed(prev_selected_ship)
+		elif Input.is_action_pressed("toggle_map"):
+			switch_maps.emit()
+		elif Input.is_action_pressed("alt_select") and Input.is_action_pressed("select") and highlighted_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
 			queue_redraw()
@@ -87,19 +96,34 @@ func _unhandled_input(event) -> void:
 			selection_line_color = settings.gui_color
 			queue_redraw()
 
+func swap_camera_feed(ship: Ship) -> void:
+	#camera_feed_active = true
+	if camera_feed_ship != null:
+		camera_feed_ship.camera_feed = false
+	camera_feed_ship = ship
+	ship.camera_feed = true
+	
+
+func toggle_camera_feed_active() -> void:
+	if camera_feed_active == false:
+		camera_feed_active = true
+	elif camera_feed_active == true:
+		camera_feed_active = false
+
 func display_map(map_value: bool) -> void:
 	# Show the Tac Map
 	if map_value == true:
-		%TacticalMapLayer.visible = true
 		TacticalCamera.enabled = true
 		TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
 		TacticalMapCamera.zoom = Vector2(.15, .15)
 		setup()
+		%TacticalMapLayer.visible = true
 	# Hide the Tac Map
 	elif map_value == false:
-		%TacticalMapLayer.visible = false
 		TacticalCamera.enabled = false
 		attack_group = false
+		#$"../..".grab_focus()
+		%TacticalMapLayer.visible = false
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
 	connect_unit_signals(friendly_group)
@@ -109,7 +133,6 @@ func display_map(map_value: bool) -> void:
 	get_tree().call_group("friendly", "display_icon", visible)
 
 func setup() -> void:
-	#ship_registry.clear()
 	# Check if new ships have been added
 	var ship_arrays: Array = ship_dictionary.values()
 	for array in ship_arrays:
@@ -127,10 +150,12 @@ func setup() -> void:
 
 func update() -> void:
 	#print("update")
-	if prev_selected_ship != null: 
-		print("disabling buttons")
+	if prev_selected_ship == null: 
 		$"../../../ButtonList/ManualControlButton".disabled = true
 		$"../../../ButtonList/CameraFeedButton".disabled = true
+	else:
+		$"../../../ButtonList/ManualControlButton".disabled = false
+		$"../../../ButtonList/CameraFeedButton".disabled = false
 	for icon in icon_list:
 		icon.position = convert_position(icon.assigned_ship.global_position, map_bounds, grid_size)
 
@@ -172,7 +197,6 @@ func _draw():
 	
 	draw_rect(Rect2(start, end - start), selection_line_color, false, 6, true) 
 
-
 func get_icons_in_box_selection(rect: Rect2) -> Array[TacticalMapIcon]:
 	var selected_controls: Array[TacticalMapIcon] = []
 	# Iterate through all children recursively
@@ -184,8 +208,10 @@ func get_icons_in_box_selection(rect: Rect2) -> Array[TacticalMapIcon]:
 				selected_controls.append(control)
 	return selected_controls
 	
+	# Called only on box select
+
 func select_units() -> void:
-	print("select_units called")
+	#print("select_units called")
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
@@ -348,7 +374,7 @@ func _on_alt_select(ship: Ship) -> void:
 	ship.highlight_selection(highlight_value)
 
 func _on_unit_selected(unit: Ship) -> void:
-	print("unit selected called")
+	#print("on unit selected")
 	get_viewport().set_input_as_handled()
 	
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)

@@ -10,6 +10,7 @@ class_name Ship
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
+@onready var TacticalDataDrawing = %TacticalDataDrawing
 @onready var ManualControlHUD = null
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
@@ -54,6 +55,7 @@ var manual_control: bool = false:
 		elif value == true:
 			manual_control = true
 			ManualControlIndicator.visible = true
+var camera_feed: bool = false
 
 # Used for targeting and weapons.
 var weapon_systems: Array[WeaponSystem] = [
@@ -100,12 +102,9 @@ var target_position: Vector2 = Vector2.ZERO
 var ship_select: bool = false:
 	set(value):
 		if value == true: 
-			OldTacticalMapIcon.button_pressed = true # Pressed is solely for GUI effects (brighten) with regards to the TacMapIcon.
 			tactical_map_icon._toggled(value)
 			ship_select = value
-			
 		elif value == false:
-			OldTacticalMapIcon.button_pressed = false
 			tactical_map_icon._toggled(value)
 			ship_select = value
 		ship_selected.emit()
@@ -128,11 +127,6 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 func deploy_ship() -> void:
 	#print("deploy ship called")
 	$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
-	OldTacticalMapIcon.texture_normal = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png")
-	OldTacticalMapIcon.texture_pressed = load("res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship_selected.png")
-	var minimum_size = Vector2(RepathShape.shape.radius, RepathShape.shape.radius) * 2.0
-	OldTacticalMapIcon.custom_minimum_size = minimum_size + minimum_size * ShipSprite.scale
-	OldTacticalMapIcon.pivot_offset = Vector2(OldTacticalMapIcon.size.x/2, OldTacticalMapIcon.size.y/2)
 	
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	if get_tree().current_scene.name == "CombatArena":
@@ -417,18 +411,18 @@ func _input(event: InputEvent) -> void:
 		elif Input.is_action_just_pressed("zoom out") and manual_control and zoom_value > zoom_out_limit:
 			zoom_value -= Vector2(0.01, 0.01)
 	elif event is InputEventKey:
-		if is_friendly:
-			if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
-				toggle_manual_control()
+		pass
+		#if is_friendly:
+			#if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
+				#toggle_manual_control()
 			#elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				#toggle_auto_aim(all_weapons)
 			#elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				#toggle_auto_fire(all_weapons)
-			elif (event.keycode == KEY_TAB and event.pressed) and manual_control:
-				toggle_manual_control()
-				ManualControlHUD.toggle_visible()
+			#if (event.keycode == KEY_TAB and event.pressed) and manual_control:
+				#toggle_manual_control()
 				#camera_removed.emit()
-		elif not is_friendly: # for non-player/enemy ships
+		if not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
 				ShipTargetIcon.visible = false
@@ -438,16 +432,18 @@ func _input(event: InputEvent) -> void:
 				targeted = true
 				ShipTargetIcon.visible = true
 
+func toggle_ship_select() -> void:
+	if is_friendly and not ship_select:
+			ship_select = true # select ship
+	elif is_friendly and ship_select:
+			ship_select = false # deselect ship
+
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
 	#
 	#if event is InputEventMouseButton:
 		#if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
 			#alt_select.emit()
 			#return
-		##if Input.is_action_just_pressed("select") and is_friendly and not ship_select:
-			##ship_select = true # select ship
-		##elif Input.is_action_just_pressed("select") and is_friendly and ship_select:
-			##ship_select = false # deselect ship
 	pass
 
 func _on_mouse_entered() -> void:
@@ -479,6 +475,7 @@ func toggle_manual_control() -> void:
 	
 	if CombatBehaviorTree.enabled == true:
 		CombatBehaviorTree.toggle_root(false)
+	
 	if manual_control == false:
 		manual_control = true
 		ship_select = false
@@ -504,8 +501,12 @@ func toggle_manual_control() -> void:
 		ShipNavigationAgent.set_target_position(position)
 	
 	if manual_control == true:
+		ManualControlHUD.toggle_visible() # Bring up the ManualControlHUD CanvasLayer
 		switch_to_manual.emit() # Calls to Tactical Map to swap Camera and give a ship
 		request_manual_camera.emit() # Calls to combat map to switch the current/prev selected unit.
+
+# func remove_manual_view() -> void:
+# pass
 
 func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 	manual_camera_freelook = toggle_status
@@ -604,12 +605,20 @@ func _physics_process(delta: float) -> void:
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 	
-	if manual_control == true: 
+	if manual_control == true and %TacticalDataDrawing.camera_feed_active == false:
 		if ManualControlHUD.current_ship == self:
 			ManualControlHUD.update_hud()
 		if manual_camera_freelook == false:
 			CombatCamera.global_position = self.global_position
 		CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	
+	if camera_feed == true:
+		CombatCamera.position_smoothing_enabled = false
+		CombatCamera.global_position = self.global_position
+		if manual_camera_freelook == false:
+			pass
+		CombatCamera.position_smoothing_enabled = true
+	
 	
 	if manual_control and Input.is_action_pressed("vent_flux"):
 		if soft_flux > 0.0:
