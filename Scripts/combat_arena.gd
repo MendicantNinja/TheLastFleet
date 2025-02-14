@@ -25,7 +25,6 @@ func _ready() -> void:
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
 	#TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	
 	#occupancy_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
@@ -102,11 +101,11 @@ func toggle_options_menu() -> void:
 		OptionsMenuPanel.visible = false
 
 func _on_switch_maps() -> void:
-	if CombatMap.visible:
-		CombatMap.display_map(false)
+	if %TacticalMapLayer.visible == false:
+		#CombatMap.display_map(false)
 		TacticalMap.display_map(true)
 	elif %TacticalMapLayer.visible:
-		CombatMap.display_map(true)
+		#CombatMap.display_map(true)
 		TacticalMap.display_map(false)
 	get_viewport().set_input_as_handled()
 

@@ -27,7 +27,7 @@ func _ready() -> void:
 		zoom_out_limit = Vector2(.01, .01)
 
 func _unhandled_input(event):
-	if not visible:
+	if %TacticalMapLayer.visible:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("zoom in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
@@ -39,13 +39,13 @@ func _unhandled_input(event):
 	elif event is InputEventMouseMotion:
 		#Middle Mouse Button Scrolling
 		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
+			print(manually_controlled_unit)
 			CombatCamera.global_position -= event.relative / CombatCamera.zoom
 			if manually_controlled_unit != null:
 				manually_controlled_unit.toggle_manual_camera_freelook(true)
 	#on middle mouse button released
 	elif event is InputEventKey:
 		if event.keycode == KEY_TAB and event.pressed:
-			print("combat map tab key pressed")
 			switch_maps.emit()
 
 func _physics_process(delta) -> void:
@@ -54,17 +54,15 @@ func _physics_process(delta) -> void:
 
 func display_map(map_value: bool) -> void:
 	if map_value == true:
-		visible = true
 		CombatCamera.enabled = true
 		
 	elif map_value == false:
-		visible = false
 		CombatCamera.enabled = false
 		
-	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
-	for ship in friendly_group:
-		if not ship.request_manual_camera.is_connected(set_manual_camera):
-			ship.request_manual_camera.connect(set_manual_camera.bind(ship))
+	#var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
+	#for ship in friendly_group:
+		#if not ship.request_manual_camera.is_connected(set_manual_camera):
+			#ship.request_manual_camera.connect(set_manual_camera.bind(ship))
 
 func set_manual_camera(unit: Ship) -> void:
 	if manually_controlled_unit and manually_controlled_unit != unit and manually_controlled_unit != null:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=42 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -22,7 +22,6 @@
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_map_layer.gd" id="11_5entx"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
 [ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
@@ -218,7 +217,6 @@ position_smoothing_enabled = true
 
 [node name="TacticalMapLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
-script = ExtResource("11_5entx")
 
 [node name="TacticalViewportContainer" type="SubViewportContainer" parent="TacticalMapLayer"]
 offset_left = -3884.0

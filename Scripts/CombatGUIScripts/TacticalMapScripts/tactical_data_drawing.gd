@@ -27,7 +27,7 @@ var zoom_in_limit: Vector2 = Vector2(1.0, 1.0)
 var zoom_out_limit: Vector2 = Vector2(0.15, 0.15) 
 @onready var TacticalCamera: Camera2D = %TacticalMapCamera
 var camera_feed_active: bool = false
-var camera_feed_ship: Ship = null # For vid feed
+var camera_feed_ship: Ship = null # For vid feed. There can be only one!
 
 # Group Creation
 var group_iterator: int = 0
@@ -37,10 +37,13 @@ var current_groups: Dictionary = {}
 var highlight_group_name: StringName = &"friendly selection"
 var highlight_enemy_name: StringName = &"enemy selection"
 var current_group_name: StringName = &""
-var prev_selected_ship: Ship = null  # Now for manual control 
-
+var prev_selected_ship: Ship = null 
 
 var attack_group: bool = false
+
+# Manual Control
+var manually_controlled_ship: Ship = null # There can be only one!
+ 
 
 signal switch_maps()
 
@@ -56,6 +59,9 @@ func _ready():
 	pass # Replace with function body.
 
 func _unhandled_input(event) -> void:
+	# We don't want tactical map taking input when it's not visible.
+	if self.visible == false:
+		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("select"):
 			box_selection_start = get_global_mouse_position()
@@ -75,16 +81,25 @@ func _unhandled_input(event) -> void:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 		if Input.is_action_pressed("take_manual_control") and TacticalCamera.enabled and prev_selected_ship != null:
-				prev_selected_ship.toggle_manual_control()
-		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null and self.visible == true:
-			print("Camera feed called")
+			#if self.visible:
 			switch_maps.emit()
-			#prev_selected_ship.toggle_camera_feed()
+			reset_box_selection()
+			if manually_controlled_ship != null:
+				manually_controlled_ship.toggle_manual_control()
+			manually_controlled_ship = prev_selected_ship
+			%CombatMap.manually_controlled_unit = manually_controlled_ship
+			manually_controlled_ship.toggle_manual_control()
+		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
+			#print("Camera feed called")
+			#if self.visible:
+			switch_maps.emit()
+			reset_box_selection()
 			toggle_camera_feed_active()
-			if camera_feed_active == true:
-				swap_camera_feed(prev_selected_ship)
+			swap_camera_feed(prev_selected_ship)
 		elif Input.is_action_pressed("toggle_map"):
 			switch_maps.emit()
+			if camera_feed_active == true and self.visible == true:
+				camera_feed_active = false
 		elif Input.is_action_pressed("alt_select") and Input.is_action_pressed("select") and highlighted_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
@@ -97,7 +112,6 @@ func _unhandled_input(event) -> void:
 			queue_redraw()
 
 func swap_camera_feed(ship: Ship) -> void:
-	#camera_feed_active = true
 	if camera_feed_ship != null:
 		camera_feed_ship.camera_feed = false
 	camera_feed_ship = ship
@@ -150,6 +164,7 @@ func setup() -> void:
 
 func update() -> void:
 	#print("update")
+	#print("camera_feed_active, camera_feed_ship, prev_selected_unit ", camera_feed_active, camera_feed_ship, prev_selected_ship)
 	if prev_selected_ship == null: 
 		$"../../../ButtonList/ManualControlButton".disabled = true
 		$"../../../ButtonList/CameraFeedButton".disabled = true
@@ -401,16 +416,10 @@ func connect_unit_signals(units: Array) -> void:
 			continue
 		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
 			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
-			n_unit.switch_to_manual.connect(_on_switched_to_manual)
+			#n_unit.switch_to_manual.connect(_on_switched_to_manual)
 			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
 		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
 			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
-
-func _on_switched_to_manual() -> void:
-	if not visible:
-		return
-	switch_maps.emit()
-	reset_box_selection()
 
 # I could make this a global with a callable as the parameter.
 func performance_testing():
