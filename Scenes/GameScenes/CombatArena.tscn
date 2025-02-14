@@ -570,9 +570,6 @@ position = Vector2(6750, 3000)
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(6375, 3500)
 
-[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(12670, 6000)
-
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(6000, 3000)
 
@@ -581,15 +578,6 @@ position = Vector2(6000, 3500)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(6750, 3500)
-
-[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9250, 12000)
-
-[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8000, 12000)
-
-[node name="PlayerShip9" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(7930, 1000)
@@ -622,29 +610,5 @@ collision_layer = 4
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(8930, 1500)
 collision_layer = 4
-
-[node name="PlayerShip10" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3964, 11918)
-
-[node name="PlayerShip11" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4964, 11918)
-
-[node name="PlayerShip12" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5964, 11918)
-
-[node name="PlayerShip13" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(12607, 9219)
-
-[node name="PlayerShip14" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5271, 7996)
-
-[node name="PlayerShip15" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5872, 9478)
-
-[node name="PlayerShip16" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6872, 9478)
-
-[node name="PlayerShip17" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 9520)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

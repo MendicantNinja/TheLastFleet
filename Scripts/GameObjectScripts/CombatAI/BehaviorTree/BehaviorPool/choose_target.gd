@@ -21,30 +21,21 @@ extends LeafAction
 #		- Maybe useful as a modifier/coefficient
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.target_unit != null or agent.targeted_units.is_empty():
+	if agent.target_unit != null:
+		return SUCCESS
+	
+	if agent.targeted_units.is_empty():
 		return SUCCESS
 	
 	var available_targets: Array = []
 	var sq_dist: Array = []
-	var erase_unit: Array = []
 	for target in agent.targeted_units:
-		if target == null:
-			erase_unit.append(target)
-			continue
-		
 		sq_dist.append(agent.global_position.distance_squared_to(target.global_position))
 		if target.targeted_by.size() > 1 or target.retreat_flag == true:
 			continue
 		available_targets.append(target)
 	
-	for unit in erase_unit:
-		if unit in agent.targeted_units:
-			agent.targeted_units.erase(unit)
-	
-	if agent.targeted_units.is_empty():
-		return SUCCESS
-	elif available_targets.is_empty():
-		agent.targeted_units = available_targets
+	if agent.targeted_units.is_empty() or available_targets.is_empty():
 		return SUCCESS
 	
 	var min_dist: float = sq_dist.min()

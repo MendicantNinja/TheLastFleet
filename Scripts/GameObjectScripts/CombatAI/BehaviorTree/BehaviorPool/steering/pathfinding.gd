@@ -6,6 +6,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			agent.target_position = Vector2.ZERO
 		return SUCCESS
 	
+	if agent.group_leader == true:
+		pass
+	
 	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO:
 		if agent.group_leader == true and imap_manager.working_maps.has(agent.group_name):
 			imap_manager.working_maps.erase(agent.group_name)

@@ -52,7 +52,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var length: float = 0.0
 	for direction in strafe_directions:
 		sum_direction += direction
-		length += sum_direction.length()
+		length += 1.0
 	
 	var speed: float = agent.ship_stats.acceleration
 	var speed_modifier: float = 0.0

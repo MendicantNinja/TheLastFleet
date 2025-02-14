@@ -285,8 +285,11 @@ func destroy_ship() -> void:
 	for unit in targeted_by:
 		if unit == null:
 			continue
-		unit.targeted_units.erase(self)
+		var targeted_units: Array = unit.targeted_units
 		unit.target_unit = null
+		if self in targeted_units:
+			targeted_units.erase(self)
+			get_tree().call_group(unit.group_name, &"set_targets", targeted_units)
 	
 	remove_from_group(group_name)
 	if group_leader == true:

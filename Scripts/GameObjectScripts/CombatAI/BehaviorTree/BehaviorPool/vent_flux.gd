@@ -83,6 +83,8 @@ func retreat_direction(agent: Ship) -> Vector2:
 	for cell in local_min_cells:
 		var distance: float = agent_cell.distance_squared_to(cell)
 		cell_distances[distance] = cell
+	
+	var geo_mean_cell: Vector2 = globals.geometric_median_of_objects(cell_distances.values())
 	var min_dist: float = cell_distances.keys().min()
 	var min_cell: Vector2i = cell_distances[min_dist]
 	var min_cell_value: float = working_map.map_grid[min_cell.x][min_cell.y]

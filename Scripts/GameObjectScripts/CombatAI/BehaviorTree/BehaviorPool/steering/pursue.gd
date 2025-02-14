@@ -10,7 +10,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		return FAILURE
 	
 	if agent.target_unit == null:
-		return FAILURE
+		return SUCCESS
 	
 	if threat_radius == 0.0:
 		delta = get_physics_process_delta_time()

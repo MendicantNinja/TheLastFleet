@@ -175,12 +175,24 @@ func weigh_force_density() -> void:
 		if density > 0.0:
 			friendly_neighborhood_density[cluster] = density
 	
-	var max_fren_density: float = friendly_neighborhood_density.values().max()
+	var max_fren_density: float = 0.0
+	if friendly_neighborhood_density.is_empty():
+		var index: Vector2i = friendly_cluster.keys()[0]
+		max_fren_density = friendly_cluster[index]
+	else:
+		max_fren_density = friendly_neighborhood_density.values().max()
+	
 	for cell in friendly_neighborhood_density:
 		var weight_density: float = friendly_neighborhood_density[cell] / max_fren_density
 		friendly_neighborhood_density[cell] = weight_density
 	
-	var max_enemy_density: float = enemy_neighborhood_density.values().max()
+	var max_enemy_density: float = 0.0
+	if friendly_neighborhood_density.is_empty():
+		var index: Vector2i = enemy_cluster.keys()[0]
+		max_enemy_density = enemy_cluster[index]
+	else:
+		max_fren_density = enemy_neighborhood_density.values().max()
+	
 	for cell in enemy_neighborhood_density:
 		var weight_density: float = enemy_neighborhood_density[cell] / max_enemy_density
 		enemy_neighborhood_density[cell] = weight_density

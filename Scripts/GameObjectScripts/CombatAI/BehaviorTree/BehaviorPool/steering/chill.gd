@@ -1,9 +1,8 @@
 extends LeafAction
 
-var time: float = 0.0
 var delta: float = 0.0
+
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	time = 0.0
 	if agent.combat_flag == true or agent.vent_flux_flag == true or agent.retreat_flag == true:
 		return FAILURE
 	
@@ -18,18 +17,10 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if floor(current_velocity) == 0.0:
 		return SUCCESS
 	
-	if agent.time != 0.0:
-		time = agent.time
+	var velocity = -agent.linear_velocity.normalized() * (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * agent.time
+	if agent.time > 0.0:
+		agent.time = 0.0
 	
-	if floor(current_velocity) != 0.0 and agent.time > 0.0:
-		time += delta + agent.time_coefficient
-	
-	var velocity = -agent.linear_velocity.normalized() * (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * time
-	if floor(velocity.length()) == 0.0:
-		velocity = 0.0
-		time = 0.0
-	
-	agent.time = time
 	agent.heur_velocity = velocity
 	agent.acceleration = velocity
 	return FAILURE

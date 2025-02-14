@@ -17,18 +17,19 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		speed_modifier = agent.zero_flux_bonus
 	var accel_speed: float = agent.ship_stats.acceleration + speed_modifier
 	
-	time = agent.time
-	if agent.time == 0.0:
-		time += delta + agent.time_coefficient
-	elif agent.linear_velocity.length() < accel_speed:
+	if agent.time != 0.0:
+		time = agent.time
+	
+	if agent.linear_velocity.length() < accel_speed:
 		time += delta + agent.time_coefficient
 	
 	var velocity = move_direction * accel_speed
 	velocity = velocity.limit_length(accel_speed)
 	if agent.combat_flag == false and agent.vent_flux_flag == true:
-		velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
+		velocity = -agent.linear_velocity.normalized() * (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * time
 		if floor(agent.linear_velocity.length()) == 0.0:
 			agent.retreat_flag = false
+			velocity = Vector2.ZERO
 	
 	agent.heur_velocity = velocity
 	agent.acceleration = velocity
