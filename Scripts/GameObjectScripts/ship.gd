@@ -615,36 +615,37 @@ func _physics_process(delta: float) -> void:
 	if CombatCamera != null and CombatCamera.enabled:
 		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
 
-	if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
-		if manual_control == true and %TacticalDataDrawing.camera_feed_active == false:
-			if ManualControlHUD.current_ship == self:
+	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
+		if manual_control == true:
+			CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
+			if %TacticalMapLayer.visible == false:
+				CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
+				if Input.is_action_pressed("select") and not flux_overload:
+					fire_weapon_system(all_weapons)
+				
+				var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
+				rotate_angle = rotate_direction.angle()
+				var adjust_mass: float = (mass * 1000)
+				rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+				move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
+				Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
+				
+				if Input.is_action_pressed("vent_flux"):
+					if soft_flux > 0.0:
+						soft_flux -= ship_stats.flux_dissipation
+					elif hard_flux > 0.0:
+						hard_flux -= ship_stats.flux_dissipation
+					update_flux_indicators()
+		#print(%TacticalDataDrawing.camera_feed_active)
+			if %TacticalDataDrawing.camera_feed_active == false:
 				ManualControlHUD.update_hud()
-			if manual_camera_freelook == false:
-				CombatCamera.global_position = self.global_position
-			CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-			
-			if Input.is_action_pressed("select") and not flux_overload:
-				fire_weapon_system(all_weapons)
-			
-			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
-			rotate_angle = rotate_direction.angle()
-			var adjust_mass: float = (mass * 1000)
-			rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-			move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
-			Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
-			
-			if Input.is_action_pressed("vent_flux"):
-				if soft_flux > 0.0:
-					soft_flux -= ship_stats.flux_dissipation
-				elif hard_flux > 0.0:
-					hard_flux -= ship_stats.flux_dissipation
-				update_flux_indicators()
-			
+				if manual_camera_freelook == false:
+					CombatCamera.global_position = self.global_position
+				#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+		
 		if camera_feed == true:
-			CombatCamera.position_smoothing_enabled = false
 			CombatCamera.global_position = self.global_position
-			CombatCamera.position_smoothing_enabled = true
-	
+		
 	if shield_toggle and not flux_overload:
 		soft_flux += shield_upkeep
 		update_flux_indicators()

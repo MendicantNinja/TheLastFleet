@@ -1,4 +1,5 @@
 extends Node2D
+@onready var TacticalMapLayer = %TacticalMapLayer
 @onready var TacticalViewport: SubViewport = $".."
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
@@ -60,7 +61,7 @@ func _ready():
 
 func _unhandled_input(event) -> void:
 	# We don't want tactical map taking input when it's not visible.
-	if self.visible == false:
+	if TacticalMapLayer.visible == false:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("select"):
@@ -91,15 +92,12 @@ func _unhandled_input(event) -> void:
 			manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
-			#if self.visible:
 			switch_maps.emit()
 			reset_box_selection()
-			toggle_camera_feed_active()
+			camera_feed_active = true
 			swap_camera_feed(prev_selected_ship)
 		elif Input.is_action_pressed("toggle_map"):
 			switch_maps.emit()
-			if camera_feed_active == true and self.visible == true:
-				camera_feed_active = false
 		elif Input.is_action_pressed("alt_select") and Input.is_action_pressed("select") and highlighted_group.size() > 0:
 			attack_group = true
 			selection_line_color = Color(Color.CRIMSON)
@@ -116,17 +114,24 @@ func swap_camera_feed(ship: Ship) -> void:
 		camera_feed_ship.camera_feed = false
 	camera_feed_ship = ship
 	ship.camera_feed = true
+	%CombatMap.CombatCamera.position_smoothing_enabled = false
+	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
 	
-
-func toggle_camera_feed_active() -> void:
-	if camera_feed_active == false:
-		camera_feed_active = true
-	elif camera_feed_active == true:
-		camera_feed_active = false
+#
+#func toggle_camera_feed_active() -> void:
+	#if camera_feed_active == false:
+		#camera_feed_active = true
+	#elif camera_feed_active == true:
+		#camera_feed_active = false
 
 func display_map(map_value: bool) -> void:
 	# Show the Tac Map
 	if map_value == true:
+		if camera_feed_ship != null:
+			print("map value called")
+			camera_feed_ship.camera_feed = false
+			camera_feed_ship = null
+			camera_feed_active = false
 		TacticalCamera.enabled = true
 		TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
 		TacticalMapCamera.zoom = Vector2(.15, .15)
