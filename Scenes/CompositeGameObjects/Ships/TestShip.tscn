@@ -80,6 +80,9 @@ script = ExtResource("9_w68pg")
 [node name="combat" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
 
+[node name="chill" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("10_c0vxc")
+
 [node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("6_26ar5")
 
@@ -97,9 +100,6 @@ script = ExtResource("9_rp377")
 
 [node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_s3gj3")
-
-[node name="chill" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("10_c0vxc")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_3duk1")

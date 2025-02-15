@@ -15,7 +15,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.vent_flux_flag == true and flux_norm == 0.0 and agent.working_map != null:
 		agent.move_direction = Vector2.ZERO
 		agent.working_map = null
-		agent.vent_flux_flag = false
 	
 	if flux_norm == 0.0:
 		agent.vent_flux_flag = false
@@ -45,6 +44,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		elif agent.hard_flux > 0.0:
 			agent.hard_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
 		agent.update_flux_indicators()
+		if agent.targeted_by.is_empty():
+			agent.retreat_flag = false
 	
 	if can_vent == false:
 		agent.vent_flux_flag = false

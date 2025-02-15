@@ -45,10 +45,10 @@ func _ready() -> void:
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:
-		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
-		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = vulnerability_map.map_grid.size()
-		var grid_column_size: int = vulnerability_map.map_grid[0].size()
+		influence_map.update_grid_value.connect(_on_grid_value_changed)
+		influence_map.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = influence_map.map_grid.size()
+		var grid_column_size: int = influence_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -56,7 +56,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(influence_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)

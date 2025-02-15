@@ -337,16 +337,10 @@ func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 
 func update_flux_indicators() -> void:
 	var current_flux: float = soft_flux + hard_flux
-	if current_flux >= total_flux and flux_overload == false:
+	if current_flux >= total_flux:
 		flux_overload = true
-		for weapon in all_weapons:
-			weapon.update_flux_overload(flux_overload)
-		return
-	elif current_flux < total_flux and flux_overload == true and vent_flux_flag == false:
+	if flux_overload == true and current_flux < total_flux:
 		flux_overload = false
-		for weapon in all_weapons:
-			weapon.update_flux_overload(flux_overload)
-	
 	var flux_rate: float = 100 / total_flux # Returns a factor multiplier of the total flux that can be used to get a percentage. e.g 100/2000 = .05. 
 	HardFluxIndicator.value = floor(flux_rate * hard_flux)
 	SoftFluxIndicator.value = floor(flux_rate * soft_flux)
