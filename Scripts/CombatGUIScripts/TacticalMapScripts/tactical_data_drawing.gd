@@ -68,6 +68,9 @@ func _unhandled_input(event) -> void:
 			box_selection_start = get_global_mouse_position()
 		elif Input.is_action_just_released("select") and box_selection_end != Vector2.ZERO:
 			select_units()
+		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt_select")):
+			var to_position: Vector2 = convert_map_to_realspace(get_global_mouse_position(), map_bounds, grid_size)
+			process_move(to_position)
 		elif Input.is_action_just_pressed("zoom in") and TacticalCamera.zoom < zoom_in_limit:
 			TacticalCamera.zoom += Vector2(0.05, 0.05)
 		elif Input.is_action_just_pressed("zoom out") and TacticalCamera.zoom > zoom_out_limit:
@@ -109,20 +112,23 @@ func _unhandled_input(event) -> void:
 			selection_line_color = settings.gui_color
 			queue_redraw()
 
-func swap_camera_feed(ship: Ship) -> void:
-	if camera_feed_ship != null:
-		camera_feed_ship.camera_feed = false
-	camera_feed_ship = ship
-	ship.camera_feed = true
-	%CombatMap.CombatCamera.position_smoothing_enabled = false
-	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
-	
-#
-#func toggle_camera_feed_active() -> void:
-	#if camera_feed_active == false:
-		#camera_feed_active = true
-	#elif camera_feed_active == true:
-		#camera_feed_active = false
+func connect_unit_signals(units: Array) -> void:
+	for n_unit in units:
+		if n_unit == null:
+			continue
+		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
+			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
+		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
+			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))    
+																																																									  
+#oooooo     oooo ooooo  .oooooo..o ooooo     ooo       .o.       ooooo        
+ #`888.     .8'  `888' d8P'    `Y8 `888'     `8'      .888.      `888'        
+  #`888.   .8'    888  Y88bo.       888       8      .8"888.      888         
+   #`888. .8'     888   `"Y8888o.   888       8     .8' `888.     888         
+	#`888.8'      888       `"Y88b  888       8    .88ooo8888.    888         
+	 #`888'       888  oo     .d8P  `88.    .8'   .8'     `888.   888       o 
+	  #`8'       o888o 8""88888P'     `YbodP'    o88o     o8888o o888ooooood8    
 
 func display_map(map_value: bool) -> void:
 	# Show the Tac Map
@@ -149,7 +155,16 @@ func display_map(map_value: bool) -> void:
 	connect_unit_signals(enemy_group)
 	
 	get_tree().call_group("enemy", "display_icon", visible)
-	get_tree().call_group("friendly", "display_icon", visible)
+	get_tree().call_group("friendly", "display_icon", visible)          
+
+func swap_camera_feed(ship: Ship) -> void:
+	if camera_feed_ship != null:
+		camera_feed_ship.camera_feed = false
+	camera_feed_ship = ship
+	ship.camera_feed = true
+	%CombatMap.CombatCamera.position_smoothing_enabled = false
+	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
+	
 
 func setup() -> void:
 	# Check if new ships have been added
@@ -177,7 +192,7 @@ func update() -> void:
 		$"../../../ButtonList/ManualControlButton".disabled = false
 		$"../../../ButtonList/CameraFeedButton".disabled = false
 	for icon in icon_list:
-		icon.position = convert_position(icon.assigned_ship.global_position, map_bounds, grid_size)
+		icon.position = convert_realspace_to_map(icon.assigned_ship.global_position, map_bounds, grid_size)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -186,11 +201,18 @@ func _process(delta):
 		#if Engine.get_physics_frames() % 60 == 0:
 			#setup()
 
-func convert_position(global_pos: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
+func convert_realspace_to_map(global_pos: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
 	return Vector2(
 		global_pos.x * (tactical_map_size.x / global_map_size.x),
 		global_pos.y * (tactical_map_size.y / global_map_size.y)
 	)
+
+func convert_map_to_realspace(map_position: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
+	return Vector2(
+		map_position.x * ( global_map_size.x/tactical_map_size.x),
+		map_position.y * ( global_map_size.y/tactical_map_size.y)
+	)
+
 
 func _draw():
 	var grid_square_size: int = 900
@@ -217,19 +239,14 @@ func _draw():
 	
 	draw_rect(Rect2(start, end - start), selection_line_color, false, 6, true) 
 
-func get_icons_in_box_selection(rect: Rect2) -> Array[TacticalMapIcon]:
-	var selected_controls: Array[TacticalMapIcon] = []
-	# Iterate through all children recursively
-	for control in self.get_children():
-		if control is TacticalMapIcon:
-			var control_rect = Rect2(control.global_position, control.size)
-	# Check if the control's rect overlaps with selection
-			if rect.intersects(control_rect):
-				selected_controls.append(control)
-	return selected_controls
-	
-	# Called only on box select
-
+ #.oooooo..o oooooooooooo ooooo        oooooooooooo   .oooooo.   ooooooooooooo 
+#d8P'    `Y8 `888'     `8 `888'        `888'     `8  d8P'  `Y8b  8'   888   `8 
+#Y88bo.       888          888          888         888               888      
+ #`"Y8888o.   888oooo8     888          888oooo8    888               888      
+	 #`"Y88b  888    "     888          888    "    888               888      
+#oo     .d8P  888       o  888       o  888       o `88b    ooo       888      
+#8""88888P'  o888ooooood8 o888ooooood8 o888ooooood8  `Y8bood8P'      o888o     
+																			  
 func select_units() -> void:
 	#print("select_units called")
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
@@ -272,6 +289,19 @@ func select_units() -> void:
 	# Whatever is still selected, highlight it.
 	get_tree().call_group(highlight_group_name, "highlight_selection", true)
 	
+func get_icons_in_box_selection(rect: Rect2) -> Array[TacticalMapIcon]:
+	var selected_controls: Array[TacticalMapIcon] = []
+	# Iterate through all children recursively
+	for control in self.get_children():
+		if control is TacticalMapIcon:
+			var control_rect = Rect2(control.global_position, control.size)
+	# Check if the control's rect overlaps with selection
+			if rect.intersects(control_rect):
+				selected_controls.append(control)
+	return selected_controls
+	
+	# Called only on box select
+	
 func get_rect_start_position() -> Vector2:
 	var new_position: Vector2
 	var mouse_position: Vector2 = get_global_mouse_position()
@@ -289,6 +319,125 @@ func reset_box_selection() -> void:
 	box_selection_start = Vector2.ZERO
 	box_selection_end = Vector2.ZERO
 	queue_redraw()
+	
+
+func _on_unit_selected(unit: Ship) -> void:
+	#print("on unit selected")
+	get_viewport().set_input_as_handled()
+	
+	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
+	if current_selection.size() > 1 and unit != prev_selected_ship:
+		if unit.group_leader == true:
+			globals.reset_group_leader(unit)
+	
+	get_tree().call_group(highlight_group_name, "highlight_selection", false)
+	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
+	
+	if prev_selected_ship == unit:
+		unit.highlight_selection(false)
+		prev_selected_ship = null
+		return
+	
+	unit.add_to_group(highlight_group_name)
+	unit.highlight_selection(true)
+	prev_selected_ship = unit
+	reset_box_selection()
+
+#ooo        ooooo   .oooooo.   oooooo     oooo oooooooooooo ooo        ooooo oooooooooooo ooooo      ooo ooooooooooooo 
+#`88.       .888'  d8P'  `Y8b   `888.     .8'  `888'     `8 `88.       .888' `888'     `8 `888b.     `8' 8'   888   `8 
+ #888b     d'888  888      888   `888.   .8'    888          888b     d'888   888          8 `88b.    8       888      
+ #8 Y88. .P  888  888      888    `888. .8'     888oooo8     8 Y88. .P  888   888oooo8     8   `88b.  8       888      
+ #8  `888'   888  888      888     `888.8'      888    "     8  `888'   888   888    "     8     `88b.8       888      
+ #8    Y     888  `88b    d88'      `888'       888       o  8    Y     888   888       o  8       `888       888      
+#o8o        o888o  `Y8bood8P'        `8'       o888ooooood8 o8o        o888o o888ooooood8 o8o        `8      o888o   
+
+
+func process_move(to_position: Vector2) -> void:
+	
+	# input, process_move, IF already existing move_unit, 
+	# else if not already existing: move_new_unit, reset_group_affiliation, move_unit
+	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	if highlighted_group.size() == 0:
+		return
+	print("Process move called", highlighted_group)
+	var group_leaders: Array = []
+	for unit in highlighted_group:
+		if unit.group_leader:
+			group_leaders.push_back(unit)
+	
+	# If the group we're selecting is already a group that exists, move it and do not proceed.
+	var group_array: Array = current_groups.values()
+	for group in group_array:
+		if highlighted_group == group and group_leaders.size() == 1:
+			move_unit(group_leaders[0], to_position)
+			return
+	
+	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
+	if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
+		var leader = group_leaders[0]
+		if leader in prev_group and leader in highlighted_group:
+			move_unit(leader, to_position)
+			return
+	
+	reset_group_affiliation(highlighted_group)
+	move_new_unit(to_position)
+
+# Calls down to an indivdual ship to move it. 
+func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
+	get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
+	get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
+	unit_leader.set_navigation_position(to_position)
+	get_viewport().set_input_as_handled()
+
+func move_new_unit(to_position: Vector2) -> void:
+	# 1) Create an array of ships (nodes) from the ships the player currently has selected
+	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	
+	# 2) Assign group leader
+	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.
+	var new_leader = null
+	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
+		new_leader = highlighted_group[0]
+	
+	# 2b) Find the geometric median of all unit positions and assign the nearest
+	# neighoring ship to the median.
+	if highlighted_group.size() > 2:
+		var unit_positions: Dictionary = {}
+		for unit in highlighted_group:
+			unit_positions[unit.global_position] = unit
+		
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		new_leader = globals.find_unit_nearest_to_median(median, unit_positions)
+	
+	# 3) Generate and assign a name. Sort the name arrays.
+	var new_group_name: StringName 
+	if available_group_names.size() > 0:
+		new_group_name = available_group_names.pop_back()
+	elif available_group_names.size() == 0:
+	# iterate a new group name
+		new_group_name = StringName("Group " + str(group_iterator))
+		group_iterator += 1
+	
+	taken_group_names.push_back(new_group_name)
+	
+	# 4) create the group from the currently selected ships. Current_selected_group is full of unique references to ships. Any changes made will not back propagate to highlighted_group and vice versa.
+	var current_selected_group: Array = highlighted_group.duplicate()
+	current_groups[new_group_name] = current_selected_group
+	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
+	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	new_leader.set_group_leader(true)
+	
+	# 5) Call down to an individual ship (new_leader).
+	move_unit(new_leader, to_position)
+
+	  #.o.       ooooooooooooo ooooooooooooo       .o.         .oooooo.   oooo    oooo 
+	 #.888.      8'   888   `8 8'   888   `8      .888.       d8P'  `Y8b  `888   .8P'  
+	#.8"888.          888           888          .8"888.     888           888  d8'    
+   #.8' `888.         888           888         .8' `888.    888           88888[      
+  #.88ooo8888.        888           888        .88ooo8888.   888           888`88b.    
+ #.8'     `888.       888           888       .8'     `888.  `88b    ooo   888  `88b.  
+#o88o     o8888o     o888o         o888o     o88o     o8888o  `Y8bood8P'  o888o  o888o 
+
 
 func attack_targets() -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
@@ -393,38 +542,6 @@ func _on_alt_select(ship: Ship) -> void:
 	
 	ship.highlight_selection(highlight_value)
 
-func _on_unit_selected(unit: Ship) -> void:
-	#print("on unit selected")
-	get_viewport().set_input_as_handled()
-	
-	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
-	if current_selection.size() > 1 and unit != prev_selected_ship:
-		if unit.group_leader == true:
-			globals.reset_group_leader(unit)
-	
-	get_tree().call_group(highlight_group_name, "highlight_selection", false)
-	get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
-	
-	if prev_selected_ship == unit:
-		unit.highlight_selection(false)
-		prev_selected_ship = null
-		return
-	
-	unit.add_to_group(highlight_group_name)
-	unit.highlight_selection(true)
-	prev_selected_ship = unit
-	reset_box_selection()
-
-func connect_unit_signals(units: Array) -> void:
-	for n_unit in units:
-		if n_unit == null:
-			continue
-		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
-			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
-			#n_unit.switch_to_manual.connect(_on_switched_to_manual)
-			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
-		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
-			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
 
 # I could make this a global with a callable as the parameter.
 func performance_testing():
