@@ -5,6 +5,9 @@ class_name Admiral
 @onready var available_units: Array = []
 
 var heuristic_strat: globals.Strategy
+var enemy_strength: float = 0.0
+var admiral_strength: float = 0.0
+var effective_strength: Dictionary = {}
 
 var unit_clusters: Array = []
 var enemy_clusters: Array = []
@@ -22,28 +25,12 @@ var queue_orders: Dictionary = {}
 var move_key: StringName = &"move"
 var target_key: StringName = &"target"
 var posture_key: StringName = &"posture"
+var diversion_key: StringName = &"diversion"
+var flank_key: StringName = &"flank"
 
-var initial_unit_count: int = 0
-var units_destroyed: int = 0
-var groups_destroyed: int = 0
+var fallback_flag: bool = false
+var retreat_flag: bool = false
 
 func _physics_process(_delta) -> void:
 	if available_units.is_empty():
 		available_units = get_tree().get_nodes_in_group(&"enemy")
-		initial_unit_count = available_units.size()
-
-func _on_unit_destroyed(unit, group_name: StringName) -> void:
-	units_destroyed += 1
-	available_groups[group_name].erase(unit)
-	if available_groups[group_name].is_empty():
-		groups_destroyed += 1
-		available_groups.erase(group_name)
-
-func _on_leader_destroyed(unit, group_name: StringName) -> void:
-	units_destroyed += 1
-	available_groups[group_name].erase(unit)
-	if available_groups[group_name].is_empty():
-		groups_destroyed += 1
-		available_groups.erase(group_name)
-	else:
-		assign_new_leader_group = available_groups[group_name]

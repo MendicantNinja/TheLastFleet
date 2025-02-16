@@ -3,7 +3,7 @@ extends LeafAction
 func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 180 != 0:
 		return FAILURE
-		
+	
 	var weighted_imap: Imap = imap_manager.weighted_imap
 	var influence_map: Imap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
 	var fake_tension_map: Imap = imap_manager.agent_maps[imap_manager.MapType.TENSION_MAP]

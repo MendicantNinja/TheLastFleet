@@ -30,7 +30,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 		clusters_median = group_clusters[0]
 	
 	var target_cell: Vector2i = Vector2i.ZERO
-	if agent.heuristic_strat == globals.Strategy.DEFENSIVE:
+	if agent.heuristic_strat == globals.Strategy.DEFENSIVE or agent.heuristic_strat == globals.Strategy.OFFENSIVE:
 		var target_distances: Dictionary = {}
 		for cell in isolated_registry:
 			var distance_to: float = clusters_median.distance_squared_to(cell)

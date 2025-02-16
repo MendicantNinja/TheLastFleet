@@ -44,7 +44,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 				targets.append(unit)
 		if not targets.is_empty():
 			vulnerable_targets[cell] = targets
-
+	
 	agent.vulnerable_targets = vulnerable_targets
 	agent.isolated_targets = isolated_targets
 	return FAILURE
