@@ -57,4 +57,3 @@ func _on_Projectile_collision(body) -> void:
 		body.process_damage(self)
 		queue_free()
 	
-	pass

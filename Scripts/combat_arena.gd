@@ -18,6 +18,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 
 # Imap values and goodies
 var debug_imap: bool = true
+var battle_over: bool = false
 var imap_debug_grid: Array
 
 func _ready() -> void:
@@ -28,10 +29,6 @@ func _ready() -> void:
 	CombatMap.display_map(false)
 	TacticalMap.display_map(true)
 	
-	#occupancy_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	#threat_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	#occupancy_map.map_type = imap_manager.MapType.OCCUPANCY_MAP
-	#threat_map.map_type = imap_manager.MapType.THREAT_MAP
 	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var weighted_imap: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var fake_tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
@@ -86,7 +83,10 @@ func _unhandled_input(event) -> void:
 			toggle_options_menu()
 
 func _physics_process(delta):
-	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 70 == 0:
+	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):
+		battle_over = true
+	
+	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 70 == 0 and battle_over == false:
 		imap_manager.weigh_force_density()
 
 func toggle_fleet_deployment_panel() -> void:

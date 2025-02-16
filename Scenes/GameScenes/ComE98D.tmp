@@ -69,7 +69,6 @@ script = ExtResource("2_shfex")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
 script = ExtResource("2_xxm3d")
-enabled = false
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_5naox")
@@ -228,6 +227,7 @@ debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
+visible = false
 script = ExtResource("5_ojmr4")
 
 [node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
@@ -563,53 +563,89 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7274)
+position = Vector2(7250, 5125)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7274)
+position = Vector2(8250, 5125)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7774)
+position = Vector2(7710, 5469)
+
+[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(12670, 6000)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7274)
+position = Vector2(3500, 5125)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7774)
+position = Vector2(4500, 5125)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7774)
+position = Vector2(8679, 5539)
+
+[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9250, 12000)
+
+[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8000, 12000)
+
+[node name="PlayerShip9" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1062)
+position = Vector2(7930, 1000)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1062)
+position = Vector2(8430, 1000)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1062)
+position = Vector2(8930, 1000)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1062)
+position = Vector2(9430, 1000)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1562)
+position = Vector2(7930, 1500)
 collision_layer = 4
 
 [node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1562)
+position = Vector2(8430, 1500)
 collision_layer = 4
 
 [node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1562)
+position = Vector2(9430, 1500)
 collision_layer = 4
 
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1562)
+position = Vector2(8930, 1500)
 collision_layer = 4
+
+[node name="PlayerShip10" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(3964, 11918)
+
+[node name="PlayerShip11" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(4964, 11918)
+
+[node name="PlayerShip12" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5964, 11918)
+
+[node name="PlayerShip13" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(12607, 9219)
+
+[node name="PlayerShip14" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5271, 7996)
+
+[node name="PlayerShip15" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5872, 9478)
+
+[node name="PlayerShip16" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(6872, 9478)
+
+[node name="PlayerShip17" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7955, 9520)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

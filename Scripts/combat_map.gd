@@ -45,6 +45,8 @@ func _unhandled_input(event):
 func _physics_process(delta) -> void:
 	if CombatCamera.zoom != zoom_value:
 		CombatCamera.zoom = lerp(CombatCamera.zoom, zoom_value, 0.5)
+	if manually_controlled_unit != null and CombatCamera.position != manually_controlled_unit.global_position:
+		CombatCamera.position = manually_controlled_unit.global_position
 
 func display_map(map_value: bool) -> void:
 	if map_value == true:
