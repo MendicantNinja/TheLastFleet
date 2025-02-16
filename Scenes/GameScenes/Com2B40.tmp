@@ -1,6 +1,7 @@
-[gd_scene load_steps=42 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=36 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tactical_map.gd" id="2_cwwbl"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/admiral.gd" id="2_shfex"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_xxm3d"]
@@ -8,11 +9,11 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_5naox"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_control_hud.gd" id="5_ojmr4"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/manual_control_hud.gd" id="5_ojmr4"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_vrrkk"]
-[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
+[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="6_ftacq"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
@@ -20,24 +21,15 @@
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_vulnerable_targets.gd" id="8_7nviv"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
-[ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/indicator_upscale.png" id="9_lucm6"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_strategy.gd" id="9_sdjo6"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/set_targets.gd" id="9_t8sgw"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
-[ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
-[ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
-[ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
-[ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
-[ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
-[ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/move_units.gd" id="12_71ucf"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/issue_orders.gd" id="13_o57mr"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
+size = Vector2(0, 0)
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -46,20 +38,7 @@ outlines = Array[PackedVector2Array]([PackedVector2Array(-1, -29, 11, 20076, 171
 agent_radius = 50.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nv86b"]
-size = Vector2(13500, 15000)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
-size = Vector2(0, 0)
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_lgtp0"]
-shader = ExtResource("13_tuyrt")
-shader_parameter/hologram_color = Vector4(0, 0.2, 1, 1)
-shader_parameter/emission_strength = 1.0
-shader_parameter/scanline_intensity = 0.02
-shader_parameter/flicker_speed = 2.0
-shader_parameter/distortion_amount = 0.1
-shader_parameter/fresnel_power = 50.0
-shader_parameter/alpha_strength = 0.7
+size = Vector2(17000, 20000)
 
 [sub_resource type="Gradient" id="Gradient_nks55"]
 offsets = PackedFloat32Array(0.237705, 1)
@@ -83,22 +62,20 @@ bg_color = Color(0, 0, 0, 0.588235)
 [node name="CombatArena" type="Node2D"]
 script = ExtResource("1_fx56v")
 
-[node name="OnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="."]
-unique_name_in_owner = true
-rect = Rect2(0, 0, 1, 1)
-
 [node name="Admiral" type="Node2D" parent="."]
 script = ExtResource("2_shfex")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
 script = ExtResource("2_xxm3d")
-enabled = false
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_5naox")
 
 [node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
 script = ExtResource("5_vrrkk")
+
+[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("11_iyhuv")
 
 [node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("6_jorw7")
@@ -109,23 +86,14 @@ script = ExtResource("7_sno18")
 [node name="find vulnerable targets" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("8_7nviv")
 
-[node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("9_sdjo6")
-
-[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("11_iyhuv")
-
 [node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
 script = ExtResource("5_vrrkk")
 
 [node name="set targets" type="Node" parent="Admiral/AdmiralAI/main/macro"]
 script = ExtResource("9_t8sgw")
 
-[node name="move units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("12_71ucf")
-
-[node name="issue orders" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("13_o57mr")
+[node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("9_sdjo6")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -151,19 +119,7 @@ playback_type = 1
 bus = &"Music"
 playback_type = 1
 
-[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
-navigation_polygon = SubResource("NavigationPolygon_ooheh")
-
-[node name="PlayableArea" type="Area2D" parent="."]
-
-[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
-unique_name_in_owner = true
-position = Vector2(6759, 7498)
-shape = SubResource("RectangleShape2D_nv86b")
-debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
-
 [node name="CombatMap" type="Node2D" parent="."]
-unique_name_in_owner = true
 script = ExtResource("2_moq8i")
 
 [node name="CombatCamera" type="Camera2D" parent="CombatMap"]
@@ -178,6 +134,18 @@ editor_draw_drag_margin = true
 
 [node name="TacticalMap" type="Node2D" parent="."]
 unique_name_in_owner = true
+script = ExtResource("2_cwwbl")
+
+[node name="Label" type="Label" parent="TacticalMap"]
+offset_left = 3.0
+offset_top = -61.0
+offset_right = 439.0
+offset_bottom = -15.0
+theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
+theme_override_fonts/font = ExtResource("3_urh14")
+theme_override_font_sizes/font_size = 32
+text = "TACTICAL DISPLAY"
+metadata/_edit_use_anchors_ = true
 
 [node name="Label2" type="Label" parent="TacticalMap"]
 visible = false
@@ -231,208 +199,28 @@ shape = SubResource("RectangleShape2D_ekgw8")
 debug_color = Color(1, 1, 0, 0.231373)
 
 [node name="TacticalCamera" type="Camera2D" parent="TacticalMap"]
-unique_name_in_owner = true
 anchor_mode = 0
-enabled = false
 zoom = Vector2(0.5, 0.5)
 process_callback = 0
 limit_left = 0
 limit_top = 0
 position_smoothing_enabled = true
 
-[node name="TacticalMapLayer" type="CanvasLayer" parent="."]
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_ooheh")
+
+[node name="PlayableArea" type="Area2D" parent="."]
+
+[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
 unique_name_in_owner = true
-
-[node name="TacticalViewportContainer" type="SubViewportContainer" parent="TacticalMapLayer"]
-offset_left = -3884.0
-offset_top = -3908.0
-offset_right = 5716.0
-offset_bottom = 5692.0
-size_flags_vertical = 4
-focus_mode = 0
-
-[node name="TacticalViewport" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer"]
-transparent_bg = true
-handle_input_locally = false
-canvas_item_default_texture_filter = 2
-gui_snap_controls_to_pixels = false
-size = Vector2i(9600, 9600)
-render_target_update_mode = 4
-
-[node name="TacticalMapCamera" type="Camera2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-unique_name_in_owner = true
-zoom = Vector2(0.25, 0.25)
-process_callback = 0
-limit_left = -400000
-limit_top = -400000
-limit_right = 400000
-limit_bottom = 400000
-limit_smoothed = true
-position_smoothing_enabled = true
-editor_draw_screen = false
-
-[node name="BroaderBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-visible = false
-self_modulate = Color(0.0980392, 0.0980392, 0.0980392, 0.839216)
-z_index = -1
-offset_right = 9600.0
-offset_bottom = 9600.0
-mouse_filter = 2
-
-[node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-unique_name_in_owner = true
-script = ExtResource("12_rlc6n")
-
-[node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
-z_index = -1
-material = SubResource("ShaderMaterial_lgtp0")
-offset_right = 5400.0
-offset_bottom = 6300.0
-mouse_filter = 2
-
-[node name="Label" type="Label" parent="TacticalMapLayer"]
-offset_left = 14.0
-offset_right = 450.0
-offset_bottom = 46.0
-theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
-theme_override_fonts/font = ExtResource("3_urh14")
-theme_override_font_sizes/font_size = 32
-text = "TACTICAL DISPLAY"
-metadata/_edit_use_anchors_ = true
-
-[node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
-offset_left = 1592.0
-offset_top = 950.0
-offset_right = 1656.0
-offset_bottom = 1014.0
-theme_override_constants/separation = 18
-
-[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
-self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
-z_index = 1
-z_as_relative = false
-layout_mode = 2
-focus_mode = 0
-action_mode = 0
-texture_normal = ExtResource("13_w2mg8")
-texture_pressed = ExtResource("14_wbn2k")
-texture_hover = ExtResource("14_wbn2k")
-texture_disabled = ExtResource("16_dqw4y")
-script = ExtResource("15_o3rb6")
-
-[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("16_dosly")
-
-[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
-layout_mode = 0
-offset_left = 8.0
-offset_top = -1.0
-offset_right = 25.0
-offset_bottom = 22.0
-mouse_filter = 2
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 16
-bbcode_enabled = true
-
-[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -23.0
-offset_top = 38.0
-offset_right = 23.0
-offset_bottom = 78.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("7_u21w5")
-bbcode_enabled = true
-text = "Take 
-Control"
-
-[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
-self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
-z_index = 1
-z_as_relative = false
-layout_mode = 2
-focus_mode = 0
-action_mode = 0
-texture_normal = ExtResource("13_w2mg8")
-texture_pressed = ExtResource("14_wbn2k")
-texture_hover = ExtResource("14_wbn2k")
-texture_disabled = ExtResource("16_dqw4y")
-script = ExtResource("20_ebklc")
-
-[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-texture = ExtResource("19_1hyx4")
-
-[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
-layout_mode = 0
-offset_left = 7.0
-offset_top = -1.0
-offset_right = 24.0
-offset_bottom = 25.0
-mouse_filter = 2
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 16
-bbcode_enabled = true
-
-[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -28.0
-offset_top = 37.0
-offset_right = 28.0
-offset_bottom = 75.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-theme = ExtResource("7_u21w5")
-bbcode_enabled = true
-text = "Camera Feed"
+position = Vector2(8500.5, 10049)
+shape = SubResource("RectangleShape2D_nv86b")
+debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
+visible = false
 script = ExtResource("5_ojmr4")
-
-[node name="ProxWarningContainer" type="Control" parent="ManualControlHUD"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
 
 [node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
 modulate = Color(0.486275, 0.843137, 0.294118, 0.784314)
@@ -440,8 +228,10 @@ z_index = 3
 z_as_relative = false
 layout_mode = 3
 anchors_preset = 0
-offset_top = 1080.0
-offset_bottom = 1080.0
+offset_left = 4.0
+offset_top = 1076.0
+offset_right = 4.0
+offset_bottom = 1076.0
 
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
 physics_interpolation_mode = 0
@@ -523,49 +313,6 @@ theme = ExtResource("7_u21w5")
 theme_override_font_sizes/font_size = 10
 text = "HULL"
 
-[node name="SpeedIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_left = 1844.0
-offset_top = -17.0
-offset_right = 1944.0
-offset_bottom = -7.0
-scale = Vector2(0.75, 0.75)
-rounded = true
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_gaw57")
-
-[node name="BarOutLiner2" type="TextureRect" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
-layout_mode = 0
-offset_top = -2.0
-offset_right = 104.0
-offset_bottom = 12.0
-texture = ExtResource("5_wtw0b")
-stretch_mode = 2
-
-[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -66.6667
-offset_top = -2.66667
-offset_right = -6.66671
-offset_bottom = 21.3333
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/font_size = 10
-text = "SPEED"
-
-[node name="Speedometer" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -0.000193238
-offset_top = -26.6667
-offset_right = 59.9998
-offset_bottom = -2.6667
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/font_size = 10
-text = "0"
-
 [node name="IndicatorDecor" type="TextureRect" parent="ManualControlHUD/HUDWrapper"]
 layout_mode = 0
 offset_left = -5.0
@@ -574,16 +321,24 @@ offset_right = 435.0
 offset_bottom = 3.0
 texture = ExtResource("9_lucm6")
 
-[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper"]
+[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
 layout_mode = 0
-offset_left = 66.0
-offset_top = -178.0
-offset_right = 219.0
-offset_bottom = -138.0
+offset_left = 71.0
+offset_top = 9.0
+offset_right = 224.0
+offset_bottom = 49.0
 theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 text = "WEAPON SYSTEMS"
+
+[node name="WeaponList" type="VBoxContainer" parent="ManualControlHUD/HUDWrapper/IndicatorDecor"]
+layout_mode = 0
+offset_left = 62.0
+offset_top = 36.0
+offset_right = 437.0
+offset_bottom = 192.0
+mouse_filter = 2
 
 [node name="OptionsMenu" type="CanvasLayer" parent="."]
 
@@ -786,7 +541,8 @@ theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 layer = -1
 
 [node name="Background" type="TextureRect" parent="SpaceBackground"]
-offset_right = 2207.0
+offset_left = 2.0
+offset_right = 2209.0
 offset_bottom = 1924.0
 texture = ExtResource("10_uvm3m")
 stretch_mode = 4
@@ -799,53 +555,89 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7274)
+position = Vector2(7250, 5125)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7274)
+position = Vector2(8250, 5125)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7774)
+position = Vector2(7710, 5469)
+
+[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(12670, 6000)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7274)
+position = Vector2(3500, 5125)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7774)
+position = Vector2(4500, 5125)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7774)
+position = Vector2(8679, 5539)
+
+[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9250, 12000)
+
+[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8000, 12000)
+
+[node name="PlayerShip9" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(2467, 8794)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1062)
+position = Vector2(7930, 1000)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1062)
+position = Vector2(8430, 1000)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1062)
+position = Vector2(8930, 1000)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1062)
+position = Vector2(9430, 1000)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1562)
+position = Vector2(7930, 1500)
 collision_layer = 4
 
 [node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1562)
+position = Vector2(8430, 1500)
 collision_layer = 4
 
 [node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1562)
+position = Vector2(9430, 1500)
 collision_layer = 4
 
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1562)
+position = Vector2(8930, 1500)
 collision_layer = 4
+
+[node name="PlayerShip10" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(3964, 11918)
+
+[node name="PlayerShip11" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(4964, 11918)
+
+[node name="PlayerShip12" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5964, 11918)
+
+[node name="PlayerShip13" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(12607, 9219)
+
+[node name="PlayerShip14" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5271, 7996)
+
+[node name="PlayerShip15" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5872, 9478)
+
+[node name="PlayerShip16" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(6872, 9478)
+
+[node name="PlayerShip17" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7955, 9520)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]
