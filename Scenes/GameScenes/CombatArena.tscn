@@ -69,7 +69,6 @@ script = ExtResource("2_shfex")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
 script = ExtResource("2_xxm3d")
-enabled = false
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_5naox")
