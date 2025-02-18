@@ -182,8 +182,8 @@ func _ready() -> void:
 	#ShipSprite.modulate = self_modulate
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
-	var occupancy_radius: int = 2
-	var threat_radius: int = 3
+	var occupancy_radius: int = randi_range(2,3)
+	var threat_radius: int = randi_range(3,4)
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]

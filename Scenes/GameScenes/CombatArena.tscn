@@ -611,4 +611,60 @@ collision_layer = 4
 position = Vector2(8681, 1562)
 collision_layer = 4
 
+[node name="TestShip8" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5185, 902)
+collision_layer = 4
+
+[node name="TestShip9" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5685, 902)
+collision_layer = 4
+
+[node name="TestShip10" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(6185, 902)
+collision_layer = 4
+
+[node name="TestShip11" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7342, 2486)
+collision_layer = 4
+
+[node name="TestShip12" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7842, 2486)
+collision_layer = 4
+
+[node name="TestShip13" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8342, 2486)
+collision_layer = 4
+
+[node name="TestShip14" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8842, 2486)
+collision_layer = 4
+
+[node name="TestShip15" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7342, 2986)
+collision_layer = 4
+
+[node name="TestShip16" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(7842, 2986)
+collision_layer = 4
+
+[node name="TestShip17" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8842, 2986)
+collision_layer = 4
+
+[node name="TestShip18" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8342, 2986)
+collision_layer = 4
+
+[node name="TestShip19" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(4846, 2326)
+collision_layer = 4
+
+[node name="TestShip20" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5346, 2326)
+collision_layer = 4
+
+[node name="TestShip21" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(5846, 2326)
+collision_layer = 4
+
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]
