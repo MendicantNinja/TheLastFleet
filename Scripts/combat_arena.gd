@@ -26,7 +26,7 @@ func _ready() -> void:
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
 	#TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	TacticalMap.display_map(true)
+	
 	
 	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
 	var weighted_imap: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
@@ -73,6 +73,7 @@ func _ready() -> void:
 	settings.swizzle(Cancel)
 	#%BlackenBackground.size = PlayableAreaBounds.shape.size
 	FleetDeploymentList.units_deployed.connect(TacticalMap.connect_unit_signals)
+	TacticalMap.display_map(true)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:

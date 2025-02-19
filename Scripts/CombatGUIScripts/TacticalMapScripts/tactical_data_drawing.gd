@@ -45,6 +45,8 @@ var attack_group: bool = false
 # Manual Control
 var manually_controlled_ship: Ship = null # There can be only one!
  
+# Weird Stuff
+var initial_setup: bool = false
 
 signal switch_maps()
 
@@ -167,8 +169,10 @@ func swap_camera_feed(ship: Ship) -> void:
 	
 
 func setup() -> void:
+	#print("setup called")
 	# Check if new ships have been added
 	var ship_arrays: Array = ship_dictionary.values()
+	#print(ship_arrays.size())
 	for array in ship_arrays:
 		for ship in array:
 			if ship_registry.has(ship):
@@ -184,7 +188,6 @@ func setup() -> void:
 
 func update() -> void:
 	#print("update")
-	#print("camera_feed_active, camera_feed_ship, prev_selected_unit ", camera_feed_active, camera_feed_ship, prev_selected_ship)
 	if prev_selected_ship == null: 
 		$"../../../ButtonList/ManualControlButton".disabled = true
 		$"../../../ButtonList/CameraFeedButton".disabled = true
@@ -198,8 +201,10 @@ func update() -> void:
 func _process(delta):
 	if self.visible == true and Engine.get_physics_frames() % 10 == 0:
 		update()
-		#if Engine.get_physics_frames() % 60 == 0:
-			#setup()
+	# Populate the map because ship registration isn't instantaneous as of 2/18/24
+	if initial_setup == false and Engine.get_physics_frames() % 70 == 0:
+			setup()
+			initial_setup = true
 
 func convert_realspace_to_map(global_pos: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
 	return Vector2(
@@ -246,9 +251,11 @@ func _draw():
 	 #`"Y88b  888    "     888          888    "    888               888      
 #oo     .d8P  888       o  888       o  888       o `88b    ooo       888      
 #8""88888P'  o888ooooood8 o888ooooood8 o888ooooood8  `Y8bood8P'      o888o     
-																			  
+																		
+																		  
+# What methods have changed?
 func select_units() -> void:
-	#print("select_units called")
+	print("select_units called")
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
@@ -353,13 +360,12 @@ func _on_unit_selected(unit: Ship) -> void:
 
 
 func process_move(to_position: Vector2) -> void:
-	
 	# input, process_move, IF already existing move_unit, 
 	# else if not already existing: move_new_unit, reset_group_affiliation, move_unit
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	if highlighted_group.size() == 0:
 		return
-	print("Process move called", highlighted_group)
+	
 	var group_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
@@ -372,16 +378,8 @@ func process_move(to_position: Vector2) -> void:
 			move_unit(group_leaders[0], to_position)
 			return
 	
-	var prev_group: Array = get_tree().get_nodes_in_group(current_group_name)
-	if prev_group.size() == highlighted_group.size() and group_leaders.size() == 1:
-		var leader = group_leaders[0]
-		if leader in prev_group and leader in highlighted_group:
-			move_unit(leader, to_position)
-			return
-	
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
-
 # Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
@@ -392,7 +390,7 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 func move_new_unit(to_position: Vector2) -> void:
 	# 1) Create an array of ships (nodes) from the ships the player currently has selected
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
-	
+	var leader_key: StringName = &"leader"
 	# 2) Assign group leader
 	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.
 	var new_leader = null
@@ -406,7 +404,7 @@ func move_new_unit(to_position: Vector2) -> void:
 		for unit in highlighted_group:
 			unit_positions[unit.global_position] = unit
 		
-		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		new_leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.
@@ -426,10 +424,9 @@ func move_new_unit(to_position: Vector2) -> void:
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	new_leader.set_group_leader(true)
-	
+	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
-
 	  #.o.       ooooooooooooo ooooooooooooo       .o.         .oooooo.   oooo    oooo 
 	 #.888.      8'   888   `8 8'   888   `8      .888.       d8P'  `Y8b  `888   .8P'  
 	#.8"888.          888           888          .8"888.     888           888  d8'    
@@ -479,7 +476,7 @@ func attack_targets() -> void:
 		for unit in highlighted_group:
 			unit_positions[unit.global_position] = unit
 		
-		var median: Vector2 = globals.geometric_median_of_objects(unit_positions)
+		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		leader = globals.find_unit_nearest_to_median(median, unit_positions)
 
 # Takes a group of recently selected ships and creates a new group for them.

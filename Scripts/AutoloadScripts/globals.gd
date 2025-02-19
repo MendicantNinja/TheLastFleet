@@ -32,7 +32,7 @@ func convert_input_to_string(action: StringName, color: String = "orange", use_c
 
 
 
-func geometric_median_of_objects(object_positions: Dictionary, epsilon: float = 1e-5) -> Vector2:
+func geometric_median_of_objects(object_positions: Array, epsilon: float = 1e-5) -> Vector2:
 	var sum_x: float = 0.0
 	var sum_y: float = 0.0
 	var number_of_objects: int = object_positions.size()

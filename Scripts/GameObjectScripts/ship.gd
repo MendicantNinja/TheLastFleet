@@ -138,8 +138,6 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 # Any adjustments before deploying the ship to the combat space. Called during/by FleetDeployment.
 func deploy_ship() -> void:
 	#print("deploy ship called")
-	$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
-	
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	if get_tree().current_scene.name == "CombatArena":
 		CombatCamera = $"../CombatMap/CombatCamera"
@@ -153,7 +151,7 @@ func deploy_ship() -> void:
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		OldTacticalMapIcon.modulate = settings.enemy_color
-		settings.swizzle($ShipLivery, settings.enemy_color) 
+		settings.swizzle($ShipLivery, settings.enemy_color)
 	
 func _ready() -> void:
 	ShipSprite.z_index = 0
@@ -259,9 +257,8 @@ func _ready() -> void:
 	toggle_auto_fire(all_weapons)
 	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
 	#furthest_safe_distance += longest_range_weapon.weapon.range
-
-	deploy_ship()
 	set_combat_ai(true)
+	deploy_ship()
 	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
@@ -381,11 +378,8 @@ func group_add(n_group_name: StringName) -> void:
 		weapon_slot.set_auto_fire(true)
 	#print("%s added to %s" % [name, n_group_name])
 func set_group_leader(value: bool) -> void:
-	print("%s made leader of %s" % [name, group_name])
+	#print("%s made leader of %s" % [name, group_name])
 	group_leader = value
-func set_group_leader(leader_value: bool) -> void:
-	print("%s made leader of %s" % [name, group_name])
-	group_leader = leader_value
 
 func set_posture(value: globals.Strategy) -> void:
 	posture = value
@@ -487,9 +481,12 @@ func toggle_manual_control() -> void:
 	# NOTE: Toggle manual aim is set to false in combat_map.gd in set_manual_camera
 	if ship_select == false:
 		manual_control = false
+		CombatBehaviorTree.toggle_root(true)
+		return
 	
 	if CombatBehaviorTree.enabled == true:
 		CombatBehaviorTree.toggle_root(false)
+	
 	if manual_control == false:
 		manual_control = true
 		ship_select = false
@@ -502,15 +499,17 @@ func toggle_manual_control() -> void:
 			#if weapon_system.auto_fire_start == true:
 				#toggle_auto_aim(weapon_system.weapons)
 				#toggle_auto_fire(weapon_system.weapons)
+		_on_mouse_exited()
+	
+	elif manual_control == true:
+		manual_control = false
+		ship_select = false
+		for weapon_system in self.weapon_systems:
+			weapon_system.set_autofire(true)
 		ManualControlHUD.set_ship(null)
 		_on_mouse_exited()
 	
 	toggle_manual_aim(all_weapons, manual_control)
-	
-	if manual_control == true:
-		CombatBehaviorTree.toggle_root(false)
-	elif manual_control == false:
-		CombatBehaviorTree.toggle_root(true)
 	
 	if manual_control == true and group_leader:
 		set_group_leader(false)
@@ -519,6 +518,7 @@ func toggle_manual_control() -> void:
 		group_name = &""
 	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
 		ShipNavigationAgent.set_target_position(position)
+	
 	
 	#if manual_control == true:
 		 # Bring up the ManualControlHUD CanvasLayer
@@ -565,6 +565,7 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 		weapon_slot.toggle_auto_fire()
 
 func set_navigation_position(to_position: Vector2) -> void:
+	print("set navigation position called")
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
@@ -593,10 +594,14 @@ func _physics_process(delta: float) -> void:
 
 	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
+		update_registry_cell.emit(registry_cell, current_registry_cell)
+		registry_cell = current_registry_cell
+	
 	if Engine.get_physics_frames() % 120 == 0 and targeted_by.is_empty() == false:
 		for unit in targeted_by:
 			if unit == null:
 				targeted_by.erase(unit)
+	
 	
 	if vent_flux_flag == true:
 		for weapon in all_weapons:
@@ -605,17 +610,7 @@ func _physics_process(delta: float) -> void:
 		for weapon in all_weapons:
 			if weapon.flux_overload == true:
 				weapon.flux_overload = false
-	if Engine.get_physics_frames() % 60 == 0 and manual_control == true:
-		#print(manual_camera_freelook)
-		pass
-	#if TacticalCamera != null and TacticalCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
-	#if ManualControlCamera != null and ManualControlCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
-		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
-	#if ManualControlCamera != null and ManualControlCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
-	
+
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
 	
@@ -643,51 +638,44 @@ func _physics_process(delta: float) -> void:
 	#if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		#ShipNavigationAgent.set_target_position(position)
 	
-	if Input.is_action_pressed("vent flux"):
-		vent_flux_flag = true
-		if soft_flux > 0.0:
-			soft_flux -= ship_stats.flux_dissipation
-		elif hard_flux > 0.0:
-			hard_flux -= ship_stats.flux_dissipation
-		update_flux_indicators()
-	elif Input.is_action_just_released("vent flux"):
-		vent_flux_flag = false
-	
-	if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
-		fire_weapon_system(all_weapons)
-	
 	if shield_toggle == true and flux_overload == false:
+		soft_flux += shield_upkeep
+		update_flux_indicators()
+	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
+		set_shields(false)
 
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
-		if manual_control == true:
-			CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
-			if %TacticalMapLayer.visible == false:
-				CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
-				if Input.is_action_pressed("select") and not flux_overload:
-					fire_weapon_system(all_weapons)
-				
-				var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
-				rotate_angle = rotate_direction.angle()
-				var adjust_mass: float = (mass * 1000)
-				rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-				move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
-				Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
-				
-				if Input.is_action_pressed("vent_flux"):
-					if soft_flux > 0.0:
-						soft_flux -= ship_stats.flux_dissipation
-					elif hard_flux > 0.0:
-						hard_flux -= ship_stats.flux_dissipation
-					update_flux_indicators()
-		#print(%TacticalDataDrawing.camera_feed_active)
-			if %TacticalDataDrawing.camera_feed_active == false:
-				ManualControlHUD.update_hud()
-				if manual_camera_freelook == false:
-					CombatCamera.global_position = self.global_position
-				#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-		
-		if camera_feed == true:
-			CombatCamera.global_position = self.global_position
+	if manual_control == true:
+		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
+		if %TacticalMapLayer.visible == false:
+			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
+			if Input.is_action_pressed("select") and not flux_overload:
+				fire_weapon_system(all_weapons)
+			
+			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
+			rotate_angle = rotate_direction.angle()
+			var adjust_mass: float = (mass * 1000)
+			rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+			move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
+			Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
+			
+			if Input.is_action_pressed("vent_flux"):
+				if soft_flux > 0.0:
+					soft_flux -= ship_stats.flux_dissipation
+				elif hard_flux > 0.0:
+					hard_flux -= ship_stats.flux_dissipation
+				update_flux_indicators()
+			elif Input.is_action_just_released("vent_flux"):
+				vent_flux_flag = false
+	#print(%TacticalDataDrawing.camera_feed_active)
+		if %TacticalDataDrawing.camera_feed_active == false:
+			ManualControlHUD.update_hud()
+			if manual_camera_freelook == false:
+				CombatCamera.global_position = self.global_position
+			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
+	
+	if camera_feed == true:
+		CombatCamera.global_position = self.global_position
 		
 	if shield_toggle and not flux_overload:
 		fire_weapon_system(all_weapons)
