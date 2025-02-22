@@ -376,7 +376,11 @@ func group_add(n_group_name: StringName) -> void:
 			continue
 		weapon_slot.set_auto_aim(true)
 		weapon_slot.set_auto_fire(true)
+	#group_name = n_group_name
 	#print("%s added to %s" % [name, n_group_name])
+	group_name = n_group_name
+	add_to_group(group_name)
+
 func set_group_leader(value: bool) -> void:
 	#print("%s made leader of %s" % [name, group_name])
 	group_leader = value
@@ -565,7 +569,6 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 		weapon_slot.toggle_auto_fire()
 
 func set_navigation_position(to_position: Vector2) -> void:
-	print("set navigation position called")
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
@@ -602,7 +605,6 @@ func _physics_process(delta: float) -> void:
 			if unit == null:
 				targeted_by.erase(unit)
 	
-	
 	if vent_flux_flag == true:
 		for weapon in all_weapons:
 			weapon.flux_overload = true
@@ -613,6 +615,12 @@ func _physics_process(delta: float) -> void:
 
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
+	ConstantSizedGUI.scale = Vector2.ONE
+	if CombatCamera != null and CombatCamera.enabled:
+		ConstantSizedGUI.scale = Vector2(1 / CombatCamera.zoom.x, 1 / CombatCamera.zoom.y)
+		# if one wants to make the manually controlled hud less transparent than friendly ships
+		#var current_color: Color = ConstantSizedGUI.modulate
+		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	if linear_damp > 0.0 and sleeping == true:
 		linear_damp = 0.0
@@ -621,19 +629,11 @@ func _physics_process(delta: float) -> void:
 		if brake_flag == true:
 			brake_flag = false
 	
+	if camera_feed == true:
+		CombatCamera.global_position = self.global_position
+	
 	if manual_control == false:
 		return
-	#if TacticalCamera != null and TacticalCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 /TacticalCamera.zoom.x, 1 / TacticalCamera.zoom.y)
-	#if ManualControlCamera != null and ManualControlCamera.enabled:
-		#ConstantSizedGUI.scale = Vector2(1 / ManualControlCamera.zoom.x, 1 / ManualControlCamera.zoom.y)
-	
-	if manual_camera_freelook == false:
-		CombatCamera.global_position = self.global_position
-	CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	# if one wants to make the manually controlled hud less transparent than friendly ships
-	#var current_color: Color = ConstantSizedGUI.modulate
-	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	#if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		#ShipNavigationAgent.set_target_position(position)
@@ -643,15 +643,14 @@ func _physics_process(delta: float) -> void:
 		update_flux_indicators()
 	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
 		set_shields(false)
-
+	
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
 	if manual_control == true:
 		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
 		if %TacticalMapLayer.visible == false:
 			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
-			if Input.is_action_pressed("select") and not flux_overload:
+			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
 				fire_weapon_system(all_weapons)
-			
 			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
 			rotate_angle = rotate_direction.angle()
 			var adjust_mass: float = (mass * 1000)
@@ -673,9 +672,6 @@ func _physics_process(delta: float) -> void:
 			if manual_camera_freelook == false:
 				CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	
-	if camera_feed == true:
-		CombatCamera.global_position = self.global_position
 		
 	if shield_toggle and not flux_overload:
 		fire_weapon_system(all_weapons)
@@ -701,11 +697,6 @@ func _physics_process(delta: float) -> void:
 	
 	velocity = velocity.limit_length(speed + speed_modifier)
 	acceleration = velocity
-	
-
-	# if one wants to make the manually controlled hud less transparent or a different color than friendly ships
-	#var current_color: Color = ConstantSizedGUI.modulate
-	#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
 		sleeping = false

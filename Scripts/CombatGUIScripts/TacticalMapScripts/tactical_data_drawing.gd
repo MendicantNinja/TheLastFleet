@@ -136,7 +136,7 @@ func display_map(map_value: bool) -> void:
 	# Show the Tac Map
 	if map_value == true:
 		if camera_feed_ship != null:
-			print("map value called")
+			#print("map value called")
 			camera_feed_ship.camera_feed = false
 			camera_feed_ship = null
 			camera_feed_active = false
@@ -195,6 +195,10 @@ func update() -> void:
 		$"../../../ButtonList/ManualControlButton".disabled = false
 		$"../../../ButtonList/CameraFeedButton".disabled = false
 	for icon in icon_list:
+		if icon.assigned_ship == null:
+			icon.free()
+			icon_list.erase(icon)
+			continue
 		icon.position = convert_realspace_to_map(icon.assigned_ship.global_position, map_bounds, grid_size)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -255,7 +259,7 @@ func _draw():
 																		  
 # What methods have changed?
 func select_units() -> void:
-	print("select_units called")
+	
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
@@ -263,6 +267,7 @@ func select_units() -> void:
 	var selection: Array[Ship]
 	for icon in selection_icons:
 		selection.append(icon.assigned_ship)
+	#print("select_units called ", selection_icons, "and selection is ", selection)
 	reset_box_selection()
 	
 	if selection.size() == 0:
@@ -290,7 +295,7 @@ func select_units() -> void:
 			ship.add_to_group(highlight_enemy_name)
 		elif ship.is_friendly and attack_group == false:
 			ship.add_to_group(highlight_group_name)
-	#add in when adding back attack
+
 	if attack_group:
 		attack_targets()
 	# Whatever is still selected, highlight it.
@@ -439,8 +444,6 @@ func move_new_unit(to_position: Vector2) -> void:
 func attack_targets() -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var targeted_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
-	var target_group_key: StringName = &" targets"
-	var target_key: StringName = &"target"
 	get_tree().call_group(highlight_enemy_name, "highlight_selection", true)
 	
 	var funny_pair: Array = current_groups.values()
@@ -449,25 +452,23 @@ func attack_targets() -> void:
 		if highlighted_group == pair:
 			existing_group = pair
 	
+	var leader = null
 	# Alt select and select_units causes a multitude of problems I can't bother to fix.
 	if not existing_group.is_empty():
-		var leader = null
 		for unit in existing_group:
 			if unit.group_leader == true:
 				leader = unit
-		var key_copy: StringName = leader.group_name + target_group_key
-		var targets_available = leader.CombatBehaviorTree.blackboard.ret_data(key_copy)
-		if targeted_group == targets_available:
+				break
+		var targets_available: Array = leader.targeted_units
+		if targets_available == targeted_group:
 			return
 	
-	var group_leaders: Array = []
 	for unit in highlighted_group:
-		if unit.group_leader:
-			group_leaders.push_back(unit)
+		if unit.group_leader == true:
+			unit.set_group_leader(false)
 	
 	reset_group_affiliation(highlighted_group)
 	
-	var leader: Ship = null
 	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
 		leader = highlighted_group[0]
 	
@@ -478,6 +479,22 @@ func attack_targets() -> void:
 		
 		var median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
 		leader = globals.find_unit_nearest_to_median(median, unit_positions)
+
+	# 3) Generate and assign a name. Sort the name arrays.
+	var new_group_name: StringName 
+	if available_group_names.size() > 0:
+		new_group_name = available_group_names.pop_back()
+	elif available_group_names.size() == 0:
+	# iterate a new group name
+		new_group_name = StringName("Group " + str(group_iterator))
+		group_iterator += 1
+	
+	taken_group_names.push_back(new_group_name)
+	current_groups[new_group_name] = highlighted_group
+	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	get_tree().call_group(new_group_name, &"set_targets", targeted_group)
+	leader.set_group_leader(true)
+
 
 # Takes a group of recently selected ships and creates a new group for them.
 func reset_group_affiliation(group_select: Array) -> void:
@@ -499,6 +516,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
+	#print("alt select called")
 	if not visible:
 		return
 	

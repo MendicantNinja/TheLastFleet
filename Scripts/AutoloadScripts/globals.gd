@@ -30,8 +30,6 @@ func convert_input_to_string(action: StringName, color: String = "orange", use_c
 		returned_bbcode = "[color=#%s]%s[/color]" % [settings.gui_color.to_html(), readable]
 	return returned_bbcode
 
-
-
 func geometric_median_of_objects(object_positions: Array, epsilon: float = 1e-5) -> Vector2:
 	var sum_x: float = 0.0
 	var sum_y: float = 0.0

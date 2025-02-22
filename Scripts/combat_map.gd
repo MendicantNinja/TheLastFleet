@@ -39,7 +39,7 @@ func _unhandled_input(event):
 	elif event is InputEventMouseMotion:
 		#Middle Mouse Button Scrolling
 		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
-			print(manually_controlled_unit)
+			#print(manually_controlled_unit)
 			CombatCamera.global_position -= event.relative / CombatCamera.zoom
 			if manually_controlled_unit != null:
 				manually_controlled_unit.toggle_manual_camera_freelook(true)
@@ -51,8 +51,8 @@ func _unhandled_input(event):
 func _physics_process(delta) -> void:
 	if CombatCamera.zoom != zoom_value:
 		CombatCamera.zoom = lerp(CombatCamera.zoom, zoom_value, 0.5)
-	if manually_controlled_unit != null and CombatCamera.position != manually_controlled_unit.global_position:
-		CombatCamera.position = manually_controlled_unit.global_position
+	#if manually_controlled_unit != null and CombatCamera.position != manually_controlled_unit.global_position:
+		#CombatCamera.position = manually_controlled_unit.global_position
 
 func display_map(map_value: bool) -> void:
 	if map_value == true:
