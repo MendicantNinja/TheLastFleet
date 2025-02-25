@@ -1,4 +1,4 @@
-[gd_scene load_steps=47 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=51 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -43,6 +43,16 @@ vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 
 polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
 outlines = Array[PackedVector2Array]([PackedVector2Array(-1, -29, 11, 20076, 17118, 20076, 17014, -91)])
 agent_radius = 50.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uu0x8"]
+size = Vector2(0, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_us2n3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7h4jy"]
+size = Vector2(0, 0)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_4kp6c"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nv86b"]
 size = Vector2(13500, 15000)
@@ -152,6 +162,47 @@ playback_type = 1
 
 [node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
 navigation_polygon = SubResource("NavigationPolygon_ooheh")
+
+[node name="CollisionBoundaryLeft" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryLeft"]
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_uu0x8")
+one_way_collision = true
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryRight" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryRight"]
+rotation = -1.5708
+shape = SubResource("RectangleShape2D_us2n3")
+one_way_collision = true
+one_way_collision_margin = 100.0
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryTop" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryTop"]
+rotation = 3.14159
+shape = SubResource("RectangleShape2D_7h4jy")
+one_way_collision = true
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryBottom" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryBottom"]
+shape = SubResource("SegmentShape2D_4kp6c")
+one_way_collision = true
+one_way_collision_margin = 100.0
+debug_color = Color(0.862745, 0.054902, 0, 1)
 
 [node name="PlayableArea" type="Area2D" parent="."]
 
@@ -799,7 +850,7 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7274)
+position = Vector2(13030, 6748)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(8705, 7274)

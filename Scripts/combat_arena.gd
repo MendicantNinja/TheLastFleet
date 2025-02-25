@@ -25,7 +25,6 @@ func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
-	#TacticalMap.set_grid_parameters(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
 	
 	
 	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
@@ -74,6 +73,26 @@ func _ready() -> void:
 	#%BlackenBackground.size = PlayableAreaBounds.shape.size
 	FleetDeploymentList.units_deployed.connect(TacticalMap.connect_unit_signals)
 	TacticalMap.display_map(true)
+	
+	# Set combat boundaries using four static bodies and shapes. A>B order is important for one-way collision. I had to use Rects and do rotation magic due to global collisions.
+	$CollisionBoundaryLeft.position = Vector2(0, PlayableAreaBounds.shape.size.y/2)
+	$CollisionBoundaryLeft/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.y, 1) 
+	
+	$CollisionBoundaryTop.position = Vector2(PlayableAreaBounds.shape.size.x/2, 0)
+	$CollisionBoundaryTop/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.x, 1 ) 
+
+	#
+	$CollisionBoundaryRight.position = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y/2)
+	$CollisionBoundaryRight/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.y, 1 ) 
+	
+	
+	#$CollisionBoundaryRight.position =  Vector2(PlayableAreaBounds.shape.size.x,0)
+	#$CollisionBoundaryRight/CollisionBoundaryShape.shape.a = Vector2(0, 0)
+	#$CollisionBoundaryRight/CollisionBoundaryShape.shape.b = Vector2(0, PlayableAreaBounds.shape.size.y)
+	
+	$CollisionBoundaryBottom.position =  Vector2(0,0)
+	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
+	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:

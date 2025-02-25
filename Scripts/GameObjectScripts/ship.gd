@@ -828,7 +828,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 	return valid_paths
 
 func _on_AvoidanceShape_body_entered(body) -> void:
-	if body == self:
+	if body == self or body is StaticBody2D:
 		return
 	neighbor_units.append(body)
 
