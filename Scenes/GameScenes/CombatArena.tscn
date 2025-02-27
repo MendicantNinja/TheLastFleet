@@ -850,7 +850,7 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(13030, 6748)
+position = Vector2(8357, 7256)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(8705, 7274)

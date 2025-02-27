@@ -1,14 +1,27 @@
 extends GridContainer
 var ships_to_deploy: Array[ShipIcon]
 @onready var CombatMap: Node2D = $"../../.."
-
+@onready var PlayableAreaBounds = %PlayableAreaBounds
 signal units_deployed(units)
+
+# Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 
+# Has 3 rows and 7 columns (21 ships). Can be expanded later.
+var friendly_deployment_position: Vector2
+var friendly_deployment_row: int = 0
+var friendly_deployment_spacing: int = 300
+var enemy_deployment_position: Vector2
 
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
 	%Deploy.pressed.connect(self.deploy_ships)
 	pass
+
+# Reset this when a ship moves off of it's deployment position.
+func reset_deployment_position() -> void:
+	friendly_deployment_position.x = PlayableAreaBounds.shape.size.x/2 - friendly_deployment_spacing * 3 # 3+1+3 = 7 columns
+	friendly_deployment_position.y = PlayableAreaBounds.shape.size.y - friendly_deployment_spacing * 3 # 3 rows
+	friendly_deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 	if toggled_on == true:
@@ -18,19 +31,31 @@ func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 
 func deploy_ships() -> void:
 	var instantiated_units: Array = []
+	reset_deployment_position()
+	var iterator: int
 	for ship_icon in ships_to_deploy:
 		if ship_icon == null or ship_icon.disabled:
 			continue
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(ship_icon.ship)
-		ship_instantiation.global_position = Vector2(0, 0)
+		# Deployment Positioning
+		if iterator > 7:
+			friendly_deployment_row += 1
+		ship_instantiation.global_position.x = friendly_deployment_position.x + iterator * friendly_deployment_spacing
+		ship_instantiation.global_position.y = friendly_deployment_position.y + friendly_deployment_row * friendly_deployment_spacing 
+		
 		ship_instantiation.is_friendly = true
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
 		ship_instantiation.display_icon(true)
-	units_deployed.emit(instantiated_units)
-	on_cancel_pressed()
+		iterator += 1
+
+	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
+	imap_manager.register_agents(instantiated_units)
+	%TacticalDataDrawing.delayed_setup_call()
+	#var TDD = %TacticalDataDrawing # Used for debugging ship_registry and deployed ships
+	on_cancel_pressed() # Hide menu after deploying ships
 
 func on_all_pressed() -> void:
 	var excluding_deployed: Array[ShipIcon] = ships_to_deploy.duplicate()

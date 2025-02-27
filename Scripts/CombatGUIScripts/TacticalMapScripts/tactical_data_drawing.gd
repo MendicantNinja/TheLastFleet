@@ -151,13 +151,7 @@ func display_map(map_value: bool) -> void:
 		attack_group = false
 		#$"../..".grab_focus()
 		%TacticalMapLayer.visible = false
-	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
-	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
-	connect_unit_signals(friendly_group)
-	connect_unit_signals(enemy_group)
-	
-	get_tree().call_group("enemy", "display_icon", visible)
-	get_tree().call_group("friendly", "display_icon", visible)          
+	  
 
 func swap_camera_feed(ship: Ship) -> void:
 	if camera_feed_ship != null:
@@ -184,6 +178,12 @@ func setup() -> void:
 				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
+	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
+	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
+	get_tree().call_group("enemy", "display_icon", visible)
+	get_tree().call_group("friendly", "display_icon", visible)    
+	connect_unit_signals(friendly_group)
+	connect_unit_signals(enemy_group)
 	update()
 
 func update() -> void:
@@ -574,3 +574,15 @@ func performance_testing():
 		ob.offset.x = 0
 	end = Time.get_ticks_msec()
 	print("time ms : " + str(end - start))
+
+func delayed_setup_call():
+	var timer = Timer.new()
+	add_child(timer)  # Add to scene tree so it runs
+	timer.wait_time = 1 # 2 seconds
+	timer.one_shot = true  # Runs once
+	timer.start()
+	timer.timeout.connect(_delayed_setup_timeout.bind(timer))  # Bind to remove after use
+
+func _delayed_setup_timeout(timer):
+	setup()
+	timer.queue_free()  # Remove the timer from the scene

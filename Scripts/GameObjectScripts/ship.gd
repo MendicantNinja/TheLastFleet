@@ -9,7 +9,7 @@ class_name Ship
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
-@onready var TacticalDataDrawing = %TacticalDataDrawing
+
 @onready var ManualControlHUD = null
 @onready var CenterCombatHUD = $CenterCombatHUD
 @onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
@@ -21,6 +21,8 @@ class_name Ship
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
 @onready var OldTacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 var tactical_map_icon: TacticalMapIcon
+var TacticalMapLayer: CanvasLayer
+var TacticalDataDrawing: Node2D 
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var CombatTimer = $CombatTimer
@@ -139,7 +141,11 @@ func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST
 func deploy_ship() -> void:
 	#print("deploy ship called")
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
+	
 	if get_tree().current_scene.name == "CombatArena":
+		# Deployed ships can't find references to other nodes in the scene. So set the paths up here as needed.
+		TacticalDataDrawing = get_tree().get_root().find_child("TacticalDataDrawing", true, false)
+		TacticalMapLayer = get_tree().get_root().find_child("TacticalMapLayer", true, false)
 		CombatCamera = $"../CombatMap/CombatCamera"
 		TacticalCamera = %TacticalMapCamera
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
@@ -220,7 +226,6 @@ func _ready() -> void:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
 		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
-	
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
 		if child is WeaponSlot:
@@ -305,6 +310,7 @@ func destroy_ship() -> void:
 		globals.reset_group_leader(self)
 	
 	destroyed.emit()
+	TacticalDataDrawing.setup() 
 	ShipTargetIcon.visible = false
 	#$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
 	queue_free()
@@ -412,7 +418,7 @@ func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
-	if %TacticalMapLayer.visible or %TacticalDataDrawing.camera_feed_active:
+	if TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("m2") and manual_control:
@@ -458,7 +464,7 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 	pass
 
 func _on_mouse_entered() -> void:
-	if %TacticalMapLayer.visible:
+	if TacticalMapLayer.visible:
 		return
 	mouse_hover = true
 	if manual_control == false:
@@ -466,7 +472,7 @@ func _on_mouse_entered() -> void:
 			weapon_slot.toggle_display_aim(mouse_hover)
 
 func _on_mouse_exited() -> void:
-	if %TacticalMapLayer.visible:
+	if TacticalMapLayer.visible:
 		return
 	mouse_hover = false
 	if targeted or manual_control:
@@ -647,7 +653,7 @@ func _physics_process(delta: float) -> void:
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
 	if manual_control == true:
 		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
-		if %TacticalMapLayer.visible == false:
+		if TacticalMapLayer.visible == false:
 			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
 			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
 				fire_weapon_system(all_weapons)
@@ -666,8 +672,8 @@ func _physics_process(delta: float) -> void:
 				update_flux_indicators()
 			elif Input.is_action_just_released("vent_flux"):
 				vent_flux_flag = false
-	#print(%TacticalDataDrawing.camera_feed_active)
-		if %TacticalDataDrawing.camera_feed_active == false:
+	#print(TacticalDataDrawing.camera_feed_active)
+		if TacticalDataDrawing.camera_feed_active == false:
 			ManualControlHUD.update_hud()
 			if manual_camera_freelook == false:
 				CombatCamera.global_position = self.global_position
