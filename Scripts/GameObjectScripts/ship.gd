@@ -147,7 +147,7 @@ func deploy_ship() -> void:
 		TacticalDataDrawing = get_tree().get_root().find_child("TacticalDataDrawing", true, false)
 		TacticalMapLayer = get_tree().get_root().find_child("TacticalMapLayer", true, false)
 		CombatCamera = $"../CombatMap/CombatCamera"
-		TacticalCamera = %TacticalMapCamera
+		TacticalCamera = get_tree().get_root().find_child("TacticalMapCamera", true, false)
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
 	
 	if is_friendly == true:
@@ -382,7 +382,6 @@ func group_add(n_group_name: StringName) -> void:
 			continue
 		weapon_slot.set_auto_aim(true)
 		weapon_slot.set_auto_fire(true)
-	#group_name = n_group_name
 	#print("%s added to %s" % [name, n_group_name])
 	group_name = n_group_name
 	add_to_group(group_name)
@@ -534,9 +533,6 @@ func toggle_manual_control() -> void:
 		 # Bring up the ManualControlHUD CanvasLayer
 		#switch_to_manual.emit() # Calls to Tactical Map to swap Camera and give a ship
 		#request_manual_camera.emit() # Calls to combat map to switch the current/prev selected unit.
-
-# func remove_manual_view() -> void:
-# pass
 
 func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 	manual_camera_freelook = toggle_status

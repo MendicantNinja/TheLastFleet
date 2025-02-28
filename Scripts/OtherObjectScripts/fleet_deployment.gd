@@ -8,8 +8,7 @@ signal units_deployed(units)
 # Has 3 rows and 7 columns (21 ships). Can be expanded later.
 var friendly_deployment_position: Vector2
 var friendly_deployment_row: int = 0
-var friendly_deployment_spacing: int = 300
-var enemy_deployment_position: Vector2
+var friendly_deployment_spacing: int = 500
 
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
@@ -38,22 +37,25 @@ func deploy_ships() -> void:
 			continue
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(ship_icon.ship)
-		# Deployment Positioning
-		if iterator > 7:
-			friendly_deployment_row += 1
-		ship_instantiation.global_position.x = friendly_deployment_position.x + iterator * friendly_deployment_spacing
-		ship_instantiation.global_position.y = friendly_deployment_position.y + friendly_deployment_row * friendly_deployment_spacing 
-		
 		ship_instantiation.is_friendly = true
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
 		ship_instantiation.display_icon(true)
+		
+		# Deployment Positioning
+		if iterator > 7:
+			friendly_deployment_row += 1
+		ship_instantiation.global_position.x = friendly_deployment_position.x + iterator * friendly_deployment_spacing # Correct
+		ship_instantiation.global_position.y = friendly_deployment_position.y + friendly_deployment_spacing * 3 + 900 + friendly_deployment_row * friendly_deployment_spacing # I want to start at the top in termso f Y
+		var path_to: Vector2 = Vector2(friendly_deployment_position.x + iterator * friendly_deployment_spacing, friendly_deployment_position.y - friendly_deployment_row * friendly_deployment_spacing)
+		ship_instantiation.set_navigation_position(path_to)
 		iterator += 1
 
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
 	imap_manager.register_agents(instantiated_units)
 	%TacticalDataDrawing.delayed_setup_call()
+	
 	#var TDD = %TacticalDataDrawing # Used for debugging ship_registry and deployed ships
 	on_cancel_pressed() # Hide menu after deploying ships
 
