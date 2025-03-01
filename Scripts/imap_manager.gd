@@ -23,11 +23,14 @@ enum MapType {
 
 var default_radius: int = 5
 var registry_map: Dictionary = {}
+var friendly_cluster: Array = []
+var enemy_cluster: Array = []
 var template_maps: Dictionary = {}
 var agent_maps: Dictionary = {}
 var vulnerability_map: Imap
 var tension_map: Imap
 var weighted_imap: Imap
+var goal_map: Imap
 var weighted_friendly: Dictionary = {}
 var weighted_enemy: Dictionary = {}
 var working_maps: Dictionary = {}
@@ -54,11 +57,12 @@ func _init():
 func register_map(map: Imap) -> void:
 	agent_maps[map.map_type] = map
 
-func register_agents(agents: Array) -> void:
+func register_agents(agents: Array, goal: int) -> void:
 	for agent: Ship in agents:
 		agent.update_agent_influence.connect(_on_agent_influence_changed.bind(agent))
 		agent.destroyed.connect(_on_agent_destroyed.bind(agent))
 		agent.update_registry_cell.connect(_on_agent_registry_changed.bind(agent))
+		agent.combat_goal = goal
 
 @warning_ignore("narrowing_conversion", "integer_division")
 func _on_agent_influence_changed(registered_cell: Vector2i, current_cell_idx: Vector2i, agent: Ship) -> void:
@@ -134,8 +138,8 @@ func _on_CombatArena_exiting() -> void:
 		agent_maps[map].clear_map()
 
 func weigh_force_density() -> void:
-	var friendly_cluster: Dictionary = {}
-	var enemy_cluster: Dictionary = {}
+	var friendly_cell_density: Dictionary = {}
+	var enemy_cell_density: Dictionary = {}
 	for cell in registry_map:
 		var registered_agents: Array = registry_map[cell]
 		var enemy_density: float = 0.0
@@ -146,39 +150,41 @@ func weigh_force_density() -> void:
 			elif not agent.is_friendly:
 				enemy_density += agent.approx_influence
 		if friendly_density != 0.0:
-			friendly_cluster[cell] = friendly_density
+			friendly_cell_density[cell] = friendly_density
 		if enemy_density != 0.0:
-			enemy_cluster[cell] = enemy_density
+			enemy_cell_density[cell] = enemy_density
 	
 	
 	var enemy_neighborhood_density: Dictionary = {}
 	visited = []
-	for cell in enemy_cluster:
+	for cell in enemy_cell_density:
 		var cluster: Array = []
 		if cell not in visited:
-			cluster = flood_fill(cell, visited, cluster, enemy_cluster)
+			cluster = flood_fill(cell, visited, cluster, enemy_cell_density)
 		var density: float = 0.0
 		for n_cluster in cluster:
-			density += enemy_cluster[n_cluster]
+			density += enemy_cell_density[n_cluster]
 		if density < 0.0:
 			enemy_neighborhood_density[cluster] = density
+	enemy_cluster = enemy_neighborhood_density.keys()
 	
 	var friendly_neighborhood_density: Dictionary = {}
 	
-	for cell in friendly_cluster:
+	for cell in friendly_cell_density:
 		var cluster: Array = []
 		if cell not in visited:
-			cluster = flood_fill(cell, visited, cluster, friendly_cluster)
+			cluster = flood_fill(cell, visited, cluster, friendly_cell_density)
 		var density: float = 0.0
 		for n_cluster in cluster:
-			density += friendly_cluster[n_cluster]
+			density += friendly_cell_density[n_cluster]
 		if density > 0.0:
 			friendly_neighborhood_density[cluster] = density
+	friendly_cluster = friendly_neighborhood_density.keys()
 	
 	var max_fren_density: float = 0.0
 	if friendly_neighborhood_density.is_empty():
-		var index: Vector2i = friendly_cluster.keys()[0]
-		max_fren_density = friendly_cluster[index]
+		var index: Vector2i = friendly_cell_density.keys()[0]
+		max_fren_density = friendly_cell_density[index]
 	else:
 		max_fren_density = friendly_neighborhood_density.values().max()
 	
@@ -187,11 +193,11 @@ func weigh_force_density() -> void:
 		friendly_neighborhood_density[cell] = weight_density
 	
 	var max_enemy_density: float = 0.0
-	if friendly_neighborhood_density.is_empty():
-		var index: Vector2i = enemy_cluster.keys()[0]
-		max_enemy_density = enemy_cluster[index]
+	if enemy_neighborhood_density.is_empty():
+		var index: Vector2i = enemy_cell_density.keys()[0]
+		max_enemy_density = enemy_cell_density[index]
 	else:
-		max_fren_density = enemy_neighborhood_density.values().max()
+		max_enemy_density = enemy_neighborhood_density.values().max()
 	
 	for cell in enemy_neighborhood_density:
 		var weight_density: float = enemy_neighborhood_density[cell] / max_enemy_density

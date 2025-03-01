@@ -10,7 +10,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	var tension_map: Imap = imap_manager.tension_map
 	var vulnerability_map: Imap = imap_manager.vulnerability_map
 	var enemy_influence_extrema: Dictionary = {}
-	var enemy_vulnerability: Dictionary = {}
+	var player_vulnerability: Dictionary = {}
 	for m in range(0, vulnerability_map.height, 1):
 		
 		var tension_max: float = snappedf(fake_tension_map.map_grid[m].max(), 0.01)
@@ -25,6 +25,8 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 			tension_map.map_grid[m] = funny_array
 			vulnerability_map.update_row_value.emit(m, funny_array)
 			tension_map.update_row_value.emit(m, funny_array)
+			fake_tension_map.update_row_value.emit(m, funny_array)
+			weighted_imap.update_row_value.emit(m, funny_array)
 			continue
 		
 		var local_minimum_vuln_id: Vector2i = Vector2i.ZERO
@@ -39,7 +41,9 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 				tension_map.map_grid[m][n] = tension_value
 				vulnerability_map.map_grid[m][n] = vuln_value
 				vulnerability_map.update_grid_value.emit(m, n, vuln_value)
+				weighted_imap.update_grid_value.emit(m, n, weighted_imap_value)
 				tension_map.update_grid_value.emit(m, n, tension_value)
+				fake_tension_map.update_grid_value.emit(m, n, fake_tension_map.map_grid[m][n])
 				continue
 			
 			tension_value = max(0, fake_tension_map.map_grid[m][n] - abs(imap_value))
@@ -47,15 +51,17 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 			tension_map.map_grid[m][n] = tension_value
 			vulnerability_map.map_grid[m][n] = vuln_value
 			if imap_value > 0.0:
-				enemy_vulnerability[Vector2(m,n)] = vuln_value
+				player_vulnerability[Vector2(m,n)] = vuln_value
 			vulnerability_map.update_grid_value.emit(m, n, vuln_value)
 			tension_map.update_grid_value.emit(m, n, tension_value)
+			weighted_imap.update_grid_value.emit(m, n, weighted_imap_value)
+			fake_tension_map.update_grid_value.emit(m, n, fake_tension_map.map_grid[m][n])
 	
 	var enemy_vuln_norm: Dictionary = {}
-	var vuln_min: float = enemy_vulnerability.values().min()
-	var vuln_max: float = enemy_vulnerability.values().max()
-	for vuln_idx in enemy_vulnerability.keys():
-		var value: float = enemy_vulnerability[vuln_idx]
+	var vuln_min: float = player_vulnerability.values().min()
+	var vuln_max: float = player_vulnerability.values().max()
+	for vuln_idx in player_vulnerability.keys():
+		var value: float = player_vulnerability[vuln_idx]
 		var norm_value: float = 2 * ((value - vuln_min) / (vuln_max - vuln_min)) - 1
 		enemy_vuln_norm[vuln_idx] = norm_value
 		#vulnerability_map.update_grid_value.emit(vuln_idx.x, vuln_idx.y, norm_value)
@@ -67,5 +73,5 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 		if enemy_vuln_norm[cell] == norm_max or enemy_vuln_norm[cell] == norm_min:
 			target_cells[cell] = enemy_vuln_norm[cell]
 	
-	agent.enemy_vulnerability = target_cells
+	agent.player_vulnerability = target_cells
 	return FAILURE

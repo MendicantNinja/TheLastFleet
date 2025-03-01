@@ -6,7 +6,7 @@ var delta: float = 0.0
 var time: float = 0.0
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.retreat_flag == true:
+	if agent.retreat_flag == true or agent.vent_flux_flag == true:
 		return FAILURE
 	
 	if agent.target_unit == null:
@@ -14,7 +14,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	if threat_radius == 0.0:
 		delta = get_physics_process_delta_time()
-		var radius: int = agent.template_maps[imap_manager.MapType.THREAT_MAP].width
+		var radius: int = agent.template_maps[imap_manager.MapType.THREAT_MAP].width - 2
 		threat_radius = (radius * imap_manager.default_cell_size) * 0.5
 	
 	if agent.target_unit != target:
@@ -42,16 +42,10 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		time += delta + agent.time_coefficient
 	
 	var brake_distance: float = (agent.linear_velocity.length() ** 2) / (2.0 * agent.ship_stats.deceleration)
-	if distance_to <= threat_radius:
+	if distance_to <= threat_radius or agent.target_in_range == true:
 		speed = agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration
 		velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
 	
-	#if agent.brake_flag == true and floor(agent.linear_velocity.length()) == 0.0:
-		#agent.brake_flag = false
-		#time = 0.0
-	
-	var transform_look_at: Transform2D = agent.transform.looking_at(target.global_position)
-	agent.transform = agent.transform.interpolate_with(transform_look_at, agent.ship_stats.turn_rate * delta)
 	velocity = velocity.limit_length(speed)
 	agent.heur_velocity = velocity
 	agent.time = time
