@@ -6,9 +6,9 @@ signal units_deployed(units)
 
 # Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 
 # Has 3 rows and 7 columns (21 ships). Can be expanded later.
-var friendly_deployment_position: Vector2
-var friendly_deployment_row: int = 0
-var friendly_deployment_spacing: int = 500
+var deployment_position: Vector2
+var deployment_row: int = 0
+var deployment_spacing: int = 500
 
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
@@ -18,9 +18,14 @@ func _ready():
 
 # Reset this when a ship moves off of it's deployment position.
 func reset_deployment_position() -> void:
-	friendly_deployment_position.x = PlayableAreaBounds.shape.size.x/2 - friendly_deployment_spacing * 3 # 3+1+3 = 7 columns
-	friendly_deployment_position.y = PlayableAreaBounds.shape.size.y - friendly_deployment_spacing * 3 # 3 rows
-	friendly_deployment_row = 0
+	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
+	#					   ------- <- map boundary
+	# starting position -> . . . . 
+	# 					   . . . .
+	# 					   . . . . <- ending position
+	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
+	deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 	if toggled_on == true:
@@ -31,24 +36,24 @@ func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 func deploy_ships() -> void:
 	var instantiated_units: Array = []
 	reset_deployment_position()
-	var iterator: int
+	var iterator: int = 0
 	for ship_icon in ships_to_deploy:
 		if ship_icon == null or ship_icon.disabled:
 			continue
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(ship_icon.ship)
-		ship_instantiation.is_friendly = true
+		ship_instantiation.collision_layer = 1
 		ship_icon.disabled = true
 		CombatMap.add_child(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
-		ship_instantiation.display_icon(true)
 		
 		# Deployment Positioning
-		if iterator > 7:
-			friendly_deployment_row += 1
-		ship_instantiation.global_position.x = friendly_deployment_position.x + iterator * friendly_deployment_spacing # Correct
-		ship_instantiation.global_position.y = friendly_deployment_position.y + friendly_deployment_spacing * 3 + 900 + friendly_deployment_row * friendly_deployment_spacing # I want to start at the top in termso f Y
-		var path_to: Vector2 = Vector2(friendly_deployment_position.x + iterator * friendly_deployment_spacing, friendly_deployment_position.y - friendly_deployment_row * friendly_deployment_spacing)
+		if iterator % 7 == 0 and iterator != 0:
+			deployment_row += 1
+		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
+		ship_instantiation.global_position.x = deployment_position.x + iterator % 7 * deployment_spacing # Correct
+		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in termso f Y
+		var path_to: Vector2 = Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row)
 		ship_instantiation.set_navigation_position(path_to)
 		iterator += 1
 

@@ -180,10 +180,11 @@ func setup() -> void:
 				icon_list.append(tactical_map_icon)
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
-	get_tree().call_group("enemy", "display_icon", visible)
-	get_tree().call_group("friendly", "display_icon", visible)    
 	connect_unit_signals(friendly_group)
 	connect_unit_signals(enemy_group)
+	get_tree().call_group("enemy", "display_icon", visible)
+	get_tree().call_group("friendly", "display_icon", visible)    
+
 	update()
 
 func update() -> void:

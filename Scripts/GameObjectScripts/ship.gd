@@ -146,7 +146,7 @@ func deploy_ship() -> void:
 		# Deployed ships can't find references to other nodes in the scene. So set the paths up here as needed.
 		TacticalDataDrawing = get_tree().get_root().find_child("TacticalDataDrawing", true, false)
 		TacticalMapLayer = get_tree().get_root().find_child("TacticalMapLayer", true, false)
-		CombatCamera = $"../CombatMap/CombatCamera"
+		CombatCamera = get_tree().get_root().find_child("CombatCamera", true, false)
 		TacticalCamera = get_tree().get_root().find_child("TacticalMapCamera", true, false)
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
 	
@@ -193,6 +193,7 @@ func _ready() -> void:
 	var threat_radius: int = 3
 	add_to_group(&"agent")
 	if collision_layer == 1:
+		print("collision_layer == 1")
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
@@ -206,6 +207,7 @@ func _ready() -> void:
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
 		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"enemy")
+		is_friendly = false
 		rotation += PI/2
 
 	CombatBehaviorTree.toggle_root(true)

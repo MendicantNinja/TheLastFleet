@@ -21,6 +21,13 @@ var debug_imap: bool = true
 var battle_over: bool = false
 var imap_debug_grid: Array
 
+# Enemy Deployment Variables (not actually friendly, I just enjoy reusing code)
+var deployment_position: Vector2
+var deployment_row: int = 0
+var deployment_spacing: int = 500
+	
+
+signal units_deployed(units)
 func _ready() -> void:
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
@@ -71,6 +78,7 @@ func _ready() -> void:
 	settings.swizzle(Cancel)
 	#%BlackenBackground.size = PlayableAreaBounds.shape.size
 	FleetDeploymentList.units_deployed.connect(TacticalMap.connect_unit_signals)
+	self.units_deployed.connect(TacticalMap.connect_unit_signals)
 	TacticalMap.display_map(true)
 	
 	# Set combat boundaries using four static bodies and shapes. A>B order is important for one-way collision. I had to use Rects and do rotation magic due to global collisions.
@@ -92,11 +100,48 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
+	deploy_enemy_fleet()
 
+func reset_deployment_position() -> void:
+	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
+	#					   ------- <- map boundary
+	# starting position -> . . . . 
+	# 					   . . . .
+	# 					   . . . . <- ending position
+	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+	deployment_position.y = 0 - deployment_spacing * 2 # Start at the (bottommost, we're deploying enemies now) row.
+	deployment_row = 0
+
+# Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
-	if enemy_fleet.fleet_stats.is_empty():
-		# Create an enemy fleet if none were passed in.
-		pass
+	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.
+	reset_deployment_position()
+	var instantiated_units: Array[Ship]
+	# Create an enemy fleets ships if no fleet was passed in.
+	if enemy_fleet.fleet_stats.ships.is_empty():
+		for i in range (98):
+			enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
+	var iterator: int 
+	for i in range (enemy_fleet.fleet_stats.ships.size()):
+		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
+		ship_instantiation.initialize(enemy_fleet.fleet_stats.ships[i])
+		ship_instantiation.is_friendly = false
+		ship_instantiation.collision_layer = 3
+		CombatMap.add_child(ship_instantiation)
+		instantiated_units.push_back(ship_instantiation)
+		
+		# Deployment Positioning
+		if i % 7 == 0 and i != 0:
+			deployment_row += 1
+		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
+		ship_instantiation.global_position.x = deployment_position.x + i % 7 * deployment_spacing # Correct
+		ship_instantiation.global_position.y = deployment_position.y - deployment_spacing * deployment_row # I want to start at the top in termso f Y
+		var path_to: Vector2 = Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y + deployment_spacing * 6 + deployment_spacing*deployment_row)
+		ship_instantiation.set_navigation_position(path_to)
+	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
+	imap_manager.register_agents(instantiated_units)
+	%TacticalDataDrawing.delayed_setup_call()
+
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
