@@ -4,7 +4,7 @@ var time: float = 0.0
 var delta: float = 0.0
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.retreat_flag == false and agent.vent_flux_flag == false:
+	if agent.retreat_flag == false:
 		time = 0.0
 		return FAILURE
 	

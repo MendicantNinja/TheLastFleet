@@ -7,6 +7,12 @@ enum Strategy{
 	EVASIVE
 }
 
+enum GOAL{
+	SKIRMISH,
+	MOTHERSHIP,
+	CONTROL,
+}
+
 func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	# Universal Setup
 	var audio_stream_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
@@ -122,7 +128,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var unit_positions: Dictionary = {}
 	for unit: Ship in group:
 		unit_positions[unit.global_position] = unit
-		var size: float = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width
+		var size: float = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1
 		occupancy_sizes.append(size)
 		average_size += Vector2(size, size)
 	
@@ -161,8 +167,6 @@ func generate_group_target_positions(leader: Ship) -> void:
 			slot_distances[distance_to] = slot
 		var min_dist: float = slot_distances.keys().min()
 		var target_position: Vector2 = slot_distances[min_dist]
-		if unit.group_leader == true:
-			unit.set_navigation_position(unit.global_position)
 		unit.target_position = target_position
 		print(unit.name, unit.target_position)
 		visited.append(target_position)

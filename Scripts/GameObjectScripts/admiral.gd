@@ -5,21 +5,27 @@ class_name Admiral
 @onready var available_units: Array = []
 
 var heuristic_strat: globals.Strategy
-var enemy_strength: float = 0.0
+var heuristic_goal: globals.GOAL
+var control_points: Array = []
+var goal_positions: Array = []
+var goal_value: Dictionary = {}
+var goal_radius: int = 0
+
+var player_strength: float = 0.0
 var admiral_strength: float = 0.0
 var effective_strength: Dictionary = {}
 
 var unit_clusters: Array = []
-var enemy_clusters: Array = []
-var enemy_vulnerability: Dictionary = {}
-var vulnerable_targets: Dictionary = {}
-var isolated_targets: Array = []
+var player_clusters: Array = []
+var player_vulnerability: Dictionary = {}
+var vulnerable_cells: Array = []
+var isolated_cells: Array = []
 
 var group_key_prefix: StringName = &"Enemy Group "
 var assign_new_leader_group: StringName = &""
 var iterator: int = 0
 
-var available_groups: Dictionary = {}
+var available_groups: Array = []
 var awaiting_orders: Array = []
 var queue_orders: Dictionary = {}
 var move_key: StringName = &"move"

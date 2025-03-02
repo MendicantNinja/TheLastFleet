@@ -20,18 +20,18 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		agent.vent_flux_flag = false
 		return FAILURE
 	
-	if agent.combat_flag == true and agent.retreat_flag == false:
+	if agent.combat_flag == true and agent.fallback_flag == false:
 		if (agent.posture == globals.Strategy.NEUTRAL or agent.posture == globals.Strategy.DEFENSIVE) and flux_norm >= def_neut_threshold:
-			agent.retreat_flag = true
+			agent.fallback_flag = true
 		elif agent.posture == globals.Strategy.OFFENSIVE and flux_norm >= offensive_threshold:
-			agent.retreat_flag = true
+			agent.fallback_flag = true
 		elif agent.posture == globals.Strategy.EVASIVE and flux_norm >= evasive_threshold:
-			agent.retreat_flag = true
+			agent.fallback_flag = true
 	
-	if agent.retreat_flag == true and agent.move_direction == Vector2.ZERO:
-		agent.move_direction = retreat_direction(agent)
-	elif agent.retreat_flag == true and Engine.get_physics_frames() % 80 == 0:
-		agent.move_direction = retreat_direction(agent)
+	if agent.fallback_flag == true and agent.move_direction == Vector2.ZERO:
+		agent.move_direction = vent_fallback_direction(agent)
+	elif agent.fallback_flag == true and Engine.get_physics_frames() % 80 == 0:
+		agent.move_direction = vent_fallback_direction(agent)
 	
 	var can_vent: bool = false
 	if flux_norm > 0.0 and agent.combat_flag == false:
@@ -45,14 +45,14 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			agent.hard_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
 		agent.update_flux_indicators()
 		if agent.targeted_by.is_empty():
-			agent.retreat_flag = false
+			agent.fallback_flag = false
 	
 	if can_vent == false:
 		agent.vent_flux_flag = false
 	
 	return FAILURE
 
-func retreat_direction(agent: Ship) -> Vector2:
+func vent_fallback_direction(agent: Ship) -> Vector2:
 	var direction: Vector2 = Vector2.ZERO
 	var agent_cell = Vector2i(agent.global_position.y / imap_manager.default_cell_size, agent.global_position.x / imap_manager.default_cell_size)
 	var working_map: Imap = agent.working_map

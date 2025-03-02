@@ -55,32 +55,6 @@ func find_cell_index_from_position(position: Vector2) -> Vector2:
 	indices = Vector2i(cell_column, cell_row)
 	return indices
 
-@warning_ignore("integer_division", "narrowing_conversion")
-func correct_influence(map: Imap, center_index: Vector2, position: Vector2) -> Imap:
-	var dupe_imap: Imap = Imap.new(map.height, map.width, 0.0, 0.0, map.cell_size)
-	dupe_imap.map_type = map.map_type
-	
-	var center_pos: Vector2 = Vector2(center_index.x, center_index.y) * cell_size
-	center_pos = Vector2(center_pos.x + cell_size / 2, center_pos.y + cell_size / 2)
-	
-	var start_column: int = center_index.x - (map.width / 2)
-	var start_row: int = center_index.y - (map.height / 2)
-	var map_anchor: Vector2 = Vector2(start_column, start_row) * cell_size
-	var adj_y: int = 0
-	for m in range(0, map.height, 1):
-		var adj_x: int = 0
-		adj_y += 1
-		for n in range(0, map.width, 1):
-			adj_x += 1
-			var cell_corner: Vector2 = Vector2(map_anchor.x * adj_x, map_anchor.y * adj_y)
-			var cell_center: Vector2 = Vector2(cell_corner.x + cell_size / 2, cell_corner.y + cell_size / 2)
-			var corner_to_center: float = cell_corner.distance_to(center_pos)
-			var cc_distance_to_pos: float = cell_center.distance_to(position)
-			var norm_distance: float = cc_distance_to_pos / corner_to_center
-			var adj_value: float = map.map_grid[n][m] + (map.map_grid[n][m] * (1 - norm_distance))
-			dupe_imap.map_grid[m][n] = adj_value
-	return dupe_imap
-
 @warning_ignore("integer_division")
 func propagate_influence_from_center(magnitude: float = 1.0) -> void:
 	var radius: int = height
@@ -180,10 +154,3 @@ func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitu
 		for n in range(min_n, max_n, 1):
 			var source_col: int = n + start_column - neg_adj_col
 			target_map.map_grid[m][n] = map_grid[source_row][source_col] * magnitude
-
-func normalize_template_map() -> void:
-	var center: int = (height - 1) / 2
-	var maximum: float = abs(map_grid[center][center])
-	for m in range(0, height):
-		for n in range(0, width):
-			map_grid[m][n] = map_grid[m][n] / maximum

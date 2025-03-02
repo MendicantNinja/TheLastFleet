@@ -82,15 +82,19 @@ var group_velocity: Vector2 = Vector2.ZERO
 var posture: globals.Strategy = globals.Strategy.NEUTRAL
 
 # Used for combat AI / behavior tree / influence map
+var combat_goal: int = 0
+var hueristic_strat: int = 0
+
 var template_maps: Dictionary = {}
 var template_cell_indices: Dictionary = {}
+var weigh_influence: Imap
 var working_map: Imap = null
-var hueristic_strat: int = 0
-var target_in_range: bool = false
+var approx_influence: float = 0.0
+var registry_cluster: Array = []
 var imap_cell: Vector2i = Vector2i.ZERO
 var registry_cell: Vector2i = Vector2i.ZERO
-var weigh_influence: Imap
-var approx_influence: float = 0.0
+var registry_neighborhood: Array = []
+
 var heur_velocity: Vector2 = Vector2.ZERO
 var target_unit: Ship = null
 var targeted_units: Array = []
@@ -98,16 +102,19 @@ var neighbor_units: Array = []
 var incoming_projectiles: Array = []
 var targeted_by: Array = []
 
+var target_in_range: bool = false
+var goal_flag: bool = false
 var avoid_flag: bool = false
 var brake_flag: bool = false
 var retreat_flag: bool = false
+var fallback_flag: bool = false
 var combat_flag: bool = false
 var vent_flux_flag: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
 var time: float = 0.0
-var zero_flux_bonus: float = 50.0
+var zero_flux_bonus: float = 0.0
 var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
@@ -162,7 +169,7 @@ func deploy_ship() -> void:
 func _ready() -> void:
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
-	
+	registry_cell = -Vector2i.ONE
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed
@@ -175,7 +182,7 @@ func _ready() -> void:
 	shield_radius = ShipNavigationAgent.radius
 	shield_upkeep = ship_hull.shield_upkeep
 	total_flux = ship_stats.flux
-	
+	zero_flux_bonus = floor(speed / 3)
 	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)
 	var manual_control_offset: Vector2 = Vector2(shield_radius, shield_radius) * -1.2
 	ShipTargetIcon.position = target_unit_offset
@@ -187,10 +194,32 @@ func _ready() -> void:
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
+	if collision_layer == 1:
+		is_friendly = true
+	
+	# Assigns weapon slots based on what's in the ship scene.
+	for child in get_children():
+		if child is WeaponSlot:
+			all_weapons.append(child)
+			child.detection_parameters(collision_mask, is_friendly, get_rid())
+			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
+			child.target_in_range.connect(_on_target_in_range)
+	# Assign weapon system groups and weapons based on ship_stats.
+	for i in range(all_weapons.size()):
+			# Placeholder
+			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+	# Turn on and off autofire as the refit system and ship stats demand.
+	var weapon_ranges: Array = []
+	for weapon_slot in all_weapons:
+		weapon_ranges.append(weapon_slot.weapon.range)
+	
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
-	var occupancy_radius: int = 2
-	var threat_radius: int = 3
+	var longest_range: float = weapon_ranges.max()
+	var occupancy_radius: int = (speed + zero_flux_bonus + ship_stats.bonus_acceleration) / 60
+	occupancy_radius += 1
+	var threat_radius: int = (longest_range / imap_manager.default_cell_size)
+	threat_radius += 1
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
@@ -198,7 +227,6 @@ func _ready() -> void:
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
 		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"friendly")
-		is_friendly = true
 		rotation -= PI/2
 	else:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
@@ -254,10 +282,11 @@ func _ready() -> void:
 	var avoidance_shape: Shape2D = CircleShape2D.new()
 	avoidance_shape.radius = imap_manager.default_cell_size * (occupancy_radius) * 2
 	AvoidanceShape.shape = avoidance_shape
-	AvoidanceArea.collision_layer = collision_layer
 	AvoidanceArea.collision_mask = collision_mask
 	AvoidanceArea.body_entered.connect(_on_AvoidanceShape_body_entered)
 	AvoidanceArea.body_exited.connect(_on_AvoidanceShape_body_exited)
+	AvoidanceArea.area_entered.connect(_on_AvoidanceShape_area_entered)
+	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	
 	toggle_auto_aim(all_weapons)
 	toggle_auto_fire(all_weapons)
@@ -284,11 +313,9 @@ func process_damage(projectile: Projectile) -> void:
 
 func destroy_ship() -> void:
 	# REMOVE IMAP MANAGER REFERENCES HERE
-	var agents_registered: Array = imap_manager.registry_map[registry_cell]
-	agents_registered.erase(self)
-	if agents_registered.is_empty():
-		imap_manager.registry_map.erase(registry_cell)
-	else:
+	if imap_manager.registry_map.has(registry_cell):
+		var agents_registered: Array = imap_manager.registry_map[registry_cell]
+		agents_registered.erase(self)
 		imap_manager.registry_map[registry_cell] = agents_registered
 	
 	remove_from_group(&"agent")
@@ -401,6 +428,7 @@ func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 	for cluster in neighborhood_density:
 		if registry_cell in cluster:
 			weight = 1 / neighborhood_density[cluster]
+			registry_cluster = cluster
 	
 	var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
 	for m in range(0, composite_influence.height):
@@ -572,6 +600,8 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 		weapon_slot.toggle_auto_fire()
 
 func set_navigation_position(to_position: Vector2) -> void:
+	if targeted_units.is_empty() == false:
+		get_tree().call_group(group_name, &"set_targets", [])
 	target_position = to_position
 	ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
@@ -602,6 +632,17 @@ func _physics_process(delta: float) -> void:
 	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
 		update_registry_cell.emit(registry_cell, current_registry_cell)
 		registry_cell = current_registry_cell
+		registry_neighborhood = []
+		var radius: int = 1
+		for m in range(-radius, radius + 1, 1):
+			for n in range(-radius, radius + 1, 1):
+				var target_cell: Vector2i = Vector2i(registry_cell.x + m, registry_cell.y + n)
+				if target_cell.x < 0:
+					target_cell.x = 0
+				if target_cell.y < 0:
+					target_cell.y = 0
+				if target_cell not in registry_neighborhood:
+					registry_neighborhood.append(target_cell)
 	
 	if Engine.get_physics_frames() % 120 == 0 and targeted_by.is_empty() == false:
 		for unit in targeted_by:
@@ -760,7 +801,19 @@ func remove_blackboard_data(key: Variant) -> void:
 	blackboard.remove_data(key)
 
 func set_targets(targets) -> void:
+	if targets.is_empty() == true and target_unit != null:
+		target_unit.targeted_by.erase(self)
+		target_unit = null
+	elif targets.is_empty() == false and target_position != Vector2.ZERO:
+		target_position = Vector2.ZERO
+	
 	targeted_units = targets
+
+func set_goal_flag(value) -> void:
+	goal_flag = value
+
+func set_fallback_flag(value) -> void:
+	fallback_flag = value
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
@@ -838,11 +891,31 @@ func _on_AvoidanceShape_body_entered(body) -> void:
 func _on_AvoidanceShape_body_exited(body) -> void:
 	neighbor_units.erase(body)
 
-func _on_AvoidanceShape_area_entered(area) -> void:
-	incoming_projectiles.append(area)
+func _on_AvoidanceShape_area_entered(projectile) -> void:
+	if projectile.collision_layer != 8 or projectile.is_friendly == is_friendly:
+		return
+	
+	var ship_id = get_rid().get_id()
+	if projectile.ship_id == ship_id:
+		return
+	
+	if projectile not in incoming_projectiles:
+		incoming_projectiles.append(projectile)
+	
+	if combat_flag == false:
+		combat_flag = true
+	CombatTimer.start()
 
-func _on_AvoidanceShape_area_exited(area) -> void:
-	incoming_projectiles.erase(area)
+func _on_AvoidanceShape_area_exited(projectile) -> void:
+	if projectile.collision_layer != 8 or projectile.is_friendly == is_friendly:
+		return
+	
+	var ship_id = get_rid().get_id()
+	if projectile.ship_id == ship_id:
+		return
+	
+	if projectile in incoming_projectiles:
+		incoming_projectiles.erase(projectile)
 
 func _on_body_entered(body):
 	if target_position != Vector2.ZERO:

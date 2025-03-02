@@ -9,6 +9,7 @@ var range: int = 0
 var damage_type: int = 0
 
 var ship_id: int
+var is_friendly: bool = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -26,12 +27,13 @@ func _physics_process(delta) -> void:
 		queue_free()
 
 # Should be called when the projectile is created in weapon.gd.
-func assign_stats(weapon: Weapon, id: int) -> void: 
+func assign_stats(weapon: Weapon, id: int, friendly_value: bool) -> void: 
 	damage = weapon.damage_per_shot
 	speed = weapon.projectile_speed
 	range = weapon.range
 	damage_type = weapon.damage_type
 	ship_id = id
+	is_friendly = friendly_value
 	var radian_accuracy = deg_to_rad(weapon.accuracy)
 	var lower_limit = -radian_accuracy
 	var upper_limit = radian_accuracy

@@ -6,23 +6,22 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	
 	var available_agents: Array = get_tree().get_nodes_in_group(&"agent")
 	var admiral_strength: float = 0.0
-	var enemy_strength: float = 0.0
+	var player_strength: float = 0.0
 	
 	for unit in available_agents:
 		if unit.approx_influence < 0.0:
 			admiral_strength += unit.approx_influence
 		else:
-			enemy_strength += unit.approx_influence
+			player_strength += unit.approx_influence
 	
-	admiral_strength = abs(admiral_strength)
-	enemy_strength = enemy_strength
-	
-	if admiral_strength > enemy_strength:
+	admiral_strength = admiral_strength
+	var relative_strength = admiral_strength + player_strength
+	if relative_strength < 0:
 		agent.heuristic_strat = globals.Strategy.OFFENSIVE
-	elif admiral_strength < enemy_strength:
+	elif relative_strength > 0:
 		agent.heuristic_strat = globals.Strategy.DEFENSIVE
 	
 	agent.admiral_strength = admiral_strength
-	agent.enemy_strength = enemy_strength
+	agent.player_strength = player_strength
 	
 	return FAILURE

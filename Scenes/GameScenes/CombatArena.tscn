@@ -13,18 +13,19 @@
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_enemies.gd" id="6_jorw7"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="6_ftacq"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_enemy_weakness.gd" id="7_sno18"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_vulnerable_targets.gd" id="8_7nviv"]
 [ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_strategy.gd" id="9_sdjo6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/set_targets.gd" id="9_t8sgw"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/choose_strategy.gd" id="9_sdjo6"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_target_positions.gd" id="10_4thlf"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/group_units.gd" id="11_iyhuv"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/fill_goal_map.gd" id="10_yugtf"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/move_units.gd" id="12_71ucf"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
@@ -101,7 +102,6 @@ script = ExtResource("2_shfex")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
 script = ExtResource("2_xxm3d")
-enabled = false
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_5naox")
@@ -112,29 +112,23 @@ script = ExtResource("5_vrrkk")
 [node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("6_jorw7")
 
-[node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("7_sno18")
-
-[node name="find vulnerable targets" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("8_7nviv")
-
 [node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
 script = ExtResource("9_sdjo6")
 
-[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("11_iyhuv")
+[node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("7_sno18")
+
+[node name="find target positions" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("10_4thlf")
 
 [node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
 script = ExtResource("5_vrrkk")
 
-[node name="set targets" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("9_t8sgw")
+[node name="fill goal map" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("10_yugtf")
 
-[node name="move units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("12_71ucf")
-
-[node name="issue orders" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("13_o57mr")
+[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("11_iyhuv")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -850,53 +844,41 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8357, 7256)
+position = Vector2(3307, 3564)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7274)
+position = Vector2(3682, 3564)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8330, 7774)
+position = Vector2(3307, 4064)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7274)
+position = Vector2(2932, 3564)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7955, 7774)
+position = Vector2(2932, 4064)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8705, 7774)
+position = Vector2(3682, 4064)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1062)
+position = Vector2(7750, 1000)
 collision_layer = 4
 
 [node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1062)
+position = Vector2(8300, 1000)
 collision_layer = 4
 
 [node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1062)
+position = Vector2(8900, 1000)
 collision_layer = 4
 
 [node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1062)
+position = Vector2(9450, 1000)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7681, 1562)
-collision_layer = 4
-
-[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8181, 1562)
-collision_layer = 4
-
-[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9181, 1562)
-collision_layer = 4
-
-[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8681, 1562)
+position = Vector2(7750, 1500)
 collision_layer = 4
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

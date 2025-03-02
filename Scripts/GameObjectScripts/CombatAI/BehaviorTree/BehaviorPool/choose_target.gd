@@ -21,7 +21,7 @@ extends LeafAction
 #		- Maybe useful as a modifier/coefficient
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.target_unit != null:
+	if agent.target_unit != null or agent.fallback_flag == true or agent.retreat_flag == true or agent.vent_flux_flag == true:
 		return SUCCESS
 	
 	if agent.targeted_units.is_empty():
@@ -29,13 +29,17 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var available_targets: Array = []
 	var sq_dist: Array = []
+	var target_dist: Dictionary = {}
 	for target in agent.targeted_units:
-		sq_dist.append(agent.global_position.distance_squared_to(target.global_position))
-		if target.targeted_by.size() > 1 or target.retreat_flag == true:
+		var dist: float = agent.global_position.distance_squared_to(target.global_position)
+		sq_dist.append(dist)
+		target_dist[dist] = target
+		if target.retreat_flag == true:
 			continue
 		available_targets.append(target)
 	
-	if agent.targeted_units.is_empty() or available_targets.is_empty():
+	if available_targets.is_empty():
+		agent.target_unit = target_dist[target_dist.keys().min()]
 		return SUCCESS
 	
 	var min_dist: float = sq_dist.min()
