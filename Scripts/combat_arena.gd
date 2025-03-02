@@ -119,7 +119,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	var instantiated_units: Array[Ship]
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
-		for i in range (98):
+		for i in range (21):
 			enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
 	var iterator: int 
 	for i in range (enemy_fleet.fleet_stats.ships.size()):

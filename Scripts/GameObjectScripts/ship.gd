@@ -193,7 +193,6 @@ func _ready() -> void:
 	var threat_radius: int = 3
 	add_to_group(&"agent")
 	if collision_layer == 1:
-		print("collision_layer == 1")
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
