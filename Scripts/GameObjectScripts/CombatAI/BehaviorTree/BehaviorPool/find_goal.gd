@@ -9,7 +9,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 487 != 0 or agent.group_leader == false:
 		return FAILURE
 	
-	if agent.combat_goal == globals.GOAL.SKIRMISH and agent.targeted_units.is_empty() == true:
+	if agent.combat_goal == globals.GOAL.SKIRMISH and agent.goal_flag == true and agent.targeted_units.is_empty() == true:
 		agent.goal_flag = false
 		get_tree().call_group(agent.group_name, &"set_goal_flag", false)
 	

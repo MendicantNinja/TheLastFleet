@@ -8,7 +8,9 @@ var tmp_name: StringName = &"threat detect "
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 65 != 0 or agent.registry_cell == -Vector2i.ONE:
 		return FAILURE
-	elif agent.vent_flux_flag == true or agent.combat_flag == true:
+	elif agent.target_unit != null or agent.targeted_units.is_empty() == false:
+		return FAILURE
+	elif agent.vent_flux_flag == true or agent.fallback_flag == true or agent.retreat_flag == true:
 		return FAILURE
 	
 	if tru_name.is_empty() and agent.is_friendly == true:
@@ -34,23 +36,26 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 				attacker_groups.append(unit.group_name)
 	
 	if attacker_groups.is_empty():
-		agent.fallback_flag = false
 		return FAILURE
 	
 	if agent.group_name.is_empty() and neighbor_groups.is_empty() and neighbor_units.is_empty() == false:
+		var unit_positions: Dictionary = {}
 		for unit in neighbor_units:
 			unit.add_to_group(tmp_name)
+			unit_positions[unit.global_position] = unit
+		var geo_median: Vector2 = globals.geometric_median_of_objects(unit_positions.keys())
+		var leader: Ship = globals.find_unit_nearest_to_median(geo_median, unit_positions)
 		var new_group_name: StringName = tru_name + agent.name
 		get_tree().call_group(tmp_name, &"group_add", new_group_name)
+		leader.set_group_leader(true)
 	
 	if agent.group_name.is_empty() and neighbor_groups.is_empty() == false:
 		var pick_rand_group: int = randi_range(0, neighbor_groups.size() - 1)
 		var rand_group_member: Ship = get_tree().get_first_node_in_group(neighbor_groups[pick_rand_group])
 		agent.targeted_units = rand_group_member.targeted_units
-		agent.add_to_group(neighbor_groups[pick_rand_group])
+		agent.group_add(neighbor_groups[pick_rand_group])
 	
 	if agent.group_name.is_empty():
-		agent.fallback_flag = true
 		return FAILURE
 	
 	var group_strength: float = 0.0
@@ -73,11 +78,14 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if attackers.is_empty():
 		return FAILURE
 	
+	if agent.is_friendly == true:
+		pass
+	
 	var relative_strength: float = abs(group_strength / total_attacker_strength)
-	if relative_strength > 1.0:
+	if relative_strength >= 1.0:
 		get_tree().call_group(agent.group_name, &"set_targets", attackers)
-		get_tree().call_group(agent.group_name, &"set_fallback_flag", false)
 	else:
-		get_tree().call_group(agent.group_name, &"set_fallback_flag", true)
+		pass
+		#get_tree().call_group(agent.group_name, &"set_fallback_flag", true)
 	
 	return FAILURE

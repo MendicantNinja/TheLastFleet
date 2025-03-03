@@ -18,11 +18,11 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="8_tdgqp"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="9_rp377"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/dynamic_threat_reassessment.gd" id="11_fqd5b"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/fallback.gd" id="11_ilxwc"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="11_sglsp"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/strafe.gd" id="14_r2m5q"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="17_j44wp"]
@@ -91,20 +91,17 @@ script = ExtResource("15_2o5di")
 [node name="combat" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
 
-[node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("6_26ar5")
-
 [node name="threat detection" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("14_iuljg")
 
-[node name="dynamic threat reassessment" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("11_fqd5b")
-
-[node name="fallback" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("11_ilxwc")
-
 [node name="choose target" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("8_nukju")
+
+[node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("6_26ar5")
+
+[node name="chill" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("11_sglsp")
 
 [node name="combat steering" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
@@ -112,11 +109,14 @@ script = ExtResource("4_qjhaj")
 [node name="pursue" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("8_tdgqp")
 
-[node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("9_rp377")
+[node name="strafe" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("14_r2m5q")
 
 [node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_s3gj3")
+
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("9_rp377")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_3duk1")
@@ -181,7 +181,7 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
-wait_time = 3.0
+wait_time = 4.0
 
 [node name="CenterCombatHUD" type="Control" parent="."]
 top_level = true

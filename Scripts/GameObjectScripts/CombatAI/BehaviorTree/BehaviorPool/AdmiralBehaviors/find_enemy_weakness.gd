@@ -57,6 +57,10 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 			weighted_imap.update_grid_value.emit(m, n, weighted_imap_value)
 			fake_tension_map.update_grid_value.emit(m, n, fake_tension_map.map_grid[m][n])
 	
+	if player_vulnerability.is_empty():
+		agent.player_vulnerability = player_vulnerability
+		return FAILURE
+	
 	var enemy_vuln_norm: Dictionary = {}
 	var vuln_min: float = player_vulnerability.values().min()
 	var vuln_max: float = player_vulnerability.values().max()

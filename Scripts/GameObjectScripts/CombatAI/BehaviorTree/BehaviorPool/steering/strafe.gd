@@ -6,5 +6,7 @@ extends LeafAction
 # Bombing/strafing runs
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-
+	if agent.target_in_range == false:
+		return FAILURE
+	
 	return FAILURE

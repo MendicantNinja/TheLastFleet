@@ -1,7 +1,7 @@
 extends LeafAction
 
 var fof_radius: float = 0.0
-var rad_coe: float = 3.0
+var rad_coe: float = 4.0
 var time: float = 0.0
 var delta: float = 0.0
 
@@ -53,14 +53,11 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if (agent.soft_flux + agent.hard_flux) == 0.0:
 		speed += agent.zero_flux_bonus
 	
-	if agent.time != 0.0:
-		time = agent.time
-	else:
-		time += delta + agent.time_coefficient
+	time += delta + agent.time_coefficient
 	
 	sum_direction = agent.heur_velocity.normalized() + sum_direction.normalized()
 	sum_direction = sum_direction.normalized()
-	velocity = sum_direction * speed * agent.time
+	velocity = sum_direction * speed * time
 	velocity = velocity.limit_length(speed)
 	agent.heur_velocity = velocity
 	agent.acceleration = velocity

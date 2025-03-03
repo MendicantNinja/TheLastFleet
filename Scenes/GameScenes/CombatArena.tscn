@@ -554,22 +554,22 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3307, 3564)
+position = Vector2(8639, 5264)
 
 [node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3682, 3564)
+position = Vector2(9014, 5264)
 
 [node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3307, 4064)
+position = Vector2(8639, 5764)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2932, 3564)
+position = Vector2(8264, 5264)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(2932, 4064)
+position = Vector2(8264, 5764)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3682, 4064)
+position = Vector2(9014, 5764)
 
 [node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(7750, 1000)
@@ -589,6 +589,18 @@ collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(7750, 1500)
+collision_layer = 4
+
+[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8360, 1509)
+collision_layer = 4
+
+[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(8910, 1509)
+collision_layer = 4
+
+[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
+position = Vector2(9510, 1509)
 collision_layer = 4
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

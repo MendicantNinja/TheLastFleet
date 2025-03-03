@@ -292,11 +292,11 @@ func destroy_ship() -> void:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
-	
+	#
 	for unit in targeted_by:
 		if unit == null:
 			continue
-		var targeted_units: Array = unit.targeted_units
+		var targeted_units: Array = unit.targeted_units.duplicate()
 		unit.target_unit = null
 		if self in targeted_units:
 			targeted_units.erase(self)
@@ -747,9 +747,9 @@ func remove_blackboard_data(key: Variant) -> void:
 
 func set_targets(targets) -> void:
 	if targets.is_empty() == true and target_unit != null:
-		target_unit.targeted_by.erase(self)
+		targeted_units.clear()
 		target_unit = null
-	elif targets.is_empty() == false and target_position != Vector2.ZERO:
+	if targets.is_empty() == false and target_position != Vector2.ZERO:
 		target_position = Vector2.ZERO
 	
 	targeted_units = targets
