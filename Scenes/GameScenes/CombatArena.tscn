@@ -552,10 +552,10 @@ position = Vector2(8281, 6180)
 position = Vector2(12670, 4301)
 
 [node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(3500, 5125)
+position = Vector2(323, 382)
 
 [node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4500, 5125)
+position = Vector2(277, 190)
 
 [node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
 position = Vector2(9250, 6250)
@@ -586,7 +586,7 @@ position = Vector2(9430, 1000)
 collision_layer = 4
 
 [node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7930, 1500)
+position = Vector2(2855, 1671)
 collision_layer = 4
 
 [node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
@@ -598,7 +598,7 @@ position = Vector2(8930, 1500)
 collision_layer = 4
 
 [node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4926, 5113)
+position = Vector2(175, 336)
 collision_layer = 4
 
 [node name="Marker2D" type="Marker2D" parent="."]

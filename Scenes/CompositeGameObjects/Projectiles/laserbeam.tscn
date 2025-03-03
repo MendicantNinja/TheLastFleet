@@ -1,0 +1,25 @@
+[gd_scene load_steps=4 format=3 uid="uid://dsmbbqm3oh601"]
+
+[ext_resource type="Script" path="res://laserbeam.gd" id="1_ivol5"]
+[ext_resource type="Texture2D" uid="uid://bnbf3uk1tgpxv" path="res://Art/ProjectileArt/laserdownscaled.png" id="2_74dct"]
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_m4xyq"]
+b = Vector2(63.9865, 0)
+
+[node name="laserbeam" type="Node2D"]
+script = ExtResource("1_ivol5")
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(70, 0)
+
+[node name="Line2D" type="Line2D" parent="."]
+position = Vector2(-0.926792, 0.900002)
+scale = Vector2(1.10732, 0.9)
+points = PackedVector2Array(0, -1, 63.9865, -1)
+texture = ExtResource("2_74dct")
+texture_mode = 2
+
+[node name="Area2D" type="Area2D" parent="Line2D"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Line2D/Area2D"]
+shape = SubResource("SegmentShape2D_m4xyq")
