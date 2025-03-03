@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://shiwidik664f"
-path="res://.godot/imported/laser shot.png-404d4b5761ed68078f4211e7110a9c82.ctex"
+uid="uid://bnbf3uk1tgpxv"
+path="res://.godot/imported/laserdownscaled.png-fe4042d5514f6c29abc003c0d01a534c.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/ProjectileArt/laser shot.png"
-dest_files=["res://.godot/imported/laser shot.png-404d4b5761ed68078f4211e7110a9c82.ctex"]
+source_file="res://Art/ProjectileArt/mazen's projectiles/laserdownscaled.png"
+dest_files=["res://.godot/imported/laserdownscaled.png-fe4042d5514f6c29abc003c0d01a534c.ctex"]
 
 [params]
 

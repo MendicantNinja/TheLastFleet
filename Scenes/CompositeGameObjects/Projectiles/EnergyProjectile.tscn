@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://cpg8q8tgtsjjp"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_va37s"]
-[ext_resource type="Texture2D" uid="uid://shiwidik664f" path="res://Art/ProjectileArt/laser shot.png" id="2_amd1k"]
+[ext_resource type="Texture2D" uid="uid://shiwidik664f" path="res://Art/ProjectileArt/mazen's projectiles/laser shot.png" id="2_amd1k"]
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_a5fds"]
 particle_flag_disable_z = true
