@@ -124,7 +124,7 @@ func _ready():
 func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	weapon_system_group = 0 # Index of 0 = weapon system 1
 	# Give everything railguns in dev mode
-	if settings.dev_mode == true:
+	if settings.dev_mode == true and p_weapon_slot.weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
 		
 		var new_shape: Shape2D = CircleShape2D.new()

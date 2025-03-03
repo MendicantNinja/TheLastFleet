@@ -1,23 +1,23 @@
 [gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://b1uex2ha5mxr7"]
 
 [ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_ym4py"]
-[ext_resource type="PackedScene" uid="uid://dmkcwbdgurrsw" path="res://Scenes/CompositeGameObjects/Ships/Trident.tscn" id="2_eac8x"]
+[ext_resource type="PackedScene" uid="uid://10wylxljg0nw" path="res://Scenes/CompositeGameObjects/Ships/Trident.tscn" id="2_eac8x"]
 [ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_puj4g"]
-[ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/carrier_base2.png" id="3_x4mtb"]
+[ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="3_ir3qh"]
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="5_kmkao"]
 
 [resource]
 script = ExtResource("1_ym4py")
 ship_type_name = "Trident"
 ship_description = "Double hanger carrier - vysl"
-ship_type = 3
+ship_type = 6
 ship_size = 3
 ship_tech = 1
 ship_packed_scene = ExtResource("2_eac8x")
 ship_system = 1
-weapon_mounts = Array[ExtResource("2_puj4g")]([ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao")])
+weapon_mounts = Array[ExtResource("2_puj4g")]([ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("5_kmkao")])
 base_mods = []
-ship_sprite = ExtResource("3_x4mtb")
+ship_sprite = ExtResource("3_ir3qh")
 ship_scaling = 2
 hull_integrity = 2500
 armor = 700

@@ -50,6 +50,7 @@ enum ship_type_enum {
 	# DEBUG / TEST SHIPS
 	TEST,
 }
+
 var ship_type_dictionary: Dictionary = {
 	#for copy pasting quickly ship_type_enum.RAPTOR : load(),
 	# Fighters
@@ -71,7 +72,28 @@ var ship_type_dictionary: Dictionary = {
 	# Test
 	ship_type_enum.TEST: load("res://Resources/ShipHulls/TestHull.tres"),
 }
+func assign_loadout(ship_stats: ShipStats) -> void:
+	var ship_type: ship_type_enum = ship_stats.ship_hull.ship_type
+	var weapon_slots: Array[WeaponSlot] = ship_stats.weapon_slots
+	
+	if loadout_dictionary.has(ship_type) == false: # Return if the ship in question doesn't have a dictionary entry yet.
+		return
+	for i in range(loadout_dictionary.get(ship_type).size()):
+		weapon_slots[i].weapon = loadout_dictionary[ship_type][i]
+	# Useful for assigning ship mods and OP later. Will probably have to add such data to the loadout dictionary
+		
+# Nested Dictionary of (currently, weapons only) loadouts. Can make probalistic later and pair with ship mods/OP points.
+var loadout_dictionary: Dictionary = {
+	# Trident has 8 weapon slots
+	ship_type_enum.TRIDENT: {
+		"default": [weapon_dictionary.get(weapon_enum.RAILGUN), weapon_dictionary.get(weapon_enum.RAILGUN), weapon_dictionary.get(weapon_enum.RAILGUN),
+		weapon_dictionary.get(weapon_enum.RAILGUN), weapon_dictionary.get(weapon_enum.RAILGUN), weapon_dictionary.get(weapon_enum.RAILGUN),
+		weapon_dictionary.get(weapon_enum.RAILGUN), weapon_dictionary.get(weapon_enum.RAILGUN)]
+	}	
+}
 
+
+	
 # Ship size
 enum ship_size_enum {
 	FIGHTER,
@@ -107,7 +129,6 @@ enum weapon_enum {
 	RAILGUN,
 	EMPTY
 }
-
 
 var weapon_dictionary: Dictionary = {
 	weapon_enum.RAILGUN: load("res://Resources/Weapons/Railgun.tres"),

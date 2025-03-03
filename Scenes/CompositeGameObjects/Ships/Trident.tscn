@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://10wylxljg0nw"]
+[gd_scene load_steps=32 format=3 uid="uid://10wylxljg0nw"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_vx8d1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_vxdxy"]
@@ -14,12 +14,14 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="12_w0h0k"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="13_533i1"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="13_kiy6n"]
-[ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="14_rrmk5"]
+[ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="14_kfouk"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="14_ygc3n"]
-[ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="15_fmwxc"]
+[ext_resource type="Texture2D" uid="uid://cfd8kdvut280u" path="res://Art/ShipArt/Trident/trident_livery1.png" id="15_fllyn"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="15_vv780"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="16_i0m8b"]
+[ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="17_ivfi0"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="17_l3sas"]
+[ext_resource type="Resource" uid="uid://5xwswaf2bcpw" path="res://Resources/WeaponMounts/MediumMissile.tres" id="18_pjw2u"]
 [ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/ManualControlHUDArt/combatHUDdetail.png" id="18_yh5q8"]
 [ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="19_8gvhq"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/TacticalMapArt/manual_control_indicator.png" id="20_f8eb1"]
@@ -44,7 +46,7 @@ colors = PackedColorArray(1, 1, 1, 1)
 gradient = SubResource("Gradient_lqjnm")
 width = 10
 
-[node name="TestShip" type="RigidBody2D"]
+[node name="Trident" type="RigidBody2D"]
 z_as_relative = false
 collision_mask = 15
 input_pickable = true
@@ -107,21 +109,46 @@ script = ExtResource("6_cpyla")
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1
 rotation = 1.5708
-texture = ExtResource("14_rrmk5")
+texture = ExtResource("14_kfouk")
 
 [node name="ShipLivery" type="Sprite2D" parent="."]
 texture_filter = 1
 rotation = 1.5708
-texture = ExtResource("15_fmwxc")
+texture = ExtResource("15_fllyn")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(54, 0, -18, -73, -19, 77)
+visible = false
+position = Vector2(-52.7971, 0)
+scale = Vector2(2.64555, 1)
+polygon = PackedVector2Array(-9.90453, 34, -6.50259, 53, 4.83722, 52, 5.59321, 41, 8.99515, 41, 9.75114, 47, 34.6987, 47, 41.5026, 47, 41.5026, 61, 57.3783, 65, 60.0243, 47, 58.5123, 2, 60.4023, -36, 57.0003, -63, 41.5026, -62, 39.9906, -49, 9.75114, -47, -5.7466, -52, -9.90453, -34, -18.9764, -34, -18.9764, 35)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("13_kiy6n")]
-position = Vector2(9, -18)
+position = Vector2(90, -55)
 
 [node name="WeaponSlot1" parent="." instance=ExtResource("13_kiy6n")]
-position = Vector2(9, 18)
+position = Vector2(90, 54)
+
+[node name="WeaponSlot2" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(64, -55)
+
+[node name="WeaponSlot3" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(64, 54)
+
+[node name="WeaponSlot4" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(14, -36)
+weapon_mount = ExtResource("17_ivfi0")
+
+[node name="WeaponSlot5" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(14, 36)
+weapon_mount = ExtResource("17_ivfi0")
+
+[node name="WeaponSlot6" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(-16, -36)
+weapon_mount = ExtResource("18_pjw2u")
+
+[node name="WeaponSlot7" parent="." instance=ExtResource("13_kiy6n")]
+position = Vector2(-16, 36)
+weapon_mount = ExtResource("18_pjw2u")
 
 [node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
 path_desired_distance = 50.0
