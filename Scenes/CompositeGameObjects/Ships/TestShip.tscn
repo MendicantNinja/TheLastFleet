@@ -24,9 +24,9 @@
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
-[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="17_j44wp"]
-[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/combatHUDdetail.png" id="20_7ssvb"]
+[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="16_roh2q"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="17_j44wp"]
+[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/ManualControlHUDArt/combatHUDdetail.png" id="20_7ssvb"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="20_n3gvt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]

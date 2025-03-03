@@ -144,7 +144,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		var path_to: Vector2 = Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y + deployment_spacing * 6 + deployment_spacing*deployment_row)
 		ship_instantiation.set_navigation_position(path_to)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.register_agents(instantiated_units)
+	imap_manager.register_agents(instantiated_units, int(combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()
 
 

@@ -206,12 +206,19 @@ func _ready() -> void:
 			child.target_in_range.connect(_on_target_in_range)
 	# Assign weapon system groups and weapons based on ship_stats.
 	for i in range(all_weapons.size()):
-			# Placeholder
-			all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
+		if all_weapons[i].weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
+			weapon_systems[all_weapons[i].weapon_system_group].add_weapon(all_weapons[i])
 	# Turn on and off autofire as the refit system and ship stats demand.
+	for i in ship_stats.weapon_systems.size():
+		if ship_stats.weapon_systems[i].auto_fire_start == true:
+			weapon_systems[i].auto_fire_start = true
+	
 	var weapon_ranges: Array = []
 	for weapon_slot in all_weapons:
 		weapon_ranges.append(weapon_slot.weapon.range)
+	
+	#SEPERATOR Assign weapon system groups and weapons based on ship_stats.
 	
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
@@ -255,30 +262,7 @@ func _ready() -> void:
 		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
 	else:
 		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
-	# Assigns weapon slots based on what's in the ship scene.
-	for child in get_children():
-		if child is WeaponSlot:
-			all_weapons.append(child)
-			child.detection_parameters(collision_mask, is_friendly, get_rid())
-			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
-			child.target_in_range.connect(_on_target_in_range)
 
-		
-# Assign weapon system groups and weapons based on ship_stats.
-	for i in range(all_weapons.size()):
-		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
-		if all_weapons[i].weapon != data.weapon_dictionary.get(data.weapon_enum.EMPTY):
-			weapon_systems[all_weapons[i].weapon_system_group].add_weapon(all_weapons[i])
-	for i in ship_stats.weapon_systems.size():
-		if ship_stats.weapon_systems[i].auto_fire_start == true:
-			weapon_systems[i].auto_fire_start = true
-
-
-# Turn on and off autofire as the refit system and ship stats demand.
-	var weapon_ranges: Dictionary = {}
-	for weapon_slot in all_weapons:
-		weapon_ranges[weapon_slot.weapon.range] = weapon_slot
-	
 	var avoidance_shape: Shape2D = CircleShape2D.new()
 	avoidance_shape.radius = imap_manager.default_cell_size * (occupancy_radius) * 2
 	AvoidanceShape.shape = avoidance_shape

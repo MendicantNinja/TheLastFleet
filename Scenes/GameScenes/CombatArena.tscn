@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=49 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -13,7 +13,6 @@
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="6_ftacq"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
@@ -27,9 +26,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/fill_goal_map.gd" id="10_yugtf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/move_units.gd" id="12_71ucf"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/issue_orders.gd" id="13_o57mr"]
 [ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
 [ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]

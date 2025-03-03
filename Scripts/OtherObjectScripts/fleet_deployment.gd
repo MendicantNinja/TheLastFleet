@@ -2,6 +2,7 @@ extends GridContainer
 var ships_to_deploy: Array[ShipIcon]
 @onready var CombatMap: Node2D = $"../../.."
 @onready var PlayableAreaBounds = %PlayableAreaBounds
+var fleet_deployment
 signal units_deployed(units)
 
 # Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 
@@ -58,7 +59,7 @@ func deploy_ships() -> void:
 		iterator += 1
 
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.register_agents(instantiated_units)
+	imap_manager.register_agents(instantiated_units, int($"../../..".combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()
 	
 	#var TDD = %TacticalDataDrawing # Used for debugging ship_registry and deployed ships
