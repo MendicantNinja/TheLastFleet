@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=2 format=3 uid="uid://befmksxei6g1n"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_0nlti"]
+
+[resource]
+script = ExtResource("1_0nlti")
+weapon_name = "Combat Laser"
+item_enum = 9
+weapon_size = 0
+armament_points = 0
+projectile_speed = 10.0
+damage_type = 3
+damage_per_shot = 0
+fire_rate = 1.0
+range = 1000.0
+beam = true
+accuracy = 1.0
+turn_rate = 10.0
+flux_per_shot = 0
+dps = 0
+flux_per_second = 0

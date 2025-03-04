@@ -1,0 +1,25 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=4 format=3 uid="uid://cjodxcc5hk7h0"]
+
+[ext_resource type="Texture2D" uid="uid://xivfxiqcx6a5" path="res://Art/WeaponArt/plasma_gun.png" id="1_jcdet"]
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_tmndf"]
+[ext_resource type="PackedScene" uid="uid://dsmbbqm3oh601" path="res://Scenes/CompositeGameObjects/Projectiles/laserbeam.tscn" id="2_iqapq"]
+
+[resource]
+script = ExtResource("1_tmndf")
+weapon_name = "C-Beam"
+item_enum = 6
+weapon_size = 1
+image = ExtResource("1_jcdet")
+armament_points = 0
+projectile_scene = ExtResource("2_iqapq")
+projectile_speed = 1000.0
+damage_type = 3
+damage_per_shot = 0
+fire_rate = 1.0
+range = 600.0
+beam = true
+accuracy = 1.0
+turn_rate = 10.0
+flux_per_shot = 2
+dps = 0
+flux_per_second = 0

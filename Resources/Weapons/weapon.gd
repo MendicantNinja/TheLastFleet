@@ -30,7 +30,7 @@ func create_projectile() -> PackedScene:
 
 # Range and Accuracy
 @export var range: float = 600                         # Maximum range of the weapon
-#@export var beam: bool = false                         # Whether the weapon is a continuous beam
+@export var beam: bool = false                         # Whether the weapon is a continuous beam
 @export var accuracy: float = 1.0                      # Accuracy of the weapon (0.0 = low, 1.0 = perfect)
 #@export var spread: float = 0.0                        # Spread of the weapon’s shots (applies to some projectile weapons)
 @export var turn_rate: float = 10.0                     # How fast the weapon can rotate to track targets
