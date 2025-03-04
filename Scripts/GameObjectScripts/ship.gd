@@ -283,6 +283,26 @@ func _ready() -> void:
 	self.mouse_exited.connect(_on_mouse_exited)
 
 func process_damage(projectile: Projectile) -> void:
+	if CombatBehaviorTree.enabled == false:
+		CombatBehaviorTree.enabled = true
+	
+	# Spawn bullet hole directly on the ship
+	var decal = preload("res://bulletdecal.tscn").instantiate()
+	add_child(decal)
+	
+	# Get ship sprite dimensions for random placement
+	var sprite_size = ShipSprite.texture.get_size() * ShipSprite.scale
+	
+	# Place decal randomly within ship bounds, using a smaller area to ensure decals stay within visible ship
+	decal.position = Vector2(
+		randf_range(-sprite_size.x/3, sprite_size.x/3),  # Using /3 instead of /2 to keep decals more centered
+		randf_range(-sprite_size.y/3, sprite_size.y/3)   # Using /3 instead of /2 to keep decals more centered
+	)
+	decal.rotation = randf_range(0, 2 * PI)
+	decal.scale = Vector2.ONE * randf_range(0.8, 1.2)
+	
+	# Regular damage processing
+
 	combat_flag = true
 	CombatTimer.start()
 	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)

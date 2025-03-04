@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dpeudswb2dw7m"
-path="res://.godot/imported/laser.png-97ad6c81454dbd59cafd210c92dc2ea2.ctex"
+uid="uid://cgn6wt6ynxran"
+path="res://.godot/imported/smoke.png-ce0ab5b87976813802d387e4b811161d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/ProjectileArt/laser.png"
-dest_files=["res://.godot/imported/laser.png-97ad6c81454dbd59cafd210c92dc2ea2.ctex"]
+source_file="res://Art/ProjectileArt/mazen's projectiles/smoke.png"
+dest_files=["res://.godot/imported/smoke.png-ce0ab5b87976813802d387e4b811161d.ctex"]
 
 [params]
 
