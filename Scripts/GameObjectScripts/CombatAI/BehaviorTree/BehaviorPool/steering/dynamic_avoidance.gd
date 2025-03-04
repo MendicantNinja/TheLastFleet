@@ -40,7 +40,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		var test_avoid: float = avoid_velocity.dot(p) ** 2
 		if test_avoid >= cone:
 			continue
-		avoid_vel[avoid_velocity.dot(avoid_velocity)] = avoid_velocity
+		avoid_vel[avoid_velocity.dot(avoid_velocity)] = avoid_velocity.limit_length(agent.speed)
 	
 	if avoid_vel.is_empty():
 		time = 0.0

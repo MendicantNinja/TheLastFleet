@@ -8,7 +8,7 @@ var tmp_name: StringName = &"threat detect "
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 65 != 0 or agent.registry_cell == -Vector2i.ONE:
 		return FAILURE
-	elif agent.target_unit != null or agent.targeted_units.is_empty() == false:
+	elif agent.target_position != Vector2.ZERO or agent.target_unit != null or agent.targeted_units.is_empty() == false:
 		return FAILURE
 	elif agent.vent_flux_flag == true or agent.fallback_flag == true or agent.retreat_flag == true:
 		return FAILURE

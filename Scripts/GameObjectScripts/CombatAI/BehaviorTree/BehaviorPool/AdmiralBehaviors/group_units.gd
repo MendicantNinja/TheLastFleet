@@ -55,6 +55,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	
 	var visited_units: Array = []
 	var main_group_count: int = relative_group_size * unit_ratio
+	var previous_group: StringName = &""
 	while visited_units.size() != main_group_count:
 		var local_group: Array = []
 		var group_strength: float = 0.0
@@ -78,11 +79,22 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 				agent.available_groups.append(group_name)
 				agent.awaiting_orders.append(group_name)
 				break
-		var median: Vector2 = globals.geometric_median_of_objects(group_positions.keys())
-		var new_leader: Ship = globals.find_unit_nearest_to_median(median, group_positions)
-		new_leader.set_group_leader(true)
-		group_strength = 0
-		agent.iterator += 1
+			if visited_units.size() == available_units.size():
+				break
+		
+		var new_leader: Ship = null
+		if local_group.size() > 1:
+			var median: Vector2 = globals.geometric_median_of_objects(group_positions.keys())
+			new_leader = globals.find_unit_nearest_to_median(median, group_positions)
+			new_leader.set_group_leader(true)
+			group_strength = 0
+			agent.iterator += 1
+			previous_group = new_leader.group_name
+		elif local_group.size() == 1:
+			local_group[0].group_add(previous_group)
+		
+		if visited_units.size() == available_units.size():
+				break
 	
 	if visited_units.size() == n_units:
 		return FAILURE

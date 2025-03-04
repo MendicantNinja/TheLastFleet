@@ -43,6 +43,7 @@ var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
+var average_weapon_range: float = 0.0
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -165,7 +166,7 @@ func _ready() -> void:
 	registry_cell = -Vector2i.ONE
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
-	speed = ship_stats.top_speed
+	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
 	ShipNavigationAgent.max_speed = speed
 	
 	var ship_hull = ship_stats.ship_hull
@@ -204,8 +205,10 @@ func _ready() -> void:
 	# Turn on and off autofire as the refit system and ship stats demand.
 	var weapon_ranges: Array = []
 	for weapon_slot in all_weapons:
+		average_weapon_range += weapon_slot.weapon.range
 		weapon_ranges.append(weapon_slot.weapon.range)
 	
+	average_weapon_range /= weapon_ranges.size()
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
 	var longest_range: float = weapon_ranges.max()
@@ -706,16 +709,16 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if (soft_flux + hard_flux) == 0.0:
 		speed_modifier += zero_flux_bonus
 	
-	if collision_flag == true and state.linear_velocity.length() < (speed + speed_modifier):
+	if collision_flag == true and state.linear_velocity.length() < (speed):
 		collision_flag = false
 		linear_damp = 0.0
-	elif collision_flag == true and state.linear_velocity.length() > (speed + speed_modifier):
+	elif collision_flag == true and state.linear_velocity.length() > (speed):
 		linear_damp = 1.0
 	
 	if collision_flag == false:
 		apply_torque(rotate_angle)
 		apply_force(force)
-		state.linear_velocity = state.linear_velocity.limit_length(speed + speed_modifier)
+		state.linear_velocity = state.linear_velocity.limit_length(speed)
 	
 	if collision_flag == true and manual_control == true:
 		apply_torque(rotate_angle)
@@ -729,8 +732,19 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
 
-func _on_target_in_range(value: bool) -> void:
-	target_in_range = value
+func _on_target_in_range(slot: WeaponSlot, value: bool) -> void:
+	var oor_count: int = 0
+	for weapon in all_weapons:
+		if weapon.can_fire == false:
+			oor_count += 1
+	if oor_count == all_weapons.size() and value == false and manual_control == false and target_unit != null and combat_flag == true and fallback_flag == false and retreat_flag == false:
+		target_unit.targeted_by.erase(self)
+		target_unit = null
+		target_in_range = value
+	elif value == false and manual_control == true:
+		slot.acquire_new_target()
+	else:
+		target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
@@ -846,10 +860,10 @@ func _on_AvoidanceShape_area_entered(projectile) -> void:
 	
 	if projectile not in incoming_projectiles:
 		incoming_projectiles.append(projectile)
-	
-	if combat_flag == false:
-		combat_flag = true
-	CombatTimer.start()
+	#
+	#if combat_flag == false:
+		#combat_flag = true
+	#CombatTimer.start()
 
 func _on_AvoidanceShape_area_exited(projectile) -> void:
 	if projectile.collision_layer != 8 or projectile.is_friendly == is_friendly:

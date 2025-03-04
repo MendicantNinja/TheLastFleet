@@ -1,12 +1,10 @@
 extends LeafAction
 
-# strafe: useful for a handful of combat scenarios
-# Use Case:
-# Manuever out of an enemy's field of fire
-# Bombing/strafing runs
+var delta: float = 0.0
+var time: float = 0.0
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.target_in_range == false:
+	if agent.target_in_range == false or agent.incoming_projectiles.is_empty():
 		return FAILURE
 	
 	return FAILURE

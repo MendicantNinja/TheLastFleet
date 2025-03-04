@@ -21,13 +21,16 @@ extends LeafAction
 #		- Maybe useful as a modifier/coefficient
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
+	if Engine.get_physics_frames() % 67 != 0:
+		return FAILURE
+	
 	if agent.fallback_flag == true or agent.retreat_flag == true or agent.vent_flux_flag == true:
 		return FAILURE
 	
 	if agent.targeted_units.is_empty():
 		return FAILURE
 	
-	if agent.target_unit != null and Engine.get_physics_frames() % 500 != 0:
+	if agent.target_unit != null and Engine.get_physics_frames() % 1000 != 0:
 		return FAILURE
 	
 	var evaluate_targets: Array = []
@@ -54,6 +57,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	for target in evaluate_targets:
 		var final_weighted_prob: float = 0.0
 		for attacker in target.targeted_by:
+			if attacker == agent and agent.target_unit == null:
+				agent.target_unit = target
+				return FAILURE
 			if attacker == null:
 				continue
 			var agent_inf: float = abs(attacker.approx_influence)
@@ -80,7 +86,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var max_prob: float = weighted_targets.keys().max()
 	agent.target_unit = weighted_targets[max_prob]
-	print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
+	#print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
 	weighted_targets[max_prob].targeted_by.append(agent)
 	agent.set_target_for_weapons(weighted_targets[max_prob])
 	return FAILURE
