@@ -105,7 +105,7 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	deploy_enemy_fleet()
+	#deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -125,7 +125,10 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
 		for i in range (21):
-			enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
+			if i % 3 == 0:
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
+			else: 
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
 	var iterator: int 
 	for i in range (enemy_fleet.fleet_stats.ships.size()):
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
