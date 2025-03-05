@@ -76,7 +76,6 @@ func _unhandled_key_input(event) -> void:
 			elif (event.keycode == KEY_8 and event.pressed):
 				weapon_system_scene_list[7].toggle_autofire_pip()
 		if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0].weapon_system_reference != null):
-			print("Weapon system 1 is selected")
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
 			current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[0]
@@ -118,7 +117,6 @@ func _unhandled_key_input(event) -> void:
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 
 func setup_weapon_systems() -> void:
-	print("setup weapon systems called")
 	for child in $HUDWrapper.get_children():
 		if child is GridContainer:
 			child.queue_free()
@@ -130,19 +128,15 @@ func setup_weapon_systems() -> void:
 		var weapon_system_instance: GridContainer = weapon_system_scene.instantiate()
 		weapon_system_scene_list.append(weapon_system_instance)
 		if weapon_system.weapons.is_empty() == false:
-			print("weapon_system.weapons is not empty for this ship")
 			weapon_system_instance.initialize(weapon_system)
 			$HUDWrapper.add_child(weapon_system_instance)
-			if weapon_system_scene_list[0].weapon_system_reference != null:
-				print("assignment of weapon system was successful")
 			weapon_system_instance.position.x = IndicatorDecor.position.x + weapon_system_instance.gui_position.x
 			weapon_system_instance.position.y =  IndicatorDecor.position.y + weapon_system_spacing.y
 			weapon_system_spacing.y += weapon_system_instance.size.y + 5
 	
 	selected_weapon_system_scene = weapon_system_scene_list[0]
 	current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
-	print(weapon_system_scene_list[0].weapon_system_reference)
-	settings.swizzle_and_brighten(weapon_system_scene_list[0])
+	settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 	
 	if weapon_system_spacing.y >= 36 + 25*6:
 		$HUDWrapper.position.y -= 25
