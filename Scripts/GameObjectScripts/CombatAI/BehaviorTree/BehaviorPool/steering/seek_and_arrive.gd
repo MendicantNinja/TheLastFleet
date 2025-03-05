@@ -46,13 +46,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.brake_flag == true:
 		speed = agent.ship_stats.deceleration
 	
-	if agent.time != 0.0:
-		time = agent.time
-	
-	if velocity.length() < speed and agent.brake_flag == false:
-		time += delta + agent.time_coefficient
-	elif velocity.length() > 0.0 and agent.brake_flag == true:
-		time += delta + agent.time_coefficient
+	time += delta + agent.time_coefficient
+	if time > 4.0:
+		time = 0.0
 	
 	velocity = direction_to_path * speed * time
 	
@@ -62,17 +58,15 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			agent.target_position = Vector2.ZERO
 			agent.heur_velocity = Vector2.ZERO
 			agent.acceleration = Vector2.ZERO
-			agent.linear_damp = 1.0
 			time = 0.0
 			return SUCCESS
 		
 		var brake_distance: float = (agent.linear_velocity.length() ** 2) / (2.0 * agent.ship_stats.deceleration)
-		if distance_to <= brake_distance and time > 0.0:
-			time = 0.0
-			agent.brake_flag = true
+		if distance_to <= brake_distance:
+			agent.brake_flag == true
 			velocity = -agent.linear_velocity.normalized() * agent.ship_stats.deceleration * time
 	
-	velocity = velocity.limit_length(speed)
+	velocity = velocity.limit_length(agent.speed)
 	agent.heur_velocity = velocity
 	agent.time = time
 	agent.acceleration = velocity

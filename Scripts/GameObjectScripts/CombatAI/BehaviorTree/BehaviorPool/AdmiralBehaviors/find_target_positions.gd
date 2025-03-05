@@ -50,6 +50,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 				vuln_cluster[cluster] = []
 			if registry_cell in cluster:
 				vuln_cluster[cluster].append(cell)
+	
 	if vuln_cluster.is_empty() and iso_cluster.is_empty():
 		return FAILURE
 	

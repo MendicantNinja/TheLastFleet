@@ -47,6 +47,7 @@ var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
+var average_weapon_range: float = 0.0
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -100,6 +101,11 @@ var heur_velocity: Vector2 = Vector2.ZERO
 var target_unit: Ship = null
 var targeted_units: Array = []
 var neighbor_units: Array = []
+var nearby_enemy_groups: Array = []
+var idle_neighbors: Array = []
+var neighbor_groups: Array = []
+var available_neighbor_groups: Array = []
+var nearby_attackers: Array = []
 var incoming_projectiles: Array = []
 var targeted_by: Array = []
 
@@ -173,7 +179,7 @@ func _ready() -> void:
 	registry_cell = -Vector2i.ONE
 	if ship_stats == null:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
-	speed = ship_stats.top_speed
+	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
 	ShipNavigationAgent.max_speed = speed
 	
 	var ship_hull = ship_stats.ship_hull
@@ -217,10 +223,10 @@ func _ready() -> void:
 	
 	var weapon_ranges: Array = []
 	for weapon_slot in all_weapons:
+		average_weapon_range += weapon_slot.weapon.range
 		weapon_ranges.append(weapon_slot.weapon.range)
 	
-	#SEPERATOR Assign weapon system groups and weapons based on ship_stats.
-	
+	average_weapon_range /= weapon_ranges.size()
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
 	var longest_range: float = weapon_ranges.max()
@@ -328,11 +334,11 @@ func destroy_ship() -> void:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
-	
+	#
 	for unit in targeted_by:
 		if unit == null:
 			continue
-		var targeted_units: Array = unit.targeted_units
+		var targeted_units: Array = unit.targeted_units.duplicate()
 		unit.target_unit = null
 		if self in targeted_units:
 			targeted_units.erase(self)
@@ -766,16 +772,16 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if (soft_flux + hard_flux) == 0.0:
 		speed_modifier += zero_flux_bonus
 	
-	if collision_flag == true and state.linear_velocity.length() < (speed + speed_modifier):
+	if collision_flag == true and state.linear_velocity.length() < (speed):
 		collision_flag = false
 		linear_damp = 0.0
-	elif collision_flag == true and state.linear_velocity.length() > (speed + speed_modifier):
+	elif collision_flag == true and state.linear_velocity.length() > (speed):
 		linear_damp = 1.0
 	
 	if collision_flag == false:
 		apply_torque(rotate_angle)
 		apply_force(force)
-		state.linear_velocity = state.linear_velocity.limit_length(speed + speed_modifier)
+		state.linear_velocity = state.linear_velocity.limit_length(speed)
 	
 	if collision_flag == true and manual_control == true:
 		apply_torque(rotate_angle)
@@ -789,8 +795,19 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
 
-func _on_target_in_range(value: bool) -> void:
-	target_in_range = value
+func _on_target_in_range(slot: WeaponSlot, value: bool) -> void:
+	var oor_count: int = 0
+	for weapon in all_weapons:
+		if weapon.can_fire == false:
+			oor_count += 1
+	if oor_count == all_weapons.size() and value == false and manual_control == false and target_unit != null and combat_flag == true and fallback_flag == false and retreat_flag == false:
+		target_unit.targeted_by.erase(self)
+		target_unit = null
+		target_in_range = value
+	elif value == false and manual_control == true:
+		slot.acquire_new_target()
+	else:
+		target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
@@ -806,13 +823,12 @@ func remove_blackboard_data(key: Variant) -> void:
 	blackboard.remove_data(key)
 
 func set_targets(targets) -> void:
-	if targets.is_empty() == true and target_unit != null:
+	targeted_units = targets
+	if not target_unit in targets and target_unit != null:
 		target_unit.targeted_by.erase(self)
 		target_unit = null
-	elif targets.is_empty() == false and target_position != Vector2.ZERO:
+	if targets.is_empty() == false and target_position != Vector2.ZERO:
 		target_position = Vector2.ZERO
-	
-	targeted_units = targets
 
 func set_goal_flag(value) -> void:
 	goal_flag = value
@@ -906,10 +922,10 @@ func _on_AvoidanceShape_area_entered(projectile) -> void:
 	
 	if projectile not in incoming_projectiles:
 		incoming_projectiles.append(projectile)
-	
-	if combat_flag == false:
-		combat_flag = true
-	CombatTimer.start()
+	#
+	#if combat_flag == false:
+		#combat_flag = true
+	#CombatTimer.start()
 
 func _on_AvoidanceShape_area_exited(projectile) -> void:
 	if projectile.collision_layer != 8 or projectile.is_friendly == is_friendly:

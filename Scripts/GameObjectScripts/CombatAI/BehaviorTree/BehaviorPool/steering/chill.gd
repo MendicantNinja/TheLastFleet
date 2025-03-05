@@ -5,36 +5,23 @@ var time: float = 0.0
 var epsilon: float = 0.1
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.combat_flag == true or agent.retreat_flag == true or agent.target_unit != null:
-		return FAILURE
-	
-	if agent.vent_flux_flag == true and agent.retreat_flag == true:
-		return FAILURE
-	
-	if agent.target_unit == null and agent.target_position != Vector2.ZERO:
-		return FAILURE
+	if agent.target_position != Vector2.ZERO or agent.target_unit != null or agent.targeted_units.is_empty() == false or agent.fallback_flag == true or agent.retreat_flag == true:
+		time = 0.0
+		agent.brake_flag = false
+		agent.linear_damp = 0.0
+		return SUCCESS
 	
 	if delta == 0.0:
 		delta = get_physics_process_delta_time()
 	
 	var current_velocity: float = agent.linear_velocity.length()
-	agent.combat_flag = false
-	agent.retreat_flag = false
-	
-	if agent.brake_flag == true and current_velocity > epsilon:
-		return FAILURE
-	elif agent.brake_flag == true and current_velocity <= epsilon:
+	if floor(current_velocity) > 0.0:
+		agent.linear_damp = 5.0
+	elif current_velocity == 0.0:
 		time = 0.0
-		agent.time = time
-		return SUCCESS
+		agent.linear_damp = 0.0
 	
-	if agent.time != 0.0 and time > agent.time:
-		time = agent.time
-	else:
-		time += delta + agent.time_coefficient
+	if current_velocity == 0.0 and agent.brake_flag == true:
+		agent.brake_flag = false
 	
-	var velocity = -agent.linear_velocity.normalized() * (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * time
-	
-	agent.heur_velocity = velocity
-	agent.acceleration = velocity
-	return FAILURE
+	return SUCCESS
