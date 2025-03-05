@@ -91,6 +91,11 @@ var heur_velocity: Vector2 = Vector2.ZERO
 var target_unit: Ship = null
 var targeted_units: Array = []
 var neighbor_units: Array = []
+var nearby_enemy_groups: Array = []
+var idle_neighbors: Array = []
+var neighbor_groups: Array = []
+var available_neighbor_groups: Array = []
+var nearby_attackers: Array = []
 var incoming_projectiles: Array = []
 var targeted_by: Array = []
 
@@ -760,13 +765,12 @@ func remove_blackboard_data(key: Variant) -> void:
 	blackboard.remove_data(key)
 
 func set_targets(targets) -> void:
-	if targets.is_empty() == true and target_unit != null:
-		targeted_units.clear()
+	targeted_units = targets
+	if not target_unit in targets and target_unit != null:
+		target_unit.targeted_by.erase(self)
 		target_unit = null
 	if targets.is_empty() == false and target_position != Vector2.ZERO:
 		target_position = Vector2.ZERO
-	
-	targeted_units = targets
 
 func set_goal_flag(value) -> void:
 	goal_flag = value

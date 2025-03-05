@@ -39,7 +39,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		agent.move_direction = Vector2.ZERO
 	
 	if agent.fallback_flag == true and agent.target_unit != null:
+		agent.target_unit.targeted_by.erase(agent)
 		agent.target_unit = null
+		agent.set_target_for_weapons(null)
 	
 	if can_vent == true:
 		agent.move_direction == Vector2.ZERO

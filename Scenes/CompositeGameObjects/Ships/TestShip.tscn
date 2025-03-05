@@ -16,13 +16,13 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="8_5vb6y"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="8_nukju"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="8_tdgqp"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/identify_nearby_units.gd" id="9_3c2b1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="9_rp377"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="11_sglsp"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/strafe.gd" id="14_r2m5q"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="17_j44wp"]
@@ -92,6 +92,9 @@ script = ExtResource("15_2o5di")
 [node name="combat" type="Node" parent="CombatBehaviorTree/main"]
 script = ExtResource("4_qjhaj")
 
+[node name="identify nearby units" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("9_3c2b1")
+
 [node name="threat detection" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("14_iuljg")
 
@@ -112,9 +115,6 @@ script = ExtResource("8_tdgqp")
 
 [node name="kiting" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("17_lxwef")
-
-[node name="strafe" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("14_r2m5q")
 
 [node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_s3gj3")

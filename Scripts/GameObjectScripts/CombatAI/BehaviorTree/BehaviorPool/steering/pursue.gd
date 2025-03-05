@@ -10,6 +10,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.target_unit != null and (agent.target_unit.retreat_flag == true or agent.fallback_flag == true):
 		agent.target_unit.targeted_by.erase(agent)
 		agent.target_unit = null
+		agent.set_target_for_weapons(null)
 		return FAILURE
 	elif agent.retreat_flag == true or agent.vent_flux_flag == true:
 		return FAILURE
@@ -48,16 +49,14 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	if agent.target_in_range == false:
 		time += delta + agent.time_coefficient
-	if time > 4.0:
-		time = 0.0
 	
 	speed += speed_modifier
-	var brake_distance: float = (agent.speed ** 2) / (2.0 * agent.ship_stats.deceleration)
-	if distance_to <= threat_radius and distance_to > agent.average_weapon_range:
-		speed = speed * (distance_to / agent.average_weapon_range)
-	elif distance_to <= threat_radius and agent.target_in_range == false:
-		speed = speed * (threat_radius / distance_to)
-		direction_to_path = -agent.linear_velocity.normalized()
+	if distance_to <= threat_radius and agent.target_in_range == false:
+		var ratio: float = 1 - distance_to / threat_radius
+		speed = (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * ratio
+		direction_to_path = -direction_to_path
+	if time > 4.0:
+		time = delta + agent.time_coefficient
 	
 	var velocity: Vector2 = Vector2.ZERO
 	velocity = direction_to_path * speed * time

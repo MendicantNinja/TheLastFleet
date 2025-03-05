@@ -9,6 +9,9 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	var fake_tension_map: Imap = imap_manager.agent_maps[imap_manager.MapType.TENSION_MAP]
 	var tension_map: Imap = imap_manager.tension_map
 	var vulnerability_map: Imap = imap_manager.vulnerability_map
+	if Engine.get_physics_frames() % 640 == 0:
+		vulnerability_map.clear_map()
+	
 	var enemy_influence_extrema: Dictionary = {}
 	var player_vulnerability: Dictionary = {}
 	for m in range(0, vulnerability_map.height, 1):

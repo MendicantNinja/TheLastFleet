@@ -85,8 +85,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		weighted_targets[prob] = target
 	
 	var max_prob: float = weighted_targets.keys().max()
-	agent.target_unit = weighted_targets[max_prob]
-	#print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
-	weighted_targets[max_prob].targeted_by.append(agent)
-	agent.set_target_for_weapons(weighted_targets[max_prob])
+	var target: Ship = weighted_targets[max_prob]
+	agent.target_unit = target
+	print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
+	target.targeted_by.append(agent)
+	agent.set_target_for_weapons(target)
 	return FAILURE

@@ -7,7 +7,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 65 != 0:
 		return FAILURE
 	
-	if agent.targeted_units.is_empty() == false and agent.target_unit != null:
+	if agent.targeted_units.is_empty() == false:
 		return SUCCESS
 	
 	var group_strength: float = 0.0

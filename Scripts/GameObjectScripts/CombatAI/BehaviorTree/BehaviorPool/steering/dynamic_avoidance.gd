@@ -43,7 +43,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		avoid_vel[avoid_velocity.dot(avoid_velocity)] = avoid_velocity.limit_length(agent.speed)
 	
 	if avoid_vel.is_empty():
-		time = 0.0
 		return FAILURE
 	
 	var new_velocity: Vector2 = avoid_vel[avoid_vel.keys().min()]

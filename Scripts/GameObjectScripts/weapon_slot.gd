@@ -35,6 +35,7 @@ var display_aim: bool = false
 var auto_aim: bool = false
 var auto_fire: bool = false
 var can_look_at: bool = false
+var timer_fire: bool = false
 var can_fire: bool = false
 var flux_overload: bool = false
 var is_friendly: bool = false
@@ -62,7 +63,7 @@ signal threat_exited(targets)
 
 # Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
 func fire(ship_id: int) -> void:
-	if flux_overload or can_fire == false:
+	if flux_overload == true or timer_fire == false:
 		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return
@@ -80,7 +81,7 @@ func fire(ship_id: int) -> void:
 	get_tree().root.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
-	can_fire = false
+	timer_fire = false
 	rate_of_fire_timer.start()
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
@@ -112,7 +113,7 @@ func _ready():
 	
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
-	can_fire = true
+	timer_fire = true
 	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)
 	
 	default_direction = weapon_node.transform
@@ -197,17 +198,17 @@ func update_flux_overload(flux_state: bool) -> void:
 
 # Assigns the RID of the ship the player targets to the variable target_unit.
 func set_target_unit(unit) -> void:
-	target_unit = unit.get_rid()
-	if not available_targets.has(target_unit):
-		target_in_range.emit(self, false)
+	if unit == null:
+		target_unit = RID()
+	else:
+		target_unit = unit.get_rid()
 
 func toggle_display_aim(toggle: bool) -> void:
 	display_aim = toggle
 	queue_redraw()
 
 func _on_ROF_timeout() -> void:
-	
-	can_fire = true
+	timer_fire = true
 
 # Creates the context for a weapon's given situation.
 func _on_EffectiveRange_entered(body) -> void:
@@ -330,32 +331,33 @@ func update_killcast(delta) -> void:
 	if target_unit != null and available_targets.has(target_unit):
 		target_position = to_local(available_targets[target_unit].global_position)
 	
-	if target_position != Vector2.ZERO:
-		var dist_to: float = position.distance_to(target_position)
-		if dist_to > weapon.range:
-			can_look_at = false
-	
+	killcast.target_position = target_position
+	killcast.force_raycast_update()
 	var collider = killcast.get_collider()
-	if not collider is Ship: # Do not shoot at obstacles
-		can_look_at = false
+	if not collider is Ship or collider == null: # Do not shoot at obstacles
+		can_fire = false
+	elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+		can_fire == false
+	else:
+		can_fire = true
 	
-	if collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
-		can_look_at == false
-	
-	var lead_shots: Vector2 = Vector2.ZERO
-	var err_adj: float = 0.8
-	if collider != null and collider.linear_velocity.length() != 0.0 and can_look_at == true:
-		lead_shots = collider.linear_velocity * 0.5
-		target_position = target_position + lead_shots
+	if can_fire == true:
+		var collision_point: Vector2 = to_local(killcast.get_collision_point())
+		var dist_to: float = position.distance_to(collision_point)
+		if dist_to > weapon.range:
+			can_fire = false
+		else:
+			can_fire = true
+			target_position = collision_point
+		var velocity: Vector2 = collider.linear_velocity * 0.1
+		target_position += velocity
 	
 	if (auto_aim or auto_fire):
 		var face_direction: Transform2D = face_weapon(target_position)
 		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	
-	if can_look_at and can_fire and auto_fire:
+	if can_look_at and can_fire and timer_fire and auto_fire:
 		fire(owner_rid.get_id())
 	
-	if (can_fire == false or can_look_at == false) and available_targets.size() > 1:
+	if can_fire == false and available_targets.size() > 1:
 		target_in_range.emit(self, false)
-	killcast.target_position = target_position
-	killcast.force_raycast_update()
