@@ -31,6 +31,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		agent.fallback_flag = true
 		can_vent = false
 	
+	if agent.vent_flux_flag == true and can_vent == true and agent.shield_toggle == true:
+		agent.set_shields(false)
+	
 	if agent.vent_flux_flag == false:
 		return FAILURE
 	

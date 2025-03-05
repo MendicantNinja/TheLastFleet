@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=37 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
@@ -21,6 +21,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="11_sglsp"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/use_shield.gd" id="13_3idnh"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
@@ -103,6 +104,9 @@ script = ExtResource("8_nukju")
 
 [node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("6_26ar5")
+
+[node name="use shield" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("13_3idnh")
 
 [node name="chill" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("11_sglsp")
