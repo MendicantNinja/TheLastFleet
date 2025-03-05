@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-var current_ship: Ship = null
 
+var current_ship: Ship = null
 #Root Wrapper
 @onready var HUDWrapper: Control = $HUDWrapper
 
@@ -18,6 +18,7 @@ var current_ship: Ship = null
 @onready var IndicatorDecor = $HUDWrapper/IndicatorDecor
 @onready var weapon_system_scene = load("res://Scenes/GUIScenes/CombatGUIScenes/ManualHUDWeaponElement.tscn")
 @onready var weapon_system_scene_list: Array[GridContainer]
+@onready var selected_weapon_system_scene: GridContainer
 @onready var weapon_system_spacing: Vector2 = Vector2(62, 36)
 
 # Proximity and Combat Radar
@@ -74,8 +75,50 @@ func _unhandled_key_input(event) -> void:
 				weapon_system_scene_list[6].toggle_autofire_pip()
 			elif (event.keycode == KEY_8 and event.pressed):
 				weapon_system_scene_list[7].toggle_autofire_pip()
+		if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0].weapon_system_reference != null):
+			print("Weapon system 1 is selected")
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[0]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[1].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[1]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[2].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[2]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[3].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[3]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[4].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[4]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[5].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[5]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[6].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[6]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7].weapon_system_reference != null):
+			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.selected_weapon_system = weapon_system_scene_list[7].weapon_system_reference
+			selected_weapon_system_scene = weapon_system_scene_list[7]
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 
 func setup_weapon_systems() -> void:
+	print("setup weapon systems called")
 	for child in $HUDWrapper.get_children():
 		if child is GridContainer:
 			child.queue_free()
@@ -87,11 +130,19 @@ func setup_weapon_systems() -> void:
 		var weapon_system_instance: GridContainer = weapon_system_scene.instantiate()
 		weapon_system_scene_list.append(weapon_system_instance)
 		if weapon_system.weapons.is_empty() == false:
+			print("weapon_system.weapons is not empty for this ship")
 			weapon_system_instance.initialize(weapon_system)
 			$HUDWrapper.add_child(weapon_system_instance)
+			if weapon_system_scene_list[0].weapon_system_reference != null:
+				print("assignment of weapon system was successful")
 			weapon_system_instance.position.x = IndicatorDecor.position.x + weapon_system_instance.gui_position.x
 			weapon_system_instance.position.y =  IndicatorDecor.position.y + weapon_system_spacing.y
 			weapon_system_spacing.y += weapon_system_instance.size.y + 5
+	
+	selected_weapon_system_scene = weapon_system_scene_list[0]
+	current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
+	print(weapon_system_scene_list[0].weapon_system_reference)
+	settings.swizzle_and_brighten(weapon_system_scene_list[0])
 	
 	if weapon_system_spacing.y >= 36 + 25*6:
 		$HUDWrapper.position.y -= 25
@@ -99,7 +150,7 @@ func setup_weapon_systems() -> void:
 		$HUDWrapper/WeaponSystems.position.y += 3
 		IndicatorDecor.scale = Vector2(1.05, 1.25)
 	elif weapon_system_spacing.y >= 36 + 25*7:
-		print('holy shit thats alot of weapons')
+		print('holy shit thats alot of weapons') # Here in case an off by 1 error occurs (it shouldn't)
 		$HUDWrapper/WeaponSystems.position.x += 8
 		$HUDWrapper/WeaponSystems.position.y += 6
 		$HUDWrapper.position.y -= 50

@@ -47,6 +47,7 @@ func initialize(weapon_system: WeaponSystem) -> void:
 		else:
 			var instanced_subrow = weapon_subtype_scene.instantiate()
 			add_child(instanced_subrow)
+			instanced_subrow.initialize()
 			instanced_subrow.NameCount.text = str(weapon_type_counts.get(weapon_name, 0)) + "X " + weapon_name.to_upper()
 		row_index += 1
 	pass

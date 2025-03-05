@@ -32,6 +32,22 @@ func initialize() -> void:
 	
 	if settings.dev_mode == true:
 		data.assign_loadout(self)
+		# Assign each different weapon type to a weapon system.
+		for weapon_slot in weapon_slots:
+			if weapon_slot.weapon:  # Ensure there's a weapon in the slot
+				var group = get_weapon_group(weapon_slot.weapon)
+				weapon_slot.weapon_system_group = group
+
+func get_weapon_group(weapon: Weapon) -> int:
+	# Logic for weapon group assignment can be changed as needed.
+	if weapon == data.weapon_dictionary.get(data.weapon_enum.RAILGUN):
+		return 0  # Assign to weapon system 1
+	elif weapon == data.weapon_dictionary.get(data.weapon_enum.CBEAM):
+		return 1  # Assign to weapon system 2
+	elif weapon == data.weapon_dictionary.get(data.weapon_enum.NIKEMISSILE):
+		return 2  # Assign to weapon system 3
+	else:
+		return 0 # Default fallback group
 
 # Updates stats. Internal function not called outside of this script. Should be called with a co-function whenever there is potentially a stat change (a new hull mod).
 func update() -> void:
@@ -171,7 +187,8 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var ship_hull: ShipHull 
 @export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
 @export_storage var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
-@export_storage var weapon_systems: Array[WeaponSystem] = [ # Indexes 0-7
+# The weapon systems here in ship stats are only used for the refitting GUI. DO NOT set them for any other purpose.
+@export_storage var weapon_systems: Array[WeaponSystem] = [ 
 	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(),
 	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new()
 ]

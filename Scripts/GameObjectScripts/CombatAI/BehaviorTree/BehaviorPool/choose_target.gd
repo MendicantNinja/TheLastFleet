@@ -55,7 +55,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var max_prob: float = weighted_targets.keys().max()
 	agent.target_unit = weighted_targets[max_prob]
-	print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
+	#print("%s targeting %s with %1.3f probability of winning" % [agent.name, weighted_targets[max_prob].name, max_prob])
 	weighted_targets[max_prob].targeted_by.append(agent)
 	agent.targeted_units = available_targets
 	agent.set_target_for_weapons(weighted_targets[max_prob])

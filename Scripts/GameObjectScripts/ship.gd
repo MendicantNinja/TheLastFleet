@@ -64,6 +64,7 @@ var weapon_systems: Array[WeaponSystem] = [
 	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(),
 	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new()
 ]
+var selected_weapon_system: WeaponSystem = weapon_systems[0]
 var all_weapons: Array[WeaponSlot]
 var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
@@ -283,25 +284,25 @@ func _ready() -> void:
 	self.mouse_exited.connect(_on_mouse_exited)
 
 func process_damage(projectile: Projectile) -> void:
-	if CombatBehaviorTree.enabled == false:
-		CombatBehaviorTree.enabled = true
+	#if CombatBehaviorTree.enabled == false:
+		#CombatBehaviorTree.enabled = true
 	
-	# Spawn bullet hole directly on the ship
-	var decal = preload("res://bulletdecal.tscn").instantiate()
-	add_child(decal)
-	
-	# Get ship sprite dimensions for random placement
-	var sprite_size = ShipSprite.texture.get_size() * ShipSprite.scale
-	
-	# Place decal randomly within ship bounds, using a smaller area to ensure decals stay within visible ship
-	decal.position = Vector2(
-		randf_range(-sprite_size.x/3, sprite_size.x/3),  # Using /3 instead of /2 to keep decals more centered
-		randf_range(-sprite_size.y/3, sprite_size.y/3)   # Using /3 instead of /2 to keep decals more centered
-	)
-	decal.rotation = randf_range(0, 2 * PI)
-	decal.scale = Vector2.ONE * randf_range(0.8, 1.2)
-	
-	# Regular damage processing
+	## Spawn bullet hole directly on the ship
+	#var decal = preload("res://bulletdecal.tscn").instantiate()
+	#add_child(decal)
+	#
+	## Get ship sprite dimensions for random placement
+	#var sprite_size = ShipSprite.texture.get_size() * ShipSprite.scale
+	#
+	## Place decal randomly within ship bounds, using a smaller area to ensure decals stay within visible ship
+	#decal.position = Vector2(
+		#randf_range(-sprite_size.x/3, sprite_size.x/3),  # Using /3 instead of /2 to keep decals more centered
+		#randf_range(-sprite_size.y/3, sprite_size.y/3)   # Using /3 instead of /2 to keep decals more centered
+	#)
+	#decal.rotation = randf_range(0, 2 * PI)
+	#decal.scale = Vector2.ONE * randf_range(0.8, 1.2)
+	#
+	## Regular damage processing
 
 	combat_flag = true
 	CombatTimer.start()
@@ -698,7 +699,7 @@ func _physics_process(delta: float) -> void:
 		if TacticalMapLayer.visible == false:
 			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
 			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
-				fire_weapon_system(all_weapons)
+				fire_weapon_system(selected_weapon_system.weapons)
 			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
 			rotate_angle = rotate_direction.angle()
 			var adjust_mass: float = (mass * 1000)
@@ -721,8 +722,8 @@ func _physics_process(delta: float) -> void:
 				CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
 		
-	if shield_toggle and not flux_overload:
-		fire_weapon_system(all_weapons)
+	#if shield_toggle and not flux_overload:
+		#fire_weapon_system(all_weapons)
 	
 	if shield_toggle and not flux_overload:
 		soft_flux += shield_upkeep

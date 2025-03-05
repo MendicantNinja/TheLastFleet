@@ -87,10 +87,8 @@ func assign_loadout(ship_stats: ShipStats, loadout_type: loadout_enum = loadout_
 		return
 	var ship_loadout_array: Array = ship_loadouts.get(loadout_type)
 	var weapon_slots: Array[WeaponSlot] = ship_stats.weapon_slots
-	print("assign loadout called, assigning weapons")
 	var weapon_loadout_array: Array = loadout_dictionary[ship_type].get(loadout_type)
 	for i in range(weapon_loadout_array.size()):
-		print(weapon_loadout_array[i])
 		weapon_slots[i].weapon = weapon_loadout_array[i]
 	# Useful for assigning ship mods and OP later. Will probably have to add such data to the loadout dictionary
 		

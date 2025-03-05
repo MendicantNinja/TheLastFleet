@@ -168,7 +168,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 		var min_dist: float = slot_distances.keys().min()
 		var target_position: Vector2 = slot_distances[min_dist]
 		unit.target_position = target_position
-		print(unit.name, unit.target_position)
+		#print(unit.name, unit.target_position)
 		visited.append(target_position)
 		if visited.size() == group.size():
 			return
