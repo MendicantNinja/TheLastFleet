@@ -505,12 +505,10 @@ func toggle_ship_select() -> void:
 			ship_select = false # deselect ship
 
 func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	#
-	#if event is InputEventMouseButton:
-		#if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
-			#alt_select.emit()
-			#return
-	pass
+	if event is InputEventMouseButton:
+		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
+			alt_select.emit()
+			return
 
 func _on_mouse_entered() -> void:
 	if TacticalMapLayer.visible:
@@ -780,29 +778,15 @@ func _physics_process(delta: float) -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
-	var speed_modifier: float = 0.0
-	if (soft_flux + hard_flux) == 0.0:
-		speed_modifier += zero_flux_bonus
 	
-	if collision_flag == true and state.linear_velocity.length() < (speed):
-		collision_flag = false
-		linear_damp = 0.0
-	elif collision_flag == true and state.linear_velocity.length() > (speed):
-		linear_damp = 1.0
+	if manual_control == false:
+		apply_force(force)
+	elif manual_control == true:
+		apply_force(force)
+		apply_torque(rotate_angle)
 	
 	if collision_flag == false:
-		apply_torque(rotate_angle)
-		apply_force(force)
 		state.linear_velocity = state.linear_velocity.limit_length(speed)
-	
-	if collision_flag == true and manual_control == true:
-		apply_torque(rotate_angle)
-		apply_force(force)
-	
-	if collision_flag == true and manual_control == false:
-		var decel: Vector2 = -linear_velocity.normalized() * ship_stats.deceleration
-		apply_torque(rotate_angle)
-		apply_force(decel)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
@@ -934,7 +918,7 @@ func _on_AvoidanceShape_area_entered(projectile) -> void:
 	
 	if projectile not in incoming_projectiles:
 		incoming_projectiles.append(projectile)
-	#
+	
 	#if combat_flag == false:
 		#combat_flag = true
 	#CombatTimer.start()

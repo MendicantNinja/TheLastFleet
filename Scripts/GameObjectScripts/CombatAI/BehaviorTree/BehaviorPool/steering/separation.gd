@@ -1,7 +1,7 @@
 extends LeafAction
 
 var fof_radius: float = 0.0
-var rad_coe: float = 2.0
+var rad_coe: float = 4.0
 var time: float = 0.0
 var delta: float = 0.0
 
@@ -53,6 +53,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		time = 0.0
 	var separation_velocity: Vector2 = strafe_direction[strafe_direction.keys().min()] * speed * time
 	var new_velocity: Vector2 = agent.heur_velocity + separation_velocity * 0.2
+	if agent.combat_flag == true or agent.target_unit != null:
+		new_velocity = separation_velocity
+	
 	agent.time = time
 	agent.heur_velocity = new_velocity.limit_length(agent.speed)
 	agent.acceleration = new_velocity.limit_length(agent.speed)

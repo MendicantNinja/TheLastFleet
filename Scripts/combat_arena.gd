@@ -26,7 +26,6 @@ var combat_goal: int = globals.GOAL.SKIRMISH
 var deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
-	
 
 signal units_deployed(units)
 func _ready() -> void:
@@ -55,10 +54,10 @@ func _ready() -> void:
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:
-		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
-		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = vulnerability_map.map_grid.size()
-		var grid_column_size: int = vulnerability_map.map_grid[0].size()
+		weighted_imap.update_grid_value.connect(_on_grid_value_changed)
+		weighted_imap.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = weighted_imap.map_grid.size()
+		var grid_column_size: int = weighted_imap.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -66,7 +65,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(weighted_imap.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
@@ -106,7 +105,7 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	#deploy_enemy_fleet()
+	deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -158,7 +157,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	var geo_median_ship: Vector2 = globals.geometric_median_of_objects(ship_positions.keys())
 	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
 	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
-	geo_median_formation.x -= 1000
+	geo_median_formation.x -= 1250
 	geo_median_formation.y -= 1000
 	new_leader.ships_deployed.connect(_on_enemy_ships_deployed)
 	new_leader.set_group_leader(true)
@@ -178,6 +177,8 @@ func _unhandled_input(event) -> void:
 func _physics_process(delta):
 	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):
 		battle_over = true
+	elif battle_over == true and (get_tree().get_node_count_in_group(&"friendly") > 0 and get_tree().get_node_count_in_group(&"enemy") > 0):
+		battle_over = false
 	
 	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 60 == 0 and battle_over == false:
 		imap_manager.weigh_force_density()

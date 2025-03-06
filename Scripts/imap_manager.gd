@@ -154,6 +154,8 @@ func weigh_force_density() -> void:
 		if enemy_density != 0.0:
 			enemy_cell_density[cell] = enemy_density
 	
+	if friendly_cell_density.is_empty() == true or enemy_cell_density.is_empty() == true:
+		return
 	
 	var enemy_neighborhood_density: Dictionary = {}
 	visited = []
