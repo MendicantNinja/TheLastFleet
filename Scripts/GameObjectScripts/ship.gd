@@ -631,16 +631,16 @@ func set_navigation_position(to_position: Vector2) -> void:
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
 	# Passive Flux Dissipation
-	if Engine.get_physics_frames() % 5 == 0:
+	if Engine.get_physics_frames() % 20 == 0:
 		if soft_flux == 0:
-			hard_flux -= ship_stats.flux_dissipation / 12
+			hard_flux -= ship_stats.flux_dissipation / 3
 			
 		elif soft_flux < ship_stats.flux_dissipation:
-			var flux_to_carry_over: float = ship_stats.flux_dissipation/ 12 - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
+			var flux_to_carry_over: float = ship_stats.flux_dissipation/ 3 - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
 			hard_flux -= flux_to_carry_over
 			soft_flux = 0
 		else: 
-			soft_flux -= ship_stats.flux_dissipation / 12
+			soft_flux -= ship_stats.flux_dissipation / 3
 		update_flux_indicators()
 	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
