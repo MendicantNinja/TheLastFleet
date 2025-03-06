@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=49 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -34,6 +34,7 @@
 [ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
+[ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -204,6 +205,7 @@ debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
 
 [node name="CombatMap" type="Node2D" parent="."]
 unique_name_in_owner = true
+process_mode = 3
 script = ExtResource("2_moq8i")
 
 [node name="CombatCamera" type="Camera2D" parent="CombatMap"]
@@ -241,14 +243,16 @@ position_smoothing_enabled = true
 
 [node name="TacticalMapLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
+process_mode = 3
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
 top_level = true
 z_index = 1
 offset_left = 8.0
 offset_top = 5.0
-offset_right = 1879.0
-offset_bottom = 1074.0
+offset_right = 1540.0
+offset_bottom = 1332.0
+scale = Vector2(0.75, 0.75)
 size_flags_vertical = 1
 theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
@@ -260,6 +264,7 @@ CONTROLS
 Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
 
 (Anywhere)
+Space = Pause
 Escape = Options Menu
 Tab = Swap between tactical/combat camera
 G = Call For Reinforcements
@@ -839,6 +844,26 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -82.5
+offset_top = -63.0
+offset_right = 82.5
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Game Paused"
 
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1

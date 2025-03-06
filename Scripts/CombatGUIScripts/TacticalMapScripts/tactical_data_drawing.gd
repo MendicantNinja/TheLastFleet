@@ -118,6 +118,16 @@ func _unhandled_input(event) -> void:
 				$"../../../TutorialText".visible = false
 			elif $"../../../TutorialText".visible == false:
 				$"../../../TutorialText".visible = true
+		elif (event.keycode == KEY_SPACE and event.pressed):
+			pause_game()
+
+func pause_game() -> void:
+			if get_tree().paused == false:
+				get_tree().paused = true
+				$"../../../../VariousCanvasPopups/GamePausedText".visible = true
+			elif get_tree().paused == true:
+				get_tree().paused = false
+				$"../../../../VariousCanvasPopups/GamePausedText".visible = false
 
 func connect_unit_signals(units: Array) -> void:
 	for n_unit in units:

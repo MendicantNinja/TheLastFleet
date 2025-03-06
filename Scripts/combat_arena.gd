@@ -106,7 +106,7 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	#deploy_enemy_fleet()
+	deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -172,7 +172,7 @@ func _unhandled_input(event) -> void:
 	if event is InputEventKey:
 		if (event.keycode == KEY_G and event.pressed):
 			toggle_fleet_deployment_panel()
-		if (event.keycode == KEY_ESCAPE and event.pressed):
+		elif (event.keycode == KEY_ESCAPE and event.pressed):
 			toggle_options_menu()
 
 func _physics_process(delta):
