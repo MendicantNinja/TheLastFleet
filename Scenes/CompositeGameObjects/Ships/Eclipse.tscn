@@ -203,7 +203,7 @@ offset_bottom = 40.0
 
 [node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
 modulate = Color(0.4669, 0.84, 0.294, 0.784314)
-z_index = 1
+z_index = 3
 anchors_preset = 0
 
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI"]
