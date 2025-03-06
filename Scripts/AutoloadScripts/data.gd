@@ -22,33 +22,34 @@ enum tech_enum {
 #oo     .d8P  888     888   888   888         oo     .d8P 
 #8""88888P'  o888o   o888o o888o o888o        8""88888P'
 
+# PLEASE READ: Adding entries to the middle of an enum breaks everything else due to numbers being shifted. Godot's fault.
 # List of Ships in the game. Matches to a dictionary.
 enum ship_type_enum {
 	# Fighters (Suggestion: Birds of Prey and Predatory Insects)
-	RAPTOR,
-	FALCON,
+	RAPTOR = 0,
+	FALCON = 1,
 	
 	# Frigates (Suggestion: Names of famous battles and reptiles/animals, famous animals?) 
-	ISSUS,
-	MONITOR, 
-	
+	CHALLENGER = 2,
+	ECLIPSE = 3, 
 	# Destroyers (Suggestion: Pack animals and Tools. Famous commanders)
-	LION,
-	WOLF,
-	TRIDENT,
+	LION = 4,
+	WOLF = 5,
+	TRIDENT = 6,
 	
 	# Cruisers (Suggestion: Nouns that are strong actions or suggest grand scale, so that they almost come off as verbs. )
-	MARATHON, # Also the name of a famous battle! :D
-	INFINITY, 
+	MARATHON = 7, # Also the name of a famous battle! :D
+	INFINITY = 8, 
 	
 	# Capitals (Suggestion: strong adjectives. Because capital ships do things.)
-	ASTRAL,
-	MALEVOLENT,
+	ASTRAL = 9,
+	MALEVOLENT = 10,
 	
 	#Motherships
 	
 	# DEBUG / TEST SHIPS
-	TEST,
+	TEST = 11,
+
 }
 
 var ship_type_dictionary: Dictionary = {
@@ -57,8 +58,8 @@ var ship_type_dictionary: Dictionary = {
 	ship_type_enum.RAPTOR : load("res://Resources/ShipHulls/Fighters/Raptor.tres"),
 	
 	# Frigates
-	ship_type_enum.ISSUS: load("res://Resources/ShipHulls/Frigates/Issus.tres"),
-	
+	ship_type_enum.CHALLENGER: load("res://Resources/ShipHulls/Frigates/Challenger.tres"),
+	ship_type_enum.ECLIPSE: load("res://Resources/ShipHulls/Frigates/Eclipse.tres"),
 	# Destroyers
 	ship_type_enum.LION : load("res://Resources/ShipHulls/Destroyers/Lion.tres"),
 	
@@ -81,6 +82,9 @@ enum loadout_enum {
 func assign_loadout(ship_stats: ShipStats, loadout_type: loadout_enum = loadout_enum.DEFAULT) -> void:
 	var ship_type: ship_type_enum = ship_stats.ship_hull.ship_type
 	if loadout_dictionary.has(ship_type) == false: # Return if the ship in question doesn't have a dictionary or loadout entry yet.
+		if ship_type != ship_type_enum.TEST:
+			print("In data.assign_loadout. Loadout does not exist for this ship, ship will have railguns added by default")
+			push_error("In data.assign_loadout. Loadout does not exist for this ship, ship will have railguns added by default")
 		return
 	var ship_loadouts: Dictionary = loadout_dictionary.get(ship_type)
 	if ship_loadouts.has(loadout_type) == false:
@@ -159,7 +163,18 @@ var loadout_dictionary: Dictionary = {
 			weapon_dictionary.get(weapon_enum.CBEAM), 
 			weapon_dictionary.get(weapon_enum.CBEAM),
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.RAILGUN)
+			weapon_dictionary.get(weapon_enum.RAILGUN),
+			]
+	},
+	ship_type_enum.CHALLENGER: {
+		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.RAILGUN),
+			]
+	},
+	ship_type_enum.ECLIPSE: {
+		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.CBEAM), 
+			weapon_dictionary.get(weapon_enum.CBEAM), 
 			]
 	}
 }

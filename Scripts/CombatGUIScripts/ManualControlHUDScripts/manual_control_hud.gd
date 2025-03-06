@@ -34,6 +34,7 @@ var current_ship: Ship = null
 @onready var proximity_indicator_icon = load("res://Scenes/GUIScenes/CombatGUIScenes/ProximityIndicator.tscn")
 func _ready() -> void:
 	pass
+	settings.swizzle(HUDWrapper, settings.gui_color, false)
 	#if settings.dev_mode == true:
 		#current_ship = ship_registry[0]
 
@@ -126,17 +127,20 @@ func setup_weapon_systems() -> void:
 		return
 	for weapon_system in current_ship.weapon_systems:
 		var weapon_system_instance: GridContainer = weapon_system_scene.instantiate()
-		weapon_system_scene_list.append(weapon_system_instance)
 		if weapon_system.weapons.is_empty() == false:
+			weapon_system_scene_list.append(weapon_system_instance)
 			weapon_system_instance.initialize(weapon_system)
 			$HUDWrapper.add_child(weapon_system_instance)
 			weapon_system_instance.position.x = IndicatorDecor.position.x + weapon_system_instance.gui_position.x
 			weapon_system_instance.position.y =  IndicatorDecor.position.y + weapon_system_spacing.y
 			weapon_system_spacing.y += weapon_system_instance.size.y + 5
-	
-	selected_weapon_system_scene = weapon_system_scene_list[0]
-	current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
-	settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+	#
+	for weapon_system_scene in weapon_system_scene_list:
+		if weapon_system_scene.NameCount1 != null:
+			selected_weapon_system_scene = weapon_system_scene_list[0]
+			current_ship.selected_weapon_system = selected_weapon_system_scene.weapon_system_reference
+			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+			#return
 	
 	if weapon_system_spacing.y >= 36 + 25*6:
 		$HUDWrapper.position.y -= 25

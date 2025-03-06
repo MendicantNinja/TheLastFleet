@@ -8,10 +8,12 @@ func _ready():
 	#for when user names are implemented ResourceLoader.load("user://"+get_child(0, true).text+".res")
 	if player_fleet.fleet_stats.ships.is_empty():
 		for i in range (14):
-			if i % 3 == 0:
+			if i % 100 == 0:
 				player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
-			else: 
-				player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
+			elif i % 3 == 0:
+				player_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
+			else:
+				player_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 
 
 # Saving/Loading the player and their fleet

@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://qxwd72cyfq8y"]
+
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_brt5q"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_h7fkm"]
+[ext_resource type="PackedScene" uid="uid://cu2fkh4ittsos" path="res://Scenes/CompositeGameObjects/Ships/Eclipse.tscn" id="2_l65qa"]
+[ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="3_phetm"]
+[ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="5_7m6vi"]
+
+[resource]
+script = ExtResource("1_brt5q")
+ship_type_name = "Eclipse"
+ship_description = "A high-tech quick frigate with a built-in drone bay and oversized energy mounts  but thin armor."
+ship_type = 3
+ship_size = 1
+ship_tech = 2
+ship_packed_scene = ExtResource("2_l65qa")
+ship_system = 0
+weapon_mounts = Array[ExtResource("2_h7fkm")]([ExtResource("5_7m6vi"), ExtResource("5_7m6vi")])
+base_mods = []
+ship_sprite = ExtResource("3_phetm")
+ship_scaling = 1
+hull_integrity = 1000
+armor = 300
+shield_efficiency = 0.6
+shield_upkeep = 100.0
+flux = 600
+flux_dissipation = 100
+top_speed = 120
+acceleration = 32.0
+deceleration = 24.0
+turn_rate = 0.7
+mass = 0.0
+drive_field = 10
+deployment_points = 1.0
+base_cr = 65.0
+cr_recovery_rate = 2.0
+cr_deployment_cost = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 0.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 0
+skeleton_crew = 0
+fighter_bays = 0
+sensor_strength = 0
+sensor_profile = 0
+repair_rate = 0.0

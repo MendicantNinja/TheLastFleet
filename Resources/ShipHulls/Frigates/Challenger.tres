@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://cio51me4h2qw5"]
+
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_rplny"]
+[ext_resource type="PackedScene" uid="uid://c2gpnr0o720b0" path="res://Scenes/CompositeGameObjects/Ships/Challenger.tscn" id="2_3nbtq"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_7iuod"]
+[ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="3_2hfhe"]
+[ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="5_liwfx"]
+
+[resource]
+script = ExtResource("1_rplny")
+ship_type_name = "Challenger"
+ship_description = "A low-tech tough frigate intended to fight as part of the flagship doctrine."
+ship_type = 2
+ship_size = 1
+ship_tech = 0
+ship_packed_scene = ExtResource("2_3nbtq")
+ship_system = 0
+weapon_mounts = Array[ExtResource("2_7iuod")]([ExtResource("5_liwfx"), ExtResource("5_liwfx"), ExtResource("5_liwfx")])
+base_mods = []
+ship_sprite = ExtResource("3_2hfhe")
+ship_scaling = 1
+hull_integrity = 2000
+armor = 500
+shield_efficiency = 0.8
+shield_upkeep = 25.0
+flux = 600
+flux_dissipation = 100
+top_speed = 100
+acceleration = 24.0
+deceleration = 18.0
+turn_rate = 0.4
+mass = 0.0
+drive_field = 10
+deployment_points = 1.0
+base_cr = 65.0
+cr_recovery_rate = 2.0
+cr_deployment_cost = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 0.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 0
+skeleton_crew = 0
+fighter_bays = 0
+sensor_strength = 0
+sensor_profile = 0
+repair_rate = 0.0

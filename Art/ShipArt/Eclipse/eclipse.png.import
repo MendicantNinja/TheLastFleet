@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://30iy2samt3sx"
-path="res://.godot/imported/high_tech_frigate.png-abc69283ccd32b4a39744b3e9b5fd97c.ctex"
+path="res://.godot/imported/eclipse.png-ca4be95cacb33b6d0b224909a3c2077b.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Art/ShipArt/HighTechFrigate/high_tech_frigate.png"
-dest_files=["res://.godot/imported/high_tech_frigate.png-abc69283ccd32b4a39744b3e9b5fd97c.ctex"]
+source_file="res://Art/ShipArt/Eclipse/eclipse.png"
+dest_files=["res://.godot/imported/eclipse.png-ca4be95cacb33b6d0b224909a3c2077b.ctex"]
 
 [params]
 

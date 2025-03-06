@@ -189,7 +189,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
-modulate = Color(0.486275, 0.843137, 0.294118, 0.588235)
+modulate = Color(0.25, 1, 0, 0.784314)
 z_index = 1
 anchors_preset = 0
 

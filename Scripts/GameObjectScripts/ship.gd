@@ -165,12 +165,13 @@ func deploy_ship() -> void:
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
 	
 	if is_friendly == true:
-		OldTacticalMapIcon.modulate = settings.player_color
-		ManualControlIndicator.self_modulate = settings.player_color
-		settings.swizzle($ShipLivery, settings.player_color) 
+		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
+		settings.swizzle(ConstantSizedGUI, settings.gui_color, false)
+		settings.swizzle($ShipLivery, settings.player_color)
+		ManualControlIndicator.self_modulate = settings.player_color 
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
-		OldTacticalMapIcon.modulate = settings.enemy_color
+		settings.swizzle(ConstantSizedGUI, settings.enemy_color, false)
 		settings.swizzle($ShipLivery, settings.enemy_color)
 	
 func _ready() -> void:
@@ -619,17 +620,18 @@ func set_navigation_position(to_position: Vector2) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
-	# Needs to be per second.
-	#if soft_flux == 0:
-		#hard_flux -= ship_stats.flux_dissipation
-		#
-	#elif soft_flux < ship_stats.flux_dissipation:
-		#var flux_to_carry_over: float = ship_stats.flux_dissipation - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
-		#hard_flux -= flux_to_carry_over
-		#soft_flux = 0
-	#else: 
-		#soft_flux -= ship_stats.flux_dissipation
-	#update_flux_indicators()
+	# Passive Flux Dissipation
+	if Engine.get_physics_frames() % 5 == 0:
+		if soft_flux == 0:
+			hard_flux -= ship_stats.flux_dissipation / 12
+			
+		elif soft_flux < ship_stats.flux_dissipation:
+			var flux_to_carry_over: float = ship_stats.flux_dissipation/ 12 - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
+			hard_flux -= flux_to_carry_over
+			soft_flux = 0
+		else: 
+			soft_flux -= ship_stats.flux_dissipation / 12
+		update_flux_indicators()
 	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
