@@ -55,6 +55,8 @@ z_as_relative = false
 collision_mask = 15
 input_pickable = true
 gravity_scale = 0.0
+center_of_mass_mode = 1
+center_of_mass = Vector2(-25, 0)
 continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
@@ -82,6 +84,9 @@ script = ExtResource("5_l4wk6")
 
 [node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("6_x8egb")
+
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("17_t3uge")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("7_wdwtq")

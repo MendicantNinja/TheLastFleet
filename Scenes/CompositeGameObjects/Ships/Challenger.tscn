@@ -82,6 +82,9 @@ script = ExtResource("5_3s4r4")
 [node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("6_3vlmf")
 
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("17_vx6dc")
+
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("7_4n4rr")
 

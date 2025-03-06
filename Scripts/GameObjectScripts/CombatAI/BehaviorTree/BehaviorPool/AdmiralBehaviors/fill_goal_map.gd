@@ -19,6 +19,9 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	
 	goal_map.clear_map()
 	var geo_mean_cell: Array = []
+	if agent.available_groups.is_empty():
+		return FAILURE 
+	
 	for group_name in agent.available_groups:
 		var group: Array = get_tree().get_nodes_in_group(group_name)
 		var positions: Array = []
