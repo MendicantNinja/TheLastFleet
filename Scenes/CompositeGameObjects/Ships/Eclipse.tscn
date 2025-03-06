@@ -306,7 +306,6 @@ texture = ExtResource("28_gnbs3")
 
 [node name="ManualControlIndicator" type="TextureRect" parent="CenterCombatHUD"]
 physics_interpolation_mode = 0
-visible = false
 texture_filter = 1
 layout_mode = 0
 offset_right = 34.0

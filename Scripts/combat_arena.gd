@@ -171,7 +171,7 @@ func _unhandled_input(event) -> void:
 	if event is InputEventKey:
 		if (event.keycode == KEY_G and event.pressed):
 			toggle_fleet_deployment_panel()
-		if (event.keycode == KEY_ESCAPE and event.pressed):
+		elif (event.keycode == KEY_ESCAPE and event.pressed):
 			toggle_options_menu()
 
 func _physics_process(delta):
