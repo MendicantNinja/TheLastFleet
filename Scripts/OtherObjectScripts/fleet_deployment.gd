@@ -4,7 +4,8 @@ var ships_to_deploy: Array[ShipIcon]
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 var fleet_deployment
 signal units_deployed(units)
-
+var group_name: StringName = &"tomato"
+var group_iterator: int = 0
 # Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 
 # Has 3 rows and 7 columns (21 ships). Can be expanded later.
 var deployment_position: Vector2
@@ -38,6 +39,9 @@ func deploy_ships() -> void:
 	var instantiated_units: Array = []
 	reset_deployment_position()
 	var iterator: int = 0
+	var n_group_name: StringName = group_name + str(group_iterator)
+	var positions: Array = []
+	var ship_positions: Dictionary = {}
 	for ship_icon in ships_to_deploy:
 		if ship_icon == null or ship_icon.disabled:
 			continue
@@ -54,10 +58,19 @@ func deploy_ships() -> void:
 		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
 		ship_instantiation.global_position.x = deployment_position.x + iterator % 7 * deployment_spacing # Correct
 		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in termso f Y
-		var path_to: Vector2 = Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row)
-		ship_instantiation.set_navigation_position(path_to)
+		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row))
+		ship_positions[ship_instantiation.global_position] = ship_instantiation
+		ship_instantiation.posture = globals.Strategy.NEUTRAL
+		ship_instantiation.group_add(n_group_name)
 		iterator += 1
-
+	group_iterator += 1
+	var geo_median_ship: Vector2 = globals.geometric_median_of_objects(ship_positions.keys())
+	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
+	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
+	geo_median_formation.x -= 1000
+	geo_median_formation.y -= 1000
+	new_leader.set_group_leader(true)
+	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
 	imap_manager.register_agents(instantiated_units, int($"../../..".combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()

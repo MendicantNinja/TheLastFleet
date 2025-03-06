@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = false
+var debug_imap: bool = true
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
@@ -30,6 +30,7 @@ var deployment_spacing: int = 500
 
 signal units_deployed(units)
 func _ready() -> void:
+	ComputerAdmiral.AdmiralAI.enabled = false
 	ComputerAdmiral.heuristic_goal = combat_goal
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
@@ -121,6 +122,8 @@ func reset_deployment_position() -> void:
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.
 	reset_deployment_position()
+	var positions: Array = []
+	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
@@ -144,12 +147,24 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
 		ship_instantiation.global_position.x = deployment_position.x + i % 7 * deployment_spacing # Correct
 		ship_instantiation.global_position.y = deployment_position.y - deployment_spacing * deployment_row # I want to start at the top in termso f Y
-		var path_to: Vector2 = Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y + deployment_spacing * 6 + deployment_spacing*deployment_row)
-		ship_instantiation.set_navigation_position(path_to)
+		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y + deployment_spacing * 6 + deployment_spacing*deployment_row))
+		ship_positions[ship_instantiation.global_position] = ship_instantiation
+		var tmp_name: StringName = &"stringbean"
+		ship_instantiation.posture = globals.Strategy.NEUTRAL
+		ship_instantiation.group_add(tmp_name)
+	
+	var geo_median_ship: Vector2 = globals.geometric_median_of_objects(ship_positions.keys())
+	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
+	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
+	geo_median_formation.x -= 1000
+	geo_median_formation.y -= 1000
+	new_leader.ships_deployed.connect(_on_enemy_ships_deployed)
+	new_leader.set_group_leader(true)
+	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
 	imap_manager.register_agents(instantiated_units, int(combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()
-
+	#ComputerAdmiral.AdmiralAI.enabled = true
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
@@ -185,6 +200,9 @@ func _on_switch_maps() -> void:
 		#CombatMap.display_map(true)
 		TacticalMap.display_map(false)
 	get_viewport().set_input_as_handled()
+
+func _on_enemy_ships_deployed() -> void:
+	ComputerAdmiral.AdmiralAI.enabled = true
 
 func _on_grid_value_changed(m: int, n: int, value: float) -> void:
 	var adj_value: float = snappedf(value, 0.001)

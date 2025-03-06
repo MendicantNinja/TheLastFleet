@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=48 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -18,7 +18,6 @@
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
-[ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="8_kko0w"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/choose_strategy.gd" id="9_sdjo6"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_target_positions.gd" id="10_4thlf"]
@@ -839,73 +838,5 @@ offset_right = 1925.0
 offset_bottom = 1923.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
-
-[node name="PlayerShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5006, 5875)
-
-[node name="PlayerShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(10778, 5636)
-
-[node name="PlayerShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(5006, 6375)
-
-[node name="PlayerShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4631, 5875)
-
-[node name="PlayerShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(4631, 6375)
-
-[node name="PlayerShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(10778, 6136)
-
-[node name="PlayerShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6254, 6395)
-
-[node name="PlayerShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6629, 6395)
-
-[node name="PlayerShip8" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6254, 6895)
-
-[node name="PlayerShip9" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(11149, 5636)
-
-[node name="PlayerShip10" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(11149, 6136)
-
-[node name="PlayerShip11" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(6629, 6895)
-
-[node name="TestShip0" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7750, 1000)
-collision_layer = 4
-
-[node name="TestShip1" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8300, 1000)
-collision_layer = 4
-
-[node name="TestShip2" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8900, 1000)
-collision_layer = 4
-
-[node name="TestShip3" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9450, 1000)
-collision_layer = 4
-
-[node name="TestShip4" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(7750, 1500)
-collision_layer = 4
-
-[node name="TestShip5" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8360, 1509)
-collision_layer = 4
-
-[node name="TestShip6" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(8910, 1509)
-collision_layer = 4
-
-[node name="TestShip7" parent="." instance=ExtResource("8_kko0w")]
-position = Vector2(9510, 1509)
-collision_layer = 4
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

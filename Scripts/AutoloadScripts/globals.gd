@@ -124,19 +124,23 @@ func reset_group_leader(unit: Ship) -> void:
 func generate_group_target_positions(leader: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(leader.group_name)
 	var occupancy_sizes: Array = []
-	var average_size: Vector2 = Vector2.ZERO
+	var average_size: Vector2i = Vector2.ZERO
 	var unit_positions: Dictionary = {}
+	var unit_speeds: Dictionary = {}
 	for unit: Ship in group:
 		unit_positions[unit.global_position] = unit
-		var size: float = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1
+		var size: float = (unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1)
 		occupancy_sizes.append(size)
-		average_size += Vector2(size, size)
+		if not unit.speed in unit_speeds:
+			unit_speeds[unit.speed] = []
+		unit_speeds[unit.speed].append(unit)
+		average_size += Vector2i(size, size)
 	
 	average_size /= group.size()
 	var max_size: int = occupancy_sizes.max()
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
-	if max_size == min_size and (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
+	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
 		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.default_cell_size / 2)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
@@ -184,20 +188,6 @@ func box_formation_offset_positions(leader, radius, separation) -> Array:
 			if offsets.size() >= get_tree().get_node_count_in_group(leader.group_name):
 				return offsets
 	return offsets
-	
-#func box_formation(leader: Ship, radius: int, slot_distance: int) -> Array:
-	#var target_cell: Vector2i = Vector2i(leader.target_position.y / imap_manager.default_cell_size, leader.target_position.x / imap_manager.default_cell_size)
-	#var iter_distance: int = slot_distance + 1
-	#var slots: Array = []
-	#for m in range(-radius, radius, iter_distance):
-		#var target_m: int = target_cell.x - m
-		#for n in range(-radius, radius, iter_distance):
-			#var target_n: int = target_cell.y - n
-			#var cell: Vector2i = Vector2i(target_m, target_n)
-			#if cell == target_cell:
-				#continue
-			#slots.append(cell)
-	#return slots
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

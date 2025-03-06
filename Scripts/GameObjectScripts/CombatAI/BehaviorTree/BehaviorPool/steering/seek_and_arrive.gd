@@ -54,7 +54,11 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var distance_to: float = agent.global_position.distance_to(agent.target_position)
 	if agent.target_position != Vector2.ZERO and agent.target_unit == null:
-		if distance_to < 10.0:
+		if agent.successful_deploy == false and distance_to < 25.0 and agent.group_leader == false:
+			agent.successful_deploy = true
+			agent.group_remove(agent.group_name)
+		
+		if distance_to < 25.0:
 			agent.target_position = Vector2.ZERO
 			agent.heur_velocity = Vector2.ZERO
 			agent.acceleration = Vector2.ZERO

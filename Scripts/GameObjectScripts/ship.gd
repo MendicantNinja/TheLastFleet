@@ -117,6 +117,7 @@ var retreat_flag: bool = false
 var fallback_flag: bool = false
 var combat_flag: bool = false
 var vent_flux_flag: bool = false
+var successful_deploy: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
@@ -147,6 +148,8 @@ signal ship_selected()
 signal destroyed()
 signal update_agent_influence(prev_imap_cell, imap_cell)
 signal update_registry_cell(prev_registry_cell, registry_cell)
+signal ships_deployed()
+
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
 	ship_stats = p_ship_stats
@@ -183,6 +186,12 @@ func _ready() -> void:
 	ShipNavigationAgent.max_speed = speed
 	
 	var ship_hull = ship_stats.ship_hull
+	if ship_stats.ship_hull.ship_type != data.ship_type_enum.TEST:
+		var texture: Texture2D = ship_hull.ship_sprite
+		var texture_size: Vector2 = texture.get_size()
+		var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
+		ShipNavigationAgent.radius = new_radius
+	
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
@@ -614,7 +623,8 @@ func set_navigation_position(to_position: Vector2) -> void:
 	if targeted_units.is_empty() == false:
 		get_tree().call_group(group_name, &"set_targets", [])
 	target_position = to_position
-	ShipNavigationAgent.set_target_position(to_position)
+	if group_leader == true:
+		ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
 
 @warning_ignore("narrowing_conversion")
@@ -630,7 +640,6 @@ func _physics_process(delta: float) -> void:
 	#else: 
 		#soft_flux -= ship_stats.flux_dissipation
 	#update_flux_indicators()
-	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
@@ -939,10 +948,7 @@ func _on_AvoidanceShape_area_exited(projectile) -> void:
 		incoming_projectiles.erase(projectile)
 
 func _on_body_entered(body):
-	if target_position != Vector2.ZERO:
-		return
-	collision_flag = true
-	linear_damp = 1.0
+	pass
 
 func _on_CombatTimer_timeout():
 	combat_flag = false

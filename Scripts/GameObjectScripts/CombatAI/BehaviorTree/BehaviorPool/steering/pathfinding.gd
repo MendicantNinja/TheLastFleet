@@ -1,6 +1,15 @@
 extends LeafAction
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
+	if NavigationServer2D.map_get_iteration_id(agent.ShipNavigationAgent.get_navigation_map()) == 0:
+		return SUCCESS
+	
+	if Engine.get_physics_frames() % 720 == 0 and agent.successful_deploy == false and agent.group_leader == true:
+		var group: Array = get_tree().get_nodes_in_group(agent.group_name)
+		if group.size() == 1:
+			agent.group_remove(agent.group_name)
+			agent.ships_deployed.emit()
+	
 	if agent.target_unit != null:
 		return SUCCESS
 	

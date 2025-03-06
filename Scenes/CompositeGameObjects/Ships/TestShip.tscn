@@ -83,6 +83,9 @@ script = ExtResource("5_n4kdd")
 [node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("9_w68pg")
 
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("9_rp377")
+
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("7_3duk1")
 
@@ -161,7 +164,7 @@ path_desired_distance = 50.0
 target_desired_distance = 50.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 80.0
+radius = 90.0
 neighbor_distance = 1000.0
 time_horizon_agents = 8.0
 time_horizon_obstacles = 1.0

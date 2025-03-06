@@ -9,7 +9,7 @@ var zoom_in_limit: Vector2 = Vector2(1.5, 1.5)
 var zoom_out_limit: Vector2 = Vector2(.5, .5)
 var camera_position: Vector2 = Vector2.ZERO
 var zoom_min: Vector2 = Vector2(1.5, 1.5)
-var zoom_value: Vector2 = Vector2.ONE
+var zoom_value: Vector2 = Vector2(0.1, 0.1)
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
 
@@ -23,6 +23,8 @@ func _ready() -> void:
 	CombatCamera.limit_left = -extra_bounds
 	CombatCamera.limit_right = map_bounds.x + extra_bounds
 	CombatCamera.limit_bottom = map_bounds.y + extra_bounds
+	var map_center: Vector2 = Vector2(map_bounds.x / 2, map_bounds.y / 2)
+	CombatCamera.position = map_center
 	if settings.dev_mode == true:
 		zoom_out_limit = Vector2(.01, .01)
 
@@ -31,9 +33,9 @@ func _unhandled_input(event):
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("zoom in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
-			zoom_value += Vector2(0.1, 0.1)
+			zoom_value += Vector2(0.01, 0.01)
 		elif Input.is_action_just_pressed("zoom out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
-			zoom_value -= Vector2(0.1, 0.1)
+			zoom_value -= Vector2(0.01, 0.01)
 		if Input.is_action_just_released("camera action") and CombatCamera.enabled and manually_controlled_unit != null:
 			manually_controlled_unit.toggle_manual_camera_freelook(false)
 	elif event is InputEventMouseMotion:
