@@ -113,6 +113,11 @@ func _unhandled_input(event) -> void:
 			attack_group = false
 			selection_line_color = settings.gui_color
 			queue_redraw()
+		elif event.keycode == KEY_F1 and event.pressed:
+			if $"../../../TutorialText".visible == true:
+				$"../../../TutorialText".visible = false
+			elif $"../../../TutorialText".visible == false:
+				$"../../../TutorialText".visible = true
 
 func connect_unit_signals(units: Array) -> void:
 	for n_unit in units:
