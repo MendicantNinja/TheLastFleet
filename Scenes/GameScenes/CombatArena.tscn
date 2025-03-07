@@ -502,9 +502,10 @@ modulate = Color(0.25098, 1, 0, 0.784314)
 z_index = 3
 z_as_relative = false
 layout_mode = 3
-anchors_preset = 0
-offset_top = 1080.0
-offset_bottom = 1080.0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
 
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
 physics_interpolation_mode = 0
@@ -630,11 +631,13 @@ theme_override_font_sizes/font_size = 10
 text = "0"
 
 [node name="IndicatorDecor" type="TextureRect" parent="ManualControlHUD/HUDWrapper"]
-layout_mode = 0
-offset_left = -5.0
-offset_top = -187.0
-offset_right = 435.0
-offset_bottom = 3.0
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -190.0
+offset_right = 440.0
+grow_vertical = 0
 texture = ExtResource("9_lucm6")
 
 [node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper"]
