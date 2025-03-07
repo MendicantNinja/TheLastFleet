@@ -5,12 +5,12 @@ var occupancy_radius: float = 0.0
 var delta: float = 0.0
 var time: float = 0.0
 
+var target_area_radius: int = 50
 var default_radius: int = 10
 var target_coefficient: float = 0.95
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.target_position == Vector2.ZERO:
-		target_position = Vector2.ZERO
 		time = 0.0
 		return SUCCESS
 	
@@ -54,11 +54,11 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var distance_to: float = agent.global_position.distance_to(agent.target_position)
 	if agent.target_position != Vector2.ZERO and agent.target_unit == null:
-		if agent.successful_deploy == false and distance_to < 25.0 and agent.group_leader == false:
+		if agent.successful_deploy == false and distance_to < target_area_radius and agent.group_leader == false:
 			agent.successful_deploy = true
 			agent.group_remove(agent.group_name)
 		
-		if distance_to < 25.0:
+		if distance_to < target_area_radius:
 			agent.target_position = Vector2.ZERO
 			agent.heur_velocity = Vector2.ZERO
 			agent.acceleration = Vector2.ZERO

@@ -10,7 +10,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 			agent.group_remove(agent.group_name)
 			agent.ships_deployed.emit()
 	
-	if agent.target_unit != null:
+	if agent.target_unit != null or agent.target_position == Vector2.ZERO:
 		return SUCCESS
 	
 	if agent.ShipNavigationAgent.is_navigation_finished() == true and agent.target_position == Vector2.ZERO:

@@ -73,3 +73,6 @@ func set_manual_camera(unit: Ship) -> void:
 		manually_controlled_unit.toggle_manual_control()
 		manually_controlled_unit.toggle_manual_aim(manually_controlled_unit.all_weapons, false) # Needed to shut off weapons because the code is fucked.
 	manually_controlled_unit = unit # Discards the old unit, brings in the new.
+
+func _add_player_ship(ship) -> void:
+	add_child(ship)

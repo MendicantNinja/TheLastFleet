@@ -86,6 +86,7 @@ func _ready() -> void:
 	self.units_deployed.connect(TacticalMap.connect_unit_signals)
 	TacticalMap.display_map(true)
 	
+	FleetDeploymentList.deploy_ship.connect(CombatMap._add_player_ship)
 	# Set combat boundaries using four static bodies and shapes. A>B order is important for one-way collision. I had to use Rects and do rotation magic due to global collisions.
 	$CollisionBoundaryLeft.position = Vector2(0, PlayableAreaBounds.shape.size.y/2)
 	$CollisionBoundaryLeft/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.y, 1) 
@@ -124,9 +125,10 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	var positions: Array = []
 	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]
+	var enemy_fleet_size: int = 10
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
-		for i in range (21):
+		for i in range (enemy_fleet_size):
 			if i % 100 == 0:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
 			elif i % 3 == 0:
@@ -138,7 +140,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(enemy_fleet.fleet_stats.ships[i])
 		ship_instantiation.is_friendly = false
-		ship_instantiation.collision_layer = 3
+		ship_instantiation.collision_layer = 4
 		CombatMap.add_child(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
 		

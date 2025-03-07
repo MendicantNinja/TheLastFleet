@@ -12,6 +12,8 @@ var deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
 
+signal deploy_ship(ship)
+
 func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
@@ -46,17 +48,18 @@ func deploy_ships() -> void:
 		if ship_icon == null or ship_icon.disabled:
 			continue
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
-		ship_instantiation.initialize(ship_icon.ship)
+		ship_instantiation.is_friendly = true
 		ship_instantiation.collision_layer = 1
+		ship_instantiation.initialize(ship_icon.ship)
 		ship_icon.disabled = true
-		CombatMap.add_child(ship_instantiation)
+		deploy_ship.emit(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
 		
 		# Deployment Positioning
 		if iterator % 7 == 0 and iterator != 0:
 			deployment_row += 1
 		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
-		ship_instantiation.global_position.x = deployment_position.x + iterator % 7 * deployment_spacing # Correct
+		ship_instantiation.global_position.x = deployment_position.x + iterator % 7 * deployment_spacing 
 		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in termso f Y
 		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row))
 		ship_positions[ship_instantiation.global_position] = ship_instantiation

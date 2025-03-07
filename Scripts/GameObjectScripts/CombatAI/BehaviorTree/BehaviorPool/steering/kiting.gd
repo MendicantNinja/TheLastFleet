@@ -4,7 +4,7 @@ var time: float = 0.0
 var delta: float = 0.0
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if agent.target_unit == null or agent.target_in_range == false:
+	if agent.vent_flux_flag == true or agent.target_unit == null or agent.target_in_range == false:
 		return FAILURE
 	
 	var speed_modifier: float = 0.0

@@ -45,9 +45,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	if can_vent == true:
 		agent.move_direction == Vector2.ZERO
-		if agent.soft_flux > 0.001:
+		if agent.soft_flux > 0.0:
 			agent.soft_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
-		elif agent.hard_flux > 0.001:
+		elif agent.hard_flux > 0.0:
 			agent.hard_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
 		agent.update_flux_indicators()
 	

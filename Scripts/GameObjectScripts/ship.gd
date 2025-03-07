@@ -211,8 +211,6 @@ func _ready() -> void:
 	
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
-	if collision_layer == 1:
-		is_friendly = true
 	
 	# Assigns weapon slots based on what's in the ship scene.
 	for child in get_children():
@@ -289,8 +287,8 @@ func _ready() -> void:
 	AvoidanceArea.area_entered.connect(_on_AvoidanceShape_area_entered)
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	
-	toggle_auto_aim(all_weapons)
-	toggle_auto_fire(all_weapons)
+	#toggle_auto_aim(all_weapons)
+	#toggle_auto_fire(all_weapons)
 	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
 	#furthest_safe_distance += longest_range_weapon.weapon.range
 	set_combat_ai(true)
@@ -508,7 +506,6 @@ func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> v
 	if event is InputEventMouseButton:
 		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
 			alt_select.emit()
-			return
 
 func _on_mouse_entered() -> void:
 	if TacticalMapLayer.visible:
@@ -629,17 +626,17 @@ func set_navigation_position(to_position: Vector2) -> void:
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
 	# Passive Flux Dissipation
-	if Engine.get_physics_frames() % 5 == 0:
-		if soft_flux == 0:
-			hard_flux -= ship_stats.flux_dissipation / 12
-			
-		elif soft_flux < ship_stats.flux_dissipation:
-			var flux_to_carry_over: float = ship_stats.flux_dissipation/ 12 - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
-			hard_flux -= flux_to_carry_over
-			soft_flux = 0
-		else: 
-			soft_flux -= ship_stats.flux_dissipation / 12
-		update_flux_indicators()
+	#if Engine.get_physics_frames() % 5 == 0:
+		#if soft_flux == 0:
+			#hard_flux -= ship_stats.flux_dissipation / 12
+			#
+		#elif soft_flux < ship_stats.flux_dissipation:
+			#var flux_to_carry_over: float = ship_stats.flux_dissipation/ 12 - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
+			#hard_flux -= flux_to_carry_over
+			#soft_flux = 0
+		#else: 
+			#soft_flux -= ship_stats.flux_dissipation / 12
+		#update_flux_indicators()
 	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
@@ -785,8 +782,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		apply_force(force)
 		apply_torque(rotate_angle)
 	
-	if collision_flag == false:
-		state.linear_velocity = state.linear_velocity.limit_length(speed)
+	state.linear_velocity = state.linear_velocity.limit_length(speed)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
@@ -800,10 +796,10 @@ func _on_target_in_range(slot: WeaponSlot, value: bool) -> void:
 		target_unit.targeted_by.erase(self)
 		target_unit = null
 		target_in_range = value
-	elif value == false and manual_control == true:
+	if value == false and manual_control == true:
 		slot.acquire_new_target()
-	else:
-		target_in_range = value
+
+	target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
