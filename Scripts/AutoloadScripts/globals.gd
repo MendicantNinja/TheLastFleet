@@ -27,6 +27,15 @@ func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	add_child(audio_stream_player)
 	audio_stream_player.finished.connect(audio_stream_player.queue_free)
 
+# Useful for displaying hotkeys, especially ones the player has given a custom binding.
+func convert_input_to_string(action: StringName, color: String = "orange", use_custom_color: bool = false) -> String:
+	var custom_binding: InputEventKey = InputMap.action_get_events(action)[0] # If multiple inputs bound, grab the first input for display
+	var readable: String = OS.get_keycode_string(custom_binding.get_physical_keycode_with_modifiers())
+	var returned_bbcode: String = "[color=" + color + "]"+ readable + "[/color]"
+	if use_custom_color == true:
+		returned_bbcode = "[color=#%s]%s[/color]" % [settings.gui_color.to_html(), readable]
+	return returned_bbcode
+
 func geometric_median_of_objects(object_positions: Array, epsilon: float = 1e-5) -> Vector2:
 	var sum_x: float = 0.0
 	var sum_y: float = 0.0
@@ -115,19 +124,23 @@ func reset_group_leader(unit: Ship) -> void:
 func generate_group_target_positions(leader: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(leader.group_name)
 	var occupancy_sizes: Array = []
-	var average_size: Vector2 = Vector2.ZERO
+	var average_size: Vector2i = Vector2.ZERO
 	var unit_positions: Dictionary = {}
+	var unit_speeds: Dictionary = {}
 	for unit: Ship in group:
 		unit_positions[unit.global_position] = unit
-		var size: float = unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1
+		var size: float = (unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1)
 		occupancy_sizes.append(size)
-		average_size += Vector2(size, size)
+		if not unit.speed in unit_speeds:
+			unit_speeds[unit.speed] = []
+		unit_speeds[unit.speed].append(unit)
+		average_size += Vector2i(size, size)
 	
 	average_size /= group.size()
 	var max_size: int = occupancy_sizes.max()
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
-	if max_size == min_size and (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
+	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
 		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.default_cell_size / 2)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
@@ -159,7 +172,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 		var min_dist: float = slot_distances.keys().min()
 		var target_position: Vector2 = slot_distances[min_dist]
 		unit.target_position = target_position
-		print(unit.name, unit.target_position)
+		#print(unit.name, unit.target_position)
 		visited.append(target_position)
 		if visited.size() == group.size():
 			return
@@ -175,20 +188,6 @@ func box_formation_offset_positions(leader, radius, separation) -> Array:
 			if offsets.size() >= get_tree().get_node_count_in_group(leader.group_name):
 				return offsets
 	return offsets
-	
-#func box_formation(leader: Ship, radius: int, slot_distance: int) -> Array:
-	#var target_cell: Vector2i = Vector2i(leader.target_position.y / imap_manager.default_cell_size, leader.target_position.x / imap_manager.default_cell_size)
-	#var iter_distance: int = slot_distance + 1
-	#var slots: Array = []
-	#for m in range(-radius, radius, iter_distance):
-		#var target_m: int = target_cell.x - m
-		#for n in range(-radius, radius, iter_distance):
-			#var target_n: int = target_cell.y - n
-			#var cell: Vector2i = Vector2i(target_m, target_n)
-			#if cell == target_cell:
-				#continue
-			#slots.append(cell)
-	#return slots
 
 # Called when the node enters the scene tree for the first time.
 func _ready():

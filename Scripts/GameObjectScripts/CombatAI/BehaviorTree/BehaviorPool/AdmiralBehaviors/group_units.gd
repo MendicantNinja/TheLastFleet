@@ -28,6 +28,9 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	if available_units.size() == 0:
 		return SUCCESS
 	
+	if player_strength == 0 and admiral_strength == 0:
+		return SUCCESS
+	
 	var relative_strength: float = admiral_strength / player_strength
 	var unit_ratio: int = n_units / n_player_units
 	if unit_ratio == 0:

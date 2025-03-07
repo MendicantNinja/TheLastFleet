@@ -14,6 +14,8 @@ class_name WeaponSlot
 
 @export var weapon: Weapon:
 	set(value):
+		if value == null:
+			return
 		weapon = value
 		if weapon_image != null:
 			weapon_image.texture = value.image
@@ -75,7 +77,7 @@ func fire(ship_id: int) -> void:
 	elif weapon.flux_per_second > 0.0:
 		weapon_slot_fired.emit(weapon.flux_per_second)
 	
-	var projectile: Area2D = weapon.create_projectile().instantiate()
+	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = weapon_node.global_transform
 	projectile.assign_stats(weapon, ship_id, is_friendly)
 	get_tree().root.add_child(projectile)
@@ -114,6 +116,7 @@ func _ready():
 	
 	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	timer_fire = true
+	can_fire = false
 	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)
 	
 	default_direction = weapon_node.transform
@@ -124,8 +127,8 @@ func _ready():
 
 func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	weapon_system_group = 0 # Index of 0 = weapon system 1
-	# Give everything railguns in dev mode
-	if settings.dev_mode == true:
+	# Give everything railguns in dev mode for empty weapons
+	if settings.dev_mode == true and p_weapon_slot.weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
 		
 		var new_shape: Shape2D = CircleShape2D.new()
@@ -134,24 +137,23 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 		
 		var interval_in_seconds: float = 1.0 / weapon.fire_rate
 		rate_of_fire_timer.wait_time = interval_in_seconds
-		return
-	
-	weapon = p_weapon_slot.weapon
-	weapon_system_group = p_weapon_slot.weapon_system_group
-	
-	var new_shape: Shape2D = CircleShape2D.new()
-	new_shape.radius = p_weapon_slot.weapon.range
-	effective_range_shape.shape = new_shape
-	
-	var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
-	rate_of_fire_timer.wait_time = interval_in_seconds
+	else:
+		weapon = p_weapon_slot.weapon
+		weapon_system_group = p_weapon_slot.weapon_system_group
+		
+		var new_shape: Shape2D = CircleShape2D.new()
+		new_shape.radius = p_weapon_slot.weapon.range
+		effective_range_shape.shape = new_shape
+		
+		var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
+		rate_of_fire_timer.wait_time = interval_in_seconds
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
 	effective_range.collision_mask = mask
 	is_friendly = friendly_value
 	owner_rid = owner_value
-	if not is_friendly:
-		auto_aim = true
+	auto_aim = true
+	auto_fire = true
 	#set_weapon_size_and_color()
 
 func set_auto_fire(fire_value: bool) -> void:
@@ -214,8 +216,8 @@ func _on_ROF_timeout() -> void:
 func _on_EffectiveRange_entered(body) -> void:
 	if body.get_rid() == owner_rid: 
 		return # ignore any overlap with other weapon slots
-	elif is_friendly == body.is_friendly:
-		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
+	#elif is_friendly == body.is_friendly:
+		#return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
 	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
 		return # ignore obstacle and projectile layers, respectively
 	
@@ -232,7 +234,7 @@ func _on_EffectiveRange_entered(body) -> void:
 	if not killcast:
 		killcast = create_killcast()
 		add_child(killcast)
-
+	
 	var ship_id = body.get_rid()
 	if killcast and target_unit == ship_id:
 		killcast.target_position = to_local(body.global_position)
@@ -269,7 +271,7 @@ func create_killcast() -> RayCast2D:
 	var new_killcast: RayCast2D = RayCast2D.new()
 	new_killcast.collide_with_bodies = true
 	new_killcast.collide_with_areas = false
-	new_killcast.collision_mask = 7
+	new_killcast.collision_mask = effective_range.collision_mask
 	return new_killcast
 
 # If a weapon is not capable of firing on an existing target but more are around it,
@@ -344,13 +346,11 @@ func update_killcast(delta) -> void:
 	if can_fire == true:
 		var collision_point: Vector2 = to_local(killcast.get_collision_point())
 		var dist_to: float = position.distance_to(collision_point)
-		if dist_to > weapon.range:
+		if dist_to * 0.8 > weapon.range:
 			can_fire = false
 		else:
 			can_fire = true
 			target_position = collision_point
-		var velocity: Vector2 = collider.linear_velocity * 0.1
-		target_position += velocity
 	
 	if (auto_aim or auto_fire):
 		var face_direction: Transform2D = face_weapon(target_position)

@@ -30,7 +30,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.targeted_units.is_empty():
 		return FAILURE
 	
-	if agent.target_unit != null and Engine.get_physics_frames() % 1000 != 0:
+	if agent.target_unit != null:
 		return FAILURE
 	
 	var evaluate_targets: Array = []

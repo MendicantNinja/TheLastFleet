@@ -1,0 +1,41 @@
+[gd_scene load_steps=8 format=3 uid="uid://b3k6jwtq4mk2w"]
+
+[ext_resource type="Texture2D" uid="uid://cgn6wt6ynxran" path="res://Art/ProjectileArt/mazen's projectiles/smoke.png" id="1_w0ifs"]
+
+[sub_resource type="Gradient" id="Gradient_ju12f"]
+colors = PackedColorArray(1, 1, 1, 0.803922, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_tk8xg"]
+gradient = SubResource("Gradient_ju12f")
+
+[sub_resource type="CurveTexture" id="CurveTexture_iqvya"]
+
+[sub_resource type="Curve" id="Curve_hbh27"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.995434, 0.043956), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_xcyhf"]
+curve = SubResource("Curve_hbh27")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_gfbln"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 25.0
+initial_velocity_max = 75.0
+gravity = Vector3(0, 0, 0)
+damping_max = 13.726
+damping_curve = SubResource("CurveTexture_iqvya")
+scale_min = 0.0
+scale_max = 2.3
+scale_curve = SubResource("CurveTexture_xcyhf")
+scale_over_velocity_max = 176.47
+color_ramp = SubResource("GradientTexture1D_tk8xg")
+turbulence_enabled = true
+turbulence_noise_scale = 1.791
+
+[node name="GPUParticles2D" type="GPUParticles2D"]
+texture_filter = 1
+amount = 25
+process_material = SubResource("ParticleProcessMaterial_gfbln")
+texture = ExtResource("1_w0ifs")
+explosiveness = 1.0

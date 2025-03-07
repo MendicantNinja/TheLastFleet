@@ -1,0 +1,73 @@
+[gd_scene load_steps=6 format=3 uid="uid://clcon1i0p0wi4"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_8gngj"]
+[ext_resource type="Texture2D" uid="uid://c3b47svjhauky" path="res://Art/ProjectileArt/mazen's projectiles/bulletshot.png" id="2_kw6en"]
+
+[sub_resource type="Environment" id="Environment_p0rvt"]
+background_mode = 3
+background_energy_multiplier = 1.95
+ambient_light_color = Color(0.816959, 0.747268, 0.220727, 1)
+ambient_light_energy = 1.96
+ssr_enabled = true
+ssao_radius = 1.71
+ssao_intensity = 3.06
+ssao_detail = 0.94
+ssao_horizon = 0.09
+ssao_light_affect = 0.04
+sdfgi_enabled = true
+sdfgi_use_occlusion = true
+glow_enabled = true
+glow_normalized = true
+glow_intensity = 2.12
+glow_strength = 0.88
+glow_bloom = 0.01
+glow_blend_mode = 0
+fog_mode = 1
+fog_light_color = Color(0.578852, 0.463582, 0.0877318, 1)
+fog_light_energy = 4.35
+fog_density = 1.0
+fog_depth_begin = 92.0
+adjustment_brightness = 0.74
+
+[sub_resource type="Compositor" id="Compositor_qvm53"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_jq6g7"]
+emission_shape_offset = Vector3(-6.01, 0, 6.825)
+emission_shape = 4
+emission_point_count = 1
+inherit_velocity_ratio = 0.159
+velocity_pivot = Vector3(2.405, 2.225, 0)
+direction = Vector3(6.315, 2.515, 0)
+angular_velocity_min = 504.45
+angular_velocity_max = 614.52
+gravity = Vector3(-5.52, -10, 1.31)
+linear_accel_min = 35.4
+linear_accel_max = 35.4
+tangential_accel_min = -94.27
+tangential_accel_max = 68.79
+
+[node name="Projectile" type="Area2D"]
+collision_layer = 0
+script = ExtResource("1_8gngj")
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+position = Vector2(1, 0)
+rotation = 1.5708
+polygon = PackedVector2Array(1, 6, 1.00001, 4, 1.00001, 2, 0.999993, -2, 0.999978, -6, 0.999957, -12, -4.34399e-05, -12, -2.00004, -12, -2, -7, -2, -5, -2, 0, -2, 2, -1.99998, 6.00001, -1.99996, 11, 2.89599e-05, 8, 2.17199e-05, 6)
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+position = Vector2(1.97076, -1)
+scale = Vector2(0.668059, 0.840909)
+texture = ExtResource("2_kw6en")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_p0rvt")
+compositor = SubResource("Compositor_qvm53")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+modulate = Color(0.578996, 0.495037, 0.0282117, 1)
+emitting = false
+amount = 1
+process_material = SubResource("ParticleProcessMaterial_jq6g7")
+lifetime = 0.1

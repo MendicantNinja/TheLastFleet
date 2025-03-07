@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://b35c4hnqhjwq3"]
 
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/Refit/refit_weapon_slot_display.gd" id="1_p47y2"]
-[ext_resource type="Texture2D" uid="uid://6g7rb5th8r0v" path="res://Art/CombatGUIArt/tac_map_player_ship.png" id="2_562b6"]
+[ext_resource type="Texture2D" uid="uid://6g7rb5th8r0v" path="res://Art/CombatGUIArt/TacticalMapArt/tac_map_player_ship.png" id="2_562b6"]
 
 [node name="WeaponSlotDisplay" type="Panel"]
 self_modulate = Color(1, 1, 1, 0.00392157)

@@ -19,10 +19,13 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	if agent.linear_velocity.length() < accel_speed:
 		time += delta + agent.time_coefficient
+	if time > 4.0:
+		time = 0.0
 	
 	var velocity = move_direction * accel_speed * time
-	velocity = velocity.limit_length(accel_speed)
+	velocity = velocity.limit_length(agent.speed)
 	agent.heur_velocity = velocity
 	agent.acceleration = velocity
 	agent.time = time
+	
 	return FAILURE

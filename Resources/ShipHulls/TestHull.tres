@@ -10,7 +10,7 @@
 script = ExtResource("1_xb8pa")
 ship_type_name = "Test"
 ship_description = "Only for testing purposes, not for the final product."
-ship_type = 0
+ship_type = 11
 ship_size = 0
 ship_tech = 0
 ship_packed_scene = ExtResource("2_rh0ln")

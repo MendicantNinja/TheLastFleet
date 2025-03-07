@@ -57,7 +57,7 @@ func _init():
 func register_map(map: Imap) -> void:
 	agent_maps[map.map_type] = map
 
-func register_agents(agents: Array, goal: int) -> void:
+func register_agents(agents: Array, goal: int = 0) -> void:
 	for agent: Ship in agents:
 		agent.update_agent_influence.connect(_on_agent_influence_changed.bind(agent))
 		agent.destroyed.connect(_on_agent_destroyed.bind(agent))
@@ -154,6 +154,8 @@ func weigh_force_density() -> void:
 		if enemy_density != 0.0:
 			enemy_cell_density[cell] = enemy_density
 	
+	if friendly_cell_density.is_empty() == true or enemy_cell_density.is_empty() == true:
+		return
 	
 	var enemy_neighborhood_density: Dictionary = {}
 	visited = []

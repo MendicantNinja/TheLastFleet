@@ -1,7 +1,7 @@
 [gd_scene load_steps=37 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
-[ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/manual_control_indicator.png" id="2_yacd8"]
+[ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/TacticalMapArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="4_pc3sf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="4_qjhaj"]
@@ -25,10 +25,10 @@
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
-[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/bar_starsector.png" id="16_roh2q"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/flux_pip.png" id="17_j44wp"]
+[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="16_roh2q"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="17_j44wp"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="17_lxwef"]
-[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/combatHUDdetail.png" id="20_7ssvb"]
+[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/ManualControlHUDArt/combatHUDdetail.png" id="20_7ssvb"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="20_n3gvt"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
@@ -83,6 +83,9 @@ script = ExtResource("5_n4kdd")
 
 [node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("9_w68pg")
+
+[node name="separation" type="Node" parent="CombatBehaviorTree/main/navigation"]
+script = ExtResource("9_rp377")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
 script = ExtResource("7_3duk1")
@@ -165,7 +168,7 @@ path_desired_distance = 50.0
 target_desired_distance = 50.0
 path_max_distance = 50.0
 avoidance_enabled = true
-radius = 80.0
+radius = 90.0
 neighbor_distance = 1000.0
 time_horizon_agents = 8.0
 time_horizon_obstacles = 1.0
@@ -199,7 +202,7 @@ offset_right = 40.0
 offset_bottom = 40.0
 
 [node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
-modulate = Color(0.486275, 0.843137, 0.294118, 0.588235)
+modulate = Color(0.25098, 1, 0, 0.784314)
 z_index = 1
 anchors_preset = 0
 

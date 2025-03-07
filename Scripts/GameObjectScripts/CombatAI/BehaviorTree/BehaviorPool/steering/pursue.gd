@@ -53,7 +53,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	speed += speed_modifier
 	if distance_to <= threat_radius and agent.target_in_range == false:
 		var ratio: float = 1 - distance_to / threat_radius
-		speed = (agent.ship_stats.deceleration + agent.ship_stats.bonus_deceleration) * ratio
+		speed = (agent.ship_stats.acceleration + agent.ship_stats.bonus_acceleration) * ratio
 		direction_to_path = -direction_to_path
 	if time > 4.0:
 		time = delta + agent.time_coefficient
