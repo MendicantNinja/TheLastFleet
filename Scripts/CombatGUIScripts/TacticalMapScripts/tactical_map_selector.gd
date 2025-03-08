@@ -1,6 +1,8 @@
 extends TextureButton
 
 func _pressed() -> void:
+	if $"..".assigned_ship == null:
+		return
 	$"..".assigned_ship.toggle_ship_select()
 # Called when the node enters the scene tree for the first time.
 func _ready():

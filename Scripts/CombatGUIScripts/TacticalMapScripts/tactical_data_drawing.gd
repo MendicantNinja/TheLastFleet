@@ -4,8 +4,8 @@ extends Node2D
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
-@onready var ship_registry: Array[Ship]
-@onready var ship_dictionary: Dictionary = imap_manager.registry_map
+@onready var ship_list: Array[Ship]
+@onready var ship_registry: Dictionary = imap_manager.registry_map
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
@@ -179,15 +179,15 @@ func swap_camera_feed(ship: Ship) -> void:
 
 func setup() -> void:
 	#print("setup called")
-	# Check if new ships have been added
-	var ship_arrays: Array = ship_dictionary.values()
+	# Check if new ships have been added or old ones died
+	var ship_arrays: Array = ship_registry.values()
 	#print(ship_arrays.size())
 	for array in ship_arrays:
 		for ship in array:
-			if ship_registry.has(ship):
+			if ship_list.has(ship):
 				continue
 			else:
-				ship_registry.append(ship)
+				ship_list.append(ship)
 				var tactical_map_icon: TacticalMapIcon = TacticalMapIconScene.instantiate()
 				self.add_child(tactical_map_icon)
 				ship.tactical_map_icon = tactical_map_icon

@@ -29,6 +29,8 @@ func reset_deployment_position() -> void:
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
 	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
+	if settings.dev_mode == true:
+		deployment_position.y = 0 + deployment_spacing * 2
 	deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
@@ -60,7 +62,7 @@ func deploy_ships() -> void:
 			deployment_row += 1
 		# Iterator % 7. Iterator = 0-6 as remainder ( i == 6 == 7 ships). Then reset to 0 at iterator 7.
 		ship_instantiation.global_position.x = deployment_position.x + iterator % 7 * deployment_spacing 
-		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in termso f Y
+		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in terms of y
 		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row))
 		ship_positions[ship_instantiation.global_position] = ship_instantiation
 		ship_instantiation.posture = globals.Strategy.NEUTRAL
