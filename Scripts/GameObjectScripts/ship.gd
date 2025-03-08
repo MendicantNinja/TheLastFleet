@@ -620,47 +620,44 @@ func set_navigation_position(to_position: Vector2) -> void:
 		ShipNavigationAgent.set_target_position(to_position)
 	get_viewport().set_input_as_handled()
 
-# func vent_flux() -> void:
-# Calculating flux dissipation in multiple places throughout the code is prone to disaster. Filter it here.
-func calculate_flux_dissipation() -> void:
-	# What is currently contributing to flux?
-	var flux_to_dissipate: int
-	var coeffecient: int = 12 # Coeffecient = 60/Physics frames. Flux per second is the goal.
-	if shield_toggle == true and flux_overload == false:
-		soft_flux += shield_upkeep / coeffecient
-	
-	# Dissipate soft_flux only if there is some to dissipate.
-	if vent_flux_flag == false:
-		flux_to_dissipate = ship_stats.flux_dissipation / coeffecient
-	elif vent_flux_flag == true:
-		flux_to_dissipate = ship_stats.flux_dissipation * 3 / coeffecient
-	if soft_flux > flux_to_dissipate: 
-		print("dissipating soft flux", soft_flux)
-		soft_flux -= flux_to_dissipate
-	# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
-	elif soft_flux < flux_to_dissipate and soft_flux > 0:
-		print("potentially dissipating both flux types", hard_flux, soft_flux)
-		var flux_to_carry_over: float = flux_to_dissipate - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
-		if hard_flux < flux_to_carry_over:
-			hard_flux = 0
-			soft_flux = 0
-		else:
-			hard_flux -= flux_to_carry_over
-			soft_flux = 0
-	# Dissipate hardflux if our layer of soft_flux is gone and hard_flux is greater than zero
-	elif soft_flux == 0 and hard_flux > flux_to_dissipate:
-		print("dissipating hard_flux ", hard_flux)
-		hard_flux -= flux_to_dissipate
-	# A very good unit test, if slightly unperformant.
-	if hard_flux < 0 or soft_flux < 0:
-		push_error("flux is negative", hard_flux, " ", soft_flux)
-	# debugging flux values
-	update_flux_indicators()
-
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
+	# Calculating flux dissipation in multiple places throughout the code is prone to disaster. Put any additions or subtractions in here.
 	if Engine.get_physics_frames() % 5 == 0:
-		calculate_flux_dissipation()
+		var flux_to_dissipate: int
+		var coeffecient: int = 12 # Coeffecient = 60/Physics frames. Flux per second is the goal.
+		if shield_toggle == true and flux_overload == false:
+			soft_flux += shield_upkeep / coeffecient
+		
+		# Dissipate soft_flux only if there is some to dissipate.
+		if vent_flux_flag == false:
+			flux_to_dissipate = ship_stats.flux_dissipation / coeffecient
+		elif vent_flux_flag == true:
+			flux_to_dissipate = ship_stats.flux_dissipation * 3 / coeffecient
+		if soft_flux > flux_to_dissipate: 
+			print("dissipating soft flux", soft_flux)
+			soft_flux -= flux_to_dissipate
+		# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
+		elif soft_flux < flux_to_dissipate and soft_flux > 0:
+			print("potentially dissipating both flux types", hard_flux, soft_flux)
+			var flux_to_carry_over: float = flux_to_dissipate - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
+			if hard_flux < flux_to_carry_over:
+				hard_flux = 0
+				soft_flux = 0
+			else:
+				hard_flux -= flux_to_carry_over
+				soft_flux = 0
+		# Dissipate hardflux if our layer of soft_flux is gone and hard_flux is greater than zero
+		elif soft_flux == 0 and hard_flux > flux_to_dissipate:
+			print("dissipating hard_flux ", hard_flux)
+			hard_flux -= flux_to_dissipate
+		# A very good unit test, if slightly unperformant.
+		if hard_flux < 0 or soft_flux < 0:
+			push_error("flux is negative", hard_flux, " ", soft_flux)
+		# debugging flux values
+		if soft_flux == 0:
+			vent_flux_flag = false
+		update_flux_indicators()
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
@@ -741,9 +738,6 @@ func _physics_process(delta: float) -> void:
 			
 			if Input.is_action_pressed("vent_flux"):
 				vent_flux_flag = true
-			# Remove this to cause flux to dissipate until 0?
-			elif Input.is_action_just_released("vent_flux"):
-				vent_flux_flag = false
 	#print(TacticalDataDrawing.camera_feed_active)
 		if TacticalDataDrawing.camera_feed_active == false:
 			ManualControlHUD.update_hud()
