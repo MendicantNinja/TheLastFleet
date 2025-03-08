@@ -123,6 +123,7 @@ var successful_deploy: bool = false
 # Used for navigation and movement
 var time: float = 0.0
 var zero_flux_bonus: float = 0.0
+var zero_flux_bonus_flag = true
 var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
@@ -628,6 +629,7 @@ func _physics_process(delta: float) -> void:
 		var coeffecient: int = 12 # Coeffecient = 60/Physics frames. Flux per second is the goal.
 		if shield_toggle == true and flux_overload == false:
 			soft_flux += shield_upkeep / coeffecient
+			zero_flux_bonus_flag = false
 		
 		# Dissipate soft_flux only if there is some to dissipate.
 		if vent_flux_flag == false:
@@ -651,14 +653,17 @@ func _physics_process(delta: float) -> void:
 		elif soft_flux == 0 and hard_flux > flux_to_dissipate:
 			#print("dissipating hard_flux ", hard_flux)
 			hard_flux -= flux_to_dissipate
-		if soft_flux == 0:
+		if soft_flux+hard_flux == 0:
+			zero_flux_bonus_flag = true
 			vent_flux_flag = false
+		else:
+			zero_flux_bonus_flag = false
 		# A very good unit test, if slightly unperformant.
 		if hard_flux < 0 or soft_flux < 0:
 			push_error("flux is negative", hard_flux, " ", soft_flux)
-		# debugging flux values
-
 		update_flux_indicators()
+		# debugging flux values
+		
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
@@ -752,7 +757,7 @@ func _physics_process(delta: float) -> void:
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0
-	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
+	if zero_flux_bonus_flag == true:
 		speed_modifier += zero_flux_bonus
 	
 	velocity = ship_stats.acceleration * time
