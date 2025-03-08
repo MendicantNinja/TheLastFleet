@@ -46,7 +46,11 @@ func _process(delta: float) -> void:
 	position = lerp(position, target_position, movement_factor);
 	target_position = $"../GridContainer".get_child(current_idx).get_child(0).star_center;
 	
+	var old = game_state.player_fleet.fleet_stats.star_id;
 	game_state.player_fleet.fleet_stats.star_id = current_idx; # FIXME!! temporary spaghetti license acquired
+
+	if current_idx != old:
+		print("Changed player star_id from %s to %s." % [old, current_idx]);
 
 	if (position - target_position).length() < 10:
 		#print("Rotating!");

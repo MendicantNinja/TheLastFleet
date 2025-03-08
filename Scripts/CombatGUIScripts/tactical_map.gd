@@ -46,15 +46,15 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt select")):
 			var to_position: Vector2 = get_global_mouse_position()
 			process_move(to_position)
-		elif Input.is_action_just_pressed("zoom in") and TacticalCamera.zoom < zoom_in_limit:
+		elif Input.is_action_just_pressed("camera_zoom_in") and TacticalCamera.zoom < zoom_in_limit:
 			TacticalCamera.zoom += Vector2(0.01, 0.01)
-		elif Input.is_action_just_pressed("zoom out") and TacticalCamera.zoom > zoom_out_limit:
+		elif Input.is_action_just_pressed("camera_zoom_out") and TacticalCamera.zoom > zoom_out_limit:
 			TacticalCamera.zoom -= Vector2(0.01, 0.01)
 	elif event is InputEventMouseMotion:
 		if Input.is_action_pressed("select") and box_selection_start > Vector2.ZERO:
 			box_selection_end = get_global_mouse_position()
 			queue_redraw()
-		elif Input.is_action_pressed("camera action"):
+		elif Input.is_action_pressed("camera_pan"):
 			TacticalCamera.position -= event.relative / TacticalCamera.zoom
 	elif event is InputEventKey:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)

@@ -11,7 +11,7 @@ class_name FleetStats
 @export_storage var inventory: Array[ItemSlot] = []
 
 var star_id: int = -1;
-var sector_id: int = 0;
+var sector_id: int;
 
 var supplies: int:
 	get:

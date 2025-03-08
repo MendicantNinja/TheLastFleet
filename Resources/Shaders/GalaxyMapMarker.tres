@@ -1,0 +1,13 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://bwgnocewhgloc"]
+
+[ext_resource type="Texture2D" uid="uid://c7xdrpdidqa6o" path="res://Art/GUIArt/sector_map_targeting_reticle.png" id="1_70vlr"]
+
+[resource]
+transparency = 1
+albedo_color = Color(1, 0.17, 0.17, 1)
+albedo_texture = ExtResource("1_70vlr")
+emission_enabled = true
+emission = Color(0.996945, 6.23293e-06, 1.54018e-06, 1)
+emission_energy_multiplier = 0.5
+billboard_mode = 1
+billboard_keep_scale = true

@@ -18,6 +18,5 @@ func _process(delta: float) -> void:
 	pass
 
 func randomize_stars() -> void:
-	print("Randomizing Stars!");
 	for i in range($"..".columns * $"..".rows):
 		get_child(i).randomize_star();

@@ -27,14 +27,14 @@ func _unhandled_input(event):
 	if not visible:
 		return
 	if event is InputEventMouseButton:
-		if Input.is_action_just_pressed("zoom in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
+		if Input.is_action_just_pressed("camera_zoom_in") and zoom_value < zoom_in_limit and CombatCamera.enabled:
 			zoom_value += Vector2(0.1, 0.1)
-		elif Input.is_action_just_pressed("zoom out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
+		elif Input.is_action_just_pressed("camera_zoom_out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
 			zoom_value -= Vector2(0.1, 0.1)
-		if Input.is_action_just_released("camera action") and CombatCamera.enabled and manually_controlled_unit != null:
+		if Input.is_action_just_released("camera_pan") and CombatCamera.enabled and manually_controlled_unit != null:
 			manually_controlled_unit.toggle_manual_camera_freelook(false)
 	elif event is InputEventMouseMotion:
-		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
+		if Input.is_action_pressed("camera_pan") and CombatCamera.enabled:
 			CombatCamera.position -= event.relative / CombatCamera.zoom
 			if manually_controlled_unit != null:
 				manually_controlled_unit.toggle_manual_camera_freelook(true)

@@ -48,7 +48,6 @@ func _ready() -> void:
 	$Star.scale *= randf_range(0.6, 1.3);
 	
 func randomize_star() -> void:
-	print("Randomizing Star %s, " % name, "Bounds: ", size);
 	$Star.position = Vector2(
 		randf_range(padding, size.x - padding),
 		randf_range(padding, size.y - padding),

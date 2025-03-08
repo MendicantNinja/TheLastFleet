@@ -18,6 +18,7 @@ func save_game() -> void:
 	save_me.save()
 
 func load_game(fleet_name: String = "Joe_Fleet") -> void:
+	print("Loading Save %s" % fleet_name);
 	var save_game: SaveGame = ResourceLoader.load("user://%s.res" % fleet_name)
 	save_game.load()
 # Saving/Loading the local state/scene tree (Solar Map)
