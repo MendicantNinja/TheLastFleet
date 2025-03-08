@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://c2gpnr0o720b0"]
+[gd_scene load_steps=36 format=3 uid="uid://cf6c7tbx8uxio"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_qqye5"]
@@ -13,6 +13,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="11_v56jh"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="12_3j8wf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="13_b3yru"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/use_shield.gd" id="14_2hktf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="14_krkqi"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="15_ngaaa"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="16_t74ra"]
@@ -105,6 +106,9 @@ script = ExtResource("11_v56jh")
 
 [node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("12_3j8wf")
+
+[node name="use shield" type="Node" parent="CombatBehaviorTree/main/combat"]
+script = ExtResource("14_2hktf")
 
 [node name="chill" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("13_b3yru")

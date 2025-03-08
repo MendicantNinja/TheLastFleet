@@ -1,20 +1,14 @@
 extends LeafAction
 
-var total_flux: float = 0.0
 var safe_distance: float = 0.0
 var offensive_threshold: float = 0.9
 var def_neut_threshold: float = 0.7
 var evasive_threshold: float = 0.5
 var default_radius: int = 10
-var delta: float = 0.0
 var can_vent: bool = false
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if total_flux == 0.0:
-		total_flux = agent.ship_stats.flux
-		delta = get_physics_process_delta_time()
-	
-	var flux_norm: float = (agent.soft_flux + agent.hard_flux) / total_flux
+	var flux_norm: float = (agent.soft_flux + agent.hard_flux) / agent.total_flux
 	
 	agent.vent_flux_flag = false
 	if (agent.posture == globals.Strategy.NEUTRAL or agent.posture == globals.Strategy.DEFENSIVE) and flux_norm >= def_neut_threshold:

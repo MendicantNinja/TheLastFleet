@@ -694,17 +694,17 @@ func _physics_process(delta: float) -> void:
 	if camera_feed == true:
 		CombatCamera.global_position = self.global_position
 	
+	if Engine.get_physics_frames() % 60 == 0 and shield_toggle == true and flux_overload == false:
+		soft_flux += shield_upkeep
+		update_flux_indicators()
+	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
+		set_shields(false)
+	
 	if manual_control == false:
 		return
 	
 	#if not ShipNavigationAgent.is_navigation_finished() and manual_control:
 		#ShipNavigationAgent.set_target_position(position)
-	
-	if shield_toggle == true and flux_overload == false:
-		soft_flux += shield_upkeep
-		update_flux_indicators()
-	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
-		set_shields(false)
 	
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
 	if manual_control == true:

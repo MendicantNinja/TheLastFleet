@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://cio51me4h2qw5"]
+[gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://cyngcda84jqgq"]
 
 [ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_rplny"]
-[ext_resource type="PackedScene" uid="uid://c2gpnr0o720b0" path="res://Scenes/CompositeGameObjects/Ships/Challenger.tscn" id="2_3nbtq"]
+[ext_resource type="PackedScene" uid="uid://cf6c7tbx8uxio" path="res://Scenes/CompositeGameObjects/Ships/Challenger.tscn" id="2_3nbtq"]
 [ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_7iuod"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="3_2hfhe"]
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="5_liwfx"]
@@ -22,7 +22,7 @@ ship_scaling = 1
 hull_integrity = 2000
 armor = 500
 shield_efficiency = 0.8
-shield_upkeep = 25.0
+shield_upkeep = 1.0
 flux = 600
 flux_dissipation = 150
 top_speed = 100
