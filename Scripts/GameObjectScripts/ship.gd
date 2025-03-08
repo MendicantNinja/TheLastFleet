@@ -635,11 +635,11 @@ func _physics_process(delta: float) -> void:
 		elif vent_flux_flag == true:
 			flux_to_dissipate = ship_stats.flux_dissipation * 3 / coeffecient
 		if soft_flux > flux_to_dissipate: 
-			print("dissipating soft flux", soft_flux)
+			#print("dissipating soft flux", soft_flux)
 			soft_flux -= flux_to_dissipate
 		# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
 		elif soft_flux < flux_to_dissipate and soft_flux > 0:
-			print("potentially dissipating both flux types", hard_flux, soft_flux)
+			#print("potentially dissipating both flux types", hard_flux, soft_flux)
 			var flux_to_carry_over: float = flux_to_dissipate - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
 			if hard_flux < flux_to_carry_over:
 				hard_flux = 0
@@ -649,14 +649,15 @@ func _physics_process(delta: float) -> void:
 				soft_flux = 0
 		# Dissipate hardflux if our layer of soft_flux is gone and hard_flux is greater than zero
 		elif soft_flux == 0 and hard_flux > flux_to_dissipate:
-			print("dissipating hard_flux ", hard_flux)
+			#print("dissipating hard_flux ", hard_flux)
 			hard_flux -= flux_to_dissipate
+		if soft_flux == 0:
+			vent_flux_flag = false
 		# A very good unit test, if slightly unperformant.
 		if hard_flux < 0 or soft_flux < 0:
 			push_error("flux is negative", hard_flux, " ", soft_flux)
 		# debugging flux values
-		if soft_flux == 0:
-			vent_flux_flag = false
+
 		update_flux_indicators()
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
@@ -744,9 +745,7 @@ func _physics_process(delta: float) -> void:
 			if manual_camera_freelook == false:
 				CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-		
-	#if shield_toggle and not flux_overload:
-		#fire_weapon_system(all_weapons)
+	
 	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
 		set_shields(false)
 	
