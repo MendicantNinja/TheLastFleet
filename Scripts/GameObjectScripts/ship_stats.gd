@@ -5,7 +5,8 @@ class_name ShipStats
 # For all intents and purposes, ship_stats is what makes an individual, unique ship in a fleet for serialization.
 
 # Called on ship.new() implicitly.
-func _init(ship_type: data.ship_type_enum) -> void:
+func _init(ship_type: data.ship_type_enum = data.ship_type_enum.TEST) -> void:
+	# Default parameter should never be used. It's only to allow loading the resource.
 	ship_hull = data.ship_type_dictionary.get(ship_type)
 	initialize()
 	update()
