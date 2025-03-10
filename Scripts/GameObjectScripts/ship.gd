@@ -46,7 +46,6 @@ var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
-var is_venting: bool = false
 var targeted: bool = false
 var average_weapon_range: float = 0.0
 
@@ -632,18 +631,18 @@ func _physics_process(delta: float) -> void:
 			soft_flux += shield_upkeep / coeffecient
 			zero_flux_bonus_flag = false
 			
-		if is_venting == false:
+		if vent_flux_flag == false:
 			flux_to_dissipate = ship_stats.flux_dissipation / coeffecient
-		elif is_venting == true:
+		elif vent_flux_flag == true:
 			flux_to_dissipate = (ship_stats.flux_dissipation * 3)/ coeffecient
 		
 		# Dissipate soft_flux only if there is some to dissipate.
 		if soft_flux > flux_to_dissipate: 
-			print("dissipating soft_flux", soft_flux)
+			#print("dissipating soft_flux", soft_flux)
 			soft_flux -= flux_to_dissipate
 		# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
 		elif soft_flux < flux_to_dissipate and soft_flux > 0:
-			print("potentially dissipating both flux types", hard_flux, soft_flux)
+			#print("potentially dissipating both flux types", hard_flux, soft_flux)
 			var flux_to_carry_over: int = flux_to_dissipate - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
 			if hard_flux < flux_to_carry_over:
 				hard_flux = 0
@@ -653,18 +652,16 @@ func _physics_process(delta: float) -> void:
 				soft_flux = 0
 		# Dissipate hardflux if our layer of soft_flux is gone and hard_flux is greater than zero
 		elif soft_flux == 0 and hard_flux > flux_to_dissipate:
-			print("dissipating hard_flux ", hard_flux)
+			#print("dissipating hard_flux ", hard_flux)
 			hard_flux -= flux_to_dissipate
 		if soft_flux+hard_flux == 0:
 			zero_flux_bonus_flag = true
-			is_venting = false
 			vent_flux_flag = false
 		else:
 			zero_flux_bonus_flag = false
 		# A very good unit test, if slightly unperformant.
 		if hard_flux < 0 or soft_flux < 0:
 			push_error("flux is negative", hard_flux, " ", soft_flux)
-			print(ship_stats.ship_hull.ship_type_name)
 		update_flux_indicators()
 		# debugging flux values
 		
@@ -748,7 +745,6 @@ func _physics_process(delta: float) -> void:
 			
 			if Input.is_action_pressed("vent_flux"):
 				vent_flux_flag = true
-				is_venting = true
 	#print(TacticalDataDrawing.camera_feed_active)
 		if TacticalDataDrawing.camera_feed_active == false:
 			ManualControlHUD.update_hud()
