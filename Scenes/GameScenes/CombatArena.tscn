@@ -1,4 +1,4 @@
-[gd_scene load_steps=49 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=50 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -35,6 +35,20 @@
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
+
+[sub_resource type="Environment" id="Environment_a8xk6"]
+background_mode = 5
+ambient_light_source = 1
+ambient_light_color = Color(0.266349, 0.548874, 0.942413, 1)
+ambient_light_energy = 2.51
+reflected_light_source = 1
+glow_intensity = 0.16
+glow_strength = 1.84
+glow_blend_mode = 0
+glow_hdr_threshold = 1.27
+glow_hdr_scale = 0.51
+glow_hdr_luminance_cap = 63.2
+glow_map_strength = 1.0
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
 vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
@@ -89,6 +103,9 @@ bg_color = Color(0, 0, 0, 0.588235)
 
 [node name="CombatArena" type="Node2D"]
 script = ExtResource("1_fx56v")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_a8xk6")
 
 [node name="OnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="."]
 unique_name_in_owner = true

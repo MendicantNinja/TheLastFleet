@@ -44,12 +44,13 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		agent.set_target_for_weapons(null)
 	
 	if can_vent == true:
+		agent.is_venting = true
 		agent.move_direction == Vector2.ZERO
-		if agent.soft_flux > 0.0:
-			agent.soft_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
-		elif agent.hard_flux > 0.0:
-			agent.hard_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
-		agent.update_flux_indicators()
+		#if agent.soft_flux > 0.0:
+			#agent.soft_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
+		#elif agent.hard_flux > 0.0:
+			#agent.hard_flux -= agent.ship_stats.flux_dissipation + agent.ship_stats.bonus_flux_dissipation
+		#agent.update_flux_indicators()
 	
 	if agent.fallback_flag == true:
 		agent.move_direction = -agent.transform.x

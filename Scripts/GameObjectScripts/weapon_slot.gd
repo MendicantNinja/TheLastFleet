@@ -74,8 +74,8 @@ func fire(ship_id: int) -> void:
 	
 	if weapon.flux_per_shot > 0.0:
 		weapon_slot_fired.emit(weapon.flux_per_shot)
-	elif weapon.flux_per_second > 0.0:
-		weapon_slot_fired.emit(weapon.flux_per_second)
+	#elif weapon.flux_per_second > 0.0:
+		#weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = weapon_node.global_transform

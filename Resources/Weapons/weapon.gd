@@ -59,4 +59,4 @@ func create_projectile() -> PackedScene:
 
 # Dynamically calculated with a getter stats
 @export var dps: int = 0                               # Damage per second. Calculate with a getter.
-@export var flux_per_second: int = 0                   # Flux generated per second of fire
+#@export var flux_per_second: int = 0                   # Flux generated per second of fire
