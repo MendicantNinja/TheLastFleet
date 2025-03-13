@@ -40,6 +40,16 @@ func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 		ships_to_deploy[this_icon.index] = null
 
 func deploy_ships() -> void:
+	var check_flag: bool = false
+	for ship_icon in ships_to_deploy:
+		if ship_icon != null:
+			if ship_icon.disabled == false:
+				check_flag = true
+				break
+	if check_flag == false:
+		on_cancel_pressed() # Hide menu after deploying ships
+		return
+
 	var instantiated_units: Array = []
 	reset_deployment_position()
 	var iterator: int = 0

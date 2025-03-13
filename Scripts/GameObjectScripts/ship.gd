@@ -19,7 +19,6 @@ class_name Ship
 @onready var FluxPip = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/FluxPip
 @onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
 @onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
-@onready var OldTacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
 var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
 var TacticalDataDrawing: Node2D 
@@ -40,7 +39,7 @@ var speed: float = 0.0
 var hull_integrity: float = 0.0
 var armor: float = 0.0
 var shield_radius: float = 0.0
-var total_flux: float = 0.0
+var total_flux: float = 0.0 # Flux Capacity
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
@@ -130,13 +129,13 @@ var move_direction: Vector2 = Vector2.ZERO
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var ship_select: bool = false:
+	# Ship Select is for individual ships when they're the only ships
 	set(value):
 		if value == true: 
-			tactical_map_icon._toggled(value)
 			ship_select = value
 		elif value == false:
-			tactical_map_icon._toggled(value)
 			ship_select = value
+		print("ship select called", ship_select)
 		ship_selected.emit()
 var collision_flag: bool = false
 
@@ -294,7 +293,6 @@ func _ready() -> void:
 	#furthest_safe_distance += longest_range_weapon.weapon.range
 	set_combat_ai(true)
 	deploy_ship()
-	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
 
@@ -408,9 +406,6 @@ func update_flux_indicators() -> void:
 	SoftFluxIndicator.position.x = HardFluxIndicator.value
 	FluxPip.position.x = HardFluxIndicator.value - 2
 
-func display_icon(value: bool) -> void:
-	OldTacticalMapIcon.visible = value
-
 # Units/Groups
 
 func group_remove(n_group_name: StringName) -> void:
@@ -475,15 +470,10 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey:
 		pass
 		#if is_friendly:
-			#if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
-				#toggle_manual_control()
 			#elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				#toggle_auto_aim(all_weapons)
 			#elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				#toggle_auto_fire(all_weapons)
-			#if (event.keycode == KEY_TAB and event.pressed) and manual_control:
-				#toggle_manual_control()
-				#camera_removed.emit()
 		if not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
@@ -499,11 +489,6 @@ func toggle_ship_select() -> void:
 			ship_select = true # select ship
 	elif is_friendly and ship_select:
 			ship_select = false # deselect ship
-
-func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	if event is InputEventMouseButton:
-		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
-			alt_select.emit()
 
 func _on_mouse_entered() -> void:
 	if TacticalMapLayer.visible:
@@ -524,9 +509,7 @@ func _on_mouse_exited() -> void:
 
 func highlight_selection(select_value: bool = false) -> void:
 	#print("%s is highlighted? %s" % [name, select_value])
-	tactical_map_icon._toggled(select_value)
-	OldTacticalMapIcon.toggle_mode = select_value
-	OldTacticalMapIcon.button_pressed = select_value
+	tactical_map_icon.highlight_selection(select_value)
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:
@@ -535,7 +518,7 @@ func toggle_manual_control() -> void:
 		manual_control = false
 		CombatBehaviorTree.toggle_root(true)
 		return
-	
+	#
 	if CombatBehaviorTree.enabled == true:
 		CombatBehaviorTree.toggle_root(false)
 	
@@ -598,6 +581,8 @@ func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
 
 func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	var ship_id = get_rid().get_id()
+	if (total_flux - (hard_flux + soft_flux)) < weapon_slot.weapon.flux_per_shot:
+		return  # Correct indentation
 	weapon_slot.fire(ship_id)
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:

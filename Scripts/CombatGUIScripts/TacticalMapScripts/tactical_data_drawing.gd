@@ -91,6 +91,7 @@ func _unhandled_input(event) -> void:
 			switch_maps.emit()
 			reset_box_selection()
 			if manually_controlled_ship != null:
+				# Turn off MC for the old ship.
 				manually_controlled_ship.toggle_manual_control()
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
@@ -350,9 +351,8 @@ func reset_box_selection() -> void:
 	
 
 func _on_unit_selected(unit: Ship) -> void:
-	#print("on unit selected")
+	print("on unit selected")
 	get_viewport().set_input_as_handled()
-	
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:
 		if unit.group_leader == true:
@@ -532,7 +532,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
-	#print("alt select called")
+	print("alt select called")
 	if not visible:
 		return
 	

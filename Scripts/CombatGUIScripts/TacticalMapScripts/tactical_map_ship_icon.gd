@@ -14,6 +14,9 @@ func _toggled(toggled_on: bool) -> void:
 	else:
 		Outline.button_pressed = false
 
+func highlight_selection(value: bool) -> void:
+	Outline.button_pressed = value
+
 func setup(ship: Ship) -> void:
 	assigned_ship = ship
 	self.texture_normal = ship.ShipSprite.texture
