@@ -11,14 +11,15 @@ class_name Ship
 @onready var TacticalCamera = null
 
 @onready var ManualControlHUD = null
-@onready var CenterCombatHUD = $CenterCombatHUD
-@onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
-@onready var SoftFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/SoftFluxIndicator
-@onready var HardFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator
-@onready var HullIntegrityIndicator = $CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator
-@onready var FluxPip = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/FluxPip
-@onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
-@onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
+@onready var CenterCombatHUD: Control = $CenterCombatHUD
+@onready var ConstantSizedGUI = CenterCombatHUD.ConstantSizedGUI
+@onready var SoftFluxIndicator = CenterCombatHUD.SoftFluxIndicator
+@onready var HardFluxIndicator = CenterCombatHUD.HardFluxIndicator
+@onready var HullIntegrityIndicator = CenterCombatHUD.HullIntegrityIndicator
+@onready var FluxPip = CenterCombatHUD.FluxPip
+@onready var ManualControlIndicator = CenterCombatHUD.ManualControlIndicator
+@onready var ShipTargetIcon = CenterCombatHUD.ShipTargetIcon
+
 var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
 var TacticalDataDrawing: Node2D 
