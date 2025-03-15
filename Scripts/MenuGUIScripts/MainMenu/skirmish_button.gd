@@ -7,7 +7,7 @@ func _ready() -> void:
 	settings.swizzle(self, settings.gui_color)
 	self.pressed.connect(self.on_button_pressed)
 	self.focus_entered.connect(self.on_focus_entered)
-	self.mouse_entered.connect(self.on_mouse_entered)
+	#self.mouse_entered.connect(self.on_mouse_entered)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

@@ -9,6 +9,8 @@ extends TextureButton
 func _ready():
 	self_modulate = settings.gui_color
 	self.gui_input.connect(_on_input_event)
+	self.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+	self.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 
 func _on_input_event(event):
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:

@@ -46,6 +46,8 @@ func on_pressed() -> void:
 
 func _ready():
 	self.connect("pressed", self.on_pressed)
+	self.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+	self.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

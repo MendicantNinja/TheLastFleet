@@ -458,7 +458,7 @@ func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
-	if TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
+	if TacticalMapLayer == null or TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("m2") and manual_control:

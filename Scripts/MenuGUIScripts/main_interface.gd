@@ -24,8 +24,17 @@ func _unhandled_input(event) -> void:
 		elif (event.keycode == KEY_I and event.is_pressed()):
 			swap_gui()
 			indicate_selected_button(Inventory)
+#
+func connect_buttons_lazy() -> void:
+	for child in $CanvasLayer/HBoxContainer.get_children():
+		if child is TextureButton:
+			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
+
+
 # Hide all GUI
 func indicate_selected_button(p_control: Control) -> void:
+	p_control.emit_signal("pressed")
 	settings.swizzle(Fleet)
 	settings.swizzle(Refit)
 	settings.swizzle(Map)
@@ -48,6 +57,7 @@ func swap_gui(p_control: Control = FleetView) -> void:
 func _ready():
 	Fleet.focus_entered.connect(self.indicate_selected_button.bind(Fleet))
 	Refit.focus_entered.connect(self.indicate_selected_button.bind(Refit))
+	connect_buttons_lazy()
 	#Inventory.focus_entered.connect($"../../..".indicate_selected_button(Inventory))
 	#Map.focus_entered.connect($"../../..".indicate_selected_button(Map))
 

@@ -4,7 +4,8 @@ var weapon_system_number: int
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	toggled.connect(on_button_toggled)
-	
+	self.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+	#self.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 	pass # Replace with function body.
 
 func on_button_toggled(toggled) -> void:

@@ -9,3 +9,7 @@ var ship: ShipStats
 func on_added_to_container() -> void:
 	self.toggled.connect(get_parent().on_icon_toggled.bind(self)) #bind this signal during fleet deployment setup
 	self.ship_sprite.self_modulate = settings.player_color
+
+func _ready() -> void:
+	self.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+	self.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))

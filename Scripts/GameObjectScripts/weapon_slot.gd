@@ -80,7 +80,7 @@ func fire(ship_id: int) -> void:
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = weapon_node.global_transform
 	projectile.assign_stats(weapon, ship_id, is_friendly)
-	get_tree().root.add_child(projectile)
+	get_tree().current_scene.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
 	timer_fire = false

@@ -5,8 +5,6 @@ func _ready():
 	var binding_name = globals.convert_input_to_string(&"take_manual_control", "green")
 	$Keybinding.text = binding_name
 
-func _pressed() -> void:
-	pass
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
