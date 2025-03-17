@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = true
+var debug_imap: bool = false
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
@@ -54,10 +54,10 @@ func _ready() -> void:
 	var register_maps: Array = [influence_map, fake_tension_map]
 	
 	if debug_imap == true:
-		weighted_imap.update_grid_value.connect(_on_grid_value_changed)
-		weighted_imap.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = weighted_imap.map_grid.size()
-		var grid_column_size: int = weighted_imap.map_grid[0].size()
+		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
+		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = vulnerability_map.map_grid.size()
+		var grid_column_size: int = vulnerability_map.map_grid[0].size()
 		ImapDebug.size = PlayableAreaBounds.shape.size
 		ImapDebugGrid.columns = grid_column_size
 		for i in range(grid_row_size):
@@ -65,7 +65,7 @@ func _ready() -> void:
 			for j in range(grid_column_size):
 				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
 				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(weighted_imap.get_cell_value(i, j))
+				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
 				cell_instance.get_child(0).visible = false
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
@@ -115,7 +115,7 @@ func reset_deployment_position() -> void:
 	# 					   . . . .
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-	deployment_position.y = 0 - deployment_spacing * 2 # Start at the (bottommost, we're deploying enemies now) row.
+	deployment_position.y = 0 - deployment_spacing * 2# Start at the (bottommost, we're deploying enemies now) row.
 	deployment_row = 0
 
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
@@ -131,7 +131,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		for i in range (enemy_fleet_size):
 			if i % 100 == 0:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
-			elif i % 3 == 0:
+			if i % 3 == 0:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
 			else:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))

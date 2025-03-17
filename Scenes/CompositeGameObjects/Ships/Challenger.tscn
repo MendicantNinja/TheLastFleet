@@ -11,15 +11,15 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/identify_nearby_units.gd" id="9_yb7ck"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="10_5taoq"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="11_v56jh"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="12_3j8wf"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/flux_management.gd" id="12_3j8wf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="13_b3yru"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/use_shield.gd" id="14_2hktf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="14_krkqi"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="15_ngaaa"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="16_t74ra"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="17_vx6dc"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_xdvy0"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_47bbe"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/velocity_matching.gd" id="19_k1mub"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_ar06l"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_4sljk"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="23_54n58"]
@@ -119,9 +119,6 @@ script = ExtResource("4_kkgeq")
 [node name="pursue" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("14_krkqi")
 
-[node name="kiting" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("15_ngaaa")
-
 [node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("16_t74ra")
 
@@ -130,6 +127,9 @@ script = ExtResource("17_vx6dc")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_4n4rr")
+
+[node name="velocity matching" type="Node" parent="CombatBehaviorTree/main/combat steering"]
+script = ExtResource("19_k1mub")
 
 [node name="align" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("8_vc0ow")
@@ -194,6 +194,8 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
+
+[node name="OverloadTimer" type="Timer" parent="."]
 
 [node name="CenterCombatHUD" type="Control" parent="."]
 top_level = true

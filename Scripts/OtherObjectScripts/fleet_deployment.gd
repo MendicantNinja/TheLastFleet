@@ -28,9 +28,9 @@ func reset_deployment_position() -> void:
 	# 					   . . . .
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
-	if settings.dev_mode == true:
-		deployment_position.y = 0 + deployment_spacing * 2
+	deployment_position.y = PlayableAreaBounds.shape.size.y * 0.7 + deployment_spacing * 2 # Start topmost row.
+	#if settings.dev_mode == true:
+		#deployment_position.y = 0 + deployment_spacing * 2
 	deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:

@@ -37,14 +37,15 @@ var working_maps: Dictionary = {}
 var visited: Array = []
 
 func _init():
+	var longest_range: int = 2250 / default_cell_size
 	var occupancy_templates: ImapTemplate = ImapTemplate.new()
 	var threat_templates: ImapTemplate = ImapTemplate.new()
 	var invert_occupancy_templates: ImapTemplate = ImapTemplate.new()
 	var invert_threat_templates: ImapTemplate = ImapTemplate.new()
 	occupancy_templates.init_occupancy_map_templates(default_radius)
-	threat_templates.init_threat_map_templates(default_radius)
+	threat_templates.init_threat_map_templates(longest_range)
 	invert_occupancy_templates.init_occupancy_map_templates(default_radius, -1.0)
-	invert_threat_templates.init_threat_map_templates(default_radius, -1.0)
+	invert_threat_templates.init_threat_map_templates(longest_range, -1.0)
 	occupancy_templates.type = TemplateType.OCCUPANCY_TEMPLATE
 	threat_templates.type = TemplateType.THREAT_TEMPLATE
 	invert_occupancy_templates.type = TemplateType.INVERT_OCCUPANCY_TEMPLATE

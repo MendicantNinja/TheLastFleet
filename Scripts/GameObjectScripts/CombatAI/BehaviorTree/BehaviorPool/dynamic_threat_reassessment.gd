@@ -37,6 +37,5 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if relative_strength >= 1.0:
 		get_tree().call_group(agent.group_name, &"set_targets", target_units)
 	#else:
-		#get_tree().call_group(agent.group_name, &"set_fallback_flag", true)
-	
+		#fallback
 	return FAILURE

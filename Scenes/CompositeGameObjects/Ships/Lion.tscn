@@ -1,10 +1,7 @@
-[gd_scene load_steps=23 format=3 uid="uid://c2noldww8g5st"]
+[gd_scene load_steps=20 format=3 uid="uid://c2noldww8g5st"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_6jg18"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_2s0ta"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="3_22nr0"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_us7ks"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pathfinding.gd" id="5_ofwj6"]
+[ext_resource type="PackedScene" uid="uid://chlj4nfewaemy" path="res://Scenes/CompositeGameObjects/CombatBehaviorTree.tscn" id="2_asysm"]
 [ext_resource type="Texture2D" uid="uid://bpdt55pm4f7di" path="res://Art/ShipArt/prototype9_v2.png" id="12_gfp81"]
 [ext_resource type="Texture2D" uid="uid://c750umbh4ihc6" path="res://Art/ShipArt/prototype9v1_livery.png" id="13_yfhmf"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="14_b3w6e"]
@@ -49,17 +46,7 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_6jg18")
 
-[node name="CombatBehaviorTree" type="Node" parent="."]
-script = ExtResource("2_2s0ta")
-
-[node name="main" type="Node" parent="CombatBehaviorTree"]
-script = ExtResource("4_us7ks")
-
-[node name="navigation" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("3_22nr0")
-
-[node name="move to position" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("5_ofwj6")
+[node name="CombatBehaviorTree" parent="." instance=ExtResource("2_asysm")]
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 rotation = 1.5708
@@ -125,6 +112,8 @@ debug_path_custom_line_width = 3.0
 
 [node name="NavigationTimer" type="Timer" parent="."]
 wait_time = 3.0
+
+[node name="OverloadTimer" type="Timer" parent="."]
 
 [node name="ShieldSlot" type="Node2D" parent="."]
 script = ExtResource("15_v5h3f")

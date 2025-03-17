@@ -9,7 +9,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="7_b4mlj"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="7_sxlxq"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="8_5awtp"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="9_mjw7i"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/flux_management.gd" id="9_mjw7i"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="11_120mt"]
 [ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="11_byh25"]
 [ext_resource type="Texture2D" uid="uid://cfd8kdvut280u" path="res://Art/ShipArt/Trident/trident_livery1.png" id="12_eskgy"]

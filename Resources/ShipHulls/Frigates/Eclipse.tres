@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_brt5q"]
 [ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_h7fkm"]
-[ext_resource type="PackedScene" path="res://Scenes/CompositeGameObjects/Ships/Eclipse.tscn" id="2_l65qa"]
+[ext_resource type="PackedScene" uid="uid://ddrfhma3rk22y" path="res://Scenes/CompositeGameObjects/Ships/Eclipse.tscn" id="2_l65qa"]
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="3_phetm"]
-[ext_resource type="Resource" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="5_7m6vi"]
+[ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="5_7m6vi"]
 
 [resource]
 script = ExtResource("1_brt5q")
@@ -24,7 +24,7 @@ armor = 300
 shield_efficiency = 0.6
 shield_upkeep = 5.0
 flux = 600
-flux_dissipation = 150
+flux_dissipation = 200
 top_speed = 130
 acceleration = 32.0
 deceleration = 24.0

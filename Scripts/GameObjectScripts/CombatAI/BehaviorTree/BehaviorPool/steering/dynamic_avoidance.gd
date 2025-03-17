@@ -4,6 +4,7 @@ var time_horizon: float = 4.0
 var delta: float = 0.0
 var debug: bool = false
 var time: float = 0.0
+var avoid_unit: Ship = null
 
 @warning_ignore("confusable_local_declaration")
 func tick(agent: Ship, blackboard: Blackboard) -> int:
@@ -19,6 +20,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var group: Array = get_tree().get_nodes_in_group(agent.group_name)
 	var avoid_vel: Dictionary = {}
+	var avoid_neighbors: Dictionary = {}
 	for neighbor in neighbor_units:
 		if neighbor in group and neighbor.brake_flag == true and neighbor.target_unit == null:
 			continue
@@ -40,17 +42,8 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		var test_avoid: float = avoid_velocity.dot(p) ** 2
 		if test_avoid >= cone:
 			continue
-		var a: float = v.dot(v)
-		var b: float = p.dot(v)
-		var c: float = p.dot(p) - r * r
-		var disrc: float = b*b - a * c
-		var tau: float = (b - sqrt(disrc)) / a
-		if tau < time_horizon and tau > 0:
-			time += delta + agent.time_coefficient
-			avoid_velocity = -agent.transform.y * agent.speed * time
-		else:
-			time = 0.0
 		avoid_vel[distance_sq] = avoid_velocity.limit_length(agent.speed)
+		avoid_neighbors[distance_sq] = neighbor
 	
 	if avoid_vel.is_empty():
 		return FAILURE

@@ -26,6 +26,7 @@ var TacticalDataDrawing: Node2D
 
 @onready var CombatBehaviorTree = $CombatBehaviorTree
 @onready var CombatTimer = $CombatTimer
+@onready var OverloadTimer = $OverloadTimer
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -44,12 +45,18 @@ var total_flux: float = 0.0
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
+var overload_time: float = 5.0
+var passive_flux_dissipation: float = 0.0
+var vf_coe: float = 3.0
+var vent_flux_dissipation: float = 0.0
 var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
 var average_weapon_range: float = 0.0
 
-var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
+var is_friendly: bool = false
+	#set(value):
+		#is_friendly = value # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
 	set(value):
 		if value == false:
@@ -98,6 +105,8 @@ var registry_cell: Vector2i = Vector2i.ZERO
 var registry_neighborhood: Array = []
 
 var heur_velocity: Vector2 = Vector2.ZERO
+var match_speed: float = 0.0
+var combat_time: float = 5.0
 var target_unit: Ship = null
 var targeted_units: Array = []
 var neighbor_units: Array = []
@@ -116,8 +125,15 @@ var brake_flag: bool = false
 var retreat_flag: bool = false
 var fallback_flag: bool = false
 var combat_flag: bool = false
-var vent_flux_flag: bool = false
+var vent_flux_flag: bool = false:
+	set(value):
+		if value == true:
+			print("%s is venting flux" % [name])
+		else:
+			print("%s vented flux" % [name])
+		vent_flux_flag = value
 var successful_deploy: bool = false
+var match_velocity_flag: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
@@ -176,7 +192,7 @@ func deploy_ship() -> void:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		settings.swizzle(ConstantSizedGUI, settings.enemy_color, false)
 		settings.swizzle($ShipLivery, settings.enemy_color)
-	
+
 func _ready() -> void:
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
@@ -185,7 +201,8 @@ func _ready() -> void:
 		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
 	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
 	ShipNavigationAgent.max_speed = speed
-	
+	OverloadTimer.wait_time = overload_time
+	CombatTimer.wait_time = combat_time
 	var ship_hull = ship_stats.ship_hull
 	if ship_stats.ship_hull.ship_type != data.ship_type_enum.TEST:
 		var texture: Texture2D = ship_hull.ship_sprite
@@ -193,11 +210,16 @@ func _ready() -> void:
 		var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
 		ShipNavigationAgent.radius = new_radius
 	
+	var dissipation_coe: float = 12
+	passive_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation)
+	passive_flux_dissipation /= dissipation_coe
+	vent_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation) * vf_coe / dissipation_coe
+	
 	ShipSprite.texture = ship_hull.ship_sprite
 	hull_integrity = ship_hull.hull_integrity
 	armor = ship_hull.armor
 	shield_radius = ShipNavigationAgent.radius
-	shield_upkeep = ship_hull.shield_upkeep
+	shield_upkeep = ship_hull.shield_upkeep / 60.0
 	total_flux = ship_stats.flux
 	zero_flux_bonus = floor(speed / 3)
 	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)
@@ -244,6 +266,7 @@ func _ready() -> void:
 	threat_radius += 1
 	add_to_group(&"agent")
 	if collision_layer == 1:
+		name = &"Player " + ship_hull.ship_type_name
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
@@ -251,6 +274,7 @@ func _ready() -> void:
 		add_to_group(&"friendly")
 		rotation -= PI/2
 	else:
+		name = &"Enemy " + ship_hull.ship_type_name
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
 		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
@@ -258,7 +282,7 @@ func _ready() -> void:
 		add_to_group(&"enemy")
 		is_friendly = false
 		rotation += PI/2
-
+	
 	CombatBehaviorTree.toggle_root(true)
 	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
@@ -286,7 +310,7 @@ func _ready() -> void:
 	AvoidanceArea.body_exited.connect(_on_AvoidanceShape_body_exited)
 	AvoidanceArea.area_entered.connect(_on_AvoidanceShape_area_entered)
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
-	
+	OverloadTimer.timeout.connect(_on_OverloadTimer_timeout)
 	#toggle_auto_aim(all_weapons)
 	#toggle_auto_fire(all_weapons)
 	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
@@ -340,14 +364,14 @@ func destroy_ship() -> void:
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
 	#
-	for unit in targeted_by:
-		if unit == null:
-			continue
-		var targeted_units: Array = unit.targeted_units.duplicate()
-		unit.target_unit = null
-		if self in targeted_units:
-			targeted_units.erase(self)
-			get_tree().call_group(unit.group_name, &"set_targets", targeted_units)
+	#for unit in targeted_by:
+		#if unit == null:
+			#continue
+		#var targeted_units: Array = unit.targeted_units.duplicate()
+		#unit.target_unit = null
+		#if self in targeted_units:
+			#targeted_units.erase(self)
+			#get_tree().call_group(unit.group_name, &"set_targets", targeted_units)
 	
 	remove_from_group(group_name)
 	if group_leader == true:
@@ -375,6 +399,9 @@ func toggle_shield() -> void:
 		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
 
 func set_shields(value: bool) -> void:
+	if value == shield_toggle:
+		return
+	
 	shield_toggle = value
 	if value == true:
 		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
@@ -396,11 +423,21 @@ func _on_Shield_Hit(damage: float, damage_type: int) -> void:
 	update_flux_indicators()
 
 func update_flux_indicators() -> void:
-	var current_flux: float = soft_flux + hard_flux
+	var current_flux: float = ceil(soft_flux + hard_flux)
 	if current_flux >= total_flux:
 		flux_overload = true
-	if flux_overload == true and current_flux < total_flux:
-		flux_overload = false
+		OverloadTimer.start()
+		
+		var flux_diff: float = current_flux - total_flux
+		if hard_flux > soft_flux:
+			hard_flux -= flux_diff
+		else:
+			soft_flux -= flux_diff
+		
+		for weapon in all_weapons:
+			weapon.flux_overload = flux_overload
+		set_shields(false)
+	
 	var flux_rate: float = 100 / total_flux # Returns a factor multiplier of the total flux that can be used to get a percentage. e.g 100/2000 = .05. 
 	HardFluxIndicator.value = floor(flux_rate * hard_flux)
 	SoftFluxIndicator.value = floor(flux_rate * soft_flux)
@@ -535,9 +572,6 @@ func toggle_manual_control() -> void:
 		CombatBehaviorTree.toggle_root(true)
 		return
 	
-	if CombatBehaviorTree.enabled == true:
-		CombatBehaviorTree.toggle_root(false)
-	
 	if manual_control == false:
 		manual_control = true
 		ship_select = false
@@ -545,6 +579,7 @@ func toggle_manual_control() -> void:
 		ManualControlHUD.toggle_visible()
 		CombatCamera.position_smoothing_enabled = false
 		CombatCamera.global_position = self.global_position
+		set_combat_ai(false)
 		for weapon_system in self.weapon_systems:
 			weapon_system.set_autofire(true)
 			#if weapon_system.auto_fire_start == true:
@@ -553,7 +588,11 @@ func toggle_manual_control() -> void:
 		_on_mouse_exited()
 	
 	elif manual_control == true:
+		retreat_flag = false
+		fallback_flag = false
+		match_velocity_flag = false
 		manual_control = false
+		set_combat_ai(true)
 		ship_select = false
 		for weapon_system in self.weapon_systems:
 			weapon_system.set_autofire(true)
@@ -567,7 +606,7 @@ func toggle_manual_control() -> void:
 	if manual_control == true and is_in_group(group_name):
 		remove_from_group(group_name)
 		group_name = &""
-	if manual_control == true and not ShipNavigationAgent.is_navigation_finished():
+	if manual_control == true and ShipNavigationAgent.is_navigation_finished() == false:
 		ShipNavigationAgent.set_target_position(position)
 	
 	
@@ -589,26 +628,41 @@ func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 
 func set_target_for_weapons(unit) -> void:
 	for weapon in all_weapons:
-		weapon.set_target_unit(unit)
+		weapon.set_primary_target(unit)
 
 func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
+	if vent_flux_flag == true or flux_overload == true:
+		return
+	
 	for weapon_slot in weapon_system:
 		fire_weapon_slot(weapon_slot)
 
 func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
+	if vent_flux_flag == true or flux_overload == true:
+		return
+	
 	var ship_id = get_rid().get_id()
 	weapon_slot.fire(ship_id)
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
+	if vent_flux_flag == true or flux_overload == true:
+		return
+	
 	for weapon_slot in weapon_system:
 		weapon_slot.set_manual_aim(manual_aim_value)
 		weapon_slot.toggle_display_aim(manual_aim_value)
 
 func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
+	if vent_flux_flag == true or flux_overload == true:
+		return
+	
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_aim()
 
 func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
+	if vent_flux_flag == true or flux_overload == true:
+		return
+	
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_fire()
 
@@ -623,42 +677,49 @@ func set_navigation_position(to_position: Vector2) -> void:
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
 	# Calculating flux dissipation in multiple places throughout the code is prone to disaster. Put any additions or subtractions in here.
-	if Engine.get_physics_frames() % 5 == 0:
-		var flux_to_dissipate: int
-		var coeffecient: int = 12 # Coeffecient = 60/Physics frames. Flux per second is the goal.
-		if shield_toggle == true and flux_overload == false:
-			soft_flux += shield_upkeep / coeffecient
+	if Engine.get_physics_frames() % 5 == 0 and flux_overload == false:
+		var flux_to_dissipate: float
+		if shield_toggle == true:
+			soft_flux += shield_upkeep
 		
 		# Dissipate soft_flux only if there is some to dissipate.
-		if vent_flux_flag == false:
-			flux_to_dissipate = ship_stats.flux_dissipation / coeffecient
-		elif vent_flux_flag == true:
-			flux_to_dissipate = ship_stats.flux_dissipation * 3 / coeffecient
+		if vent_flux_flag == false and (soft_flux > 0.0 or hard_flux > 0.0):
+			flux_to_dissipate = passive_flux_dissipation
+		if vent_flux_flag == true and (soft_flux > 0.0 or hard_flux > 0.0):
+			flux_to_dissipate = vent_flux_dissipation
+		
+		if vent_flux_flag == true and shield_toggle == true:
+			set_shields(false)
+		
 		if soft_flux > flux_to_dissipate: 
 			#print("dissipating soft flux", soft_flux)
 			soft_flux -= flux_to_dissipate
 		# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
-		elif soft_flux < flux_to_dissipate and soft_flux > 0:
+		elif soft_flux < flux_to_dissipate and soft_flux > 0.0:
 			#print("potentially dissipating both flux types", hard_flux, soft_flux)
 			var flux_to_carry_over: float = flux_to_dissipate - soft_flux # (10 dissipation - 3 soft flux = 7 left_over)
-			if hard_flux < flux_to_carry_over:
-				hard_flux = 0
-				soft_flux = 0
-			else:
-				hard_flux -= flux_to_carry_over
-				soft_flux = 0
+			hard_flux -= flux_to_carry_over
+			soft_flux = 0.0
 		# Dissipate hardflux if our layer of soft_flux is gone and hard_flux is greater than zero
-		elif soft_flux == 0 and hard_flux > flux_to_dissipate:
+		elif hard_flux > flux_to_dissipate:
 			#print("dissipating hard_flux ", hard_flux)
 			hard_flux -= flux_to_dissipate
-		if soft_flux == 0:
+		elif hard_flux <= flux_to_dissipate and hard_flux > 0.0:
+			hard_flux = 0.0
+		
+		if hard_flux < 0.0:
+			hard_flux = 0.0
+		if soft_flux < 0.0:
+			soft_flux = 0.0
+		var current_flux: float = hard_flux + soft_flux
+		if current_flux == 0.0 and vent_flux_flag == true:
 			vent_flux_flag = false
-		# A very good unit test, if slightly unperformant.
-		if hard_flux < 0 or soft_flux < 0:
-			push_error("flux is negative", hard_flux, " ", soft_flux)
-		# debugging flux values
-
+			for weapon in all_weapons:
+				weapon.vent_flux = vent_flux_flag
+				weapon.flux_overload = false
+		
 		update_flux_indicators()
+	
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
 	
@@ -688,14 +749,6 @@ func _physics_process(delta: float) -> void:
 			if unit == null:
 				targeted_by.erase(unit)
 	
-	if vent_flux_flag == true:
-		for weapon in all_weapons:
-			weapon.flux_overload = true
-	elif vent_flux_flag == false and flux_overload == false:
-		for weapon in all_weapons:
-			if weapon.flux_overload == true:
-				weapon.flux_overload = false
-
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
 	ConstantSizedGUI.scale = Vector2.ONE
@@ -715,45 +768,33 @@ func _physics_process(delta: float) -> void:
 	if camera_feed == true:
 		CombatCamera.global_position = self.global_position
 	
-	if Engine.get_physics_frames() % 60 == 0 and shield_toggle == true and flux_overload == false:
-		soft_flux += shield_upkeep
-		update_flux_indicators()
-	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
-		set_shields(false)
-	
 	if manual_control == false:
 		return
 	
-	#if not ShipNavigationAgent.is_navigation_finished() and manual_control:
-		#ShipNavigationAgent.set_target_position(position)
-	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
-		set_shields(false)
-	
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
-	if manual_control == true:
-		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
-		if TacticalMapLayer.visible == false:
-			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
-			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
-				fire_weapon_system(selected_weapon_system.weapons)
-			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
-			rotate_angle = rotate_direction.angle()
-			var adjust_mass: float = (mass * 1000)
-			rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-			move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
-			Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
-			
-			if Input.is_action_pressed("vent_flux"):
-				vent_flux_flag = true
-	#print(TacticalDataDrawing.camera_feed_active)
-		if TacticalDataDrawing.camera_feed_active == false:
-			ManualControlHUD.update_hud()
-			if manual_camera_freelook == false:
-				CombatCamera.global_position = self.global_position
+	CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
+	if TacticalMapLayer.visible == false:
+		CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
+		if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
+			fire_weapon_system(selected_weapon_system.weapons)
+		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
+		rotate_angle = rotate_direction.angle()
+		var adjust_mass: float = (mass * 1000)
+		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+		move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
+		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
+		
+	if Input.is_action_pressed("vent_flux"):
+		vent_flux_flag = true
+		for weapon in all_weapons:
+			weapon.vent_flux = vent_flux_flag
+
+#print(TacticalDataDrawing.camera_feed_active)
+	if TacticalDataDrawing.camera_feed_active == false:
+		ManualControlHUD.update_hud()
+		if manual_camera_freelook == false:
+			CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	
-	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
-		set_shields(false)
 	
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
@@ -761,14 +802,14 @@ func _physics_process(delta: float) -> void:
 	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
 		speed_modifier += zero_flux_bonus
 	
-	velocity = ship_stats.acceleration * time
+	velocity = (ship_stats.acceleration + ship_stats.bonus_acceleration + speed_modifier) * time
 	velocity *= true_direction
 	if move_direction == Vector2.ZERO:
 		time = 0.0
 	elif velocity.length() < (speed + speed_modifier):
 		time += delta + time_coefficient
 	
-	velocity = velocity.limit_length(speed + speed_modifier)
+	velocity = velocity.limit_length(speed)
 	acceleration = velocity
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
@@ -793,29 +834,45 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		apply_force(force)
 		apply_torque(rotate_angle)
 	
-	state.linear_velocity = state.linear_velocity.limit_length(speed)
+	if match_velocity_flag == true:
+		state.linear_velocity = state.linear_velocity.limit_length(match_speed)
+	else:
+		state.linear_velocity = state.linear_velocity.limit_length(speed)
 	
 	# use apply_impulse for one-shot calculations for collisions
 	# its time-independent hence why its a one-shot
 
-func _on_target_in_range(slot: WeaponSlot, value: bool) -> void:
+func _on_target_in_range(value: bool) -> void:
+	if value == false and (fallback_flag == true or retreat_flag == true):
+		target_in_range = value
+	
+	if value == true:
+		target_in_range = true
+		return
+	
 	var oor_count: int = 0
 	for weapon in all_weapons:
-		if weapon.can_fire == false:
+		if target_unit.get_rid() != weapon.current_target:
 			oor_count += 1
-	if oor_count == all_weapons.size() and value == false and manual_control == false and target_unit != null and combat_flag == true and fallback_flag == false and retreat_flag == false:
+		elif target_unit.get_rid() == weapon.primary_target and weapon.can_fire == false:
+			oor_count += 1
+	
+	if oor_count == all_weapons.size():
+		target_in_range = false
+	
+	if target_in_range == false and (posture == globals.Strategy.OFFENSIVE):
+		print("%s out of range of target %s and searching for other targets" % [name, target_unit.name])
 		target_unit.targeted_by.erase(self)
 		target_unit = null
-		target_in_range = value
-	if value == false and manual_control == true:
-		slot.acquire_new_target()
-
-	target_in_range = value
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
 	CombatBehaviorTree.toggle_root(value)
+	for weapon in all_weapons:
+		weapon.AI_enabled = value
+		weapon.auto_aim = true
+		weapon.auto_fire = true
 
 func set_blackboard_data(key: Variant, value: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
@@ -838,6 +895,15 @@ func set_goal_flag(value) -> void:
 
 func set_fallback_flag(value) -> void:
 	fallback_flag = value
+
+func generate_combat_probability(enemy: Ship) -> float:
+	var agent_inf: float = abs(approx_influence)
+	var target_inf: float = abs(enemy.approx_influence)
+	var threat_weight: float = agent_inf / (agent_inf + target_inf)
+	var flux_weight: float = total_flux / (enemy.total_flux + total_flux)
+	var weapon_weight: float = all_weapons.size() / (enemy.all_weapons.size() + all_weapons.size())
+	var prob: float = (threat_weight + flux_weight + weapon_weight) / 3.0
+	return prob
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
 func collision_raycast(from: Vector2, to: Vector2, collision_bitmask: int, test_area: bool, test_body: bool) -> Dictionary:
@@ -926,9 +992,8 @@ func _on_AvoidanceShape_area_entered(projectile) -> void:
 	if projectile not in incoming_projectiles:
 		incoming_projectiles.append(projectile)
 	
-	#if combat_flag == false:
-		#combat_flag = true
-	#CombatTimer.start()
+	combat_flag = true
+	CombatTimer.start()
 
 func _on_AvoidanceShape_area_exited(projectile) -> void:
 	if projectile.collision_layer != 8 or projectile.is_friendly == is_friendly:
@@ -946,3 +1011,9 @@ func _on_body_entered(body):
 
 func _on_CombatTimer_timeout():
 	combat_flag = false
+
+func _on_OverloadTimer_timeout():
+	flux_overload = false
+	for weapon in all_weapons:
+			weapon.vent_flux = true
+			weapon.flux_overload = flux_overload
