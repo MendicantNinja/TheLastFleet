@@ -23,20 +23,22 @@ func create_projectile() -> PackedScene:
 
 # Damage-related stats
 @export var damage_type: data.weapon_damage_enum = data.weapon_damage_enum.KINETIC                # Type of damage (kinetic, high-explosive, energy, fragmentation)
-@export var damage_per_shot: int = 0                   # The amount of damage dealt per shot
-@export var fire_rate: float = 1.0                     # Rate of fire (shots per second). 1 shot per second is pretty slow.
+@export var damage_per_shot: int = 0                   # The amount of damage dealt per shot. Or 1 second of a continuous beam. Or the beam duration of a non-continuous beam.
+@export var fire_rate: float = 1.0                     # Rate of fire (shots per second). 1.0 = 1 shot per second. 2.0 = 2 shots per second (quicker). .5 = a shot every 2 seconds
 #@export var burst_size: int = 1                        # Number of shots in a burst, for burst-type weapons
 #@export var burst_delay: float = 0.0                   # Delay between the next burst in seconds. 
 
 # Range and Accuracy
 @export var range: float = 600                         # Maximum range of the weapon
-@export var beam: bool = false                         # Whether the weapon is a continuous beam
 @export var accuracy: float = 1.0                      # Accuracy of the weapon (0.0 = low, 1.0 = perfect)
 #@export var spread: float = 0.0                        # Spread of the weapon’s shots (applies to some projectile weapons)
 @export var turn_rate: float = 10.0                     # How fast the weapon can rotate to track targets
 
+@export var beam_duration: float = 0 # Beam Duration in Seconds
+@export var is_beam: bool = false                         # Whether the weapon is a beam/raycast
+@export var is_continuous: bool = false                   # Whether the weapon is a continuous beam/raycast. 
 # Flux-related stats
-@export var flux_per_shot: int = 0                     # Amount of flux generated per shot
+@export var flux_per_shot: int = 0                     # Amount of flux generated per shot. Or per 1/59 second of a continuous beam.
 
 # Projectile and effects
 

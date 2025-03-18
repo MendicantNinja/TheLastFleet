@@ -8,6 +8,22 @@ var speed: float = 0
 var range: int = 0
 var damage_type: int = 0
 
+# For Beams Only
+var is_beam = false
+var is_continuous = false
+var beam_duration: float
+var beam_raycast: RayCast2D = null
+var beam_line: Line2D = null
+var beam_damage_timer: Timer = null
+var weapon_slot_rotation: float
+# Can't circularly reference the weapon slot directly. So update the beam!
+
+# For Missiles Only
+var is_missile: bool = false
+var is_seeking: bool = false
+
+# For other stuff:
+var owner_rid: RID
 var ship_id: int
 var is_friendly: bool = false
 
@@ -18,21 +34,40 @@ func _ready() -> void:
 	collision_layer = 8
 	collision_mask = 15
 	self.body_entered.connect(_on_Projectile_collision)
-
+#
 func _physics_process(delta) -> void:
-	var next_position: Vector2 = transform.x * delta * speed
-	position += next_position
-	track_distance += next_position
-	if track_distance.length() >= range:
-		queue_free()
+	if is_beam == false:
+		var next_position: Vector2 = transform.x * delta * speed
+		position += next_position
+		track_distance += next_position
+		if track_distance.length() >= range:
+			queue_free()
+	elif is_beam == true:
+		var beam_end = beam_raycast.target_position  # Default to max length
+		if beam_raycast.is_colliding():
+			var target: PhysicsBody2D = beam_raycast.get_collider() # A CollisionObject2D.
+			if beam_damage_timer.is_stopped() == true:
+				#print("Emitting signal for beam weapon")
+				emit_signal("body_entered", target)
+				beam_damage_timer.start()
+			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
+		#beam_line.points[0] = start_position
+		beam_line.points[1] = beam_end
+		# Update Line2D to match the beam length
+		#update_beam(Vector2.ZERO, beam_end)
+#
+#func update_beam(start_position: Vector2, end_position: Vector2) -> void:
+	#beam_line.points[0] = start_position
+	#beam_line.points[1] = end_position
 
 # Should be called when the projectile is created in weapon.gd.
-func assign_stats(weapon: Weapon, id: int, friendly_value: bool) -> void: 
+func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void: 
 	damage = weapon.damage_per_shot
 	speed = weapon.projectile_speed
 	range = weapon.range
 	damage_type = weapon.damage_type
-	ship_id = id
+	owner_rid = rid
+	ship_id = owner_rid.get_id()
 	is_friendly = friendly_value
 	var radian_accuracy = deg_to_rad(weapon.accuracy)
 	var lower_limit = -radian_accuracy
@@ -41,11 +76,26 @@ func assign_stats(weapon: Weapon, id: int, friendly_value: bool) -> void:
 	var rand_rotation: float = randi_range(-1, 1) * randf_range(lower_limit, upper_limit)
 	spread = spread.rotated_local(rand_rotation)
 	transform = spread
+	
+	is_beam = weapon.is_beam
+	if is_beam == true:
+		#beam_collision_line = $CollisionShape2D # Beam Collision shape isn't used.
+		#beam_collision_line.shape.b.x = range # Beam collision shape distance
+		beam_duration = weapon.beam_duration
+		beam_raycast = $RayCast2D
+		beam_raycast.add_exception_rid(owner_rid)
+		beam_raycast.target_position.x = range # Beam Raycast
+		beam_line = $Line2D
+		beam_damage_timer = $beam_damage_timer
+		beam_damage_timer.wait_time = 0.05 # Emit damage call every 0.05s
+		#beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
 func _on_Projectile_collision(body) -> void:
-	var body_id: int = body.get_rid().get_id()
-	if body_id == ship_id:
+	if body == null:
+		return
+	var body_id: RID = body.get_rid()
+	if body_id == owner_rid:
 		return
 	if damage == 0:
 		push_error("No weapon detected for projectile scene. res://Scenes/CompositeGameObjects/Projectiles/RailgunProjectile.tscn")
@@ -57,5 +107,9 @@ func _on_Projectile_collision(body) -> void:
 	
 	if "hull_integrity" in body:
 		body.process_damage(self)
-		queue_free()
+		if is_beam == false:
+			queue_free()
+		#if is_continuous == false:
+			
+		
 	

@@ -58,6 +58,9 @@ var target_unit: RID = RID()
 var current_target_id: RID = RID()
 var owner_rid: RID = RID()
 
+# Special Beam Logic
+var current_beam: Projectile = null
+
 signal weapon_slot_fired(flux)
 signal target_in_range(slot, value)
 signal new_threats(targets)
@@ -79,12 +82,23 @@ func fire(ship_id: int) -> void:
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = weapon_node.global_transform
-	projectile.assign_stats(weapon, ship_id, is_friendly)
+	projectile.assign_stats(weapon, owner_rid, is_friendly)
+	
+	if projectile.is_beam == true:
+		current_beam = projectile
+		if current_beam.is_continuous == false:
+			var tween: Tween = create_tween()
+			tween.tween_property(projectile.beam_line, "modulate", Color(1, 1, 1, 0), projectile.beam_duration)
+			tween.finished.connect(func(): 
+				current_beam.queue_free()  # Free projectile after fading out
+				current_beam = null
+)
 	get_tree().current_scene.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
-	timer_fire = false
-	rate_of_fire_timer.start()
+	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
+		timer_fire = false
+		rate_of_fire_timer.start()
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
@@ -130,23 +144,16 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	# Give everything railguns in dev mode for empty weapons
 	if settings.dev_mode == true and p_weapon_slot.weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
-		
-		var new_shape: Shape2D = CircleShape2D.new()
-		new_shape.radius = weapon.range
-		effective_range_shape.shape = new_shape
-		
-		var interval_in_seconds: float = 1.0 / weapon.fire_rate
-		rate_of_fire_timer.wait_time = interval_in_seconds
 	else:
 		weapon = p_weapon_slot.weapon
-		weapon_system_group = p_weapon_slot.weapon_system_group
-		
-		var new_shape: Shape2D = CircleShape2D.new()
-		new_shape.radius = p_weapon_slot.weapon.range
-		effective_range_shape.shape = new_shape
-		
-		var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
-		rate_of_fire_timer.wait_time = interval_in_seconds
+	weapon_system_group = p_weapon_slot.weapon_system_group
+	
+	var new_shape: Shape2D = CircleShape2D.new()
+	new_shape.radius = p_weapon_slot.weapon.range
+	effective_range_shape.shape = new_shape
+	
+	var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
+	rate_of_fire_timer.wait_time = interval_in_seconds
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
 	effective_range.collision_mask = mask
@@ -313,6 +320,9 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	return target_transform
 
 func _physics_process(delta) -> void:
+	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
+		current_beam.global_transform = weapon_node.global_transform
+		#current_beam.rotation = self.rotation
 	if flux_overload == true:
 		return
 	if manual_aim:

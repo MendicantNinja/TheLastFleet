@@ -317,11 +317,28 @@ func process_damage(projectile: Projectile) -> void:
 
 	combat_flag = true
 	CombatTimer.start()
-	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
-	armor -= armor_damage_reduction
-	var hull_damage: float = armor_damage_reduction * projectile.damage
-	hull_integrity -= hull_damage
-	HullIntegrityIndicator.value = hull_integrity
+	# Beam damage logic is a little bit different than normal projectiles
+	if projectile.is_beam == true:
+		#print("projectile beam process damage was called")
+		# Armor should be done differently with beams. Probably. Playtesting needed.
+		var beam_projectile_divisor: int = projectile.beam_duration / .05
+		var beam_projectile_damage: int = int(projectile.damage/beam_projectile_divisor)
+		print(beam_projectile_damage)
+		var armor_damage_reduction: float = projectile.damage / (beam_projectile_damage + armor)
+		armor -= armor_damage_reduction
+		#armor_damage_reduction = 1
+		var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+		hull_integrity -= hull_damage
+		HullIntegrityIndicator.value = hull_integrity
+		
+	elif projectile.is_beam == false:
+		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+		armor -= armor_damage_reduction
+		
+		var hull_damage: float = armor_damage_reduction * projectile.damage
+		hull_integrity -= hull_damage
+		HullIntegrityIndicator.value = hull_integrity
+	
 	if hull_integrity <= 0.0:
 		destroy_ship()
 	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
