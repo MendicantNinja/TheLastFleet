@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://cm8kl24pqccpl"]
+
+[ext_resource type="Script" path="res://Scripts/HelloWorld.cs" id="1_gyamj"]
+
+[node name="Node" type="Node"]
+script = ExtResource("1_gyamj")

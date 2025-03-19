@@ -1,4 +1,4 @@
-[gd_scene load_steps=36 format=3 uid="uid://cf6c7tbx8uxio"]
+[gd_scene load_steps=37 format=3 uid="uid://cf6c7tbx8uxio"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_qqye5"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="14_krkqi"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="16_t74ra"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="17_vx6dc"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Leaves/bt_action.gd" id="18_vwop7"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_xdvy0"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_47bbe"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/velocity_matching.gd" id="19_k1mub"]
@@ -123,7 +124,7 @@ script = ExtResource("14_krkqi")
 script = ExtResource("16_t74ra")
 
 [node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("17_vx6dc")
+script = ExtResource("18_vwop7")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_4n4rr")
