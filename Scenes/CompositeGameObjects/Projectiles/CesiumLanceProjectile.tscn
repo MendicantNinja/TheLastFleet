@@ -25,3 +25,4 @@ texture_mode = 2
 round_precision = 4
 
 [node name="beam_damage_timer" type="Timer" parent="."]
+one_shot = true

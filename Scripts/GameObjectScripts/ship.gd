@@ -323,11 +323,12 @@ func process_damage(projectile: Projectile) -> void:
 		# Armor should be done differently with beams. Probably. Playtesting needed.
 		var beam_projectile_divisor: int = projectile.beam_duration / .05
 		var beam_projectile_damage: int = int(projectile.damage/beam_projectile_divisor)
-		print(beam_projectile_damage)
-		var armor_damage_reduction: float = projectile.damage / (beam_projectile_damage + armor)
+		#print(beam_projectile_damage)
+		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
 		armor -= armor_damage_reduction
 		#armor_damage_reduction = 1
 		var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+		#print(hull_damage)
 		hull_integrity -= hull_damage
 		HullIntegrityIndicator.value = hull_integrity
 		

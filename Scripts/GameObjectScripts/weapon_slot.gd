@@ -87,12 +87,10 @@ func fire(ship_id: int) -> void:
 	if projectile.is_beam == true:
 		current_beam = projectile
 		if current_beam.is_continuous == false:
-			var tween: Tween = create_tween()
-			tween.tween_property(projectile.beam_line, "modulate", Color(1, 1, 1, 0), projectile.beam_duration)
-			tween.finished.connect(func(): 
-				current_beam.queue_free()  # Free projectile after fading out
-				current_beam = null
-)
+			current_beam.projectile_freed.connect(func():
+				current_beam = null  # Clear reference after projectile is freed
+			)
+	
 	get_tree().current_scene.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	

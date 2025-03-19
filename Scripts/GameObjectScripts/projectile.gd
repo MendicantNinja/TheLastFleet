@@ -18,7 +18,7 @@ var beam_damage_timer: Timer = null
 var weapon_slot_rotation: float
 # Can't circularly reference the weapon slot directly. So update the beam!
 
-# For Missiles Only
+# For Missiles and Tracking Projectiles Only
 var is_missile: bool = false
 var is_seeking: bool = false
 
@@ -26,6 +26,8 @@ var is_seeking: bool = false
 var owner_rid: RID
 var ship_id: int
 var is_friendly: bool = false
+
+signal projectile_freed
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
@@ -51,6 +53,7 @@ func _physics_process(delta) -> void:
 				emit_signal("body_entered", target)
 				beam_damage_timer.start()
 			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
+
 		#beam_line.points[0] = start_position
 		beam_line.points[1] = beam_end
 		# Update Line2D to match the beam length
@@ -88,6 +91,13 @@ func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void:
 		beam_line = $Line2D
 		beam_damage_timer = $beam_damage_timer
 		beam_damage_timer.wait_time = 0.05 # Emit damage call every 0.05s
+		if is_continuous == false:
+			var tween: Tween = create_tween()
+			tween.tween_property(beam_line, "modulate", Color(1, 1, 1, 0), beam_duration)
+			tween.finished.connect(func(): 
+				queue_free()  # Free projectile after fading out
+				emit_signal("projectile_freed")  # Emit signal after freeing
+)
 		#beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
