@@ -18,8 +18,14 @@ func _ready():
 	%All.pressed.connect(self.on_all_pressed)
 	%Cancel.pressed.connect(self.on_cancel_pressed)
 	%Deploy.pressed.connect(self.deploy_ships)
+	connect_buttons_lazy()
 	pass
 
+func connect_buttons_lazy() -> void:
+	for child in $"../HBoxContainer".get_children():
+		if child is TextureButton:
+			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
+			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 # Reset this when a ship moves off of it's deployment position.
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -40,6 +46,16 @@ func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
 		ships_to_deploy[this_icon.index] = null
 
 func deploy_ships() -> void:
+	var check_flag: bool = false
+	for ship_icon in ships_to_deploy:
+		if ship_icon != null:
+			if ship_icon.disabled == false:
+				check_flag = true
+				break
+	if check_flag == false:
+		on_cancel_pressed() # Hide menu after deploying ships
+		return
+
 	var instantiated_units: Array = []
 	reset_deployment_position()
 	var iterator: int = 0

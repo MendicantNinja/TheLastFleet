@@ -1,37 +1,29 @@
-[gd_scene load_steps=19 format=3 uid="uid://cw88yegmucgbv"]
+[gd_scene load_steps=27 format=3 uid="uid://cw88yegmucgbv"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
-[ext_resource type="PackedScene" uid="uid://chlj4nfewaemy" path="res://Scenes/CompositeGameObjects/CombatBehaviorTree.tscn" id="2_xsemy"]
-[ext_resource type="Texture2D" uid="uid://cey2s4hiuicmi" path="res://Art/CombatGUIArt/TacticalMapArt/manual_control_indicator.png" id="2_yacd8"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="3_b8p4t"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="5_v4g3k"]
-[ext_resource type="Texture2D" uid="uid://d4hbj5jccdfk5" path="res://Art/CombatGUIArt/ship_targetted.png" id="6_ufc28"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="6_26ar5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/dynamic_avoidance.gd" id="7_3duk1"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="7_s3gj3"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="7_thatc"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="8_5vb6y"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="8_nukju"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="8_tdgqp"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/identify_nearby_units.gd" id="9_3c2b1"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="9_rp377"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="9_w68pg"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="11_sglsp"]
 [ext_resource type="Texture2D" uid="uid://d16fx4bx6tgo5" path="res://Art/ShipArt/ship1enginerefinedsmall.png" id="12_6r768"]
 [ext_resource type="Texture2D" uid="uid://drdsc7g0vup4b" path="res://Art/ShipArt/ship1livery.png" id="13_bdbdv"]
-[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="16_roh2q"]
-[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="17_j44wp"]
-[ext_resource type="Texture2D" uid="uid://doewdp3hp2q71" path="res://Art/CombatGUIArt/ManualControlHUDArt/combatHUDdetail.png" id="20_7ssvb"]
-[ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="20_n3gvt"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="14_iuljg"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="15_2o5di"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="17_lxwef"]
+[ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_d5m22"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
-
-[sub_resource type="Gradient" id="Gradient_nks55"]
-offsets = PackedFloat32Array(0.237705, 1)
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_47ww1"]
-gradient = SubResource("Gradient_nks55")
-width = 10
-
-[sub_resource type="Gradient" id="Gradient_lqjnm"]
-offsets = PackedFloat32Array(1)
-colors = PackedColorArray(1, 1, 1, 1)
-
-[sub_resource type="GradientTexture1D" id="GradientTexture1D_17qoa"]
-gradient = SubResource("Gradient_lqjnm")
-width = 10
 
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
@@ -102,147 +94,7 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 process_callback = 0
 wait_time = 4.0
 
-[node name="OverloadTimer" type="Timer" parent="."]
-
-[node name="CenterCombatHUD" type="Control" parent="."]
-top_level = true
-layout_mode = 3
-anchors_preset = 0
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="ConstantSizedGUI" type="Control" parent="CenterCombatHUD"]
-modulate = Color(0.25098, 1, 0, 0.784314)
-z_index = 1
-anchors_preset = 0
-
-[node name="HardFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_left = 71.0
-offset_top = -80.0
-offset_right = 171.0
-offset_bottom = -70.0
-scale = Vector2(0.75, 0.75)
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_47ww1")
-
-[node name="SoftFluxIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
-physics_interpolation_mode = 0
-show_behind_parent = true
-texture_filter = 1
-layout_mode = 0
-offset_right = 100.0
-offset_bottom = 10.0
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_47ww1")
-
-[node name="BarOutliner" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
-layout_mode = 0
-offset_top = -2.0
-offset_right = 102.0
-offset_bottom = 12.0
-texture = ExtResource("16_roh2q")
-stretch_mode = 2
-
-[node name="FluxPip" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
-layout_mode = 0
-offset_left = -2.0
-offset_top = -4.0
-offset_right = 4.0
-offset_bottom = 14.0
-texture = ExtResource("17_j44wp")
-
-[node name="Label" type="Label" parent="CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -54.6667
-offset_top = -2.66667
-offset_right = 4.33333
-offset_bottom = 18.3333
-theme = ExtResource("20_n3gvt")
-theme_override_font_sizes/font_size = 10
-text = "FLUX"
-
-[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="CenterCombatHUD/ConstantSizedGUI"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_left = 71.0
-offset_top = -63.0
-offset_right = 171.0
-offset_bottom = -53.0
-scale = Vector2(0.75, 0.75)
-nine_patch_stretch = true
-texture_progress = SubResource("GradientTexture1D_17qoa")
-
-[node name="BarOutLiner2" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator"]
-layout_mode = 0
-offset_top = -2.0
-offset_right = 104.0
-offset_bottom = 12.0
-texture = ExtResource("16_roh2q")
-stretch_mode = 2
-
-[node name="Label" type="Label" parent="CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator"]
-texture_filter = 1
-layout_mode = 0
-offset_left = -54.6667
-offset_top = -2.66667
-offset_right = 5.33329
-offset_bottom = 21.3333
-theme = ExtResource("20_n3gvt")
-theme_override_font_sizes/font_size = 10
-text = "HULL"
-
-[node name="IndicatorDecor" type="TextureRect" parent="CenterCombatHUD/ConstantSizedGUI"]
-self_modulate = Color(1, 1, 1, 0.588235)
-layout_mode = 0
-offset_top = -48.0
-offset_right = 130.0
-offset_bottom = -8.0
-scale = Vector2(1.2, 1.2)
-texture = ExtResource("20_7ssvb")
-stretch_mode = 2
-
-[node name="ShipTargetIcon" type="TextureRect" parent="CenterCombatHUD"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-texture = ExtResource("6_ufc28")
-
-[node name="ManualControlIndicator" type="TextureRect" parent="CenterCombatHUD"]
-physics_interpolation_mode = 0
-texture_filter = 1
-layout_mode = 0
-offset_right = 34.0
-offset_bottom = 30.0
-texture = ExtResource("2_yacd8")
-
-[node name="TacticalMapIcon" type="TextureButton" parent="CenterCombatHUD"]
-visible = false
-self_modulate = Color(1, 1, 1, 0.588235)
-z_index = 1
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -36.0
-offset_top = -36.0
-offset_right = -4.0
-offset_bottom = -4.0
-grow_horizontal = 2
-grow_vertical = 2
-focus_mode = 0
-mouse_filter = 2
-action_mode = 0
-button_mask = 0
-stretch_mode = 0
+[node name="CenterCombatHUD" parent="." instance=ExtResource("24_d5m22")]
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]

@@ -24,4 +24,3 @@ accuracy = 2.0
 turn_rate = 10.0
 flux_per_shot = 50
 dps = 0
-flux_per_second = 0

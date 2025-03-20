@@ -11,15 +11,15 @@ class_name Ship
 @onready var TacticalCamera = null
 
 @onready var ManualControlHUD = null
-@onready var CenterCombatHUD = $CenterCombatHUD
-@onready var ConstantSizedGUI = $CenterCombatHUD/ConstantSizedGUI
-@onready var SoftFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/SoftFluxIndicator
-@onready var HardFluxIndicator = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator
-@onready var HullIntegrityIndicator = $CenterCombatHUD/ConstantSizedGUI/HullIntegrityIndicator
-@onready var FluxPip = $CenterCombatHUD/ConstantSizedGUI/HardFluxIndicator/FluxPip
-@onready var ManualControlIndicator = $CenterCombatHUD/ManualControlIndicator
-@onready var ShipTargetIcon = $CenterCombatHUD/ShipTargetIcon
-@onready var OldTacticalMapIcon = $CenterCombatHUD/TacticalMapIcon
+@onready var CenterCombatHUD: Control = $CenterCombatHUD
+@onready var ConstantSizedGUI = CenterCombatHUD.ConstantSizedGUI
+@onready var SoftFluxIndicator = CenterCombatHUD.SoftFluxIndicator
+@onready var HardFluxIndicator = CenterCombatHUD.HardFluxIndicator
+@onready var HullIntegrityIndicator = CenterCombatHUD.HullIntegrityIndicator
+@onready var FluxPip = CenterCombatHUD.FluxPip
+@onready var ManualControlIndicator = CenterCombatHUD.ManualControlIndicator
+@onready var ShipTargetIcon = CenterCombatHUD.ShipTargetIcon
+
 var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
 var TacticalDataDrawing: Node2D 
@@ -41,7 +41,7 @@ var speed: float = 0.0
 var hull_integrity: float = 0.0
 var armor: float = 0.0
 var shield_radius: float = 0.0
-var total_flux: float = 0.0
+var total_flux: float = 0.0 # Flux Capacity
 var soft_flux: float = 0.0
 var hard_flux: float = 0.0
 var shield_upkeep: float = 0.0
@@ -139,19 +139,20 @@ var match_velocity_flag: bool = false
 # Used for navigation and movement
 var time: float = 0.0
 var zero_flux_bonus: float = 0.0
+var zero_flux_bonus_flag = true
 var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO
 var acceleration: Vector2 = Vector2.ZERO
 var target_position: Vector2 = Vector2.ZERO
 var ship_select: bool = false:
+	# Ship Select is for individual ships when they're the only ships
 	set(value):
 		if value == true: 
-			tactical_map_icon._toggled(value)
 			ship_select = value
 		elif value == false:
-			tactical_map_icon._toggled(value)
 			ship_select = value
+		print("ship select called", ship_select)
 		ship_selected.emit()
 var collision_flag: bool = false
 
@@ -317,7 +318,6 @@ func _ready() -> void:
 	#furthest_safe_distance += longest_range_weapon.weapon.range
 	set_combat_ai(true)
 	deploy_ship()
-	self.input_event.connect(_on_input_event)
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
 
@@ -341,11 +341,29 @@ func process_damage(projectile: Projectile) -> void:
 
 	combat_flag = true
 	CombatTimer.start()
-	var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
-	armor -= armor_damage_reduction
-	var hull_damage: float = armor_damage_reduction * projectile.damage
-	hull_integrity -= hull_damage
-	HullIntegrityIndicator.value = hull_integrity
+	# Beam damage logic is a little bit different than normal projectiles
+	if projectile.is_beam == true:
+		#print("projectile beam process damage was called")
+		# Armor should be done differently with beams. Probably. Playtesting needed.
+		var beam_projectile_divisor: int = projectile.beam_duration / .05
+		var beam_projectile_damage: int = int(projectile.damage/beam_projectile_divisor)
+		#print(beam_projectile_damage)
+		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+		armor -= armor_damage_reduction
+		#armor_damage_reduction = 1
+		var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+		#print(hull_damage)
+		hull_integrity -= hull_damage
+		HullIntegrityIndicator.value = hull_integrity
+		
+	elif projectile.is_beam == false:
+		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+		armor -= armor_damage_reduction
+		
+		var hull_damage: float = armor_damage_reduction * projectile.damage
+		hull_integrity -= hull_damage
+		HullIntegrityIndicator.value = hull_integrity
+	
 	if hull_integrity <= 0.0:
 		destroy_ship()
 	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
@@ -444,9 +462,6 @@ func update_flux_indicators() -> void:
 	SoftFluxIndicator.position.x = HardFluxIndicator.value
 	FluxPip.position.x = HardFluxIndicator.value - 2
 
-func display_icon(value: bool) -> void:
-	OldTacticalMapIcon.visible = value
-
 # Units/Groups
 
 func group_remove(n_group_name: StringName) -> void:
@@ -499,7 +514,7 @@ func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 
 # Any generic input event.
 func _input(event: InputEvent) -> void:
-	if TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
+	if TacticalMapLayer == null or TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
 		return
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("m2") and manual_control:
@@ -511,15 +526,10 @@ func _input(event: InputEvent) -> void:
 	elif event is InputEventKey:
 		pass
 		#if is_friendly:
-			#if (event.keycode == KEY_T and event.pressed) and ship_select and TacticalCamera.enabled:
-				#toggle_manual_control()
 			#elif (event.keycode == KEY_C and event.pressed) and manual_control:
 				#toggle_auto_aim(all_weapons)
 			#elif (event.keycode == KEY_V and event.pressed) and manual_control:
 				#toggle_auto_fire(all_weapons)
-			#if (event.keycode == KEY_TAB and event.pressed) and manual_control:
-				#toggle_manual_control()
-				#camera_removed.emit()
 		if not is_friendly: # for non-player/enemy ships
 			if (event.keycode == KEY_R and event.pressed) and not mouse_hover:
 				targeted = false
@@ -535,11 +545,6 @@ func toggle_ship_select() -> void:
 			ship_select = true # select ship
 	elif is_friendly and ship_select:
 			ship_select = false # deselect ship
-
-func _on_input_event(viewport: Viewport, event: InputEvent, shape_idx: int) -> void:
-	if event is InputEventMouseButton:
-		if Input.is_action_pressed("alt_select") and Input.is_action_just_pressed("select"):
-			alt_select.emit()
 
 func _on_mouse_entered() -> void:
 	if TacticalMapLayer.visible:
@@ -560,9 +565,7 @@ func _on_mouse_exited() -> void:
 
 func highlight_selection(select_value: bool = false) -> void:
 	#print("%s is highlighted? %s" % [name, select_value])
-	tactical_map_icon._toggled(select_value)
-	OldTacticalMapIcon.toggle_mode = select_value
-	OldTacticalMapIcon.button_pressed = select_value
+	tactical_map_icon.highlight_selection(select_value)
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:
@@ -642,6 +645,8 @@ func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 		return
 	
 	var ship_id = get_rid().get_id()
+	if (total_flux - (hard_flux + soft_flux)) < weapon_slot.weapon.flux_per_shot:
+		return  # Correct indentation
 	weapon_slot.fire(ship_id)
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
@@ -692,7 +697,7 @@ func _physics_process(delta: float) -> void:
 			set_shields(false)
 		
 		if soft_flux > flux_to_dissipate: 
-			#print("dissipating soft flux", soft_flux)
+			#print("dissipating soft_flux", soft_flux)
 			soft_flux -= flux_to_dissipate
 		# Dissipate hardflux and soft flux if you have some soft flux, but some flux dissipation that dips into hardflux.
 		elif soft_flux < flux_to_dissipate and soft_flux > 0.0:
@@ -799,7 +804,7 @@ func _physics_process(delta: float) -> void:
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0
-	if (soft_flux + hard_flux) == 0.0 and speed_modifier != zero_flux_bonus:
+	if zero_flux_bonus_flag == true:
 		speed_modifier += zero_flux_bonus
 	
 	velocity = (ship_stats.acceleration + ship_stats.bonus_acceleration + speed_modifier) * time

@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://b3k6jwtq4mk2w"]
+[gd_scene load_steps=9 format=3 uid="uid://b3k6jwtq4mk2w"]
 
 [ext_resource type="Texture2D" uid="uid://cgn6wt6ynxran" path="res://Art/ProjectileArt/mazen's projectiles/smoke.png" id="1_w0ifs"]
 
@@ -8,7 +8,13 @@ colors = PackedColorArray(1, 1, 1, 0.803922, 1, 1, 1, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_tk8xg"]
 gradient = SubResource("Gradient_ju12f")
 
+[sub_resource type="Curve" id="Curve_oxoqc"]
+max_value = 100.0
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 1), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [sub_resource type="CurveTexture" id="CurveTexture_iqvya"]
+curve = SubResource("Curve_oxoqc")
 
 [sub_resource type="Curve" id="Curve_hbh27"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.995434, 0.043956), 0.0, 0.0, 0, 0]

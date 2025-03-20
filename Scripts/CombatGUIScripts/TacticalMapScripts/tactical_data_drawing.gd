@@ -58,6 +58,12 @@ func _ready():
 	#%TacticalMapCamera.limit_bottom = TacticalMapBackground.size.x * 2
 	setup()
 	queue_redraw()
+	
+	for child in $"../../../ButtonList".get_children():
+		if child is TextureButton:
+			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
+			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
+	
 	#stress_testing()
 	pass # Replace with function body.
 
@@ -88,15 +94,18 @@ func _unhandled_input(event) -> void:
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 		if Input.is_action_pressed("take_manual_control") and TacticalCamera.enabled and prev_selected_ship != null:
 			#if self.visible:
+			$"../../../ButtonList/ManualControlButton".emit_signal("pressed")
 			switch_maps.emit()
 			reset_box_selection()
 			if manually_controlled_ship != null:
+				# Turn off MC for the old ship.
 				manually_controlled_ship.toggle_manual_control()
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
 			manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
+			$"../../../ButtonList/CameraFeedButton".emit_signal("pressed")
 			switch_maps.emit()
 			reset_box_selection()
 			camera_feed_active = true
@@ -273,9 +282,7 @@ func _draw():
 #8""88888P'  o888ooooood8 o888ooooood8 o888ooooood8  `Y8bood8P'      o888o     
 																		
 																		  
-# What methods have changed?
 func select_units() -> void:
-	
 	var size: Vector2 = abs(box_selection_end - box_selection_start)
 	var area_position: Vector2 = get_rect_start_position()
 	
@@ -293,7 +300,7 @@ func select_units() -> void:
 		get_tree().call_group(highlight_group_name, "group_remove", highlight_group_name)
 		current_group_name = &""
 		return
-	
+	globals.play_gui_audio_string("selected")
 	var past_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	for ship in past_group:
 		if not ship in selection and ship.is_friendly and attack_group == false:
@@ -350,9 +357,8 @@ func reset_box_selection() -> void:
 	
 
 func _on_unit_selected(unit: Ship) -> void:
-	#print("on unit selected")
+	print("on unit selected")
 	get_viewport().set_input_as_handled()
-	
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:
 		if unit.group_leader == true:
@@ -386,7 +392,7 @@ func process_move(to_position: Vector2) -> void:
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	if highlighted_group.size() == 0:
 		return
-	
+	globals.play_gui_audio_string("order")
 	var group_leaders: Array = []
 	for unit in highlighted_group:
 		if unit.group_leader:
@@ -471,6 +477,7 @@ func attack_targets() -> void:
 	var leader = null
 	# Alt select and select_units causes a multitude of problems I can't bother to fix.
 	if not existing_group.is_empty():
+		globals.play_gui_audio_string("attack")
 		for unit in existing_group:
 			if unit.group_leader == true:
 				leader = unit
@@ -532,7 +539,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
-	#print("alt select called")
+	print("alt select called")
 	if not visible:
 		return
 	

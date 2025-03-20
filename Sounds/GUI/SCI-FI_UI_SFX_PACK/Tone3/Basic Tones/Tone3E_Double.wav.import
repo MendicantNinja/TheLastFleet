@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://bowfuk37873yd"
+path="res://.godot/imported/Tone3E_Double.wav-c2471cc95fcfa1d7541be3d58ca87804.sample"
+
+[deps]
+
+source_file="res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Tone3/Basic Tones/Tone3E_Double.wav"
+dest_files=["res://.godot/imported/Tone3E_Double.wav-c2471cc95fcfa1d7541be3d58ca87804.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=0

@@ -13,6 +13,76 @@ enum GOAL{
 	CONTROL,
 }
 
+var gui_sounds: Dictionary = {
+	&"select": AudioStreamPlayer.new(),
+	&"hover": AudioStreamPlayer.new(),
+	&"confirm": AudioStreamPlayer.new(),
+	&"cancel": AudioStreamPlayer.new(),
+	&"drag": AudioStreamPlayer.new(),
+	
+	# Combat-Specific GUI Noises
+	&"order": AudioStreamPlayer.new(),
+	&"cancelorder": AudioStreamPlayer.new(),
+	&"attack": AudioStreamPlayer.new(),
+	&"selected": AudioStreamPlayer.new()
+}
+
+func _ready():
+	# Audio
+	var select: AudioStreamPlayer = gui_sounds.get("select")
+	select.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Clicks/High_Click_1.wav")
+	add_child(select)
+
+	var hover: AudioStreamPlayer = gui_sounds.get("hover")
+	hover.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Clicks/Click_1.wav")
+	add_child(hover)
+	
+	var confirm: AudioStreamPlayer = gui_sounds.get("confirm")
+	confirm.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Click Combos/Click_Combo_4.wav")
+	add_child(confirm)
+	
+	var cancel: AudioStreamPlayer = gui_sounds.get("cancel")
+	cancel.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Glitches/Glitch_7.wav")
+	add_child(cancel)
+	
+	var drag: AudioStreamPlayer = gui_sounds.get("drag")
+	drag.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Clicks/Click.wav")
+	add_child(drag)
+	
+	var order: AudioStreamPlayer = gui_sounds.get("order")
+	order.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Rings/Ring_Pitched_Down.wav")
+	add_child(order)
+	
+	var cancel_order: AudioStreamPlayer = gui_sounds.get("cancelorder")
+	cancel_order.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Glitches/Glitch_11.wav")
+	add_child(cancel_order)
+	
+	var attack: AudioStreamPlayer = gui_sounds.get("attack")
+	attack.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Glitches/Glitch_13.wav")
+	add_child(attack)
+	
+	var selected: AudioStreamPlayer = gui_sounds.get("selected")
+	selected.stream = load("res://Sounds/GUI/SCI-FI_UI_SFX_PACK/Rings/Ring_Pitched_Up.wav")
+	add_child(selected)
+
+func play_gui_audio_string(string: StringName = "select") -> void:
+	var pitch_range: float = .2
+	var audio_stream_player: AudioStreamPlayer = gui_sounds.get(string)
+	audio_stream_player.pitch_scale = 1 * randf_range(1-pitch_range, 1+pitch_range)
+	audio_stream_player.play()
+
+func play_gui_audio_pitched(sound: AudioStream)-> void:
+	# Universal Setup
+	var pitch_range: float = .2
+	var audio_stream_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
+	audio_stream_player.autoplay = true
+	audio_stream_player.pitch_scale = audio_stream_player.pitch_scale * randf_range(1-pitch_range, 1+pitch_range)
+	#audio_stream_player.max_distance = 1600
+	# Variable Setup
+	audio_stream_player.stream = sound #randomize later on if we do multiple samples
+	#audio_stream_player.position = position
+	audio_stream_player.volume_db = settings.sound_effect_volume
+
 func play_audio_pitched(sound: AudioStream, position: Vector2 ) -> void:
 	# Universal Setup
 	var audio_stream_player: AudioStreamPlayer2D = AudioStreamPlayer2D.new()
@@ -190,8 +260,6 @@ func box_formation_offset_positions(leader, radius, separation) -> Array:
 	return offsets
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

@@ -131,14 +131,15 @@ var ship_system_dictionary: Dictionary = {
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 																										 
+# PLEASE READ: Adding entries to the middle of an enum breaks everything else due to numbers being shifted. Godot's fault.
 enum weapon_enum {
-	AUTOCANNON,
-	CBEAM,
-	NIKEMISSILEMMEDIUM,
-	RAILGUN,
-	COMBATLASER,
-	NIKEMISSILE,
-	EMPTY
+	AUTOCANNON = 0,
+	CBEAM = 1,
+	NIKEMISSILEMMEDIUM = 2,
+	RAILGUN = 3,
+	COMBATLASER = 4,
+	NIKEMISSILE = 5,
+	EMPTY = 6,
 }
 
 var weapon_dictionary: Dictionary = {
