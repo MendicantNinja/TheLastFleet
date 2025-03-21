@@ -8,6 +8,7 @@ class_name WeaponSlot
 @onready var effective_range: Area2D = $EffectiveRange
 @onready var weapon_node: Node2D = $WeaponNode
 @onready var rate_of_fire_timer: Timer = $ROFTimer
+@onready var ContinuousFluxTimer = $ContinuousFluxTimer
 
 # Important Stuff
 @export var weapon_system_group: int = -1
@@ -39,7 +40,11 @@ var auto_fire: bool = false
 var can_look_at: bool = false
 var timer_fire: bool = false
 var can_fire: bool = false
-var flux_overload: bool = false
+var flux_overload: bool = false: 
+	set(value):
+		flux_overload = value
+		if flux_overload == true:
+			stop_continuous_beam()
 var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
@@ -66,9 +71,9 @@ signal target_in_range(slot, value)
 signal new_threats(targets)
 signal threat_exited(targets)
 
-# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
+# Called to spew forth a --> SINGLE <-- projectile (or beam) scene from the given Weapon in the WeaponSlot.
 func fire(ship_id: int) -> void:
-	if flux_overload == true or timer_fire == false:
+	if flux_overload == true or timer_fire == false or current_beam != null:
 		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return
@@ -90,13 +95,20 @@ func fire(ship_id: int) -> void:
 			current_beam.projectile_freed.connect(func():
 				current_beam = null  # Clear reference after projectile is freed
 			)
-	
+		else:
+			ContinuousFluxTimer.start() # Flux per second for continuous beams.
 	get_tree().current_scene.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
 	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
 		rate_of_fire_timer.start()
+
+func stop_continuous_beam() -> void:
+	ContinuousFluxTimer.stop()
+	if current_beam != null:
+		current_beam.queue_free()
+		current_beam = null 
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
@@ -136,6 +148,11 @@ func _ready():
 	
 	effective_range.body_entered.connect(_on_EffectiveRange_entered)
 	effective_range.body_exited.connect(_on_EffectiveRange_exited)
+	
+	if weapon.is_continuous:
+		ContinuousFluxTimer.timeout.connect(func():  # Example value, replace with actual flux
+			emit_signal("weapon_slot_fired", weapon.flux_per_shot)
+	)
 
 func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	weapon_system_group = 0 # Index of 0 = weapon system 1
@@ -165,6 +182,8 @@ func set_auto_fire(fire_value: bool) -> void:
 	auto_fire = fire_value
 	if fire_value == false:
 		manual_aim = true
+	if weapon.is_continuous == true:
+		stop_continuous_beam()
 
 func set_auto_aim(aim_value: bool) -> void:
 	auto_aim = aim_value
@@ -320,7 +339,7 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 func _physics_process(delta) -> void:
 	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
 		current_beam.global_transform = weapon_node.global_transform
-		#current_beam.rotation = self.rotation
+	
 	if flux_overload == true:
 		return
 	if manual_aim:

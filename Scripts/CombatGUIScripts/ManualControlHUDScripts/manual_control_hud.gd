@@ -78,41 +78,49 @@ func _unhandled_key_input(event) -> void:
 				weapon_system_scene_list[7].toggle_autofire_pip()
 		if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[0]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[1].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[1]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[2].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[2]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[3].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[3]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[4].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[4]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[5].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[5]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[6].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[6]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 		elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7].weapon_system_reference != null):
 			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
 			current_ship.selected_weapon_system = weapon_system_scene_list[7].weapon_system_reference
 			selected_weapon_system_scene = weapon_system_scene_list[7]
 			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)

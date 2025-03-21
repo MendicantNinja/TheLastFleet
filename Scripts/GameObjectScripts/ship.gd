@@ -321,16 +321,29 @@ func process_damage(projectile: Projectile) -> void:
 	if projectile.is_beam == true:
 		#print("projectile beam process damage was called")
 		# Armor should be done differently with beams. Probably. Playtesting needed.
-		var beam_projectile_divisor: int = projectile.beam_duration / .05
-		var beam_projectile_damage: int = int(projectile.damage/beam_projectile_divisor)
-		#print(beam_projectile_damage)
-		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
-		armor -= armor_damage_reduction
-		#armor_damage_reduction = 1
-		var hull_damage: float = armor_damage_reduction * beam_projectile_damage
-		#print(hull_damage)
-		hull_integrity -= hull_damage
-		HullIntegrityIndicator.value = hull_integrity
+		if projectile.is_continuous == false:
+			var beam_projectile_divisor: int = .05/projectile.beam_duration # Inverse and multiply is quicker than 2x division.
+			var beam_projectile_damage: int = int(projectile.damage * beam_projectile_divisor)
+			#print(beam_projectile_damage)
+			var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+			armor -= armor_damage_reduction
+			#armor_damage_reduction = 1
+			var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+			#print(hull_damage)
+			hull_integrity -= hull_damage
+			HullIntegrityIndicator.value = hull_integrity
+		else:
+			#var beam_projectile_divisor: int = 1 / .05
+			var beam_projectile_damage: int = int(projectile.damage * .05 )
+			#print(beam_projectile_damage)
+			var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+			armor -= armor_damage_reduction
+			#armor_damage_reduction = 1
+			var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+			#print(hull_damage)
+			hull_integrity -= hull_damage
+			HullIntegrityIndicator.value = hull_integrity
+		
 		
 	elif projectile.is_beam == false:
 		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
@@ -482,6 +495,8 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
 		if Input.is_action_just_pressed("m2") and manual_control:
 			toggle_shield()
+		if event.is_action_released("select"):
+				stop_firing_beams(selected_weapon_system.weapons)
 		elif Input.is_action_just_pressed("zoom in") and manual_control and zoom_value < zoom_in_limit:
 			zoom_value += Vector2(0.01, 0.01)
 		elif Input.is_action_just_pressed("zoom out") and manual_control and zoom_value > zoom_out_limit:
@@ -601,7 +616,7 @@ func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
 func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	var ship_id = get_rid().get_id()
 	if (total_flux - (hard_flux + soft_flux)) < weapon_slot.weapon.flux_per_shot:
-		return  # Correct indentation
+		return 
 	weapon_slot.fire(ship_id)
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
@@ -616,6 +631,12 @@ func toggle_auto_aim(weapon_system: Array[WeaponSlot]) -> void:
 func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_fire()
+
+func stop_firing_beams(weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		if weapon_slot.weapon.is_continuous == true:
+			weapon_slot.stop_continuous_beam()
+	pass
 
 func set_navigation_position(to_position: Vector2) -> void:
 	if targeted_units.is_empty() == false:
@@ -755,10 +776,7 @@ func _physics_process(delta: float) -> void:
 			if manual_camera_freelook == false:
 				CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	
-	elif shield_toggle == true and (flux_overload == true or vent_flux_flag == true):
-		set_shields(false)
-	
+
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0

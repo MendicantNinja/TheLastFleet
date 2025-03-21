@@ -47,7 +47,7 @@ func _physics_process(delta) -> void:
 	elif is_beam == true:
 		var beam_end = beam_raycast.target_position  # Default to max length
 		if beam_raycast.is_colliding():
-			var target: PhysicsBody2D = beam_raycast.get_collider() # A CollisionObject2D.
+			var target = beam_raycast.get_collider()
 			if beam_damage_timer.is_stopped() == true:
 				#print("Emitting signal for beam weapon")
 				emit_signal("body_entered", target)
@@ -81,6 +81,7 @@ func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void:
 	transform = spread
 	
 	is_beam = weapon.is_beam
+	is_continuous = weapon.is_continuous
 	if is_beam == true:
 		#beam_collision_line = $CollisionShape2D # Beam Collision shape isn't used.
 		#beam_collision_line.shape.b.x = range # Beam collision shape distance
