@@ -55,7 +55,6 @@ func shield_parameters(type: int, radius: float, collision_layer: int, id: int) 
 	queue_redraw()
 
 func _on_Shields_entered(projectile: Projectile) -> void:
-	print("on_shields_entered ", projectile.is_continuous)
 	if not projectile is Projectile:
 		return
 	

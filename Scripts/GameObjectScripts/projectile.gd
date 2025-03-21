@@ -53,15 +53,7 @@ func _physics_process(delta) -> void:
 				emit_signal("body_entered", target)
 				beam_damage_timer.start()
 			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
-
-		#beam_line.points[0] = start_position
 		beam_line.points[1] = beam_end
-		# Update Line2D to match the beam length
-		#update_beam(Vector2.ZERO, beam_end)
-#
-#func update_beam(start_position: Vector2, end_position: Vector2) -> void:
-	#beam_line.points[0] = start_position
-	#beam_line.points[1] = end_position
 
 # Should be called when the projectile is created in weapon.gd.
 func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void: 
