@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cf5u16ev0jmep"]
+
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map_ship_icon_friendly.gdshader" id="1_e3ueh"]
+
+[resource]
+shader = ExtResource("1_e3ueh")
+shader_parameter/hologram_color = Vector4(0.5, 1, 0.6, 1)
+shader_parameter/grid_scale = 20.0
+shader_parameter/glow_intensity = 0.4
+shader_parameter/flicker_intensity = 0.1
+shader_parameter/time_speed = 1.0

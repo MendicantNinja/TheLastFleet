@@ -16,6 +16,7 @@ disabled = true
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, 0)
 collision_mask = 15
+collide_with_areas = true
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PackedVector2Array(0, 0, 572.718, 0)

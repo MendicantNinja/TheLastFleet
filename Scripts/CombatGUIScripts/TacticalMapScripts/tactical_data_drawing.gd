@@ -14,7 +14,7 @@ extends Node2D
 var TacticalMapBackground: ColorRect 
 var grid_size: Vector2
 #var sub_line_color: Color = Color8(162, 141, 60, 255)
-var line_color: Color = Color8(255, 255, 255, 125)
+var line_color: Color = Color8(100, 100, 255, 175)
 var line_width: int = 9
 var sub_line_width: int = 5
 
@@ -168,6 +168,7 @@ func display_map(map_value: bool) -> void:
 		TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
 		TacticalMapCamera.zoom = Vector2(.15, .15)
 		setup()
+		%BlackenScreenLayer.visible = true
 		%TacticalMapLayer.visible = true
 	# Hide the Tac Map
 	elif map_value == false:
@@ -175,6 +176,7 @@ func display_map(map_value: bool) -> void:
 		attack_group = false
 		#$"../..".grab_focus()
 		%TacticalMapLayer.visible = false
+		%BlackenScreenLayer.visible = false
 	  
 
 func swap_camera_feed(ship: Ship) -> void:
@@ -228,8 +230,8 @@ func update() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if self.visible == true and Engine.get_physics_frames() % 10 == 0:
-		update()
+	#if self.visible == true and Engine.get_physics_frames() % 3 == 0:
+	update()
 	# Populate the map because ship registration isn't instantaneous as of 2/18/24
 	if initial_setup == false and Engine.get_physics_frames() % 70 == 0:
 			setup()

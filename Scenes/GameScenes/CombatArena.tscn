@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=53 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -26,15 +26,17 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
-[ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
 [ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/fog_of_war.gdshader" id="15_olg0c"]
 [ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
 [ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -71,6 +73,10 @@ size = Vector2(13500, 15000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u4shx"]
+shader = ExtResource("15_olg0c")
+shader_parameter/fog_color = Vector4(0, 0, 0, 0.8)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lgtp0"]
 shader = ExtResource("13_tuyrt")
@@ -265,13 +271,13 @@ process_mode = 3
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
 top_level = true
 z_index = 1
-offset_left = 8.0
-offset_top = 5.0
-offset_right = 1540.0
-offset_bottom = 1332.0
+offset_left = 9.0
+offset_top = 66.0
+offset_right = 1541.0
+offset_bottom = 1393.0
 scale = Vector2(0.75, 0.75)
 size_flags_vertical = 1
-theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 22
 text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
@@ -342,25 +348,17 @@ limit_smoothed = true
 position_smoothing_enabled = true
 editor_draw_screen = false
 
-[node name="BroaderBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-self_modulate = Color(0.0980392, 0.0980392, 0.0980392, 0.839216)
-z_index = -1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -12500.0
-offset_top = -12500.0
-offset_right = 12500.0
-offset_bottom = 12500.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
 [node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
 unique_name_in_owner = true
 script = ExtResource("12_rlc6n")
+
+[node name="FogOfWar" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+z_index = 1
+material = SubResource("ShaderMaterial_u4shx")
+offset_right = 5400.0
+offset_bottom = 6300.0
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
 
 [node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
 z_index = -1
@@ -370,8 +368,8 @@ offset_bottom = 6300.0
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="TacticalMapLayer"]
-offset_left = 14.0
-offset_right = 450.0
+offset_left = 3.0
+offset_right = 439.0
 offset_bottom = 46.0
 theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
@@ -380,13 +378,14 @@ text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
 [node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
-offset_left = 1592.0
-offset_top = 950.0
-offset_right = 1656.0
-offset_bottom = 1014.0
+offset_left = 1518.0
+offset_top = 971.0
+offset_right = 1664.0
+offset_bottom = 1035.0
 theme_override_constants/separation = 18
 
 [node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
 z_as_relative = false
@@ -446,6 +445,7 @@ text = "Take
 Control"
 
 [node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
 z_as_relative = false
@@ -885,6 +885,25 @@ theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
 text = "Game Paused"
 
+[node name="FPS Counter" type="RichTextLabel" parent="VariousCanvasPopups"]
+anchors_preset = -1
+anchor_left = 0.592
+anchor_top = 1.0
+anchor_right = 0.592
+anchor_bottom = 1.0
+offset_left = 634.36
+offset_top = -1078.0
+offset_right = 931.36
+offset_bottom = -1038.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+script = ExtResource("34_4p8f2")
+
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1
 
@@ -894,11 +913,36 @@ offset_bottom = 1924.0
 texture = ExtResource("10_uvm3m")
 stretch_mode = 4
 
-[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground"]
+[node name="Parallax2D" type="Parallax2D" parent="SpaceBackground"]
+scroll_scale = Vector2(2, 2)
+repeat_size = Vector2(1925, 1923)
+autoscroll = Vector2(0, 10)
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
 self_modulate = Color(1, 1, 1, 0.34902)
 offset_right = 1925.0
 offset_bottom = 1923.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
+
+[node name="BlackenScreenLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 0
+visible = false
+
+[node name="BlackenBackground" type="Panel" parent="BlackenScreenLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

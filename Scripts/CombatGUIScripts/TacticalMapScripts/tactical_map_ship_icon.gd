@@ -26,9 +26,11 @@ func setup(ship: Ship) -> void:
 	if ship.is_friendly:
 		Outline.self_modulate = Color8(21, 187, 0, 255)
 		Direction.self_modulate = Color8(21, 187, 0, 255)
+		material = load("res://Shaders/CombatGUIShaders/tactical_map_ship_icon_friendly.tres")
 	else:
 		Outline.self_modulate = Color8(175, 47, 34, 255)
 		Direction.self_modulate = Color8(175, 47, 34, 255)
+		material = load("res://Shaders/CombatGUIShaders/tactical_map_ship_icon_enemy.tres")
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#print(Outline.button_pressed)
