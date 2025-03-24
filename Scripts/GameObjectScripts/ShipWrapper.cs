@@ -1,71 +1,224 @@
 using Godot;
 using System;
 
-public partial class ShipWrapper : RigidBody2D
+public partial class ShipWrapper : Node
 {
-    // Called when the node enters the scene tree for the first time.
-    [Export]
-    public bool group_leader { get; private set; }
-    [Export]
-    public String group_name { get; set; }
+    public enum Strategy
+    {
+        NEUTRAL,
+        DEFENSIVE,
+        OFFENSIVE,
+        EVASIVE
+    }
+
+    public enum Goal
+    {
+        SKIRMISH,
+        MOTHERSHIP,
+        CONTROL
+    }
 
     [Export]
-    public bool target_in_range { get; private set; }
+    public String GroupName { get; private set; }
+
     [Export]
-    public bool goal_flag { get; private set; }
+    public bool GroupLeader { get; private set; }
+
     [Export]
-    public bool avoid_flag { get; private set; }
+    public bool IsFriendly { get; private set; }
+
     [Export]
-    public bool brake_flag { get; private set; }
+    public bool FluxOverload { get; private set; }
+
     [Export]
-    public bool retreat_flag { get; private set; }
+    public int CombatGoal { get; private set; }
+
     [Export]
-    public bool fallback_flag { get; private set; }
+    public bool TargetInRange { get; private set; }
+
     [Export]
-    public bool combat_flag { get; private set; }
+    public bool GoalFlag { get; private set; }
+
+    [Export]
+    public bool AvoidFlag { get; private set; }
+
+    [Export]
+    public bool BrakeFlag { get; private set; }
+
+    [Export]
+    public bool RetreatFlag { get; private set; }
+
+    [Export]
+    public bool FallbackFlag { get; private set; }
+
+    [Export]
+    public bool CombatFlag { get; private set; }
+
+    [Export]
+    public bool SuccessfulDeploy { get; private set; }
+
+    [Export]
+    public bool MatchVelocityFlag { get; private set; }
+
+    public float ApproxInfluence { get; private set; }
+
+    public float TotalFlux { get; private set; }
+
+    public float SoftFlux { get; private set; }
+    
+    public float HardFlux { get; private set; }
+
+    public float HullIntegrity { get; private set; }
+
+    public float Armor { get; private set; }
+
+    public int Posture { get; private set; }
+
+    public Array TargetedUnits { get; private set; }
+
+    public RigidBody2D TargetUnit { get; private set; }
+
+    public Array NeighborUnits { get; private set; }
+
+    public Array TargetedBy { get; private set; }
+
+    public Vector2I ImapCell { get; private set; }
+
+    public Vector2I RegistryCell { get; private set; }
 
     public void SetGroupName(string newGroupName)
     {
-        group_name = newGroupName ?? throw new ArgumentNullException(nameof(newGroupName), "Group name cannot be null.");
+        GroupName = newGroupName ?? throw new ArgumentNullException(nameof(newGroupName), "Group name cannot be null.");
     }
 
     public void SetGroupLeader(bool value)
     {
-        group_leader = value;
+        GroupLeader = value;
+    }
+
+    public void SetIsFriendly(bool value)
+    {
+        IsFriendly = value;
+    }
+
+    public void SetFluxOverload(bool value)
+    {
+        FluxOverload = value;
+    }
+
+    public void SetCombatGoal(int value)
+    {
+        CombatGoal = value;
     }
 
     public void SetTargetInRange(bool value)
     {
-        target_in_range = value;
+        TargetInRange = value;
     }
 
     public void SetGoalFlag(bool value)
     {
-        goal_flag = value;
+        GoalFlag = value;
     }
 
     public void SetAvoidFlag(bool value)
     {
-        avoid_flag = value;
+        AvoidFlag = value;
     }
 
     public void SetBrakeFlag(bool value)
     {
-        brake_flag = value;
+        BrakeFlag = value;
     }
 
     public void SetRetreatFlag(bool value)
     {
-        retreat_flag = value;
+        RetreatFlag = value;
     }
 
     public void SetFallbackFlag(bool value)
     {
-        fallback_flag = value;
+        FallbackFlag = value;
     }
 
     public void SetCombatFlag(bool value)
     {
-        combat_flag = value;
+        CombatFlag = value;
+    }
+
+    public void SetDeployFlag(bool value)
+    {
+        SuccessfulDeploy = value;
+    }
+
+    public void SetMatchVelocityFlag(bool value)
+    {
+        MatchVelocityFlag = value;
+    }
+
+    public void SetApproxInfluence(float value)
+    {
+        ApproxInfluence = value;
+    }
+
+    public void SetPosture(int value)
+    {
+        Posture = value;
+    }
+
+    public void SetTargetedUnits(Array value)
+    {
+        TargetedUnits = value;
+    }
+
+    public void SetTargetUnit(RigidBody2D target)
+    {
+        TargetUnit = target;
+    }
+
+    public void SetNeighborUnits(Array neighbors)
+    {
+        NeighborUnits = neighbors;
+    }
+
+    public void SetTargetedBy(Array attackers)
+    {
+        TargetedBy = attackers;
+    }
+
+    public void SetTotalFlux(float value)
+    {
+        TotalFlux = value;
+    }
+
+    public void SetSoftFlux(float value)
+    {
+        SoftFlux = value;
+    }
+
+    public void SetHardFlux(float value)
+    {
+        HardFlux = value;
+    }
+
+    public void SetHullIntegrity(float value)
+    {
+        HullIntegrity = value;
+    }
+
+    public void SetArmor(float value)
+    {
+        Armor = value;
+    }
+
+
+    public void SetImapCell(Vector2I cell)
+    {
+        ImapCell = cell;
+    }
+
+    public void SetRegistryCell(Vector2I cell)
+    {
+        RegistryCell = cell;
     }
 }

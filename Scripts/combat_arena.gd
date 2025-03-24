@@ -139,9 +139,9 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	for i in range (enemy_fleet.fleet_stats.ships.size()):
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(enemy_fleet.fleet_stats.ships[i])
+		self.add_child(ship_instantiation)
 		ship_instantiation.is_friendly = false
 		ship_instantiation.collision_layer = 4
-		self.add_child(ship_instantiation)
 		instantiated_units.push_back(ship_instantiation)
 		
 		# Deployment Positioning

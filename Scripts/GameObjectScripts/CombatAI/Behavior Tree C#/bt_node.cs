@@ -14,6 +14,8 @@ public abstract partial class BehaviorTreeNode : BehaviorTree
 
 	public SteerData steer_data;
 
+	public ShipWrapper ship_wrapper;
+
     public enum NodeState {FAILURE, SUCCESS, RUNNING};
 
     protected NodeState state;

@@ -1,25 +1,40 @@
 using Godot;
 using System;
-using System.ComponentModel;
-
-public class SteerData
+public partial class SteerData : Node
 {
-	public Vector2 desired_velocity { get; set; }
-	public float default_acceleration { get; private set; }
-	public float zero_flux_bonus { get ; private set; }
-	public double n_delta { get; private set; }
-	public float time_coefficient { get; private set; }
+	[Export]
+	public Vector2 TargetPosition { get; private set; }
 
-	public void Initialize(Node agent)
+	[Export]
+	public RigidBody2D TargetUnit { get; private set; }
+
+    public Vector2 DesiredVelocity { get; set; }
+    public float DefaultAcceleration { get; private set; }
+    public float ZeroFluxBonus { get; private set; }
+    public double NDelta { get; private set; }
+    public float TimeCoefficient { get; private set; }
+    public Vector2 MoveDirection { get; private set; }
+
+    public void Initialize(Node agent)
+    {
+        var shipStats = (Resource)agent.Get("ship_stats") ?? throw new InvalidOperationException("ship_stats cannot be null");
+        DesiredVelocity = Vector2.Zero;
+        DefaultAcceleration = (float)shipStats.Get("acceleration") + (float)shipStats.Get("bonus_acceleration");
+        TimeCoefficient = (float)agent.Get("time_coefficient");
+    }
+    
+    public void SetDelta(double value)
+    {
+        NDelta = value;
+    }
+
+    public void SetMoveDirection(Vector2 value)
+    {
+        MoveDirection = value;
+    }
+
+	public void SetTargetPosition(Vector2 value)
 	{
-		var ship_stats = (Resource)agent.Get("ship_stats") ?? throw new InvalidOperationException("ship_stats cannot be null");
-		desired_velocity = Vector2.Zero;
-		default_acceleration = (float)ship_stats.Get("acceleration") + (float)ship_stats.Get("bonus_acceleration");
-		time_coefficient = (float)agent.Get("time_coefficient");
-	}
-	
-	public void SetDelta(double value)
-	{
-		n_delta = value;
+		TargetPosition = value;
 	}
 }

@@ -37,29 +37,59 @@ var TacticalDataDrawing: Node2D
 
 
 var ShipWrapper
+var SteerData
 
 # ship stats
 var ship_stats: ShipStats
 var speed: float = 0.0
-var hull_integrity: float = 0.0
-var armor: float = 0.0
+var hull_integrity: float = 0.0:
+	set(value):
+		ShipWrapper.SetHullIntegrity(value)
+		hull_integrity = value
+
+var armor: float = 0.0:
+	set(value):
+		ShipWrapper.SetArmor(value)
+		armor = value
+
 var shield_radius: float = 0.0
-var total_flux: float = 0.0 # Flux Capacity
-var soft_flux: float = 0.0
-var hard_flux: float = 0.0
+
+var total_flux: float = 0.0:
+	set(value):
+		ShipWrapper.SetTotalFlux(value)
+		total_flux = value # Flux Capacity
+
+var soft_flux: float = 0.0:
+	set(value):
+		ShipWrapper.SetSoftFlux(value)
+		soft_flux = value # Soft Flux Capacity
+
+var hard_flux: float = 0.0:
+	set(value):
+		ShipWrapper.SetHardFlux(value)
+		hard_flux = value # Hard Flux Capacity
+
 var shield_upkeep: float = 0.0
 var overload_time: float = 5.0
 var passive_flux_dissipation: float = 0.0
 var vf_coe: float = 3.0
 var vent_flux_dissipation: float = 0.0
 var shield_toggle: bool = false
-var flux_overload: bool = false
-var targeted: bool = false
-var average_weapon_range: float = 0.0
+var flux_overload: bool = false:
+	set(value):
+		ShipWrapper.SetFluxOverload(value)
+		flux_overload = value
 
-var is_friendly: bool = false
-	#set(value):
-		#is_friendly = value # For friendly NPC ships (I love three-party combat)
+var targeted: bool = false
+var average_weapon_range: float = 0.0:
+	set(value):
+		ShipWrapper.SetAvgWeaponRange(value)
+		average_weapon_range = value
+
+var is_friendly: bool = false:
+	set(value):
+		ShipWrapper.SetIsFriendly(value)
+		is_friendly = value
 
 var manual_control: bool = false:
 	set(value):
@@ -69,6 +99,7 @@ var manual_control: bool = false:
 		elif value == true:
 			manual_control = true
 			ManualControlIndicator.visible = true
+
 var camera_feed: bool = false
 
 # Used for targeting and weapons.
@@ -98,89 +129,139 @@ var group_leader: bool = false:
 		ShipWrapper.SetGroupLeader(value)
 		group_leader = value
 
-var group_transform: Transform2D = Transform2D.IDENTITY
-var group_velocity: Vector2 = Vector2.ZERO
-var posture: globals.Strategy = globals.Strategy.NEUTRAL
+var posture: globals.Strategy = globals.Strategy.NEUTRAL:
+	set(value):
+		ShipWrapper.SetPosture(value)
+		posture = value
+
+var match_speed: float = 0.0
 
 # Used for combat AI / behavior tree / influence map
-var combat_goal: int = 0
-var hueristic_strat: int = 0
+var combat_goal: int = 0:
+	set(value):
+		ShipWrapper.SetCombatGoal(value)
+		combat_goal = value
 
 var template_maps: Dictionary = {}
 var template_cell_indices: Dictionary = {}
 var weigh_influence: Imap
 var working_map: Imap = null
-var approx_influence: float = 0.0
+var approx_influence: float = 0.0:
+	set(value):
+		ShipWrapper.SetApproxInfluence(value)
+		approx_influence = value
+
 var registry_cluster: Array = []
-var imap_cell: Vector2i = Vector2i.ZERO
-var registry_cell: Vector2i = Vector2i.ZERO
+var imap_cell: Vector2i = Vector2i.ZERO:
+	set(value):
+		ShipWrapper.SetImapCell(value)
+		imap_cell = value
+
+var registry_cell: Vector2i = Vector2i.ZERO:
+	set(value):
+		ShipWrapper.SetRegistryCell(value)
+		registry_cell = value
+
 var registry_neighborhood: Array = []
 
 var heur_velocity: Vector2 = Vector2.ZERO
-var match_speed: float = 0.0
 var combat_time: float = 5.0
-var target_unit: Ship = null
-var targeted_units: Array = []
-var neighbor_units: Array = []
+var target_unit: Ship = null:
+	set(value):
+		ShipWrapper.SetTargetUnit(value)
+		#SteerData.SetTargetUnit(value)
+		target_unit = value
+
+var targeted_units: Array = []:
+	set(value):
+		ShipWrapper.SetTargetedUnits(value)
+		targeted_units = value
+
+var neighbor_units: Array = []:
+	set(value):
+		ShipWrapper.SetNeighborUnits(value)
+		targeted_units = value
+
 var nearby_enemy_groups: Array = []
 var idle_neighbors: Array = []
 var neighbor_groups: Array = []
 var available_neighbor_groups: Array = []
 var nearby_attackers: Array = []
 var incoming_projectiles: Array = []
-var targeted_by: Array = []
+var targeted_by: Array = []:
+	set(value):
+		ShipWrapper.SetTargetedBy(value)
+		targeted_by = value
+
+var target_in_range: bool = false:
+	set(value):
+		ShipWrapper.SetGoalFlag(value)
+		target_in_range = value
 
 var goal_flag: bool = false:
-    set(value):
-        ShipWrapper.SetGoalFlag(value)
-        goal_flag = value
+	set(value):
+		ShipWrapper.SetGoalFlag(value)
+		goal_flag = value
 
 var avoid_flag: bool = false:
-    set(value):
-        ShipWrapper.SetAvoidFlag(value)
-        avoid_flag = value
+	set(value):
+		ShipWrapper.SetAvoidFlag(value)
+		avoid_flag = value
 
 var brake_flag: bool = false:
-    set(value):
-        ShipWrapper.SetBrakeFlag(value)
-        brake_flag = value
+	set(value):
+		ShipWrapper.SetBrakeFlag(value)
+		brake_flag = value
 
 var retreat_flag: bool = false:
-    set(value):
-        ShipWrapper.SetRetreatFlag(value)
-        retreat_flag = value
+	set(value):
+		ShipWrapper.SetRetreatFlag(value)
+		retreat_flag = value
 
 var fallback_flag: bool = false:
-    set(value):
-        ShipWrapper.SetFallbackFlag(value)
-        fallback_flag = value
+	set(value):
+		ShipWrapper.SetFallbackFlag(value)
+		fallback_flag = value
 
 var combat_flag: bool = false:
-    set(value):
-        ShipWrapper.SetCombatFlag(value)
-        combat_flag = value
+	set(value):
+		ShipWrapper.SetCombatFlag(value)
+		combat_flag = value
 
 var vent_flux_flag: bool = false:
 	set(value):
 		ShipWrapper.SetVentFlux(value)
-		if value == true:
-			print("%s is venting flux" % [name])
-		else:
-			print("%s vented flux" % [name])
 		vent_flux_flag = value
-var successful_deploy: bool = false
-var match_velocity_flag: bool = false
+
+var successful_deploy: bool = false:
+	set(value):
+		ShipWrapper.SetDeployFlag(value)
+		successful_deploy = value
+
+var match_velocity_flag: bool = false:
+	set(value):
+		ShipWrapper.SetMatchVelocityFlag(match_velocity_flag)
+		successful_deploy = match_velocity_flag
+
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
 var time: float = 0.0
 var zero_flux_bonus: float = 0.0
-var zero_flux_bonus_flag = true
 var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
-var move_direction: Vector2 = Vector2.ZERO
+var move_direction: Vector2 = Vector2.ZERO:
+	set(value):
+		ShipWrapper.move_direction(value)
+		move_direction = value
+
 var acceleration: Vector2 = Vector2.ZERO
-var target_position: Vector2 = Vector2.ZERO
+var target_position: Vector2 = Vector2.ZERO:
+	set(value):
+		ShipWrapper.SetTargetPosition(value)
+		#SteerData.SetTargetPosition(value)
+		target_position = value
+
 var ship_select: bool = false:
 	# Ship Select is for individual ships when they're the only ships
 	set(value):
@@ -190,6 +271,7 @@ var ship_select: bool = false:
 			ship_select = value
 		print("ship select called", ship_select)
 		ship_selected.emit()
+
 var collision_flag: bool = false
 
 # Custom signals.
@@ -233,6 +315,8 @@ func deploy_ship() -> void:
 func _ready() -> void:
 	ShipWrapper = preload("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
 	add_child(ShipWrapper)
+	#SteerData = preload("res://Scripts/GameObjectScripts/CombatAI/Behavior Tree C#/BehaviorPool/Steering/steer_data.cs").new()
+	#add_child(SteerData)
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	registry_cell = -Vector2i.ONE
@@ -842,17 +926,17 @@ func _physics_process(delta: float) -> void:
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0
-	if zero_flux_bonus_flag == true:
-		speed_modifier += zero_flux_bonus
+	if (soft_flux + hard_flux) == 0.0:
+		speed_modifier = zero_flux_bonus
 	
-	velocity = (ship_stats.acceleration + ship_stats.bonus_acceleration + speed_modifier) * time
+	velocity = (speed + speed_modifier) * time
 	velocity *= true_direction
 	if move_direction == Vector2.ZERO:
 		time = 0.0
 	elif velocity.length() < (speed + speed_modifier):
 		time += delta + time_coefficient
 	
-	velocity = velocity.limit_length(speed)
+	velocity = velocity.limit_length(speed + speed_modifier)
 	acceleration = velocity
 	
 	if (acceleration.abs().floor() != Vector2.ZERO or manual_control) and sleeping:
