@@ -35,6 +35,9 @@ var TacticalDataDrawing: Node2D
 @onready var ShieldArea = $ShieldSlot/Shields
 @onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
 
+
+var ShipWrapper
+
 # ship stats
 var ship_stats: ShipStats
 var speed: float = 0.0
@@ -56,7 +59,8 @@ var average_weapon_range: float = 0.0
 
 var is_friendly: bool = false
 	#set(value):
-		#is_friendly = value # For friendly NPC ships (I love three-party combat) 
+		#is_friendly = value # For friendly NPC ships (I love three-party combat)
+
 var manual_control: bool = false:
 	set(value):
 		if value == false:
@@ -84,8 +88,16 @@ var zoom_out_limit: Vector2 = Vector2(0.6, 0.6)
 var zoom_value: Vector2 = Vector2.ONE
 
 # group/unit stuff
-var group_name: StringName = &""
-var group_leader: bool = false
+var group_name: StringName = &"":
+	set(value):
+		ShipWrapper.SetGroupName(value)
+		group_name = value
+
+var group_leader: bool = false:
+	set(value):
+		ShipWrapper.SetGroupLeader(value)
+		group_leader = value
+
 var group_transform: Transform2D = Transform2D.IDENTITY
 var group_velocity: Vector2 = Vector2.ZERO
 var posture: globals.Strategy = globals.Strategy.NEUTRAL
@@ -118,15 +130,39 @@ var nearby_attackers: Array = []
 var incoming_projectiles: Array = []
 var targeted_by: Array = []
 
-var target_in_range: bool = false
-var goal_flag: bool = false
-var avoid_flag: bool = false
-var brake_flag: bool = false
-var retreat_flag: bool = false
-var fallback_flag: bool = false
-var combat_flag: bool = false
+var goal_flag: bool = false:
+    set(value):
+        ShipWrapper.SetGoalFlag(value)
+        goal_flag = value
+
+var avoid_flag: bool = false:
+    set(value):
+        ShipWrapper.SetAvoidFlag(value)
+        avoid_flag = value
+
+var brake_flag: bool = false:
+    set(value):
+        ShipWrapper.SetBrakeFlag(value)
+        brake_flag = value
+
+var retreat_flag: bool = false:
+    set(value):
+        ShipWrapper.SetRetreatFlag(value)
+        retreat_flag = value
+
+var fallback_flag: bool = false:
+    set(value):
+        ShipWrapper.SetFallbackFlag(value)
+        fallback_flag = value
+
+var combat_flag: bool = false:
+    set(value):
+        ShipWrapper.SetCombatFlag(value)
+        combat_flag = value
+
 var vent_flux_flag: bool = false:
 	set(value):
+		ShipWrapper.SetVentFlux(value)
 		if value == true:
 			print("%s is venting flux" % [name])
 		else:
@@ -195,6 +231,8 @@ func deploy_ship() -> void:
 		settings.swizzle($ShipLivery, settings.enemy_color)
 
 func _ready() -> void:
+	ShipWrapper = preload("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
+	add_child(ShipWrapper)
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	registry_cell = -Vector2i.ONE
@@ -261,7 +299,7 @@ func _ready() -> void:
 	var occupancy_template: ImapTemplate
 	var threat_template: ImapTemplate
 	var longest_range: float = weapon_ranges.max()
-	var occupancy_radius: int = (speed + zero_flux_bonus + ship_stats.bonus_acceleration) / 60
+	var occupancy_radius: int = (ship_stats.acceleration + ship_stats.bonus_acceleration + zero_flux_bonus) / 60
 	occupancy_radius += 1
 	var threat_radius: int = (longest_range / imap_manager.default_cell_size)
 	threat_radius += 1

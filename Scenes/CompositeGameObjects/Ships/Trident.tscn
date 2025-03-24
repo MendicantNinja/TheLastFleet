@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://10wylxljg0nw"]
+[gd_scene load_steps=12 format=3 uid="uid://10wylxljg0nw"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_vx8d1"]
 [ext_resource type="PackedScene" uid="uid://chlj4nfewaemy" path="res://Scenes/CompositeGameObjects/CombatBehaviorTree.tscn" id="2_wxdtm"]
@@ -6,11 +6,8 @@
 [ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="14_kfouk"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="14_ygc3n"]
 [ext_resource type="Texture2D" uid="uid://cfd8kdvut280u" path="res://Art/ShipArt/Trident/trident_livery1.png" id="15_fllyn"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="15_qeenb"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="17_ivfi0"]
 [ext_resource type="Resource" uid="uid://5xwswaf2bcpw" path="res://Resources/WeaponMounts/MediumMissile.tres" id="18_pjw2u"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_qep61"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_e7nxv"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="26_06ix5"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
@@ -109,6 +106,9 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 3.0
+
+[node name="OverloadTimer" type="Timer" parent="."]
+process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("26_06ix5")]
 

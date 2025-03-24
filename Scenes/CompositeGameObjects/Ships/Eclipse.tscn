@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=10 format=3 uid="uid://cu2fkh4ittsos"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
 [ext_resource type="PackedScene" uid="uid://chlj4nfewaemy" path="res://Scenes/CompositeGameObjects/CombatBehaviorTree.tscn" id="2_bob3e"]
@@ -84,6 +84,9 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
+
+[node name="OverloadTimer" type="Timer" parent="."]
+process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
 

@@ -60,10 +60,8 @@ var current_target: RID = RID()
 var owner_rid: RID = RID()
 var killcast: RayCast2D = null
 var last_valid_position: Vector2 = Vector2.ZERO
-var default_direction: Transform2D
 var target_unit: RID = RID()
 var current_target_id: RID = RID()
-var owner_rid: RID = RID()
 
 # Special Beam Logic
 var current_beam: Projectile = null
@@ -88,7 +86,7 @@ func fire(ship_id: int) -> void:
 		#weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
-	projectile.global_transform = weapon_node.global_transform
+	projectile.global_transform = WeaponNode.global_transform
 	projectile.assign_stats(weapon, owner_rid, is_friendly)
 	
 	if projectile.is_beam == true:
@@ -103,7 +101,7 @@ func fire(ship_id: int) -> void:
 	
 	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
-		rate_of_fire_timer.start()
+		ROFTimer.start()
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
@@ -302,7 +300,7 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 
 func _physics_process(delta) -> void:
 	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
-		current_beam.global_transform = weapon_node.global_transform
+		current_beam.global_transform = WeaponNode.global_transform
 		#current_beam.rotation = self.rotation
 	if flux_overload == true:
 		return

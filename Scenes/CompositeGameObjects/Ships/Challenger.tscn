@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c2gpnr0o720b0"]
+[gd_scene load_steps=27 format=3 uid="uid://c2gpnr0o720b0"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_qqye5"]
@@ -17,7 +17,6 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="14_krkqi"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="16_t74ra"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="17_vx6dc"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Leaves/bt_action.gd" id="18_vwop7"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_xdvy0"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_47bbe"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/velocity_matching.gd" id="19_k1mub"]
@@ -84,7 +83,7 @@ script = ExtResource("10_5taoq")
 [node name="choose target" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("11_v56jh")
 
-[node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
+[node name="flux management" type="Node" parent="CombatBehaviorTree/main/combat"]
 script = ExtResource("12_3j8wf")
 
 [node name="use shield" type="Node" parent="CombatBehaviorTree/main/combat"]
@@ -103,7 +102,7 @@ script = ExtResource("14_krkqi")
 script = ExtResource("16_t74ra")
 
 [node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("18_vwop7")
+script = ExtResource("17_vx6dc")
 
 [node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_4n4rr")
@@ -174,6 +173,9 @@ debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
+
+[node name="OverloadTimer" type="Timer" parent="."]
+process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("23_px6v0")]
 

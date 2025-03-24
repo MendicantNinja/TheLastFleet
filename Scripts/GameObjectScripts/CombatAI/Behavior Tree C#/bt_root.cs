@@ -10,10 +10,11 @@ public partial class BehaviorTreeRoot : BehaviorTree
 
     public override void _Ready()
     {
-        agent = GetParent<RigidBody2D>();
+        agent = GetParent();
         if (GetChildCount() != 1)
         {
             ToggleRoot(false);
+            return;
         }
     }
 
