@@ -33,7 +33,7 @@ var TacticalDataDrawing: Node2D
 @onready var ShieldSlot = $ShieldSlot
 @onready var ShieldArea = $ShieldSlot/Shields
 @onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
-
+@onready var DetectionArea = $DetectionArea
 # ship stats
 var ship_stats: ShipStats
 var speed: float = 0.0
@@ -48,6 +48,20 @@ var shield_toggle: bool = false
 var flux_overload: bool = false
 var targeted: bool = false
 var average_weapon_range: float = 0.0
+
+var is_revealed: bool:
+	set(value):
+		if settings.debug_mode == true:
+			return
+		if value == true:
+			visible = value
+			tactical_map_icon.disabled = value
+			tactical_map_icon.visible = value
+		elif value == false:
+			visible = value
+			tactical_map_icon.disabled = value
+			tactical_map_icon.visible = value
+var ships_detecting_me: int = 0 # Increment this counter for enemies when entering a detection body. Decrement when exiting. See detection_area.gd in the packed scene.
 
 var is_friendly: bool = false # For friendly NPC ships (I love three-party combat) 
 var manual_control: bool = false:
@@ -121,6 +135,7 @@ var successful_deploy: bool = false
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
+var sensor_strength: int 
 var time: float = 0.0
 var zero_flux_bonus: float = 0.0
 var zero_flux_bonus_flag = true
@@ -136,7 +151,7 @@ var ship_select: bool = false:
 			ship_select = value
 		elif value == false:
 			ship_select = value
-		print("ship select called", ship_select)
+		#print("ship select called", ship_select)
 		ship_selected.emit()
 var collision_flag: bool = false
 
@@ -170,9 +185,11 @@ func deploy_ship() -> void:
 	
 	if is_friendly == true:
 		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
+		print("deploy_ship called")
 		settings.swizzle(ConstantSizedGUI, settings.gui_color, false)
 		settings.swizzle($ShipLivery, settings.player_color)
 		ManualControlIndicator.self_modulate = settings.player_color 
+		DetectionArea.DetectionRadius.shape.radius  = sensor_strength
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		settings.swizzle(ConstantSizedGUI, settings.enemy_color, false)
@@ -210,6 +227,8 @@ func _ready() -> void:
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
 	HullIntegrityIndicator.value = hull_integrity
 	
+	sensor_strength = ship_stats.sensor_strength
+	DetectionArea.self_ship = self
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
 	
@@ -250,6 +269,7 @@ func _ready() -> void:
 		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
 		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"friendly")
+		is_friendly = true
 		rotation -= PI/2
 	else:
 		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
@@ -259,7 +279,7 @@ func _ready() -> void:
 		add_to_group(&"enemy")
 		is_friendly = false
 		rotation += PI/2
-
+	
 	CombatBehaviorTree.toggle_root(true)
 	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)

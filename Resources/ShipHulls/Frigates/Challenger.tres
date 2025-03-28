@@ -43,6 +43,6 @@ fuel_usage_per_lightyear = 0.0
 crew_capacity = 0
 skeleton_crew = 0
 fighter_bays = 0
-sensor_strength = 0
+sensor_strength = 2000
 sensor_profile = 0
 repair_rate = 0.0

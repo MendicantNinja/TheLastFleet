@@ -22,12 +22,11 @@
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="20_de2qj"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_fuyaf"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="22_oob2k"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="23_mqt8o"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="23_ajnna"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_n0517"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="25_q5s6h"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
@@ -157,21 +156,13 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="ShieldSlot" type="Node2D" parent="."]
-script = ExtResource("23_mqt8o")
-
-[node name="Shields" type="Area2D" parent="ShieldSlot"]
-collision_layer = 0
-collision_mask = 8
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
-shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
-
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
+
+[node name="ShieldSlot" parent="." instance=ExtResource("23_ajnna")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("25_q5s6h")]
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
 

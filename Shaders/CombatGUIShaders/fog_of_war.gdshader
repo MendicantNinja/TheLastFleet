@@ -1,17 +1,19 @@
 shader_type canvas_item;
+//render_mode light_only;
+uniform sampler2D noise_texture: repeat_enable, filter_nearest; // Texture to modify fog
+uniform sampler2D visibility_texture; 
 
-uniform sampler2D fog_texture; // Reveal texture to modify fog
-uniform vec4 fog_color = vec4(0.0, 0.0, 0.0, 0.8); // Default fog color
-
+uniform float density: hint_range(0.0, 1.0) = 1.0;
+ // If 1.0, do not reveal. If 0, do!)
+uniform vec2 speed = vec2(1, 1);
 void fragment() {
-    vec4 fog_tex = texture(fog_texture, UV);
-    float reveal = fog_tex.r; 
-
-    // Lerp between fog color and transparency based on revealed areas
-    COLOR = mix(fog_color, vec4(0.0), reveal);
+	if (texture(visibility_texture, UV).r > 0.1) {
+        COLOR = vec4(1, 1, 1, 0); // Make the fog transparent
+	}
+	else {
+		vec2 uv = UV + speed * TIME;
+		float noise = texture(noise_texture, UV).r;
+		// Apply the fog
+		COLOR.a = noise;
+	}
 }
-
-//void light() {
-	// Called for every pixel for every light affecting the CanvasItem.
-	// Uncomment to replace the default light processing function with this one.
-//}

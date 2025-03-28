@@ -18,18 +18,17 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="13_533i1"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="13_kiy6n"]
 [ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="14_kfouk"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="14_ygc3n"]
 [ext_resource type="Texture2D" uid="uid://cfd8kdvut280u" path="res://Art/ShipArt/Trident/trident_livery1.png" id="15_fllyn"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="15_qeenb"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="17_ivfi0"]
 [ext_resource type="Resource" uid="uid://5xwswaf2bcpw" path="res://Resources/WeaponMounts/MediumMissile.tres" id="18_pjw2u"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_qep61"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_e7nxv"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="25_wx7ub"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="26_06ix5"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="27_y2dbk"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
 [node name="Trident" type="RigidBody2D"]
 z_as_relative = false
@@ -178,21 +177,13 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="ShieldSlot" type="Node2D" parent="."]
-script = ExtResource("14_ygc3n")
-
-[node name="Shields" type="Area2D" parent="ShieldSlot"]
-collision_layer = 0
-collision_mask = 8
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
-shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
-
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 3.0
+
+[node name="ShieldSlot" parent="." instance=ExtResource("25_wx7ub")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("27_y2dbk")]
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("26_06ix5")]
 

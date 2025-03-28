@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://bmogmneffwvgs"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="1_0lsec"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
+resource_local_to_scene = true
+
+[node name="ShieldSlot" type="Node2D"]
+script = ExtResource("1_0lsec")
+
+[node name="Shields" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+input_pickable = false
+
+[node name="ShieldShape" type="CollisionShape2D" parent="Shields"]
+shape = SubResource("CircleShape2D_vu5jp")
+debug_color = Color(0.203922, 0.639216, 0, 0.0862745)

@@ -4,14 +4,21 @@ extends Node2D
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
+
 @onready var ship_list: Array[Ship]
 @onready var ship_registry: Dictionary = imap_manager.registry_map
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
 
+@onready var VisibilityLayer: SubViewport
+@onready var DetectionTexture: TextureRect = $VisibilityLayerContainer/VisibilityLayer/DetectionRadius
+@onready var detection_list: Array[TextureRect]
+
 # Visuals
-var TacticalMapBackground: ColorRect 
+var TacticalMapBackground: ColorRect
+var conversion_coeffecient_x: float
+var conversion_coeffecient_y: float
 var grid_size: Vector2
 #var sub_line_color: Color = Color8(162, 141, 60, 255)
 var line_color: Color = Color8(100, 100, 255, 175)
@@ -56,6 +63,13 @@ func _ready():
 	grid_size = Vector2(TacticalMapBackground.size.x, TacticalMapBackground.size.y)
 	#%TacticalMapCamera.limit_right = TacticalMapBackground.size.x * 2
 	#%TacticalMapCamera.limit_bottom = TacticalMapBackground.size.x * 2
+	conversion_coeffecient_x = TacticalMapBackground.size.x/map_bounds.x
+	conversion_coeffecient_y = TacticalMapBackground.size.y/map_bounds.y
+	
+	$FogOfWar.size = TacticalMapBackground.size
+	$VisibilityLayerContainer/VisibilityLayer.size = TacticalMapBackground.size
+	$FogOfWar.material.set_shader_parameter("visibility_texture", $VisibilityLayerContainer/VisibilityLayer.get_texture())
+	
 	setup()
 	queue_redraw()
 	
@@ -63,7 +77,6 @@ func _ready():
 		if child is TextureButton:
 			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
-	
 	#stress_testing()
 	pass # Replace with function body.
 
@@ -204,6 +217,23 @@ func setup() -> void:
 				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
+				
+				var texture_appended: TextureRect = DetectionTexture.duplicate()
+				$VisibilityLayerContainer/VisibilityLayer.add_child(texture_appended)
+				detection_list.append(texture_appended)
+				if ship.is_friendly == false: # We dont want enemies removing the fog of war!
+					ship.is_revealed = false 
+					texture_appended.visible = false
+					continue
+				else:
+					ship.is_revealed = true
+				var detection_diameter_tacmap: int = ship.sensor_strength * 2 * conversion_coeffecient_x
+				texture_appended.texture.width = detection_diameter_tacmap
+				texture_appended.texture.height = detection_diameter_tacmap
+				#texture_appended.pivot_offset = -(texture_appended.size) 
+				
+
+				
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
 	connect_unit_signals(friendly_group)
@@ -221,19 +251,26 @@ func update() -> void:
 	else:
 		$"../../../ButtonList/ManualControlButton".disabled = false
 		$"../../../ButtonList/CameraFeedButton".disabled = false
-	for icon in icon_list:
-		if icon.assigned_ship == null:
-			icon.free()
-			icon_list.erase(icon)
+	for i in icon_list.size():
+		if icon_list[i] == null or icon_list[i].assigned_ship == null:
+			icon_list[i].queue_free()
+			icon_list.erase(icon_list[i])
+			detection_list[i].queue_free() 
+			detection_list.erase(detection_list[i])
 			continue
+	
+	for i in icon_list.size():
+		var icon = icon_list[i]
+		var radius = detection_list[i]
 		icon.position = convert_realspace_to_map(icon.assigned_ship.global_position, map_bounds, grid_size)
-
+		radius.position = icon.position + Vector2(-radius.size.x/2, -radius.size.y/2)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#if self.visible == true and Engine.get_physics_frames() % 3 == 0:
 	update()
 	# Populate the map because ship registration isn't instantaneous as of 2/18/24
-	if initial_setup == false and Engine.get_physics_frames() % 70 == 0:
+	if initial_setup == false and Engine.get_physics_frames() % 62 == 0:
 			setup()
 			initial_setup = true
 
@@ -359,7 +396,7 @@ func reset_box_selection() -> void:
 	
 
 func _on_unit_selected(unit: Ship) -> void:
-	print("on unit selected")
+	#print("on unit selected")
 	get_viewport().set_input_as_handled()
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=57 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -74,9 +74,21 @@ size = Vector2(13500, 15000)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2a6qp"]
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_avm21"]
+width = 320
+height = 180
+seamless = true
+seamless_blend_skirt = 0.75
+noise = SubResource("FastNoiseLite_2a6qp")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_u4shx"]
 shader = ExtResource("15_olg0c")
-shader_parameter/fog_color = Vector4(0, 0, 0, 0.8)
+shader_parameter/density = 1.0
+shader_parameter/speed = Vector2(0.01, 0.02)
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_avm21")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lgtp0"]
 shader = ExtResource("13_tuyrt")
@@ -87,6 +99,18 @@ shader_parameter/flicker_speed = 2.0
 shader_parameter/distortion_amount = 0.1
 shader_parameter/fresnel_power = 50.0
 shader_parameter/alpha_strength = 0.7
+
+[sub_resource type="Gradient" id="Gradient_084at"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2yroj"]
+gradient = SubResource("Gradient_084at")
+width = 2000
+height = 2000
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
 
 [sub_resource type="Gradient" id="Gradient_nks55"]
 offsets = PackedFloat32Array(0.237705, 1)
@@ -329,10 +353,12 @@ size_flags_vertical = 4
 focus_mode = 0
 
 [node name="TacticalViewport" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer"]
+disable_3d = true
 transparent_bg = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 2
 gui_snap_controls_to_pixels = false
+canvas_cull_mask = 4294967279
 size = Vector2i(9600, 9600)
 render_target_update_mode = 4
 
@@ -353,19 +379,48 @@ unique_name_in_owner = true
 script = ExtResource("12_rlc6n")
 
 [node name="FogOfWar" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+self_modulate = Color(0.724287, 0.576944, 0.999999, 1)
+light_mask = 16
 z_index = 1
 material = SubResource("ShaderMaterial_u4shx")
 offset_right = 5400.0
 offset_bottom = 6300.0
 mouse_filter = 2
-color = Color(0, 0, 0, 1)
 
 [node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
 z_index = -1
 material = SubResource("ShaderMaterial_lgtp0")
-offset_right = 5400.0
-offset_bottom = 6300.0
+offset_right = 5850.0
+offset_bottom = 6500.0
 mouse_filter = 2
+
+[node name="VisibilityLayerContainer" type="SubViewportContainer" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+visibility_layer = 16
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VisibilityLayer" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+canvas_cull_mask = 4294966288
+size = Vector2i(5850, 6500)
+render_target_update_mode = 4
+
+[node name="DetectionRadius" type="TextureRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer/VisibilityLayer"]
+visibility_layer = 16
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -102924.0
+offset_top = -103249.0
+offset_right = -100924.0
+offset_bottom = -101249.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_2yroj")
 
 [node name="Label" type="Label" parent="TacticalMapLayer"]
 offset_left = 3.0
@@ -668,6 +723,66 @@ theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 text = "WEAPON SYSTEMS"
 
+[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -82.5
+offset_top = -63.0
+offset_right = 82.5
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Game Paused"
+
+[node name="FPS Counter" type="RichTextLabel" parent="VariousCanvasPopups"]
+anchors_preset = -1
+anchor_left = 0.592
+anchor_top = 1.0
+anchor_right = 0.592
+anchor_bottom = 1.0
+offset_left = 634.36
+offset_top = -1078.0
+offset_right = 931.36
+offset_bottom = -1038.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+script = ExtResource("34_4p8f2")
+
+[node name="SpaceBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="SpaceBackground"]
+offset_right = 1972.0
+offset_bottom = 1924.0
+texture = ExtResource("10_uvm3m")
+stretch_mode = 4
+
+[node name="Parallax2D" type="Parallax2D" parent="SpaceBackground"]
+scroll_scale = Vector2(0.8, 0.8)
+repeat_size = Vector2(1925, 1923)
+follow_viewport = false
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
+self_modulate = Color(1, 1, 1, 0.34902)
+offset_right = 1925.0
+offset_bottom = 1923.0
+texture = ExtResource("11_kx52a")
+stretch_mode = 4
+
 [node name="OptionsMenu" type="CanvasLayer" parent="."]
 
 [node name="OptionsMenuPanel" type="Panel" parent="OptionsMenu"]
@@ -864,66 +979,6 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
-
-[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
-process_mode = 3
-
-[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
-visible = false
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -82.5
-offset_top = -63.0
-offset_right = 82.5
-grow_horizontal = 2
-grow_vertical = 0
-theme = ExtResource("33_lcetb")
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "Game Paused"
-
-[node name="FPS Counter" type="RichTextLabel" parent="VariousCanvasPopups"]
-anchors_preset = -1
-anchor_left = 0.592
-anchor_top = 1.0
-anchor_right = 0.592
-anchor_bottom = 1.0
-offset_left = 634.36
-offset_top = -1078.0
-offset_right = 931.36
-offset_bottom = -1038.0
-grow_horizontal = 2
-grow_vertical = 0
-theme = ExtResource("33_lcetb")
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-script = ExtResource("34_4p8f2")
-
-[node name="SpaceBackground" type="CanvasLayer" parent="."]
-layer = -1
-
-[node name="Background" type="TextureRect" parent="SpaceBackground"]
-offset_right = 2207.0
-offset_bottom = 1924.0
-texture = ExtResource("10_uvm3m")
-stretch_mode = 4
-
-[node name="Parallax2D" type="Parallax2D" parent="SpaceBackground"]
-scroll_scale = Vector2(2, 2)
-repeat_size = Vector2(1925, 1923)
-autoscroll = Vector2(0, 10)
-
-[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
-self_modulate = Color(1, 1, 1, 0.34902)
-offset_right = 1925.0
-offset_bottom = 1923.0
-texture = ExtResource("11_kx52a")
-stretch_mode = 4
 
 [node name="BlackenScreenLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true

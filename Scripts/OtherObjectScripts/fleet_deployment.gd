@@ -1,9 +1,10 @@
 extends GridContainer
 var ships_to_deploy: Array[ShipIcon]
-@onready var CombatMap: Node2D = $"../../.."
+@onready var CombatArena: Node2D = $"../../.."
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 var fleet_deployment
-signal units_deployed(units)
+
+
 var group_name: StringName = &"tomato"
 var group_iterator: int = 0
 # Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 
@@ -12,6 +13,7 @@ var deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
 
+signal units_deployed(units)
 signal deploy_ship(ship)
 
 func _ready():
@@ -35,8 +37,8 @@ func reset_deployment_position() -> void:
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
 	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
-	#if settings.dev_mode == true:
-		#deployment_position.y = 0 + deployment_spacing * 2
+	if settings.debug_mode == true:
+		deployment_position.y = 5000 + deployment_spacing * 2
 	deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
