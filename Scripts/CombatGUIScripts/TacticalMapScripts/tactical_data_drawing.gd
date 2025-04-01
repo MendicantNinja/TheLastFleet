@@ -451,7 +451,7 @@ func move_new_unit(to_position: Vector2) -> void:
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	new_leader.set_group_leader(true)
-	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
+	#get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 	  #.o.       ooooooooooooo ooooooooooooo       .o.         .oooooo.   oooo    oooo 

@@ -1,5 +1,5 @@
 @icon("res://Art/MetaIcons/BehaviorTree/sequencer.svg")
-extends Composite
+extends GodotComposite
 class_name CompositeSequence
 
 func tick(agent, blackboard):

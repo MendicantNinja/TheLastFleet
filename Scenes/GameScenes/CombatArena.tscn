@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=51 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -35,6 +35,7 @@
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
+[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="36_yq4wo"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -900,5 +901,41 @@ offset_right = 1925.0
 offset_bottom = 1923.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
+
+[node name="TestShip" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(6679, 3086)
+
+[node name="TestShip2" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(7136, 3099)
+
+[node name="TestShip3" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(7530, 3099)
+
+[node name="TestShip4" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(6984, 3657)
+
+[node name="TestShip5" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(7441, 3670)
+
+[node name="TestShip6" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(7835, 3670)
+
+[node name="TestShip7" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(3047, 3137)
+
+[node name="TestShip8" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(3504, 3150)
+
+[node name="TestShip9" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(3898, 3150)
+
+[node name="TestShip10" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(3352, 3708)
+
+[node name="TestShip11" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(3809, 3721)
+
+[node name="TestShip12" parent="." instance=ExtResource("36_yq4wo")]
+position = Vector2(4203, 3721)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

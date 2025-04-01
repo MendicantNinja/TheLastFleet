@@ -49,7 +49,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var evaluate_targets: Array = []
 	var available_targets: Array = []
 	var sq_dist: Array = []
-	var target_dist: Dictionary = {}
+	#var target_dist: Dictionary = {}
 	for target in agent.targeted_units:
 		if target == null:
 			continue
@@ -60,7 +60,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		
 		var dist: float = agent.global_position.distance_squared_to(target.global_position)
 		sq_dist.append(dist)
-		target_dist[dist] = target
+		#target_dist[dist] = target
 		if target.targeted_by.is_empty() == false:
 			evaluate_targets.append(target)
 		else:
@@ -98,7 +98,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var agent_weapons: int = agent.all_weapons.size()
 	var weighted_targets: Dictionary = {}
-	var weigh_targetsed_targets: Dictionary = {}
 	for target: Ship in available_targets:
 		var agent_inf: float = abs(agent.approx_influence)
 		var target_inf: float = abs(target.approx_influence)

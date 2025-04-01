@@ -1,3 +1,3 @@
 @icon("res://Art/MetaIcons/BehaviorTree/action.svg")
-extends Leaf
+extends GodotLeaf
 class_name LeafAction

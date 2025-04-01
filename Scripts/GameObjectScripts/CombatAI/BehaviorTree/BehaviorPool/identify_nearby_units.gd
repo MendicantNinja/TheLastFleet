@@ -50,9 +50,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		if availability_count == group.size():
 			available_neighbor_groups.append(group_name)
 	
-	
-	
-	
 	agent.available_neighbor_groups = available_neighbor_groups
 	agent.nearby_enemy_groups = nearby_enemy_groups
 	agent.idle_neighbors = idle_neighbors

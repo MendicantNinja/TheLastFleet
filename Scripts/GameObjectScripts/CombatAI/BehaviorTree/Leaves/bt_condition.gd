@@ -1,3 +1,3 @@
 @icon("res://Art/MetaIcons/BehaviorTree/condition.svg")
-extends Leaf
+extends GodotLeaf
 class_name LeafCondition

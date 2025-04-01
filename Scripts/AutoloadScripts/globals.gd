@@ -177,7 +177,6 @@ func reset_group_leader(unit: Ship) -> void:
 		var median: Vector2 = geometric_median_of_objects(unit_positions.keys())
 		new_leader = find_unit_nearest_to_median(median, unit_positions)
 	
-	get_tree().call_group(unit.group_name, &"set_blackboard_data", leader_key, new_leader)
 	# maybe shift orders to new leader here
 	
 	if not unit.ShipNavigationAgent.is_navigation_finished():

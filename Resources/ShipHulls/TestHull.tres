@@ -1,35 +1,34 @@
-[gd_resource type="Resource" script_class="ShipHull" load_steps=6 format=3 uid="uid://ckxe4jmt2xg2j"]
+[gd_resource type="Resource" script_class="ShipHull" load_steps=5 format=3 uid="uid://b0opng4g4kosx"]
 
-[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_xb8pa"]
-[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_6a6no"]
-[ext_resource type="PackedScene" uid="uid://cw88yegmucgbv" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="2_rh0ln"]
-[ext_resource type="Texture2D" uid="uid://dl4wcjtsccgku" path="res://Art/ShipArt/ship1enginemaximalist.png" id="3_cllak"]
-[ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="3_tjgeo"]
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_ipljx"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_236ag"]
+[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="2_ohvm0"]
+[ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="3_iuuak"]
 
 [resource]
-script = ExtResource("1_xb8pa")
-ship_type_name = "Test"
-ship_description = "Only for testing purposes, not for the final product."
+script = ExtResource("1_ipljx")
+ship_type_name = ""
+ship_description = ""
 ship_type = 11
 ship_size = 0
 ship_tech = 0
-ship_packed_scene = ExtResource("2_rh0ln")
+ship_packed_scene = ExtResource("2_ohvm0")
 ship_system = 0
-weapon_mounts = Array[ExtResource("2_6a6no")]([ExtResource("3_tjgeo"), ExtResource("3_tjgeo")])
+weapon_mounts = Array[ExtResource("2_236ag")]([null, null, null])
 base_mods = []
-ship_sprite = ExtResource("3_cllak")
+ship_sprite = ExtResource("3_iuuak")
 ship_scaling = 1
 hull_integrity = 500
-armor = 300
-shield_efficiency = 0.2
-shield_upkeep = 0.5
-flux = 2000
+armor = 100
+shield_efficiency = 20.0
+shield_upkeep = 10.0
+flux = 1000
 flux_dissipation = 50
-top_speed = 100
-acceleration = 40.0
-deceleration = 30.0
+top_speed = 200
+acceleration = 100.0
+deceleration = 50.0
 turn_rate = 0.7
-mass = 0.0
+mass = 1.0
 drive_field = 10
 deployment_points = 1.0
 base_cr = 65.0

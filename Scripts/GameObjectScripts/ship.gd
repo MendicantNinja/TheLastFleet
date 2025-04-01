@@ -180,7 +180,7 @@ var targeted_units: Array = []:
 var neighbor_units: Array = []:
 	set(value):
 		ShipWrapper.SetNeighborUnits(value)
-		targeted_units = value
+		neighbor_units = value
 
 var nearby_enemy_groups: Array = []
 var idle_neighbors: Array = []
@@ -252,14 +252,15 @@ var time_coefficient: float = 0.1
 var rotate_angle: float = 0.0
 var move_direction: Vector2 = Vector2.ZERO:
 	set(value):
-		ShipWrapper.move_direction(value)
 		move_direction = value
 
-var acceleration: Vector2 = Vector2.ZERO
+var acceleration: Vector2 = Vector2.ZERO:
+	set(value):
+		acceleration = value
+
 var target_position: Vector2 = Vector2.ZERO:
 	set(value):
-		ShipWrapper.SetTargetPosition(value)
-		#SteerData.SetTargetPosition(value)
+		SteerData.SetTargetPosition(value)
 		target_position = value
 
 var ship_select: bool = false:
@@ -313,10 +314,12 @@ func deploy_ship() -> void:
 		settings.swizzle($ShipLivery, settings.enemy_color)
 
 func _ready() -> void:
-	ShipWrapper = preload("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
+	ShipWrapper = load("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
 	add_child(ShipWrapper)
-	#SteerData = preload("res://Scripts/GameObjectScripts/CombatAI/Behavior Tree C#/BehaviorPool/Steering/steer_data.cs").new()
-	#add_child(SteerData)
+	ShipWrapper.name = &"ShipWrapper"
+	SteerData = load("res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/SteerData.cs").new()
+	add_child(SteerData)
+	SteerData.name = &"SteerData"
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	registry_cell = -Vector2i.ONE
@@ -327,11 +330,13 @@ func _ready() -> void:
 	OverloadTimer.wait_time = overload_time
 	CombatTimer.wait_time = combat_time
 	var ship_hull = ship_stats.ship_hull
-	if ship_stats.ship_hull.ship_type != data.ship_type_enum.TEST:
-		var texture: Texture2D = ship_hull.ship_sprite
-		var texture_size: Vector2 = texture.get_size()
-		var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
-		ShipNavigationAgent.radius = new_radius
+	var texture: Texture2D = ship_hull.ship_sprite
+	var texture_size: Vector2 = texture.get_size()
+	var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
+	ShipNavigationAgent.radius = new_radius
+	SteerData.SetFOFRadius(new_radius)
+	if ship_stats.ship_hull.ship_type == data.ship_type_enum.TEST:
+		is_friendly = true
 	
 	var dissipation_coe: float = 12
 	passive_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation)
@@ -364,6 +369,8 @@ func _ready() -> void:
 			child.detection_parameters(collision_mask, is_friendly, get_rid())
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
+	
+
 	# Assign weapon system groups and weapons based on ship_stats.
 	for i in range(all_weapons.size()):
 		all_weapons[i].set_weapon_slot(ship_stats.weapon_slots[i])
@@ -406,7 +413,11 @@ func _ready() -> void:
 		is_friendly = false
 		rotation += PI/2
 	
-	CombatBehaviorTree.toggle_root(true)
+	if ship_hull.ship_type == data.ship_type_enum.TEST:
+		CombatBehaviorTree.ToggleRoot(true)
+	else:
+		CombatBehaviorTree.toggle_root(true)
+	
 	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
 	for map in template_maps.values():
@@ -803,6 +814,9 @@ func set_navigation_position(to_position: Vector2) -> void:
 
 @warning_ignore("narrowing_conversion")
 func _physics_process(delta: float) -> void:
+	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
+		return
+	
 	# Calculating flux dissipation in multiple places throughout the code is prone to disaster. Put any additions or subtractions in here.
 	if Engine.get_physics_frames() % 5 == 0 and flux_overload == false:
 		var flux_to_dissipate: float
@@ -847,9 +861,6 @@ func _physics_process(delta: float) -> void:
 		
 		update_flux_indicators()
 	
-	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
-		return
-	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
 		update_agent_influence.emit(imap_cell, current_imap_cell)
@@ -889,8 +900,6 @@ func _physics_process(delta: float) -> void:
 		linear_damp = 0.0
 		if collision_flag == true:
 			collision_flag = false
-		if brake_flag == true:
-			brake_flag = false
 	
 	if camera_feed == true:
 		CombatCamera.global_position = self.global_position
@@ -995,7 +1004,12 @@ func _on_target_in_range(value: bool) -> void:
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
-	CombatBehaviorTree.toggle_root(value)
+	
+	if ship_stats.ship_hull.ship_type == data.ship_type_enum.TEST:
+		CombatBehaviorTree.ToggleRoot(value)
+	else:
+		CombatBehaviorTree.toggle_root(value)
+	
 	for weapon in all_weapons:
 		weapon.AI_enabled = value
 		weapon.auto_aim = true

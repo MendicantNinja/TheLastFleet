@@ -1,6 +1,5 @@
 using Godot;
-using System;
-
+[Icon("res://Art/MetaIcons/BehaviorTree/category_bt.svg")]
 public abstract partial class BehaviorTreeNode : BehaviorTree
 {
     public enum MapType 
@@ -12,9 +11,9 @@ public abstract partial class BehaviorTreeNode : BehaviorTree
 	VULNERABILITY_MAP,
 	}
 
-	public SteerData steer_data;
+	public SteerData steer_data = null;
 
-	public ShipWrapper ship_wrapper;
+	public ShipWrapper ship_wrapper = null;
 
     public enum NodeState {FAILURE, SUCCESS, RUNNING};
 

@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
+[Icon("res://Art/MetaIcons/BehaviorTree/category_composite.svg")]
 public abstract partial class Composite : BehaviorTreeNode
 {
     protected List<BehaviorTreeNode> children = new List<BehaviorTreeNode>();

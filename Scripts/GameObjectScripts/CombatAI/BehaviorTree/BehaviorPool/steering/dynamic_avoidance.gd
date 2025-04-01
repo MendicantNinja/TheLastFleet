@@ -28,7 +28,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		var v: Vector2 = agent.linear_velocity - neighbor.linear_velocity
 		var r: float = agent.ShipNavigationAgent.radius + neighbor.ShipNavigationAgent.radius
 		var distance_sq: float = agent.global_position.distance_squared_to(neighbor.global_position)
-		var test_sq: float = p.dot(p)
 		var cone: float = v.dot(v) * (p.dot(p) - r**2)
 		var rel_v: float = (v.dot(p) ** 2)
 		if rel_v <= cone:
@@ -50,6 +49,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	
 	var min_dist: float = avoid_vel.keys().min()
 	var new_velocity: Vector2 = avoid_vel[avoid_vel.keys().min()]
-	agent.heur_velocity = new_velocity.limit_length(agent.speed)
+	agent.heur_velocity = new_velocity
 	agent.acceleration = new_velocity
 	return FAILURE

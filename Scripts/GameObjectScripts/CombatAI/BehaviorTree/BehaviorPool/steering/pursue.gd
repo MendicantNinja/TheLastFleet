@@ -52,7 +52,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		distance_to = predict_agent_position.distance_to(predicted_position)
 		direction_to_path = predict_agent_position.direction_to(predicted_position)
 	
-	
 	time += delta + agent.time_coefficient
 	if time > 4.0:
 		time = 0.0
