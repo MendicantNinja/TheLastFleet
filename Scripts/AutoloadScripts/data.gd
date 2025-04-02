@@ -118,6 +118,7 @@ enum ship_system_enum {
 	PHASE, # Order AI to turn it on when a large amount of damage is incoming and flux is available.
 	
 }
+
 var ship_system_dictionary: Dictionary = {
 	#for copy pasting quickly ship_type_enum.RAPTOR : load(),
 	ship_system_enum.STEALTH : load("res://Resources/ShipSystems/Stealth.tres"),

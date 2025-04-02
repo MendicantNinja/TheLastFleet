@@ -62,6 +62,7 @@ var default_direction: Transform2D
 var target_unit: RID = RID()
 var current_target_id: RID = RID()
 var owner_rid: RID = RID()
+var shield_rid: RID = RID()
 
 # Special Beam Logic
 var current_beam: Projectile = null
@@ -87,7 +88,7 @@ func fire(ship_id: int) -> void:
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = weapon_node.global_transform
-	projectile.assign_stats(weapon, owner_rid, is_friendly)
+	projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 	
 	if projectile.is_beam == true:
 		current_beam = projectile
@@ -170,10 +171,11 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
 	rate_of_fire_timer.wait_time = interval_in_seconds
 
-func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
+func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
 	effective_range.collision_mask = mask
 	is_friendly = friendly_value
 	owner_rid = owner_value
+	shield_rid = p_shield_rid
 	auto_aim = true
 	auto_fire = true
 	#set_weapon_size_and_color()

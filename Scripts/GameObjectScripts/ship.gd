@@ -31,9 +31,9 @@ var TacticalDataDrawing: Node2D
 # Should group weapon slots in the near future instead of this, 
 # even though call_group() broke in 4.3 stable.
 @onready var ShieldSlot = $ShieldSlot
-@onready var ShieldArea = $ShieldSlot/Shields
-@onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
+@onready var ShieldShape
 @onready var DetectionArea = $DetectionArea
+var shield_rid: RID
 # ship stats
 var ship_stats: ShipStats
 var speed: float = 0.0
@@ -216,6 +216,10 @@ func _ready() -> void:
 	armor = ship_hull.armor
 	shield_radius = ShipNavigationAgent.radius
 	shield_upkeep = ship_hull.shield_upkeep
+	ShieldShape = ShieldSlot.ShieldShape
+	ShieldSlot.shield_parameters(ship_stats.shield_arc, collision_layer, get_rid().get_id(), self)
+	ShieldSlot.shield_hit.connect(_on_Shield_Hit)
+	shield_rid = ShieldSlot.Shields.get_rid()
 	total_flux = ship_stats.flux
 	zero_flux_bonus = floor(speed / 3)
 	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)
@@ -236,7 +240,7 @@ func _ready() -> void:
 	for child in get_children():
 		if child is WeaponSlot:
 			all_weapons.append(child)
-			child.detection_parameters(collision_mask, is_friendly, get_rid())
+			child.detection_parameters(collision_mask, is_friendly, get_rid(), shield_rid)
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
 	# Assign weapon system groups and weapons based on ship_stats.
@@ -342,8 +346,9 @@ func process_damage(projectile: Projectile) -> void:
 		#print("projectile beam process damage was called")
 		# Armor should be done differently with beams. Probably. Playtesting needed.
 		if projectile.is_continuous == false:
-			var beam_projectile_divisor: int = .05/projectile.beam_duration # Inverse and multiply is quicker than 2x division.
-			var beam_projectile_damage: int = int(projectile.damage * beam_projectile_divisor)
+			var beam_projectile_divisor: float = projectile.beam_duration * 20.0
+			var inverse_divisor: float = 1.0 / beam_projectile_divisor
+			var beam_projectile_damage: int = int(projectile.damage * inverse_divisor)
 			#print(beam_projectile_damage)
 			var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
 			armor -= armor_damage_reduction
@@ -410,29 +415,9 @@ func destroy_ship() -> void:
 	#$"../TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing".setup()
 	queue_free()
 
-func toggle_shield() -> void:
-	if shield_toggle == false and flux_overload:
-		return
-	elif vent_flux_flag == true:
-		return
-	
-	if shield_toggle == false:
-		shield_toggle = true
-		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	elif shield_toggle == true:
-		shield_toggle = false
-		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
-
 func set_shields(value: bool) -> void:
-	shield_toggle = value
-	if value == true:
-		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	else:
-		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
+		shield_toggle = value
+		ShieldSlot.toggle_shields(value)
 
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
@@ -513,8 +498,11 @@ func _input(event: InputEvent) -> void:
 	if TacticalMapLayer == null or TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
 		return
 	if event is InputEventMouseButton:
-		if Input.is_action_just_pressed("m2") and manual_control:
-			toggle_shield()
+		if Input.is_action_just_pressed("m2") and manual_control and flux_overload == false:
+			if shield_toggle == true:
+				set_shields(false)
+			else:
+				set_shields(true)
 		if event.is_action_released("select"):
 				stop_firing_beams(selected_weapon_system.weapons)
 		elif Input.is_action_just_pressed("zoom in") and manual_control and zoom_value < zoom_in_limit:

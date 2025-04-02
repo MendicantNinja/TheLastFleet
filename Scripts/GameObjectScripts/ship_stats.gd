@@ -55,6 +55,7 @@ func update() -> void:
 	drive_field = ship_hull.drive_field + bonus_drive_field
 	hull_integrity = ship_hull.hull_integrity + bonus_hull_integrity
 	armor = ship_hull.armor + bonus_armor
+	shield_arc = ship_hull.shield_arc
 	shield_efficiency = ship_hull.shield_efficiency + bonus_shield_efficiency
 	flux = ship_hull.flux + bonus_flux
 	flux_dissipation = ship_hull.flux_dissipation + bonus_flux_dissipation
@@ -201,6 +202,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var hull_integrity: int                    # Ship's total hit points (health)
 @export var armor: int                        # Ship's armor rating (used for damage mitigation)
 
+@export var shield_arc: int
 @export var shield_efficiency: float          # How effective the shields are at blocking damage
 @export var flux: int                         # Total flux the ship can buildup before overloading
 @export var flux_dissipation: int             # Rate at which flux is dissipated (flux/sec)

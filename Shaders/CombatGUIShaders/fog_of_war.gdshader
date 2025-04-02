@@ -1,7 +1,7 @@
 shader_type canvas_item;
 //render_mode light_only;
 uniform sampler2D noise_texture: repeat_enable, filter_nearest; // Texture to modify fog
-uniform sampler2D visibility_texture; 
+uniform sampler2D visibility_texture;
 
 uniform float density: hint_range(0.0, 1.0) = 1.0;
  // If 1.0, do not reveal. If 0, do!)

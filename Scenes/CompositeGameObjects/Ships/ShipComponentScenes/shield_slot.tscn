@@ -1,18 +1,39 @@
-[gd_scene load_steps=3 format=3 uid="uid://bmogmneffwvgs"]
+[gd_scene load_steps=6 format=3 uid="uid://bmogmneffwvgs"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="1_0lsec"]
+[ext_resource type="Material" uid="uid://frj611bp24hs" path="res://Shaders/CombatShaders/shield_material.tres" id="2_43jcn"]
+[ext_resource type="Texture2D" uid="uid://cscr7f7fbu5ol" path="res://Extra-Temp-Imported/Light.png" id="2_veb2h"]
+[ext_resource type="Shader" path="res://Shaders/CombatShaders/shields.gdshader" id="3_cpuef"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gmyao"]
 resource_local_to_scene = true
+shader = ExtResource("3_cpuef")
+shader_parameter/shield_color = Vector4(0, 0.4, 1, 1)
+shader_parameter/ellipse_radius = Vector2(0.607, 1)
 
 [node name="ShieldSlot" type="Node2D"]
+z_index = -1
 script = ExtResource("1_0lsec")
 
 [node name="Shields" type="Area2D" parent="."]
 collision_layer = 0
-collision_mask = 8
+collision_mask = 15
 input_pickable = false
 
-[node name="ShieldShape" type="CollisionShape2D" parent="Shields"]
-shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
+[node name="ShieldShape" type="CollisionPolygon2D" parent="Shields"]
+build_mode = 1
+disabled = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+visible = false
+material = ExtResource("2_43jcn")
+position = Vector2(3.8147e-06, 0)
+rotation = 1.5708
+scale = Vector2(2.30588, 2.72941)
+texture = ExtResource("2_veb2h")
+
+[node name="ShieldVisuals" type="Polygon2D" parent="."]
+material = SubResource("ShaderMaterial_gmyao")
+texture = ExtResource("2_veb2h")
+polygon = PackedVector2Array(-100, -100, 100, -100, 100, 100, -100, 100)
+uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)

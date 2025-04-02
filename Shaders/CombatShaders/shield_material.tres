@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://frj611bp24hs"]
+
+[ext_resource type="Shader" path="res://Shaders/CombatShaders/shields.gdshader" id="1_g5yui"]
+
+[resource]
+shader = ExtResource("1_g5yui")
+shader_parameter/shield_color = Vector4(0, 0.4, 1, 1)
+shader_parameter/ellipse_radius = Vector2(0.607, 1)

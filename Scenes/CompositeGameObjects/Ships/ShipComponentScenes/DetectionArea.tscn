@@ -13,4 +13,4 @@ script = ExtResource("1_2pa5a")
 
 [node name="DetectionRadius" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_cl75h")
-debug_color = Color(0.0509804, 0.486275, 0.133333, 0.117647)
+debug_color = Color(0.0509804, 0.486275, 0.133333, 0)

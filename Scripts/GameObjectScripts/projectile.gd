@@ -55,8 +55,8 @@ func _physics_process(delta) -> void:
 			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
 		beam_line.points[1] = beam_end
 
-# Should be called when the projectile is created in weapon.gd.
-func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void: 
+# Should be called when the projectile is created in weapon_slot.gd.
+func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: bool) -> void: 
 	damage = weapon.damage_per_shot
 	speed = weapon.projectile_speed
 	range = weapon.range
@@ -80,6 +80,7 @@ func assign_stats(weapon: Weapon, rid: RID, friendly_value: bool) -> void:
 		beam_duration = weapon.beam_duration
 		beam_raycast = $RayCast2D
 		beam_raycast.add_exception_rid(owner_rid)
+		beam_raycast.add_exception_rid(shield_rid)
 		beam_raycast.target_position.x = range # Beam Raycast
 		beam_line = $Line2D
 		beam_damage_timer = $beam_damage_timer
@@ -106,13 +107,20 @@ func _on_Projectile_collision(body) -> void:
 	
 	var body_layer: int = body.collision_layer
 	if body_layer == 2: # obstacle layer
-		return 
+		queue_free()  # Free projectile after fading out
+		emit_signal("projectile_freed")  # Emit signal after freeing
+		return
 	
+	# Contact with a ship or projectile
 	if "hull_integrity" in body:
 		body.process_damage(self)
 		if is_beam == false:
 			queue_free()
+			return
 		#if is_continuous == false:
-			
-		
+	
+	# Contact with a shield
+	elif "shield_radius" in body:
+		if body.ship_id == ship_id:
+			return
 	

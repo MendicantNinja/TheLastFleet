@@ -24,6 +24,7 @@ ship_sprite = ExtResource("3_ir3qh")
 ship_scaling = 1
 hull_integrity = 4500
 armor = 700
+shield_arc = 270
 shield_efficiency = 0.4
 shield_upkeep = 1.5
 flux = 2000

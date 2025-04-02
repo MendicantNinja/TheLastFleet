@@ -251,13 +251,12 @@ func update() -> void:
 	else:
 		$"../../../ButtonList/ManualControlButton".disabled = false
 		$"../../../ButtonList/CameraFeedButton".disabled = false
-	for i in icon_list.size():
+	for i in range(icon_list.size() - 1, -1, -1):
 		if icon_list[i] == null or icon_list[i].assigned_ship == null:
 			icon_list[i].queue_free()
 			icon_list.erase(icon_list[i])
-			detection_list[i].queue_free() 
+			detection_list[i].queue_free()
 			detection_list.erase(detection_list[i])
-			continue
 	
 	for i in icon_list.size():
 		var icon = icon_list[i]
