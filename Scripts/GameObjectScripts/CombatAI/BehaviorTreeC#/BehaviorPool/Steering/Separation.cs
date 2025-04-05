@@ -6,12 +6,15 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class Separation : Action
 {
+	float epsilon = 0.1f;
 	float time = 0.0f;
 
 	public override NodeState Tick(Node agent)
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		steer_data = (SteerData)agent.Get("SteerData");
+
+		if (steer_data.BrakeFlag == true) return NodeState.FAILURE;
 
 		if (ship_wrapper.NeighborUnits == null || ship_wrapper.NeighborUnits.Length == 0)
 		{
@@ -22,6 +25,7 @@ public partial class Separation : Action
 		foreach (RigidBody2D unit in ship_wrapper.NeighborUnits)
 		{
 			if (unit == null) continue;
+			if (unit.LinearVelocity.Length() <= epsilon) continue;
 			if (ship_wrapper.IsFriendly == (bool)unit.Get("is_friendly"))
 			{
 				friendly_neighbors.Add(unit);
@@ -62,7 +66,6 @@ public partial class Separation : Action
 
 		if (strafe_direction.Count == 0)
 		{
-			time = 0.0f;
 			return NodeState.FAILURE;
 		}
 
@@ -72,23 +75,20 @@ public partial class Separation : Action
 			speed += steer_data.ZeroFluxBonus;
 		}
 
-		time += steer_data.NDelta + steer_data.TimeCoefficient;
 		double min_distance = strafe_direction.Keys.Min();
-		Vector2 separation_velocity = strafe_direction[min_distance] * speed * time;
-		if (time * speed > speed)
+		Vector2 separation_velocity = strafe_direction[min_distance] * speed * steer_data.Time;
+		if (steer_data.Time * speed > speed)
 		{
-			time = 0.0f;
-			separation_velocity = strafe_direction[min_distance] * speed;
+			steer_data.Time = 0.0f;
 		}
 		
-		Vector2 new_velocity = steer_data.DesiredVelocity * 0.5f + separation_velocity * 0.2f;
+		separation_velocity = strafe_direction[min_distance] * speed * time;
+		Vector2 new_velocity = steer_data.DesiredVelocity * 0.5f + separation_velocity * 0.5f;
 		if (ship_wrapper.CombatFlag == true)
 		{
 			new_velocity = steer_data.DesiredVelocity * 0.5f + separation_velocity * 0.5f;
 		}
 
-		
-		steer_data.Time = time;
 		steer_data.DesiredVelocity = new_velocity;
 		return NodeState.FAILURE;
 	}

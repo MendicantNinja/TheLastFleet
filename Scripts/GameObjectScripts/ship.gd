@@ -74,7 +74,11 @@ var overload_time: float = 5.0
 var passive_flux_dissipation: float = 0.0
 var vf_coe: float = 3.0
 var vent_flux_dissipation: float = 0.0
-var shield_toggle: bool = false
+var shield_toggle: bool = false:
+	set(value):
+		ShipWrapper.SetShieldToggle(value)
+		shield_toggle = value
+
 var flux_overload: bool = false:
 	set(value):
 		ShipWrapper.SetFluxOverload(value)
@@ -108,7 +112,7 @@ var weapon_systems: Array[WeaponSystem] = [
 	WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new(), WeaponSystem.new()
 ]
 var selected_weapon_system: WeaponSystem = weapon_systems[0]
-var all_weapons: Array[WeaponSlot]
+var all_weapons: Array
 var aim_direction: Vector2 = Vector2.ZERO
 var mouse_hover: bool = false
 
@@ -169,7 +173,7 @@ var combat_time: float = 5.0
 var target_unit: Ship = null:
 	set(value):
 		ShipWrapper.SetTargetUnit(value)
-		#SteerData.SetTargetUnit(value)
+		SteerData.SetTargetUnit(value)
 		target_unit = value
 
 var targeted_units: Array = []:
@@ -262,6 +266,12 @@ var target_position: Vector2 = Vector2.ZERO:
 	set(value):
 		SteerData.SetTargetPosition(value)
 		target_position = value
+
+var threat_radius: int = 0:
+	set(value):
+		var modify_threat_radius: int = (value - 1) / 2
+		SteerData.SetThreatRadius(modify_threat_radius * imap_manager.default_cell_size)
+		threat_radius = value
 
 var ship_select: bool = false:
 	# Ship Select is for individual ships when they're the only ships
@@ -392,8 +402,7 @@ func _ready() -> void:
 	var longest_range: float = weapon_ranges.max()
 	var occupancy_radius: int = (ship_stats.acceleration + ship_stats.bonus_acceleration + zero_flux_bonus) / 60
 	occupancy_radius += 1
-	var threat_radius: int = (longest_range / imap_manager.default_cell_size)
-	threat_radius += 1
+	threat_radius = (longest_range / imap_manager.default_cell_size) + 1
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		name = &"Player " + ship_hull.ship_type_name

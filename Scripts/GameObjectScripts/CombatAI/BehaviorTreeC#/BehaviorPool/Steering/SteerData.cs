@@ -18,7 +18,8 @@ public partial class SteerData : Node
     public float Time { get; set; }
     public float FOFRadius { get; private set; }
     public float SqFOFRadius { get; private set; }
-    public Vector2 MoveDirection { get; private set; }
+    public float ThreatRadius { get; private set; }
+    public Vector2 MoveDirection { get; set; }
     public Vector2 TargetPosition { get; private set; }
     [Export]
     public Godot.Vector2 debugTargetP { get; private set; }
@@ -57,6 +58,11 @@ public partial class SteerData : Node
     {
         FOFRadius = radius;
         SqFOFRadius = FOFRadius * FOFRadius;
+    }
+
+    public void SetThreatRadius(float radius)
+    {
+        ThreatRadius = radius;
     }
 
     public static Vector2 DirectionTo(Vector2 from, Vector2 to)

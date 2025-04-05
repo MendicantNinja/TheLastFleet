@@ -40,7 +40,10 @@ var can_look_at: bool = false
 var timer_fire: bool = false
 var can_fire: bool = false
 var flux_overload: bool = false
-var vent_flux: bool = false
+var vent_flux: bool = false:
+	set(value):
+		vent_flux = value
+
 var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
@@ -259,6 +262,9 @@ func acquire_new_target() -> void:
 	killcast.force_raycast_update()
 
 func acquire_new_target_AI() -> void:
+	if weighted_targets.is_empty():
+		return
+	
 	var max_prob: float = weighted_targets.keys().max()
 	for prob in weighted_targets:
 		var enemy_ids: Array = weighted_targets[prob]

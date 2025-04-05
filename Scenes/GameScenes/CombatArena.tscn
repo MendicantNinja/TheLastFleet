@@ -35,7 +35,7 @@
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
-[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="36_yq4wo"]
+[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="36_4q2va"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -902,40 +902,196 @@ offset_bottom = 1923.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
-[node name="TestShip" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(6679, 3086)
+[node name="TestShip" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2911, 6431)
 
-[node name="TestShip2" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(7136, 3099)
+[node name="TestShip2" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3596, 6412)
 
-[node name="TestShip3" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(7530, 3099)
+[node name="TestShip3" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3653, 7230)
 
-[node name="TestShip4" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(6984, 3657)
+[node name="TestShip4" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2987, 7173)
 
-[node name="TestShip5" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(7441, 3670)
+[node name="TestShip5" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4528, 6564)
 
-[node name="TestShip6" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(7835, 3670)
+[node name="TestShip6" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5213, 6545)
 
-[node name="TestShip7" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(3047, 3137)
+[node name="TestShip7" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5270, 7363)
 
-[node name="TestShip8" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(3504, 3150)
+[node name="TestShip8" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4604, 7306)
 
-[node name="TestShip9" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(3898, 3150)
+[node name="TestShip9" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2968, 7934)
 
-[node name="TestShip10" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(3352, 3708)
+[node name="TestShip10" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3653, 7915)
 
-[node name="TestShip11" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(3809, 3721)
+[node name="TestShip11" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3710, 8733)
 
-[node name="TestShip12" parent="." instance=ExtResource("36_yq4wo")]
-position = Vector2(4203, 3721)
+[node name="TestShip12" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3044, 8676)
+
+[node name="TestShip13" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4585, 8067)
+
+[node name="TestShip14" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5270, 8048)
+
+[node name="TestShip15" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5327, 8866)
+
+[node name="TestShip16" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4661, 8809)
+
+[node name="TestShip17" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2645, 1066)
+
+[node name="TestShip18" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3330, 1047)
+
+[node name="TestShip19" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3387, 1865)
+
+[node name="TestShip20" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2721, 1808)
+
+[node name="TestShip21" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4262, 1199)
+
+[node name="TestShip22" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4947, 1180)
+
+[node name="TestShip23" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5004, 1998)
+
+[node name="TestShip24" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4338, 1941)
+
+[node name="TestShip25" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2702, 2569)
+
+[node name="TestShip26" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3387, 2550)
+
+[node name="TestShip27" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(3444, 3368)
+
+[node name="TestShip28" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(2778, 3311)
+
+[node name="TestShip29" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4319, 2702)
+
+[node name="TestShip30" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5004, 2683)
+
+[node name="TestShip31" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5061, 3501)
+
+[node name="TestShip32" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(4395, 3444)
+
+[node name="TestShip33" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8353, 6678)
+
+[node name="TestShip34" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9038, 6659)
+
+[node name="TestShip35" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9095, 7477)
+
+[node name="TestShip36" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8429, 7420)
+
+[node name="TestShip37" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9970, 6811)
+
+[node name="TestShip38" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10655, 6792)
+
+[node name="TestShip39" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10712, 7610)
+
+[node name="TestShip40" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10046, 7553)
+
+[node name="TestShip41" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8410, 8181)
+
+[node name="TestShip42" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9095, 8162)
+
+[node name="TestShip43" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9152, 8980)
+
+[node name="TestShip44" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8486, 8923)
+
+[node name="TestShip45" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10027, 8314)
+
+[node name="TestShip46" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10712, 8295)
+
+[node name="TestShip47" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10769, 9113)
+
+[node name="TestShip48" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10103, 9056)
+
+[node name="TestShip49" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8087, 1313)
+
+[node name="TestShip50" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8772, 1294)
+
+[node name="TestShip51" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8829, 2112)
+
+[node name="TestShip52" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8163, 2055)
+
+[node name="TestShip53" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9704, 1446)
+
+[node name="TestShip54" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10389, 1427)
+
+[node name="TestShip55" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10446, 2245)
+
+[node name="TestShip56" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9780, 2188)
+
+[node name="TestShip57" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8144, 2816)
+
+[node name="TestShip58" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8829, 2797)
+
+[node name="TestShip59" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8886, 3615)
+
+[node name="TestShip60" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(8220, 3558)
+
+[node name="TestShip61" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9761, 2949)
+
+[node name="TestShip62" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10446, 2930)
+
+[node name="TestShip63" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(10503, 3748)
+
+[node name="TestShip64" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(9837, 3691)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

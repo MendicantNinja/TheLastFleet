@@ -4,7 +4,7 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class SeekAndArrive : Action
 {
-	float target_area_radius = 10.0f;
+	float target_area_radius = 50.0f;
 	float epsilon = 1.0f;
 	float time = 0.0f;
 
@@ -30,7 +30,7 @@ public partial class SeekAndArrive : Action
 		
 		time += steer_data.NDelta + steer_data.TimeCoefficient;
 		velocity = direction_to_path * speed * time;
-		float distance_to = Vector2.Distance(agent_position, steer_data.TargetPosition);
+		float distance_to = Vector2.Distance(agent_position, steer_data.TargetPosition) - target_area_radius;
 		if (ship_wrapper.SuccessfulDeploy == false && ship_wrapper.GroupLeader == false && distance_to < target_area_radius)
 		{
 			agent.Set("successful_deploy", true);
@@ -44,11 +44,20 @@ public partial class SeekAndArrive : Action
 		{
 			steer_data.BrakeFlag = true;
 		}
+		else if (distance_to > brake_distance && steer_data.BrakeFlag == true)
+		{
+			steer_data.BrakeFlag = false;
+		}
+
+		if (steer_data.BrakeFlag == false && speed * time > speed)
+		{
+			time = 0.0f;
+		}
 
 		if (steer_data.BrakeFlag == true)
 		{
-			float brake_time = lin_vel_len / speed;
-			velocity = Vector2.Lerp(Vector2.Zero, -velocity, brake_time);
+			velocity = new Vector2(lin_vel.X, lin_vel.Y);
+			velocity = -Vector2.Normalize(velocity) * speed;
 		}
 
 		if (steer_data.BrakeFlag == true & lin_vel_len < epsilon)
@@ -57,14 +66,9 @@ public partial class SeekAndArrive : Action
 			agent.Set("acceleration", Godot.Vector2.Zero);
 			agent.Set("linear_velocity", Godot.Vector2.Zero);
 			steer_data.BrakeFlag = false;
+			steer_data.DesiredVelocity = Vector2.Zero;
 			time = 0.0f;
 			return NodeState.SUCCESS;
-		}
-
-		if (steer_data.BrakeFlag == false && speed * time > speed)
-		{
-			time = 0.0f;
-			velocity = Vector2.Normalize(velocity) * speed;
 		}
 		
 		steer_data.Time = time;

@@ -1,10 +1,8 @@
 extends LeafAction
 
-var safe_distance: float = 0.0
 var offensive_threshold: float = 0.8
 var def_neut_threshold: float = 0.7
 var evasive_threshold: float = 0.5
-var this_is_stupid: float = 0.0
 var vent_flux: bool = false:
 	set(value):
 		vent_flux = value

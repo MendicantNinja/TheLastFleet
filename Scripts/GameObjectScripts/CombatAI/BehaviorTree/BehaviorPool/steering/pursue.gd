@@ -56,7 +56,6 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if time > 4.0:
 		time = 0.0
 	
-	speed += speed_modifier
 	if distance_to > threat_radius:
 		desired_velocity = direction_to_path * speed * time
 	elif distance_to < threat_radius and distance_to > agent.average_weapon_range:

@@ -1,6 +1,6 @@
 extends LeafAction
 
-var overload_thresh: float = 0.95
+var overload_thresh: float = 0.9
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.vent_flux_flag == true or agent.flux_overload == true:
