@@ -1,15 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://bmogmneffwvgs"]
+[gd_scene load_steps=4 format=3 uid="uid://bmogmneffwvgs"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="1_0lsec"]
-[ext_resource type="Material" uid="uid://frj611bp24hs" path="res://Shaders/CombatShaders/shield_material.tres" id="2_43jcn"]
-[ext_resource type="Texture2D" uid="uid://cscr7f7fbu5ol" path="res://Extra-Temp-Imported/Light.png" id="2_veb2h"]
-[ext_resource type="Shader" path="res://Shaders/CombatShaders/shields.gdshader" id="3_cpuef"]
+[ext_resource type="Material" uid="uid://frj611bp24hs" path="res://Shaders/CombatShaders/shield_material.tres" id="2_f7132"]
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_gmyao"]
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mtinx"]
 resource_local_to_scene = true
-shader = ExtResource("3_cpuef")
-shader_parameter/shield_color = Vector4(0, 0.4, 1, 1)
-shader_parameter/ellipse_radius = Vector2(0.607, 1)
 
 [node name="ShieldSlot" type="Node2D"]
 z_index = -1
@@ -24,16 +19,6 @@ input_pickable = false
 build_mode = 1
 disabled = true
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
-visible = false
-material = ExtResource("2_43jcn")
-position = Vector2(3.8147e-06, 0)
-rotation = 1.5708
-scale = Vector2(2.30588, 2.72941)
-texture = ExtResource("2_veb2h")
-
 [node name="ShieldVisuals" type="Polygon2D" parent="."]
-material = SubResource("ShaderMaterial_gmyao")
-texture = ExtResource("2_veb2h")
-polygon = PackedVector2Array(-100, -100, 100, -100, 100, 100, -100, 100)
-uv = PackedVector2Array(0, 0, 1, 0, 1, 1, 0, 1)
+material = ExtResource("2_f7132")
+texture = SubResource("PlaceholderTexture2D_mtinx")

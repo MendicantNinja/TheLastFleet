@@ -1,7 +1,7 @@
 extends Node2D
-# Used to detect the type during body collisions to safely check ship_id.
-@onready var Shields = $Shields
-@onready var ShieldShape = $Shields/ShieldShape
+
+@onready var Shields: Area2D = $Shields
+@onready var ShieldShape: CollisionPolygon2D = $Shields/ShieldShape
 @onready var ShieldVisuals: Polygon2D = $ShieldVisuals
 var shield_material: Material = load("res://Shaders/CombatShaders/shield_material.tres")
 
@@ -13,92 +13,82 @@ var shield_color: Color
 
 var theta: float
 var samples: int # More points = more of an accurate circle shape
-var ellipse_scale: float 
+var ellipse_scale: Vector2 
 var perimeter_points: PackedVector2Array
 
 signal shield_hit(damage, type)
 
 func _ready() -> void:
 	Shields.area_entered.connect(_on_Shields_entered)
-	
 
 func toggle_shields(value: bool) -> void:
+	#var pass_through = 0
 	if value == true:
+		print("toggle shields called true")
 		ShieldShape.disabled = false
-			# Populate the points of and create the collision shape
-			#await get_tree().create_timer(0.2).timeout # Raise Shields Gradually
-	else:
-		#ShieldShape.set_polygon(perimeter_points)
-		#ShieldVisuals.set_polygon(perimeter_points)
+		
+		ShieldVisuals.visible = true
+		# Precompute points
+		perimeter_points.append(Vector2(0, 0))
+		for i in range(samples):
+			var direction = 1 if i % 2 == 1 else -1  # Alternate R/L
+			var step = ceil(i / 2.0)  # 1,1,2,2,3,3...
+			var angle: float 
+
+			angle = -theta / 2 + (theta * i / samples)
+			perimeter_points.append(shield_radius * Vector2(cos(angle), sin(angle)))
+			#ShieldShape.set_polygon(perimeter_points)
+			#ShieldVisuals.set_polygon(perimeter_points)
+		#perimeter_points.append(Vector2(0, 0))
+		
+		var polygon_array: Array[Vector2]
+		var center: int = samples/2
+		for i in range(center): # Samples of 30 = 15 loops
+			if ShieldShape.disabled == true:
+				return
+			var left_boundary = center - i + 1 # center - 1 + 1 = 15
+			var right_boundary = center + i + 1 # center + 1 + 1 = 17
+			polygon_array.clear()
+			polygon_array.append(Vector2(0, 0))
+			for point in range(left_boundary, right_boundary+1): # Stops before n.
+				polygon_array.append(perimeter_points[point])
+			
+			ShieldShape.set_polygon(polygon_array)
+			ShieldVisuals.set_polygon(polygon_array)
+			await get_tree().create_timer(0.2).timeout # Raise Shields Gradually
+		#polygon_array.append(Vector2(0, 0))
+	elif value == false:
 		ShieldShape.disabled = true
-	ShieldVisuals.visible = value
+		perimeter_points.clear()
+		ShieldShape.set_polygon(perimeter_points)
+		ShieldVisuals.set_polygon(perimeter_points)
+		ShieldVisuals.visible = value
 	pass
-
+	# Setup the shields parameters initially.
 func shield_parameters(shield_arc: int, collision_layer: int, id: int, ship: Ship) -> void:
+	ShieldVisuals.material = shield_material.duplicate(true) 
 	var rectangle = ship.ShipSprite.get_rect()
-	rectangle.size += rectangle.size/3
+	rectangle.size.x = max(rectangle.size.x, rectangle.size.y)
+	rectangle.size.y = rectangle.size.x
+	rectangle.size += rectangle.size * .5 + Vector2(20, 20)
 	aabb = rectangle
-	
-	shield_radius = aabb.end.y
-	ellipse_scale = aabb.size.x/aabb.size.y # How many times bigger is the width than the height?
-
+	shield_radius = aabb.size.x/2
+	ShieldVisuals.texture.size = aabb.size
 	theta = deg_to_rad(shield_arc)
-	samples = 50 # More points = more of an accurate circle shape
+	samples = 30 # More points = more of an accurate circle shape
 	ship_id = id
 	Shields.collision_layer = collision_layer
-	
-	var normalized_radius: Vector2 = aabb.size / max(aabb.size.x, aabb.size.y) # Normalize
-		# Define a simple square (counterclockwise order)
-	# Define a simple square (counterclockwise order)
-	#var polygon = [
-		#Vector2(-50, 50),  # Bottom-left
-		#Vector2(50, 50),   # Bottom-right
-		#Vector2(50, -50),    # Top-right
-		#Vector2(-50, -50)    # Top-left
-	#]
-#
-	## Define corresponding UVs in (0,1) range
-	#var uvs = [
-		#Vector2(0, 1),  # Bottom-left
-		#Vector2(1, 1),  # Bottom-right
-		#Vector2(1, 0),  # Top-right
-		#Vector2(0, 0)   # Top-left
-	#]
-#
-	## Apply to Polygon2D
-	#ShieldVisuals.set_polygon(polygon)
-	#ShieldVisuals.set_uv(uvs)
-	#ShieldVisuals.material = shield_material.duplicate() 
-	
-	
-	#for i in range(samples):
-		#if i == 0:
-			#perimeter_points.append(Vector2(0, 0))
-			#continue
-		#var angle: float =  -theta / 2 + (theta * i / samples)
-		#perimeter_points.append(shield_radius * Vector2(cos(angle), sin(angle)*ellipse_scale))
-		#ShieldShape.set_polygon(perimeter_points)
-		#ShieldVisuals.set_polygon(perimeter_points)
-		##perimeter_points.clear()
-	#var uv_points: PackedVector2Array
-	#for i in range(perimeter_points.size()):
-		#var uv_x = (perimeter_points[i].x / aabb.size.x + 1.0) * 0.5  # Convert -1..1 to 0..1
-		#var uv_y = (perimeter_points[i].y / aabb.size.y + 1.0) * 0.5
-		##if i == 0:
-			##uv_y = 0.00
-		#var uv: Vector2 = Vector2(uv_x, uv_y)
-		#uv_points.append(uv)
-	#ShieldVisuals.set_uv(uv_points)
-	ShieldVisuals.material = shield_material.duplicate() 
-	#ShieldVisuals.material.set_shader_parameter("ellipse_radius", normalized_radius)
+
+	ShieldVisuals.material.set_shader_parameter("circle_radius", shield_radius)
 
 func _on_Shields_entered(projectile: Node2D) -> void: # Do not change the type to projectile.
-	print("on_shields entered")
 	if not projectile is Projectile:
 		return
-	
 	if projectile.ship_id == ship_id:
 		return
+
+	print("on shields entered")
+
 	if projectile.is_beam == true:
 		#print("projectile beam process damage was called")
 		# Armor should be done differently with beams. Probably. Playtesting needed.
