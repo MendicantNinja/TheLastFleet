@@ -2,6 +2,7 @@ extends Resource
 class_name SaveGame
 
 @export var player_fleet_stats: FleetStats
+@export var galaxy_map_stats: GalaxyMapStats
 @export var player_name: String
 @export var player_sectors: Array[PackedScene]
 
@@ -12,6 +13,7 @@ class_name SaveGame
 func save(image_to_save: ImageTexture = null) -> void:
 	# Do what you need to do with player and NPC data (Will need to do a for loop later). 
 	player_sectors = game_state.galaxy_map.galaxy_map_stats.pack();
+	galaxy_map_stats = game_state.galaxy_map.galaxy_map_stats;
 	player_fleet_stats = game_state.player_fleet.fleet_stats
 	player_name = game_state.player_name
 	
@@ -30,6 +32,7 @@ func save(image_to_save: ImageTexture = null) -> void:
 func load() -> void:
 	# Handle the data from the savegame class after calling ResourceLoader. Import them into the appropriate categories. 
 	# Data for the player and NPC's.
+	game_state.galaxy_map.galaxy_map_stats = galaxy_map_stats;
 	game_state.galaxy_map.galaxy_map_stats.unpack(player_sectors);
 	game_state.player_fleet.fleet_stats = player_fleet_stats 
 	game_state.player_name = player_name

@@ -17,6 +17,6 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	pass
 
-func randomize_stars() -> void:
+func randomize_stars(rng: RandomNumberGenerator) -> void:
 	for i in range($"..".columns * $"..".rows):
-		get_child(i).randomize_star();
+		get_child(i).randomize_star(rng);

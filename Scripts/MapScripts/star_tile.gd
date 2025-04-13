@@ -47,10 +47,10 @@ func _ready() -> void:
 	$Star.texture_idx = texture;
 	$Star.scale *= randf_range(0.6, 1.3);
 	
-func randomize_star() -> void:
+func randomize_star(rng: RandomNumberGenerator) -> void:
 	$Star.position = Vector2(
-		randf_range(padding, size.x - padding),
-		randf_range(padding, size.y - padding),
+		rng.randf_range(padding, size.x - padding),
+		rng.randf_range(padding, size.y - padding),
 	) - $Star.pivot_offset; # + global_position;
 	
 	var ret = $Reticle;

@@ -2,7 +2,7 @@ extends Control
 
 @export var movement_factor = 0.1;
 @onready var target_position = position;
-var current_idx = 0;
+@export_storage var current_idx = 0;
 
 func _draw() -> void:
 	pass

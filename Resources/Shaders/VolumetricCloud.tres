@@ -1,0 +1,41 @@
+[gd_resource type="ShaderMaterial" load_steps=7 format=3 uid="uid://bbeesiwk4vn7x"]
+
+[ext_resource type="Shader" path="res://Resources/Shaders/VolumetricCloud.gdshader" id="1_sfckh"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_m3yvn"]
+noise_type = 3
+seed = 3
+frequency = 0.0589
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_s0w27"]
+seamless = true
+noise = SubResource("FastNoiseLite_m3yvn")
+
+[sub_resource type="Gradient" id="Gradient_0vbmc"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_gxvam"]
+noise_type = 3
+seed = 9
+frequency = 0.0096
+offset = Vector3(69.93, 0, 0)
+
+[sub_resource type="NoiseTexture3D" id="NoiseTexture3D_6nj34"]
+seamless = true
+seamless_blend_skirt = 0.604
+color_ramp = SubResource("Gradient_0vbmc")
+noise = SubResource("FastNoiseLite_gxvam")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_sfckh")
+shader_parameter/cloud_scale = 1.961
+shader_parameter/cloud_threshold = 0.492
+shader_parameter/cloud_threshold_multiplier = 0.535
+shader_parameter/max_steps = 200
+shader_parameter/step_size = 0.01
+shader_parameter/cloud_scroll_speed = 0.02
+shader_parameter/minBounds = Vector3(-7, -0.5, -7)
+shader_parameter/maxBounds = Vector3(7, 0.5, 7)
+shader_parameter/detail_intensity = 0.5
+shader_parameter/cloud_noise_texture = SubResource("NoiseTexture3D_s0w27")
+shader_parameter/detail_noise_texture = SubResource("NoiseTexture3D_6nj34")

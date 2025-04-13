@@ -12,6 +12,10 @@ class_name SectorMap
 
 @export var label_offset = Vector2(5, 10);
 
+@export_storage var seed = randi();
+
+@onready var rng = RandomNumberGenerator.new();
+
 func get_star_xy(x: int, y: int) -> Star:
 	return get_star_id(x % columns + (y % rows) * columns);
 	
@@ -25,8 +29,8 @@ func _init() -> void:
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	entrance_row = (randi() if entrance_row < 0 else entrance_row) % rows;
-	exit_row = (randi() if exit_row < 0 else exit_row) % rows;
+	entrance_row = (rng.randi() if entrance_row < 0 else entrance_row) % rows;
+	exit_row = (rng.randi() if exit_row < 0 else exit_row) % rows;
 	
 	entrance = get_star_xy(0, entrance_row);
 	exit = get_star_xy(columns - 1, exit_row);
@@ -34,7 +38,8 @@ func _ready() -> void:
 	$Ship.initialize();
 	
 func randomize_stars() -> void:
-	$GridContainer.randomize_stars();
+	rng.set_seed(seed)
+	$GridContainer.randomize_stars(rng);
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

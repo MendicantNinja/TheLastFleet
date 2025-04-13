@@ -1,8 +1,9 @@
 extends Resource
 class_name GalaxyMapStats
 
-# FIXME!!! TEMPORARY!!!
 @export_storage var sectors : Array[SectorMap] = [null, null, null, null, null, null, null, null];
+@export_storage var selected_path : Array[int] = [0];
+@export_storage var seed : int = 0;
 
 # Called after load to unpack all saved sectors. 
 func unpack(saved_sectors: Array[PackedScene]) -> void:

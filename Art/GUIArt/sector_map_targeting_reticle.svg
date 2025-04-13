@@ -14,6 +14,7 @@
    sodipodi:docname="sector_map_targeting_reticle.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
@@ -26,9 +27,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="1.8101279"
-     inkscape:cx="497.75488"
-     inkscape:cy="372.34938"
+     inkscape:zoom="1.0406944"
+     inkscape:cx="331.50941"
+     inkscape:cy="397.81129"
      inkscape:window-width="1728"
      inkscape:window-height="1051"
      inkscape:window-x="0"
@@ -41,10 +42,10 @@
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
        id="filter33"
-       x="-0.13251845"
-       y="-inf"
-       width="1.2650369"
-       height="inf">
+       x="-0.05486498"
+       y="-0.072289995"
+       width="1.10973"
+       height="1.1444498">
       <feGaussianBlur
          inkscape:collect="always"
          stdDeviation="0.95279608"
@@ -63,6 +64,42 @@
          stdDeviation="1.6538697"
          id="feGaussianBlur85" />
     </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient50"
+       id="radialGradient51"
+       cx="49.897839"
+       cy="146.69757"
+       fx="49.897839"
+       fy="146.69757"
+       r="9.1677752"
+       gradientTransform="matrix(0.8894962,0,0,0.8894962,5.5139005,16.210675)"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient50"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="0"
+         id="stop50" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:0;"
+         offset="1"
+         id="stop51" />
+    </linearGradient>
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter51"
+       x="-0.017593194"
+       y="-0.017593209"
+       width="1.0351864"
+       height="1.0351864">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.059660561"
+         id="feGaussianBlur51" />
+    </filter>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -72,7 +109,7 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square"
        id="rect1"
        width="113.91305"
-       height="120"
+       height="274.17392"
        x="0"
        y="22.826088"
        inkscape:label="background"
@@ -444,7 +481,7 @@
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:3;stroke-linecap:square"
        id="rect2"
        width="113.91305"
-       height="120"
+       height="274.17392"
        x="92.599907"
        y="22.826088"
        inkscape:label="background"
@@ -551,6 +588,27 @@
          id="path90"
          style="color:#000000;fill:#ffffff;-inkscape-stroke:none;fill-opacity:1"
          d="m 136.1797,100.38318 -1.09479,3.39086 1.42888,0.46135 1.09217,-3.3825 a 18.186964,18.186964 0 0 1 -0.58357,-0.13814 18.186964,18.186964 0 0 1 -0.84269,-0.33157 z m 10.63627,0.60822 0.91172,3.13222 1.44009,-0.41974 -0.91687,-3.14877 a 18.186964,18.186964 0 0 1 -1.43494,0.43629 z" />
+    </g>
+    <g
+       id="g51"
+       inkscape:export-filename="./sector_map_targeting_reticle_past.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <path
+         style="color:#000000;fill:#ffffff;fill-opacity:1;stroke-width:1;-inkscape-stroke:none"
+         d="m 47.019392,143.81913 c -1.587858,1.58785 -1.587858,4.16903 0,5.75688 1.587858,1.58786 4.169035,1.58786 5.756892,1e-5 1.587858,-1.58786 1.587857,-4.16904 -10e-7,-5.75689 -1.587857,-1.58786 -4.169033,-1.58786 -5.756891,0 z m 0.623575,0.62357 c 1.247008,-1.247 3.262734,-1.247 4.50974,0 1.247008,1.24701 1.247009,3.26273 2e-6,4.50974 -1.247008,1.247 -3.262734,1.247 -4.509741,-1e-5 -1.247008,-1.247 -1.247008,-3.26272 -1e-6,-4.50973 z"
+         id="path46"
+         sodipodi:nodetypes="ssssssssss" />
+      <path
+         style="color:#000000;fill:url(#radialGradient51);stroke-width:0.999998;-inkscape-stroke:none"
+         d="m 44.129611,140.92935 c -3.181968,3.18197 -3.181967,8.35448 1e-6,11.53644 3.181968,3.18197 8.354485,3.18197 11.536452,1e-5 3.181968,-3.18197 3.181965,-8.35448 -2e-6,-11.53645 -3.181967,-3.18197 -8.354482,-3.18197 -11.536451,0 z"
+         id="path46-3"
+         sodipodi:nodetypes="sssss" />
+      <path
+         style="color:#000000;fill:#ffffff;fill-opacity:1;stroke-width:1;-inkscape-stroke:none;filter:url(#filter51)"
+         d="m 47.019392,143.81913 c -1.587858,1.58785 -1.587858,4.16903 0,5.75688 1.587858,1.58786 4.169035,1.58786 5.756892,1e-5 1.587858,-1.58786 1.587857,-4.16904 -10e-7,-5.75689 -1.587857,-1.58786 -4.169033,-1.58786 -5.756891,0 z m 0.623575,0.62357 c 1.247008,-1.247 3.262734,-1.247 4.50974,0 1.247008,1.24701 1.247009,3.26273 2e-6,4.50974 -1.247008,1.247 -3.262734,1.247 -4.509741,-1e-5 -1.247008,-1.247 -1.247008,-3.26272 -1e-6,-4.50973 z"
+         id="path51"
+         sodipodi:nodetypes="ssssssssss" />
     </g>
   </g>
 </svg>

@@ -10,7 +10,7 @@ float luminance(vec3 color) {
 
 void fragment() {
 	vec4 albedo_color = texture(texture_albedo, UV);
-	
+
 	ALBEDO = vec3(albedo_color.r, albedo_color.g, albedo_color.b);
 	ALPHA = luminance(ALBEDO);
 }
