@@ -5,6 +5,7 @@
 
 [node name="Projectile" type="Area2D"]
 collision_layer = 0
+collision_mask = 0
 script = ExtResource("1_g831g")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]

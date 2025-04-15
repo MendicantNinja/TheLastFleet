@@ -14,6 +14,7 @@ var is_continuous = false
 var beam_duration: float
 var beam_raycast: RayCast2D = null
 var beam_line: Line2D = null
+var beam_end: Vector2 
 var beam_damage_timer: Timer = null
 var weapon_slot_rotation: float
 # Can't circularly reference the weapon slot directly. So update the beam!
@@ -34,7 +35,7 @@ func _ready() -> void:
 	z_index = 1
 	input_pickable = false
 	collision_layer = 8
-	collision_mask = 15
+	collision_mask = 31
 	self.body_entered.connect(_on_Projectile_collision)
 #
 func _physics_process(delta) -> void:
@@ -45,15 +46,16 @@ func _physics_process(delta) -> void:
 		if track_distance.length() >= range:
 			queue_free()
 	elif is_beam == true:
-		var beam_end = beam_raycast.target_position  # Default to max length
+		beam_end = beam_raycast.target_position  # Default to max length
 		if beam_raycast.is_colliding():
+			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
+			beam_line.points[1] = beam_end
 			var target = beam_raycast.get_collider()
 			if beam_damage_timer.is_stopped() == true:
 				#print("Emitting signal for beam weapon")
 				emit_signal("body_entered", target)
 				beam_damage_timer.start()
-			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
-		beam_line.points[1] = beam_end
+
 
 # Should be called when the projectile is created in weapon_slot.gd.
 func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: bool) -> void: 
@@ -92,6 +94,7 @@ func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: boo
 				queue_free()  # Free projectile after fading out
 				emit_signal("projectile_freed")  # Emit signal after freeing
 )
+		beam_raycast.collision_mask = 31
 		#beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
@@ -111,8 +114,18 @@ func _on_Projectile_collision(body) -> void:
 		emit_signal("projectile_freed")  # Emit signal after freeing
 		return
 	
-	# Contact with a ship or projectile
-	if "hull_integrity" in body:
+	# Collision acceptance and damage processing is handled by shield_slot.gd
+	# This is due to ShieldSlot being an area. Rather than a body.
+	if body is ShieldSlot:
+		if body.ship_id == ship_id:
+			return
+		body.process_damage(self)
+		if is_beam == false:
+			queue_free()
+			return
+	
+	# Contact with a ship (and later on in dev,  projectiles with hull integrity)
+	if body is Ship:
 		body.process_damage(self)
 		if is_beam == false:
 			queue_free()
@@ -120,7 +133,5 @@ func _on_Projectile_collision(body) -> void:
 		#if is_continuous == false:
 	
 	# Contact with a shield
-	elif "shield_radius" in body:
-		if body.ship_id == ship_id:
-			return
+
 	

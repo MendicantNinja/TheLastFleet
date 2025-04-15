@@ -9,6 +9,8 @@ uniform float circle_radius = .5;
 
 uniform vec2 ellipse_radius = vec2(.3035, .5);
 
+uniform vec2 hit_pos = vec2(-10.0); // Default off-screen
+uniform float hit_strength = 0.0;   // 0 = gone, 1 = fresh
 
 /*
 < 0 → Inside the circle
@@ -31,7 +33,6 @@ void fragment() {
 	// UV Ranges from -1 to 1
 	// Shield.x and Shield.y are ranges within this range. (.5, .5) (if AABB is square)
 	// -.5 is the center. 0 is the edge.
-	//float distance_from_center = sdfEllipse(UV, ellipse_radius);
 	float dist = sdfCircle(UV, .5); //
 	float shield_width = shield_px_width / circle_radius; // shield_width in UV for the currently sized ship
 	float alpha = .5;
@@ -39,16 +40,23 @@ void fragment() {
 		vec3 edge_rgb = mix(vec3(1.0), shield_color.rgb, 0.7); // adjust 0.5 as needed
 		COLOR = vec4(edge_rgb, 0.5);
 	}
-	else { // 0.0 to -.48 or so
+	
+	else { // 0.0 to -.48 or so. The rest of the shield.
 		vec2 sample_uv = UV * 0.5 + vec2(0.5);
 		float noise = texture(shield_noise_texture, sample_uv).r;
 		//alpha = noise;
 		alpha -= smoothstep(0.0, -.5, dist);
 		COLOR = vec4(shield_color.rgb, alpha);
-
-
 	}
+	
 
-	//float alpha = 1.0 - smoothstep(0.4, 0.5, dist); // soft edge falloff
+float hit_radius = 0.05; // tweak as needed
+float hit_dist = length(UV - hit_pos);
+float hit_fade = smoothstep(hit_radius, 0.0, hit_dist);
+float hit_alpha = hit_fade * hit_strength;
 
+vec3 hit_color = vec3(1.0); // white
+COLOR.rgb = mix(COLOR.rgb, hit_color, hit_alpha);
+
+	
 }

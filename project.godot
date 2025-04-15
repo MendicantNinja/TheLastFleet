@@ -154,6 +154,7 @@ toggle_map={
 2d_physics/layer_2="Obstacle"
 2d_physics/layer_3="EnemyShip"
 2d_physics/layer_4="Projectile"
+2d_physics/layer_5="Shields"
 2d_physics/layer_7="Projectiles Pass, Not Ships (map boundaries)"
 2d_physics/layer_8="Inputs (e.g. WeaponSlotRefitting)"
 2d_physics/layer_9="Misc. Stuff (Raycast Intersections for Proximity Warnings)"

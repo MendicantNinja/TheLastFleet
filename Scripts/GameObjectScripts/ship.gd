@@ -219,7 +219,7 @@ func _ready() -> void:
 	ShieldShape = ShieldSlot.ShieldShape
 	ShieldSlot.shield_parameters(ship_stats.shield_arc, collision_layer, get_rid().get_id(), self)
 	ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	shield_rid = ShieldSlot.Shields.get_rid()
+	shield_rid = ShieldSlot.get_rid()
 	total_flux = ship_stats.flux
 	zero_flux_bonus = floor(speed / 3)
 	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)

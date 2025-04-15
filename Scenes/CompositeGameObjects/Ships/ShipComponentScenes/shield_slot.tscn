@@ -6,19 +6,15 @@
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mtinx"]
 resource_local_to_scene = true
 
-[node name="ShieldSlot" type="Node2D"]
-z_index = -1
+[node name="Shields" type="StaticBody2D"]
+collision_layer = 16
+collision_mask = 0
 script = ExtResource("1_0lsec")
 
-[node name="Shields" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 15
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionPolygon2D" parent="Shields"]
-build_mode = 1
+[node name="ShieldShape" type="CollisionPolygon2D" parent="."]
 disabled = true
 
 [node name="ShieldVisuals" type="Polygon2D" parent="."]
 material = ExtResource("2_f7132")
+antialiased = true
 texture = SubResource("PlaceholderTexture2D_mtinx")
