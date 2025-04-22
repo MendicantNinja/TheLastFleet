@@ -36,7 +36,7 @@ func _ready() -> void:
 	input_pickable = false
 	collision_layer = 8
 	collision_mask = 31
-	self.body_entered.connect(_on_Projectile_collision)
+	self.body_entered.connect(_on_projectile_collision)
 #
 func _physics_process(delta) -> void:
 	if is_beam == false:
@@ -48,12 +48,17 @@ func _physics_process(delta) -> void:
 	elif is_beam == true:
 		beam_end = beam_raycast.target_position  # Default to max length
 		if beam_raycast.is_colliding():
+			var target = beam_raycast.get_collider()
+			if target is Projectile:
+				if target.ship_id == ship_id:
+					return
 			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
 			beam_line.points[1] = beam_end
-			var target = beam_raycast.get_collider()
+			
+			
 			if beam_damage_timer.is_stopped() == true:
 				#print("Emitting signal for beam weapon")
-				emit_signal("body_entered", target)
+				_on_projectile_collision(target)
 				beam_damage_timer.start()
 
 
@@ -98,7 +103,7 @@ func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: boo
 		#beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
-func _on_Projectile_collision(body) -> void:
+func _on_projectile_collision(body) -> void:
 	if body == null:
 		return
 	var body_id: RID = body.get_rid()
@@ -114,6 +119,9 @@ func _on_Projectile_collision(body) -> void:
 		emit_signal("projectile_freed")  # Emit signal after freeing
 		return
 	
+	#if body is Projectile: # Collide with enemy projectiles (point defense). 
+		#if body.is_friendly == false:
+			#body.process_damage()
 	# Collision acceptance and damage processing is handled by shield_slot.gd
 	# This is due to ShieldSlot being an area. Rather than a body.
 	if body is ShieldSlot:

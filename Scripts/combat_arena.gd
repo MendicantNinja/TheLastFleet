@@ -133,8 +133,8 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
 			elif i % 3 == 0:
 				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
-			#else:
-				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
+			else:
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 	var iterator: int 
 	for i in range (enemy_fleet.fleet_stats.ships.size()):
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()

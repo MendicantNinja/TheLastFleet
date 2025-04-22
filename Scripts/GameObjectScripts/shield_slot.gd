@@ -22,10 +22,83 @@ signal shield_hit(damage, type)
 func _ready() -> void:
 	pass
 
-#func _physics_process(delta) -> void:
-	#global_position = get_parent().global_position
-	#rotation = get_parent().rotation + 1.5708
-	#pass
+# Used for processing hit shaders with a timer. Process is good for vfx since it's called every frame.
+const MAX_HITS := 32
+var hits: Array[Dictionary] = [] # each hit = {pos, radius, timer}
+func _process(delta) -> void:
+	if hits.size() == 0:
+		set_process(false)
+		return
+
+	for i in range(hits.size() - 1, -1, -1): # Iterate backwards so we can remove stuff.
+		hits[i]["timer"] -= delta * 2.0
+		if hits[i]["timer"] <= 0.0:
+			hits.remove_at(i)
+
+	# Prepare arrays for shader
+	var hit_positions: Array = []
+	var hit_radii: Array = []
+	var hit_timers: Array = []
+
+	for i in range(min(hits.size(), MAX_HITS)):
+		hit_positions.append(hits[i]["pos"])
+		hit_radii.append(hits[i]["radius"])
+		hit_timers.append(clamp(hits[i]["timer"], 0.0, 1.0))
+
+	# Send to shader
+	ShieldVisuals.material.set_shader_parameter("hit_count", hit_positions.size())
+	ShieldVisuals.material.set_shader_parameter("hit_positions", hit_positions)
+	ShieldVisuals.material.set_shader_parameter("hit_radii", hit_radii)
+	ShieldVisuals.material.set_shader_parameter("hit_timers", hit_timers)
+
+func register_hit(uv_pos: Vector2, radius: float):
+	if hits.size() >= MAX_HITS:
+		hits.pop_front()
+	hits.append({
+		"pos": uv_pos,
+		"radius": radius,
+		"timer": .9
+	})
+	set_process(true)
+
+func process_damage(projectile: Projectile) -> void:
+	if not projectile is Projectile:
+		return
+	if projectile.ship_id == ship_id:
+		return
+	var local_pos: Vector2 # Where has the hit occured, in local coordinates?
+	var hit_radius: float # How large should the hit effect be? It's based on damage.
+	if projectile.is_beam == true:
+		#var test_position = projectile.to_global(projectile.beam_end) 
+		local_pos = to_local(projectile.to_global(projectile.beam_end))
+		
+		#print("projectile beam process damage was called")
+		# Armor should be done differently with beams. Probably. Playtesting needed.
+		if projectile.is_continuous == false:
+			var beam_projectile_divisor: float = projectile.beam_duration * 20.0
+			var inverse_divisor: float = 1.0 / beam_projectile_divisor
+			var beam_projectile_damage: int = int(projectile.damage * inverse_divisor)
+			shield_hit.emit(beam_projectile_damage, projectile.damage_type)
+			hit_radius = projectile.damage/500.0 * .01
+			#var debug =  beam_projectile_damage/500.0 * .3
+			#print("continuous beam damage is", debug)
+		else:
+			#var beam_projectile_divisor: int = 1 / .05
+			var beam_projectile_damage: int = int(projectile.damage * .05 )
+			shield_hit.emit(beam_projectile_damage, projectile.damage_type)
+			hit_radius = projectile.damage/500.0 * .1
+			#var debug =  beam_projectile_damage/500.0 * .3
+			#print("non-continuous beam damage is", debug)
+	elif projectile.is_beam == false:
+		local_pos = to_local(projectile.global_position)
+		hit_radius = projectile.damage/500.0 * .2 # 500 damage = full 8 pixels
+		projectile.call_deferred("queue_free")
+		shield_hit.emit(projectile.damage, projectile.damage_type)
+		#var debug =  projectile.damage/500.0 * .5
+		#print("projectile damage is", debug)
+	register_hit(local_pos/aabb.size, hit_radius)
+	pass
+
 
 func toggle_shields(value: bool) -> void:
 	#var pass_through = 0
@@ -84,45 +157,10 @@ func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: S
 	shield_radius = aabb.size.x/2
 	ShieldVisuals.texture.size = aabb.size
 	theta = deg_to_rad(shield_arc)
-	samples = 30 # More points = more of an accurate circle shape
+	samples = 30 # More points = more of an accurate circle shape, worse performance.
 	ship_id = id
-	#collision_layer = p_collision_layer
 
 	ShieldVisuals.material.set_shader_parameter("circle_radius", shield_radius)
-
-func process_damage(projectile: Projectile) -> void:
-	if not projectile is Projectile:
-		return
-	if projectile.ship_id == ship_id:
-		return
-	var local_pos: Vector2 # Where has the hit occured, in local coordinates?
-	if projectile.is_beam == true:
-		var test_position = projectile.to_global(projectile.beam_end) 
-		local_pos = to_local(projectile.to_global(projectile.beam_end))
-		#print("projectile beam process damage was called")
-		# Armor should be done differently with beams. Probably. Playtesting needed.
-		if projectile.is_continuous == false:
-			var beam_projectile_divisor: float = projectile.beam_duration * 20.0
-			var inverse_divisor: float = 1.0 / beam_projectile_divisor
-			var beam_projectile_damage: int = int(projectile.damage * inverse_divisor)
-			shield_hit.emit(beam_projectile_damage, projectile.damage_type)
-			ShieldVisuals.material.set_shader_parameter("hit_strength", beam_projectile_damage)
-			#print(beam_projectile_damage)
-		else:
-			#var beam_projectile_divisor: int = 1 / .05
-			var beam_projectile_damage: int = int(projectile.damage * .05 )
-			shield_hit.emit(beam_projectile_damage, projectile.damage_type)
-			ShieldVisuals.material.set_shader_parameter("hit_strength", beam_projectile_damage)
-			#print(beam_projectile_damage)
-	elif projectile.is_beam == false:
-		local_pos = to_local(projectile.global_position)
-		ShieldVisuals.material.set_shader_parameter("hit_strength", projectile.damage)
-		projectile.call_deferred("queue_free")
-		shield_hit.emit(projectile.damage, projectile.damage_type)
-	
-	ShieldVisuals.material.set_shader_parameter("hit_pos", local_pos)
-	pass
-
 	
 	#var shield_transform: Transform2D = global_transform
 	#var look_at_projectile: Transform2D = shield_transform.looking_at(projectile.global_position)
