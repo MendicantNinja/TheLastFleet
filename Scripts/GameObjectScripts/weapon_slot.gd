@@ -314,57 +314,58 @@ func _physics_process(delta) -> void:
 		var mouse_position = to_local(get_global_mouse_position())
 		var face_direction: Transform2D = face_weapon(mouse_position)
 		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
-	update_killcast(delta)
+	
+	if killcast.enabled == true:
+		var target_position: Vector2 = Vector2.ZERO
+		if available_targets.has(current_target):
+			target_position = to_local(available_targets[current_target].global_position)
+		
+		killcast.target_position = target_position
+		killcast.force_raycast_update()
+		var collider = killcast.get_collider()
+		if not collider is Ship or collider == null: # Do not shoot at obstacles
+			can_fire = false
+		elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+			can_fire = false
+		else:
+			can_fire = true
+		
+		if can_fire == true:
+			var collision_point: Vector2 = to_local(killcast.get_collision_point())
+			var dist_to: float = position.distance_to(collision_point)
+			if dist_to > weapon.range:
+				can_fire = false
+			else:
+				can_fire = true
+		
+		if (auto_aim or auto_fire):
+			var face_direction: Transform2D = face_weapon(target_position)
+			WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+		
+		if can_look_at and can_fire and timer_fire and auto_fire:
+			fire(owner_rid.get_id())
+			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
+				target_in_range.emit(true)
+		
+		if AI_enabled == true and available_targets.size() >= 1 and can_fire == false:
+			acquire_new_target_AI()
+		elif available_targets.size() >= 1 and can_fire == false:
+			acquire_new_target()
 
 # this function has two purposes:
 # A) updates the raycast every physics frame to track a ship's current position
 # B) checks to see if a ship the player targets is within the effective range of the weapon
-func update_killcast(delta) -> void:
-	if available_targets.size() == 0:
-		return
-	
-	var target_position: Vector2 = Vector2.ZERO
-	if available_targets.has(current_target):
-		target_position = to_local(available_targets[current_target].global_position)
-	
-	killcast.target_position = target_position
-	killcast.force_raycast_update()
-	var collider = killcast.get_collider()
-	if not collider is Ship or collider == null: # Do not shoot at obstacles
-		can_fire = false
-	elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
-		can_fire == false
-	else:
-		can_fire = true
-	
-	if can_fire == true:
-		var collision_point: Vector2 = to_local(killcast.get_collision_point())
-		var dist_to: float = position.distance_to(collision_point)
-		if dist_to > weapon.range:
-			can_fire = false
-		else:
-			can_fire = true
-	
-	if (auto_aim or auto_fire):
-		var face_direction: Transform2D = face_weapon(target_position)
-		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
-	
-	if can_look_at and can_fire and timer_fire and auto_fire:
-		fire(owner_rid.get_id())
-		if AI_enabled == true and primary_target != RID() and primary_target == current_target:
-			target_in_range.emit(true)
-	
-	if AI_enabled == true and available_targets.size() >= 1 and can_fire == false:
-		acquire_new_target_AI()
-	elif available_targets.size() >= 1 and can_fire == false:
-		acquire_new_target()
-	
+#func update_killcast(delta) -> void:
 
 # Creates the context for a weapon's given situation.
 func _on_EffectiveRange_entered(body) -> void:
 	if body.get_rid() == owner_rid: 
 		return # ignore any overlap with other weapon slots
-	elif is_friendly == body.is_friendly:
+	
+	if is_friendly == body.is_friendly and available_targets.is_empty() and killcast.enabled == true:
+		killcast.enabled = false
+	
+	if is_friendly == body.is_friendly:
 		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
 	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
 		return # ignore obstacle and projectile layers, respectively
@@ -410,6 +411,9 @@ func _on_EffectiveRange_exited(body) -> void:
 	
 	threat_exited.emit(body)
 	available_targets.erase(ship_id)
+	if available_targets.is_empty() and killcast.enabled == true:
+		killcast.enabled = false
+	
 	if AI_enabled == true and current_target == ship_id and primary_target == current_target:
 		SoftlockTimer.start()
 	elif AI_enabled == true and current_target == ship_id and available_targets.size() >= 1:

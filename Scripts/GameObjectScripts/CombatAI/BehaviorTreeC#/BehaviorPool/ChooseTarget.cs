@@ -11,19 +11,19 @@ public partial class ChooseTarget : Action
 	public override NodeState Tick(Node agent)
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		steer_data = (SteerData)agent.Get("SteerData");
-        
-		if (ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true || ship_wrapper.VentFluxFlag == true)
-		{
-			return NodeState.FAILURE;
-		}
-
-		if (steer_data.TargetUnit != null || ship_wrapper.TargetedUnits.Count == 0)
+		if (ship_wrapper.TargetedUnits.Count == 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true || ship_wrapper.VentFluxFlag == true)
 		{
 			return NodeState.FAILURE;
 		}
 		
-		Godot.Vector2 agent_pos = (Godot.Vector2)agent.Get("global_position");
+		steer_data = (SteerData)agent.Get("SteerData");
+		if (steer_data.TargetUnit != null && ship_wrapper.TargetUnit != null)
+		{
+			return NodeState.FAILURE;
+		}
+
+		RigidBody2D n_agent = agent as RigidBody2D;
+		Godot.Vector2 agent_pos = n_agent.GlobalPosition;
 		Godot.Collections.Dictionary<float, Godot.Collections.Array<int>> weigh_targets = new Godot.Collections.Dictionary<float, Godot.Collections.Array<int>>();
 		List<RigidBody2D> evaluate_targets = new List<RigidBody2D>();
 		List<RigidBody2D> available_targets = new List<RigidBody2D>();
@@ -39,10 +39,10 @@ public partial class ChooseTarget : Action
 			}
 			weigh_targets[prob].Append(target.GetIndex());
 		   
-			Godot.Vector2 target_pos = (Godot.Vector2)target.Get("global_position");
+			Godot.Vector2 target_pos = target.GlobalPosition;
 			float dist = agent_pos.DistanceSquaredTo(target_pos);
 			sq_dist.Add(dist);
-			if (target_wrapper.TargetedBy.Count == 0)
+			if (target_wrapper.TargetedBy is null || target_wrapper.TargetedBy.Count == 0)
 			{
 				available_targets.Add(target);
 			}
@@ -61,9 +61,8 @@ public partial class ChooseTarget : Action
 		{
 			return NodeState.FAILURE;
 		}
-		
-		float min_distance = sq_dist.Min();
 
+		float min_distance = sq_dist.Min();
 		foreach (RigidBody2D target in evaluate_targets)
 		{
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
@@ -91,10 +90,6 @@ public partial class ChooseTarget : Action
 			if (final_weight < 1.0f) available_targets.Add(target);
 		}
 
-		if (available_targets.Count == 0) 
-		{
-			return NodeState.FAILURE;
-		}
 		Dictionary<float, RigidBody2D> weighted_targets = new Dictionary<float, RigidBody2D>();
 		foreach (RigidBody2D target in available_targets)
 		{
@@ -112,11 +107,11 @@ public partial class ChooseTarget : Action
 			weighted_targets[prob] = target;
 		}
 
-		RigidBody2D n_target = null;
-		if (weighted_targets.Keys.Count == 0)
+		RigidBody2D n_target;
+		if (weighted_targets.Count == 0)
 		{
-			int rand_int = (int)GD.Randi() % available_targets.Count - 1;
-			n_target = available_targets[rand_int];
+			int rand_int = GD.RandRange(0, ship_wrapper.TargetedUnits.Count - 1);
+			n_target = ship_wrapper.TargetedUnits[rand_int];
 		}
 		else
 		{
@@ -124,10 +119,11 @@ public partial class ChooseTarget : Action
 			n_target = weighted_targets[max_prob];
 		}
 
-		ShipWrapper n_target_wrapper = (ShipWrapper)n_target.Get("ShipWrapper");
+		Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)n_target.Get("targeted_by");
 		steer_data.TargetUnit = n_target;
 		ship_wrapper.TargetUnit = n_target;
-		n_target_wrapper.TargetedBy.Add((RigidBody2D)agent);
+		targeted_by.Add(n_agent);
+		n_target.Set("targeted_by", targeted_by);
 		agent.Call("set_target_for_weapons", n_target);
 		return NodeState.FAILURE; 
 	}

@@ -4,31 +4,89 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class SteerData : Node
 {
-	[Export]
-	public RigidBody2D TargetUnit { get; set; }
-    public Vector2 DesiredVelocity { get; set; }
+    // Core Parameters
     [Export]
-    public float DefaultAcceleration { get; private set; }
-    public float Deceleration { get; private set; }
-    public float ZeroFluxBonus { get; private set; }
-    public float TurnRate { get; private set; }
+    public RigidBody2D TargetUnit { get; set; }
+    
+    public Vector2 DesiredVelocity { get; set; } = Vector2.Zero;
+    
     [Export]
-    public float NDelta { get; private set; }
-    public float TimeCoefficient { get; private set; }
+    public float DefaultAcceleration { get; set; }
+    public float Deceleration { get; set; }
+    public float ZeroFluxBonus { get; set; }
+    public float TurnRate { get; set; }
+
+    public Vector2 LinearVelocity { get; set; }
+    
+    [Export]
+    public float NDelta { get; set; }
+    
+    public float TimeCoefficient { get; set; }
     public float Time { get; set; }
-    public float FOFRadius { get; private set; }
-    public float SqFOFRadius { get; private set; }
-    public float ThreatRadius { get; private set; }
-    public Vector2 MoveDirection { get; set; }
-    public Vector2 TargetPosition { get; private set; }
+
     [Export]
-    public Godot.Vector2 debugTargetP { get; private set; }
+    public float SqSeparationRadius { get; private set; }
+    public float FOFRadius { get; set; }
+    public float SqFOFRadius { get; set; }
+    public float AvoidRadius { get; set; }
+    [Export]
+    public float ThreatRadius { get; private set; }
+
+    public int AvoidanceBias = 0;
+    
+    public Vector2 MoveDirection { get; set; } = Vector2.Zero;
+    public Vector2 TargetPosition { get; set; } = Vector2.Zero;
+    
+    [Export]
+    public Godot.Vector2 debugTargetP { get; set; } // Keeps the original Godot type if needed for debugging.
     [Export]
     public bool BrakeFlag { get; set; }
+    
     public float RADCoe = 2.0f;
+    
+    // --- Steering Behavior Forces ---
+    // These properties let your individual behavior modules simply assign to the vector.
+    public Vector2 SeparationForce { get; set; } = Vector2.Zero;
+    public Vector2 AvoidanceForce { get; set; } = Vector2.Zero;
+    
+    // Weights for blending forces.
+    public float SeparationWeight { get; set; } = 0.0f;
+    public float AvoidanceWeight { get; set; } = 0.0f;
+    public float GoalWeight { get; set; } = 1.0f;
+    
+    // Computed aggregation of all steering forces.
+    public Vector2 SteeringForce
+    {
+        get
+        {
+            Vector2 aggregated = DesiredVelocity;
+            float total_weight = SeparationWeight + AvoidanceWeight + GoalWeight;
+            if (total_weight == 0.0f) return aggregated;
+                        
+            aggregated = SeparationForce * SeparationWeight +
+                                 AvoidanceForce * AvoidanceWeight +
+                                 DesiredVelocity;
+            
+            aggregated /= total_weight;
+            return aggregated;
+        }
+    }
+    
+    // A convenience routine to update the agent's final desired velocity.
+    public void UpdateDesiredVelocity(float maxForce)
+    {
+        Vector2 force = SteeringForce;
+        if (force.Length() > maxForce)
+        {
+            force = Vector2.Normalize(force) * maxForce;
+        }
+        DesiredVelocity = force;
+    }
+    
     public void Initialize(Node agent)
     {
-        var shipStats = (Resource)agent.Get("ship_stats") ?? throw new InvalidOperationException("ship_stats cannot be null");
+        var shipStats = (Resource)agent.Get("ship_stats") 
+                        ?? throw new InvalidOperationException("ship_stats cannot be null");
         DesiredVelocity = Vector2.Zero;
         DefaultAcceleration = (float)shipStats.Get("acceleration") + (float)shipStats.Get("bonus_acceleration");
         TimeCoefficient = (float)agent.Get("time_coefficient");
@@ -54,6 +112,11 @@ public partial class SteerData : Node
         debugTargetP = vector;
 	}
 
+    public void SetTargetUnit(RigidBody2D target)
+    {
+        TargetUnit = target;
+    }
+
     public void SetFOFRadius(float radius)
     {
         FOFRadius = radius;
@@ -63,6 +126,16 @@ public partial class SteerData : Node
     public void SetThreatRadius(float radius)
     {
         ThreatRadius = radius;
+    }
+
+    public void SetAvoidRadius(float radius)
+    {
+        AvoidRadius = radius;
+    }
+
+    public void SetSqSeparationRadius(float radius)
+    {
+        SqSeparationRadius = radius;
     }
 
     public static Vector2 DirectionTo(Vector2 from, Vector2 to)

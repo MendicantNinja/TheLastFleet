@@ -44,7 +44,7 @@ func clear_map() -> void:
 		row_reset.resize(width)
 		row_reset.fill(0.0)
 		map_grid[m] = row_reset
-		update_row_value.emit(m, row_reset) 
+		#update_row_value.emit(m, row_reset) 
 		# Might need that for debugging but unlikely
 
 @warning_ignore("integer_division", "narrowing_conversion")

@@ -6,18 +6,16 @@ public partial class Pursue : Action
 {
 	RigidBody2D target_unit = null;
 	float prediction_window = 2.0f;
-	float time = 0.0f;
 
 	public override NodeState Tick(Node agent)
 	{
-		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		steer_data = (SteerData)agent.Get("SteerData");
-
-		if (steer_data.TargetUnit == null)
+		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
+		if (steer_data.TargetUnit == null || ship_wrapper.TargetUnit == null)
 		{
 			return NodeState.SUCCESS;
 		}
-
+		
 		if (ship_wrapper.VentFluxFlag == true || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
 		{
 			return NodeState.FAILURE;
@@ -27,8 +25,11 @@ public partial class Pursue : Action
 		ShipWrapper target_wrapper = (ShipWrapper)ship_wrapper.TargetUnit.Get("ShipWrapper");
 		if (ship_wrapper.TargetInRange == true && (target_wrapper.FallbackFlag == true || target_wrapper.RetreatFlag == true))
 		{
-			target_wrapper.TargetedBy.Remove(n_agent);
+			Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
+			targeted_by.Remove(n_agent);
+			ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
 			steer_data.TargetUnit = null;
+			ship_wrapper.TargetUnit = null;
 			agent.Call("set_target_for_weapons", steer_data.TargetUnit);
 			return NodeState.SUCCESS;
 		}
@@ -49,10 +50,10 @@ public partial class Pursue : Action
 			speed += steer_data.ZeroFluxBonus;
 		}
 
-		Vector2 velocity = speed * direction_to * time;
+		Vector2 velocity = speed * direction_to;
 		Vector2 target_lin_vel = new Vector2(target_unit.LinearVelocity.X, target_unit.LinearVelocity.Y);
 		Vector2 pred_direction = Vector2.Normalize(target_lin_vel);
-		if (Math.Floor(target_unit.LinearVelocity.Length()) > 0.0f)
+		if (Math.Floor(target_lin_vel.Length()) > 0.0f)
 		{
 			SteerData target_steer_data = (SteerData)target_unit.Get("SteerData");
 			Vector2 pred_agent_pos = agent_pos + velocity;
@@ -65,32 +66,27 @@ public partial class Pursue : Action
 			direction_to = SteerData.DirectionTo(pred_agent_pos, pred_target_pos);
 		}
 
-		time += steer_data.NDelta + steer_data.TimeCoefficient;
-		if (time * speed > speed)
-		{
-			time = 0.0f;
-		}
-
 		if (distance_to > steer_data.ThreatRadius)
 		{
-			velocity = direction_to * speed * time;
+			steer_data.GoalWeight = 1.0f;
+			velocity = direction_to * speed;
 		}
 		else if (distance_to < steer_data.ThreatRadius && distance_to > ship_wrapper.AverageWeaponRange)
 		{
-			if (ship_wrapper.CombatFlag == false) ship_wrapper.SetCombatFlag(true);
-			float scale_speed = (distance_to - steer_data.ThreatRadius) / (steer_data.ThreatRadius - ship_wrapper.AverageWeaponRange);
-			if (scale_speed < -0.7f) scale_speed = 0.1f;
-			speed *= scale_speed;
-			velocity = direction_to * speed * time;
+			agent.Set("combat_flag", true);
+			float normalized_distance = 1.0f - (distance_to - ship_wrapper.AverageWeaponRange) / (steer_data.ThreatRadius - ship_wrapper.AverageWeaponRange);
+   			steer_data.GoalWeight = Mathf.Clamp(normalized_distance, 0.1f, 0.5f);
+			velocity = direction_to * Mathf.Lerp(speed, -speed * steer_data.GoalWeight, steer_data.GoalWeight); // Gradual slowdown
 		}
 		else
 		{
-			float scale_speed = (ship_wrapper.AverageWeaponRange - distance_to) / ship_wrapper.AverageWeaponRange;
-			velocity = pred_direction * speed * scale_speed;
+			float normalized_weight = Mathf.Clamp(ship_wrapper.AverageWeaponRange - distance_to / ship_wrapper.AverageWeaponRange, 0.1f, 1.0f);
+			steer_data.GoalWeight = normalized_weight / 2.0f;
+	
+			velocity = direction_to * Mathf.Lerp(0.0f, -speed * steer_data.GoalWeight, normalized_weight); // More controlled movement near combat range
 		}
 
 		steer_data.DesiredVelocity = velocity;
-		steer_data.Time = time;
 		return NodeState.FAILURE;
 	}
 }

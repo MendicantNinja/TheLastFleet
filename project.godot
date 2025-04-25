@@ -21,7 +21,7 @@ data="*res://Scripts/AutoloadScripts/data.gd"
 settings="*res://Scripts/AutoloadScripts/settings.gd"
 game_state="*res://Scripts/AutoloadScripts/game_state.gd"
 globals="*res://Scripts/AutoloadScripts/globals.gd"
-imap_manager="*res://Scripts/imap_manager.gd"
+imap_manager="*res://Scripts/GameObjectScripts/imap_manager.gd"
 Bulletdecalmanager="*res://bulletdecalmanager.tscn"
 
 [debug]

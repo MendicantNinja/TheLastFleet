@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Threading;
 using Vector2 = System.Numerics.Vector2;
 
 public partial class ShipWrapper : Node
@@ -32,7 +33,7 @@ public partial class ShipWrapper : Node
 	[Export]
 	public bool VentFluxFlag { get; private set; }
 	[Export]
-	public int CombatGoal { get; private set; }
+	public Goal CombatGoal { get; private set; }
 	[Export]
 	public bool TargetInRange { get; private set; }
 	[Export]
@@ -50,7 +51,7 @@ public partial class ShipWrapper : Node
 	[Export]
 	public bool MatchVelocityFlag { get; private set; }
 	[Export]
-	public bool ShieldToggle { get; private set; }
+	public bool ShieldFlag { get; private set; }
 	public float ApproxInfluence { get; private set; }
 	public float TotalFlux { get; private set; }
 	public float SoftFlux { get; private set; }
@@ -60,17 +61,22 @@ public partial class ShipWrapper : Node
 	public List<Node2D> AllWeapons { get; private set; } = new List<Node2D>();
 	public Strategy Posture { get; private set; }
 	public List<RigidBody2D> TargetedUnits { get; private set; } = new List<RigidBody2D>();
+	[Export]
 	public RigidBody2D TargetUnit { get; set; }
-	public Array NeighborUnits { get; private set; }
+	public Godot.Collections.Array<RigidBody2D> NeighborUnits { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
+	[Export]
+	public Godot.Collections.Array<RigidBody2D> SeparationNeighbors { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Vector2I ImapCell { get; private set; }
 	public Vector2I RegistryCell { get; private set; }
+	public Vector2I[] RegistryNeighborhood { get; private set; }
 	public float DefaultCellSize { get; private set; }
 	public float MaxCellSize { get; private set; }
+	[Export]
 	public float AverageWeaponRange { get; private set; }
 	public List<string> AvailableNeighborGroups { get; set; }
 	public List<string> NearbyEnemyGroups { get; set; }
-	public List <string> NeighborGroups { get; set; }
-	public List <string> NearbyAttackers { get; set; }
+	public List<string> NeighborGroups { get; set; }
+	public List<string> NearbyAttackers { get; set; }
 	public List<RigidBody2D> IdleNeighbors { get; set; }
 	public List<RigidBody2D> TargetedBy { get; set; }
 
@@ -99,7 +105,7 @@ public partial class ShipWrapper : Node
 		VentFluxFlag = value;
 	}
 
-	public void SetCombatGoal(int value)
+	public void SetCombatGoal(Goal value)
 	{
 		CombatGoal = value;
 	}
@@ -144,9 +150,9 @@ public partial class ShipWrapper : Node
 		MatchVelocityFlag = value;
 	}
 
-	public void SetToggleShield(bool value)
+	public void SetShieldFlag(bool value)
 	{
-		ShieldToggle = value;
+		ShieldFlag = value;
 	}
 
 	public void SetApproxInfluence(float value)
@@ -167,8 +173,9 @@ public partial class ShipWrapper : Node
 		}
 	}
 
-	public void SetTargetedUnits(Godot.Collections.Array targeted_units)
+	public void SetTargetedUnits(Godot.Collections.Array<RigidBody2D> targeted_units)
 	{
+		TargetedUnits.Clear();
 		foreach (RigidBody2D target in targeted_units)
 		{
 			if (target == null) continue;
@@ -176,9 +183,24 @@ public partial class ShipWrapper : Node
 		}
 	}
 
-	public void SetNeighborUnits(Array neighbors)
+	public void SetTargetedBy(Godot.Collections.Array<RigidBody2D> attackers)
+	{
+		TargetedBy.Clear();
+		foreach(RigidBody2D n_attacker in attackers)
+		{
+			if (n_attacker == null) continue;
+			TargetedBy.Add(n_attacker);
+		}
+	}
+
+	public void SetNeighborUnits(Godot.Collections.Array<RigidBody2D> neighbors)
 	{
 		NeighborUnits = neighbors;
+	}
+
+	public void SetSeparationNeighbors(Godot.Collections.Array<RigidBody2D> neighbors)
+	{
+		SeparationNeighbors = neighbors;
 	}
 
 	public void SetTotalFlux(float value)
@@ -217,6 +239,17 @@ public partial class ShipWrapper : Node
 		RegistryCell = cell;
 	}
 
+	public void SetRegistryNeighborhood(Godot.Collections.Array<Vector2I> neighborhood)
+	{
+		int size = neighborhood.Count;
+		RegistryNeighborhood = new Vector2I[size];
+		int idx = 0;
+		foreach (Vector2I cell in neighborhood)
+		{
+			RegistryNeighborhood[idx] = cell;
+		}
+	}
+
 	public void SetDefaultCellSize(float size)
 	{
 		DefaultCellSize = size;
@@ -230,5 +263,10 @@ public partial class ShipWrapper : Node
 	public void SetAvgWeaponRange(float avg)
 	{
 		AverageWeaponRange = avg;
+	}
+
+	public void SetTargetUnit(RigidBody2D target)
+	{
+		TargetUnit = target;
 	}
 }
