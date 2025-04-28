@@ -18,7 +18,9 @@ public partial class ImapManager : Node
     public Dictionary<ImapType, Imap> AgentMaps = new Dictionary<ImapType, Imap>();
     [Export]
     public Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>> RegistryMap = new Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>>();
+    public Imap ArenaInfluenceMap;
     public Imap VulnerabilityMap;
+    public Imap InverseTensionMap;
     public Imap TensionMap;
     public Imap WeightedImap;
     public Imap GoalMap;
@@ -282,7 +284,14 @@ public partial class ImapManager : Node
 
     public void InitializeArenaMaps()
     {
-
+        ArenaInfluenceMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.InfluenceMap);
+        VulnerabilityMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.VulnerabilityMap);
+        InverseTensionMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize);
+        TensionMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize);
+        WeightedImap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize);
+        GoalMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize);
+        RegisterMap(ArenaInfluenceMap);
+        RegisterMap(InverseTensionMap);
     }
 
     public List<ImapTemplate> InitOccupancyMapTemplates(int radius, ImapType type, float magnitude = 1.0f)
