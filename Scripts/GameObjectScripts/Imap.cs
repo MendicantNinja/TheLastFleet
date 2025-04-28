@@ -22,12 +22,13 @@ public partial class Imap : GodotObject
 	public delegate void UpdateRowValueEventHandler(int m, float[] values);
 
 	// Constructor
-	public Imap(int new_width, int new_height, float x = 0.0f, float y = 0.0f, int new_cell_size = 1)
+	public Imap(int new_width, int new_height, float x = 0.0f, float y = 0.0f, int new_cell_size = 1, ImapType type = ImapType.InfluenceMap)
 	{
 		Width = new_width / new_cell_size;
 		Height = new_height / new_cell_size;
+        AnchorLocation = new Vector2(x, y);
 		CellSize = new_cell_size;
-		AnchorLocation = new Vector2(x, y);
+        Type = type;
 
 		MapGrid = new float[Height, Width];
 		for (int m = 0; m < Height; m++)
