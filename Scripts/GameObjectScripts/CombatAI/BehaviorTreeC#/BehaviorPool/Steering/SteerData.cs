@@ -15,8 +15,6 @@ public partial class SteerData : Node
     public float Deceleration { get; set; }
     public float ZeroFluxBonus { get; set; }
     public float TurnRate { get; set; }
-
-    public Vector2 LinearVelocity { get; set; }
     
     [Export]
     public float NDelta { get; set; }

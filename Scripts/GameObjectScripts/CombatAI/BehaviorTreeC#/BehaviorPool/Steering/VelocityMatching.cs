@@ -9,7 +9,7 @@ public partial class VelocityMatching : Action
 
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		
-		if (ship_wrapper.Posture == ShipWrapper.Strategy.OFFENSIVE || ship_wrapper.Posture == ShipWrapper.Strategy.EVASIVE) 
+		if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE || ship_wrapper.Posture == Globals.Strategy.EVASIVE) 
 		{
 			return NodeState.FAILURE;
 		}
@@ -51,5 +51,4 @@ public partial class VelocityMatching : Action
 		agent.Set("match_speed", group_speeds.Min());
 		return NodeState.FAILURE;
 	}
-
 }

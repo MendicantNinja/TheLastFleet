@@ -1,5 +1,5 @@
 extends Node
-class_name ImapManager
+class_name GDImapManager
 
 var arena_width: int = 17000
 var arena_height: int = 20000
@@ -38,10 +38,10 @@ var visited: Array = []
 
 func _init():
 	var longest_range: int = 2250 / default_cell_size
-	var occupancy_templates: ImapTemplate = ImapTemplate.new()
-	var threat_templates: ImapTemplate = ImapTemplate.new()
-	var invert_occupancy_templates: ImapTemplate = ImapTemplate.new()
-	var invert_threat_templates: ImapTemplate = ImapTemplate.new()
+	var occupancy_templates: GDImapTemplate = GDImapTemplate.new()
+	var threat_templates: GDImapTemplate = GDImapTemplate.new()
+	var invert_occupancy_templates: GDImapTemplate = GDImapTemplate.new()
+	var invert_threat_templates: GDImapTemplate = GDImapTemplate.new()
 	occupancy_templates.init_occupancy_map_templates(default_radius)
 	threat_templates.init_threat_map_templates(longest_range)
 	invert_occupancy_templates.init_occupancy_map_templates(default_radius, -1.0)

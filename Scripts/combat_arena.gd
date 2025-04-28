@@ -35,45 +35,36 @@ func _ready() -> void:
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
 	
-	var influence_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	var weighted_imap: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	var fake_tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	var tension_map: Imap = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	var vulnerability_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	var goal_map = Imap.new(imap_manager.arena_width, imap_manager.arena_height, 0.0, 0.0, imap_manager.default_cell_size)
-	influence_map.map_type = imap_manager.MapType.INFLUENCE_MAP
-	weighted_imap.map_type = imap_manager.MapType.INFLUENCE_MAP
-	fake_tension_map.map_type = imap_manager.MapType.TENSION_MAP
-	vulnerability_map.map_type = imap_manager.MapType.VULNERABILITY_MAP
-	tension_map.map_type = imap_manager.MapType.TENSION_MAP
-	goal_map.map_type = imap_manager.MapType.INFLUENCE_MAP
-	imap_manager.goal_map = goal_map
-	imap_manager.tension_map = tension_map
-	imap_manager.vulnerability_map = vulnerability_map
-	imap_manager.weighted_imap = weighted_imap
-	var register_maps: Array = [influence_map, fake_tension_map]
+	imap_manager.InitializeArenaMaps()
+	#var influence_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var weighted_imap: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var fake_tension_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var tension_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var vulnerability_map = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var goal_map = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
+	#var register_maps: Array = [influence_map, fake_tension_map]
 	
-	if debug_imap == true:
-		vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
-		vulnerability_map.update_row_value.connect(_on_grid_row_changed)
-		var grid_row_size: int = vulnerability_map.map_grid.size()
-		var grid_column_size: int = vulnerability_map.map_grid[0].size()
-		ImapDebug.size = PlayableAreaBounds.shape.size
-		ImapDebugGrid.columns = grid_column_size
-		for i in range(grid_row_size):
-			imap_debug_grid.append([])
-			for j in range(grid_column_size):
-				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
-				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.default_cell_size
-				cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
-				cell_instance.get_child(0).visible = false
-				ImapDebugGrid.add_child(cell_instance)
-				imap_debug_grid[i].append(cell_instance)
+	#if debug_imap == true:
+		#vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
+		#vulnerability_map.update_row_value.connect(_on_grid_row_changed)
+		#var grid_row_size: int = vulnerability_map.map_grid.size()
+		#var grid_column_size: int = vulnerability_map.map_grid[0].size()
+		#ImapDebug.size = PlayableAreaBounds.shape.size
+		#ImapDebugGrid.columns = grid_column_size
+		#for i in range(grid_row_size):
+			#imap_debug_grid.append([])
+			#for j in range(grid_column_size):
+				#var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
+				#cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.DefaultCellSize
+				#cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
+				#cell_instance.get_child(0).visible = false
+				#ImapDebugGrid.add_child(cell_instance)
+				#imap_debug_grid[i].append(cell_instance)
 	
-	imap_manager.register_agents(get_tree().get_nodes_in_group(&"agent"), combat_goal)
+	imap_manager.RegisterAgents(get_tree().get_nodes_in_group(&"agent"), combat_goal)
 	
-	for map in register_maps:
-		imap_manager.register_map(map)
+	#for map in register_maps:
+		#imap_manager.register_map(map)
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)

@@ -1,29 +1,14 @@
 using Godot;
+using Globals;
+using InfluenceMap;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
 using Vector2 = System.Numerics.Vector2;
 
 public partial class ShipWrapper : Node
 {
-	public enum Strategy
-	{
-		NEUTRAL,
-		DEFENSIVE,
-		OFFENSIVE,
-		EVASIVE
-	}
-
-	public enum Goal
-	{
-		SKIRMISH,
-		MOTHERSHIP,
-		CONTROL
-	}
-
 	[Export]
-	public String GroupName { get; private set; }
+	public string GroupName { get; private set; }
 	[Export]
 	public bool GroupLeader { get; private set; }
 	[Export]
@@ -32,7 +17,6 @@ public partial class ShipWrapper : Node
 	public bool FluxOverload { get; private set; }
 	[Export]
 	public bool VentFluxFlag { get; private set; }
-	[Export]
 	public Goal CombatGoal { get; private set; }
 	[Export]
 	public bool TargetInRange { get; private set; }
@@ -67,6 +51,9 @@ public partial class ShipWrapper : Node
 	[Export]
 	public Godot.Collections.Array<RigidBody2D> SeparationNeighbors { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Vector2I ImapCell { get; private set; }
+	public Dictionary<ImapType, Vector2I> TemplateCellIndices { get; set; } = new Dictionary<ImapType, Vector2I>();
+	public Dictionary<ImapType, Imap> TemplateMaps { get; private set; } = new Dictionary<ImapType,Imap>();
+	public Imap WeighInfluence { get; set; }
 	public Vector2I RegistryCell { get; private set; }
 	public Vector2I[] RegistryNeighborhood { get; private set; }
 	public float DefaultCellSize { get; private set; }
@@ -80,6 +67,62 @@ public partial class ShipWrapper : Node
 	public List<RigidBody2D> IdleNeighbors { get; set; }
 	public List<RigidBody2D> TargetedBy { get; set; }
 
+	public void InitializeAgentImaps(ImapManager imap_manager, RigidBody2D agent, float acceleration, float bonus_acceleration, float zero_flux_bonus, float longest_weapon_range)
+	{
+		// Compute influence-related parameters using ShipWrapper’s properties.
+		int occupancy_radius = (int)(acceleration + bonus_acceleration + zero_flux_bonus) / 60 + 1;
+		int threat_radius = (int)(longest_weapon_range / imap_manager.DefaultCellSize) + 1;
+
+		// Retrieve the proper templates from ImapManager based on agent allegiance.
+		ImapTemplate occupancy_template;
+		ImapTemplate threat_template;
+		
+		// Assume that the parent is our agent (a RigidBody2D) so we can check its collision layer.
+		if (agent.CollisionLayer == 1)
+		{
+			occupancy_template = imap_manager.GetTemplate(ImapType.OccupancyMap, occupancy_radius);
+			threat_template = imap_manager.GetTemplate(ImapType.ThreatMap, threat_radius);
+		}
+		else
+		{
+			occupancy_template = imap_manager.GetTemplate(ImapType.InverseOccupancyMap, occupancy_radius);
+			threat_template = imap_manager.GetTemplate(ImapType.InverseThreatMap, threat_radius);
+		}
+		// Store these influence maps in the local dictionary.
+		TemplateMaps[ImapType.OccupancyMap] = occupancy_template.Map;
+		TemplateMaps[ImapType.ThreatMap] = threat_template.Map;
+
+		Imap composite_influence = new Imap(threat_template.Map.Width, threat_template.Map.Height);
+		Imap inverse_composite = new Imap(threat_template.Map.Width, threat_template.Map.Height);
+		foreach (ImapType type in TemplateMaps.Keys)
+		{
+			int center = threat_radius;
+			composite_influence.AddMap(TemplateMaps[type], center, center, 1.0f);
+			inverse_composite.AddMap(TemplateMaps[type], center, center, -1.0f);
+		}
+
+		for (int m = 0; m < threat_template.Map.Height; m++)
+		{
+			for (int n = 0; n < threat_template.Map.Width; n++)
+			{
+				ApproxInfluence += composite_influence.MapGrid[m, n];
+			}
+		}
+
+		TemplateMaps[ImapType.OccupancyMap] = composite_influence;
+		if (IsFriendly == true)
+		{
+			TemplateMaps[ImapType.TensionMap] = composite_influence;
+		}
+		else
+		{
+			TemplateMaps[ImapType.TensionMap] = inverse_composite;
+		}
+
+		WeighInfluence = new Imap(threat_template.Map.Width, threat_template.Map.Height);
+		GD.Print("Influence mapping initialized for agent: ", agent?.Name);
+	}
+	
 	public void SetGroupName(string newGroupName)
 	{
 		GroupName = newGroupName ?? throw new ArgumentNullException(nameof(newGroupName), "Group name cannot be null.");
@@ -105,9 +148,13 @@ public partial class ShipWrapper : Node
 		VentFluxFlag = value;
 	}
 
-	public void SetCombatGoal(Goal value)
+	public void SetCombatGoal(int value)
 	{
-		CombatGoal = value;
+		Dictionary<int, Goal> MapGoal = new Dictionary<int, Goal>();
+		MapGoal[0] = Goal.SKIRMISH;
+		MapGoal[1] = Goal.MOTHERSHIP;
+		MapGoal[2] = Goal.CONTROL;
+		CombatGoal = MapGoal[value];
 	}
 
 	public void SetTargetInRange(bool value)
