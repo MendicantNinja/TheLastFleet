@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
+using Godot.Collections;
 
 public partial class ThreatDetection : Action
 {
@@ -61,22 +62,120 @@ public partial class ThreatDetection : Action
 
 
         if (ship_wrapper.GroupName.Count() == 0 && available_neighbor_groups.Count == 0 && idle_neighbors.Count > 0)
-        {   // I had to use Godot's Vector2 to compare to the ships global_position property. 
-            Dictionary<Godot.Variant, RigidBody2D> unit_positions = new Dictionary<Variant, RigidBody2D>();
+        {   // I had to use Godot's Vector2/classes to compare to the ships global_position property/pass to the global methods. 
+            Godot.Collections.Dictionary<Godot.Vector2, RigidBody2D> unit_positions = new Godot.Collections.Dictionary<Godot.Vector2, RigidBody2D>();
             foreach (RigidBody2D ship in idle_neighbors)
             {
                 ship.AddToGroup(tmp_name);
-                unit_positions[ship.Get("global_position")] = ship;
+                Variant global_position_to_cast = ship.Get("global_position");
+                Godot.Vector2 ship_position = global_position_to_cast.As<Godot.Vector2>();
+                unit_positions[ship_position] = ship;
             }
-
-            Vector2 geo_median = globals.Call("geometric_median_of_objects", unit_positions.Keys.ToList());
-            ShipWrapper leader = globals.find_unit_nearest_to_median(geo_median, unit_positions);
+            Godot.Collections.Array<Godot.Vector2> key_array = new Godot.Collections.Array<Godot.Vector2>(unit_positions.Keys);
+            Godot.Vector2 geo_median = (Godot.Vector2)globals.Call("geometric_median_of_objects", key_array);
+            RigidBody2D leader_body = (Godot.RigidBody2D)globals.Call("find_unit_nearest_to_median", geo_median, key_array);
+            
             string new_group_name = true_name + agent.Name;
             GetTree().CallGroup(tmp_name, "group_add", new_group_name);
             GetTree().CallGroup(tmp_name, "group_remove", tmp_name);
-            leader.SetGroupLeader(true);
+            ShipWrapper leader_ship_wrapper = (ShipWrapper)leader_body.Get("ShipWrapper");
+            leader_ship_wrapper.SetGroupLeader(true);
         }
 
+        if (ship_wrapper.GroupName.Count() == 0 && available_neighbor_groups.Count > 0)
+        {
+            // Pick a random group from available_neighbor_groups
+            int pick_rand_group = (int)GD.RandRange(0, available_neighbor_groups.Count - 1);
+            string group_name = available_neighbor_groups[pick_rand_group];
+
+            // Pick a random member of that group
+            RigidBody2D rand_group_member = (RigidBody2D)GetTree().GetFirstNodeInGroup(group_name);
+            ShipWrapper rand_member_wrapper = (ShipWrapper)rand_group_member.Get("ShipWrapper");
+
+            if (rand_member_wrapper != null)
+            {
+                ship_wrapper.SetTargetedUnits(rand_member_wrapper.TargetedUnits); 
+            }
+
+            agent.Call("group_add", group_name);
+        }
+
+        if (ship_wrapper.GroupName.Count() == 0)
+        {
+            return NodeState.FAILURE;
+        }
+
+        // Calculate agent group strength
+        float agent_group_strength = 0.0f;
+        foreach (RigidBody2D unit_body in GetTree().GetNodesInGroup(ship_wrapper.GroupName))
+        {
+            if (unit_body == null)
+                continue;
+
+            ShipWrapper unit = (ShipWrapper)unit_body.Get("ShipWrapper");
+            if (unit == null)
+                continue;
+
+            agent_group_strength += unit.ApproxInfluence;
+        }
+
+        // Collect attackers and their total strength
+        Godot.Collections.Array<RigidBody2D> attackers = new Godot.Collections.Array<RigidBody2D>();
+        float total_attacker_strength = 0.0f;
+        foreach (string group_name in attacker_groups)
+        {
+            float relative_strength = 0.0f;
+            foreach (RigidBody2D ship in GetTree().GetNodesInGroup(group_name))
+            {
+                if (ship == null)
+                    continue;
+
+                attackers.Add(ship);
+
+                ShipWrapper unit = (ShipWrapper)ship.Get("ShipWrapper");
+                if (unit != null)
+                {
+                    relative_strength += unit.ApproxInfluence;
+                }
+            }
+            total_attacker_strength += relative_strength;
+        }
+
+        if (attackers.Count == 0)
+        {
+            return NodeState.FAILURE;
+        }
+    /*
+    if agent.group_name.is_empty() == true and available_neighbor_groups.is_empty() == false:
+		var pick_rand_group: int = randi_range(0, available_neighbor_groups.size() - 1)
+		var group_name: StringName = available_neighbor_groups[pick_rand_group]
+		var rand_group_member: Ship = get_tree().get_first_node_in_group(group_name)
+		agent.targeted_units = rand_group_member.targeted_units
+		agent.group_add(available_neighbor_groups[pick_rand_group])
+	
+	if agent.group_name.is_empty():
+		return FAILURE
+	
+	var agent_group_strength: float = 0.0
+	for unit in get_tree().get_nodes_in_group(agent.group_name):
+		if unit == null:
+			continue
+		agent_group_strength += unit.approx_influence
+	
+	var attackers: Array = []
+	var total_attacker_strength: float = 0.0
+	for group_name in attacker_groups:
+		var relative_strength: float = 0.0
+		for unit in get_tree().get_nodes_in_group(group_name):
+			if unit == null:
+				continue
+			attackers.append(unit)
+			relative_strength += unit.approx_influence
+		total_attacker_strength += relative_strength
+	
+	if attackers.is_empty():
+		return FAILURE
+    */
 
 
 
@@ -91,8 +190,7 @@ public partial class ThreatDetection : Action
 
 
 
-
-        Dictionary<float, string> nearby_group_strength = new Dictionary<float, string>();
+        Godot.Collections.Dictionary<float, string> nearby_group_strength = new Godot.Collections.Dictionary<float, string>();
         foreach (String group_name in available_neighbor_groups)
         {
             
