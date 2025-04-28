@@ -36,13 +36,6 @@ func _ready() -> void:
 	CombatMap.switch_maps.connect(_on_switch_maps)
 	
 	imap_manager.InitializeArenaMaps()
-	#var influence_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var weighted_imap: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var fake_tension_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var tension_map: Imap = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var vulnerability_map = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var goal_map = Imap.new(imap_manager.ArenaWidth, imap_manager.ArenaHeight, 0.0, 0.0, imap_manager.DefaultCellSize)
-	#var register_maps: Array = [influence_map, fake_tension_map]
 	
 	#if debug_imap == true:
 		#vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
@@ -63,8 +56,6 @@ func _ready() -> void:
 	
 	imap_manager.RegisterAgents(get_tree().get_nodes_in_group(&"agent"), combat_goal)
 	
-	#for map in register_maps:
-		#imap_manager.register_map(map)
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)

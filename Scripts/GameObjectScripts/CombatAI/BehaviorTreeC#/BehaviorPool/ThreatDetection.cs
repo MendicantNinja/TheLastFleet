@@ -2,9 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
-using Godot.Collections;
 
 public partial class ThreatDetection : Action
 {
@@ -15,11 +13,6 @@ public partial class ThreatDetection : Action
 	{
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		SteerData steer_data = (SteerData)agent.Get("SteerData");
-		
-		// You will need to know this is how we currently access globals
-		// Node globals = GetTree().Root.GetNode("globals");
-		// Call its functions like this
-		// globals.Call("generate_group_target_positions", agent);
 
 		Node globals = GetTree().Root.GetNode("globals");
 		if (Engine.GetPhysicsFrames() % 120 != 0 || ship_wrapper.RegistryCell == Godot.Vector2I.One || steer_data.TargetPosition != Vector2.Zero)

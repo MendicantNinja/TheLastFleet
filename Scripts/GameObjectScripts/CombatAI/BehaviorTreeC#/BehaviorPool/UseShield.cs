@@ -3,7 +3,7 @@ using System;
 
 public partial class UseShield : Action
 {
-	float overload_thresh = 0.95f;
+	float overload_thresh = 0.9f;
 	public override NodeState Tick(Node agent)
 	{
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");

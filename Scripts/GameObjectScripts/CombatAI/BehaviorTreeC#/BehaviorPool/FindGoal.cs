@@ -1,4 +1,5 @@
 using Godot;
+using InfluenceMap;
 using System;
 
 public partial class FindGoal : Action
