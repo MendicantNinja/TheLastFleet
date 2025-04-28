@@ -148,10 +148,10 @@ var combat_goal: int = 0:
 		ShipWrapper.SetCombatGoal(value)
 		combat_goal = value
 
-var template_maps: Dictionary = {}
-var template_cell_indices: Dictionary = {}
-var weigh_influence: Imap
-var working_map: Imap = null
+#var template_maps: Dictionary = {}
+#var template_cell_indices: Dictionary = {}
+#var weigh_influence: Imap
+#var working_map: Imap = null
 var approx_influence: float = 0.0:
 	set(value):
 		ShipWrapper.SetApproxInfluence(value)
@@ -293,7 +293,7 @@ var target_position: Vector2 = Vector2.ZERO:
 
 var threat_radius: int = 0:
 	set(value):
-		SteerData.SetThreatRadius(value * imap_manager.default_cell_size)
+		SteerData.SetThreatRadius(value * imap_manager.DefaultCellSize)
 		threat_radius = value
 
 var avoid_radius_sq: float = 0:
@@ -325,8 +325,8 @@ signal switch_to_manual()
 signal request_manual_camera()
 signal ship_selected()
 signal destroyed()
-signal update_agent_influence(prev_imap_cell, imap_cell)
-signal update_registry_cell(prev_registry_cell, registry_cell)
+signal update_agent_influence()
+signal update_registry_cell()
 signal ships_deployed()
 
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
@@ -432,49 +432,52 @@ func _ready() -> void:
 		weapon_ranges.append(weapon_slot.weapon.range)
 	
 	average_weapon_range /= weapon_ranges.size()
-	var occupancy_template: ImapTemplate
-	var threat_template: ImapTemplate
+	
+	#var occupancy_template: ImapTemplate
+	#var threat_template: ImapTemplate
+	
 	var longest_range: float = weapon_ranges.max()
 	var occupancy_radius: int = (ship_stats.acceleration + ship_stats.bonus_acceleration + zero_flux_bonus) / 60
 	occupancy_radius += 1
-	threat_radius = (longest_range / imap_manager.default_cell_size) + 1
+	threat_radius = (longest_range / imap_manager.DefaultCellSize) + 1
+	
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		name = &"Player " + ship_hull.ship_type_name
-		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
-		threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
-		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
+		#occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.OCCUPANCY_TEMPLATE]
+		#template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		#threat_template = imap_manager.template_maps[imap_manager.TemplateType.THREAT_TEMPLATE]
+		#template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"friendly")
 		rotation -= PI/2
 	else:
 		name = &"Enemy " + ship_hull.ship_type_name
-		occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
-		template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
-		threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
-		template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
+		#occupancy_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_OCCUPANCY_TEMPLATE]
+		#template_maps[imap_manager.MapType.OCCUPANCY_MAP] = occupancy_template.template_maps[occupancy_radius]
+		#threat_template = imap_manager.template_maps[imap_manager.TemplateType.INVERT_THREAT_TEMPLATE]
+		#template_maps[imap_manager.MapType.THREAT_MAP] = threat_template.template_maps[threat_radius]
 		add_to_group(&"enemy")
 		is_friendly = false
 		rotation += PI/2
 	
-	var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
-	var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
-	for map in template_maps.values():
-		var center_val: int = threat_radius
-		composite_influence.add_map(map, center_val, center_val, 1.0)
-		invert_composite.add_map(map, center_val, center_val, -1.0)
-	
-	weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
-	for m in range(0, composite_influence.height):
-		for n in range(0, composite_influence.width):
-			approx_influence += composite_influence.map_grid[m][n]
-	
-	template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
-	if is_friendly == true:
-		template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
-	else:
-		template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
-	
+	#var composite_influence = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	#var invert_composite = Imap.new(template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].width, template_maps[imap_manager.TemplateType.THREAT_TEMPLATE].height)
+	#for map in template_maps.values():
+		#var center_val: int = threat_radius
+		#composite_influence.add_map(map, center_val, center_val, 1.0)
+		#invert_composite.add_map(map, center_val, center_val, -1.0)
+	#
+	#weigh_influence = Imap.new(composite_influence.width, composite_influence.height)
+	#for m in range(0, composite_influence.height):
+		#for n in range(0, composite_influence.width):
+			#approx_influence += composite_influence.map_grid[m][n]
+	#
+	#template_maps[imap_manager.MapType.INFLUENCE_MAP] = composite_influence
+	#if is_friendly == true:
+		#template_maps[imap_manager.MapType.TENSION_MAP] = composite_influence
+	#else:
+		#template_maps[imap_manager.MapType.TENSION_MAP] = invert_composite
+	ShipWrapper.InitializeAgentImaps(imap_manager, self, acceleration, ship_stats.bonus_acceleration, zero_flux_bonus, longest_range)
 	var separation_shape: Shape2D = CircleShape2D.new()
 	var separation_radius: float = new_radius * 5.0
 	separation_shape.radius = separation_radius
@@ -496,10 +499,6 @@ func _ready() -> void:
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	OverloadTimer.timeout.connect(_on_OverloadTimer_timeout)
 	
-	#toggle_auto_aim(all_weapons)
-	#toggle_auto_fire(all_weapons)
-	#furthest_safe_distance = Vector2.ZERO.distance_to(longest_range_weapon.transform.origin)
-	#furthest_safe_distance += longest_range_weapon.weapon.range
 	set_combat_ai(true)
 	deploy_ship()
 	self.mouse_entered.connect(_on_mouse_entered)
@@ -677,19 +676,20 @@ func set_posture(value: globals.Strategy) -> void:
 	posture = value
 
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
-	if weigh_influence != null:
-		imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
-	var weight: float = 0.0
-	for cluster in neighborhood_density:
-		if registry_cell in cluster:
-			weight = 1 / neighborhood_density[cluster]
-			registry_cluster = cluster
-	
-	var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
-	for m in range(0, composite_influence.height):
-		for n in range(0, composite_influence.width):
-			weigh_influence.map_grid[m][n] = composite_influence.map_grid[m][n] * abs(weight)
-	imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, 1.0)
+	return
+	#if weigh_influence != null:
+		#imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
+	#var weight: float = 0.0
+	#for cluster in neighborhood_density:
+		#if registry_cell in cluster:
+			#weight = 1 / neighborhood_density[cluster]
+			#registry_cluster = cluster
+	#
+	#var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
+	#for m in range(0, composite_influence.height):
+		#for n in range(0, composite_influence.width):
+			#weigh_influence.map_grid[m][n] = composite_influence.map_grid[m][n] * abs(weight)
+	#imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, 1.0)
 
 #ooooo ooooo      ooo ooooooooo.   ooooo     ooo ooooooooooooo 
 #`888' `888b.     `8' `888   `Y88. `888'     `8' 8'   888   `8 
@@ -919,25 +919,23 @@ func _physics_process(delta: float) -> void:
 	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.default_cell_size, global_position.x / imap_manager.default_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
-		update_agent_influence.emit(imap_cell, current_imap_cell)
-		imap_cell = current_imap_cell
+		var center_cell_position: Vector2 = Vector2(current_imap_cell.y, current_imap_cell.x) * imap_manager.default_cell_size;
+		center_cell_position.x += imap_manager.default_cell_size / 2.0;
+		center_cell_position.y += imap_manager.default_cell_size / 2.0;
+		var dist_to: float = center_cell_position.distance_to(global_position)
+		if dist_to > imap_manager.default_cell_size / 2.0:
+			update_agent_influence.emit()
+			imap_cell = current_imap_cell
 
 	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.max_cell_size, global_position.x / imap_manager.max_cell_size)
 	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
-		update_registry_cell.emit(registry_cell, current_registry_cell)
-		registry_cell = current_registry_cell
-		var n_registry_neighborhood: Array = []
-		var radius: int = 1
-		for m in range(-radius, radius + 1, 1):
-			for n in range(-radius, radius + 1, 1):
-				var target_cell: Vector2i = Vector2i(registry_cell.x + m, registry_cell.y + n)
-				if target_cell.x < 0:
-					target_cell.x = 0
-				if target_cell.y < 0:
-					target_cell.y = 0
-				if target_cell not in n_registry_neighborhood:
-					n_registry_neighborhood.append(target_cell)
-		registry_neighborhood = n_registry_neighborhood
+		var center_cell_position: Vector2 = Vector2(current_registry_cell.y, current_registry_cell.x) * imap_manager.max_cell_size
+		center_cell_position.x += imap_manager.max_cell_size / 2.0
+		center_cell_position.y += imap_manager.max_cell_size / 2.0
+		var dist_to: float = center_cell_position.distance_to(global_position)
+		if dist_to > imap_manager.default_cell_size / 2.0:
+			update_registry_cell.emit()
+			registry_cell = current_registry_cell
 	
 	if Engine.get_physics_frames() % 120 == 0 and targeted_by.is_empty() == false:
 		for unit in targeted_by:

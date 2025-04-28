@@ -5,7 +5,7 @@ extends Node2D
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
 @onready var ship_list: Array[Ship]
-@onready var ship_registry: Dictionary = imap_manager.registry_map
+@onready var ship_registry: Dictionary = imap_manager.RegistryMap
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")

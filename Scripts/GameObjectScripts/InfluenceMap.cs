@@ -1,5 +1,3 @@
-using System;
-
 namespace InfluenceMap
 {
     public enum ImapType

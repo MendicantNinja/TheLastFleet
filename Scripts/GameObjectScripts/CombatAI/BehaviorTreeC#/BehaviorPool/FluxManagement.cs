@@ -38,15 +38,15 @@ public partial class FluxManagement : Action
 			vent_flux = false;
 		}
 
-		if ((ship_wrapper.Posture == ShipWrapper.Strategy.NEUTRAL | ship_wrapper.Posture == ShipWrapper.Strategy.DEFENSIVE) && flux_norm >= def_neut_threshold)
+		if ((ship_wrapper.Posture == Globals.Strategy.NEUTRAL | ship_wrapper.Posture == Globals.Strategy.DEFENSIVE) && flux_norm >= def_neut_threshold)
 		{
 			vent_flux = true;
 		}
-		else if (ship_wrapper.Posture == ShipWrapper.Strategy.OFFENSIVE && flux_norm >= offense_threshold)
+		else if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE && flux_norm >= offense_threshold)
 		{
 			vent_flux = true;
 		}
-		else if (ship_wrapper.Posture == ShipWrapper.Strategy.EVASIVE && flux_norm >= evasive_threshold)
+		else if (ship_wrapper.Posture == Globals.Strategy.EVASIVE && flux_norm >= evasive_threshold)
 		{
 			vent_flux = true;
 		}

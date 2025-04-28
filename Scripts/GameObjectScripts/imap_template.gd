@@ -1,5 +1,5 @@
 extends Object
-class_name ImapTemplate
+class_name GDImapTemplate
 
 var max_radius: int
 var type: int
