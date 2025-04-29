@@ -58,9 +58,7 @@ public partial class ThreatDetection : Action
 			foreach (RigidBody2D ship in idle_neighbors)
 			{
 				ship.AddToGroup(tmp_name);
-				Variant global_position_to_cast = ship.Get("global_position");
-				Godot.Vector2 ship_position = global_position_to_cast.As<Godot.Vector2>();
-				unit_positions[ship_position] = ship;
+				unit_positions[ship.GlobalPosition] = ship;
 			}
 			Godot.Collections.Array<Godot.Vector2> key_array = new Godot.Collections.Array<Godot.Vector2>(unit_positions.Keys);
 			Godot.Vector2 geo_median = (Godot.Vector2)globals.Call("geometric_median_of_objects", key_array);

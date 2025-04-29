@@ -157,7 +157,11 @@ var approx_influence: float = 0.0:
 		ShipWrapper.SetApproxInfluence(value)
 		approx_influence = value
 
-var registry_cluster: Array = []
+var registry_cluster: Array = []:
+	set(value):
+		ShipWrapper.SetRegistryCluster(value)
+		registry_cluster = value
+
 var imap_cell: Vector2i = Vector2i.ZERO:
 	set(value):
 		ShipWrapper.SetImapCell(value)
