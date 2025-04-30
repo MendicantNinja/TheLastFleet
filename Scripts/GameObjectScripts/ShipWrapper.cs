@@ -55,6 +55,8 @@ public partial class ShipWrapper : Node
 	public Dictionary<ImapType, Imap> TemplateMaps { get; private set; } = new Dictionary<ImapType,Imap>();
 	public Imap WeighInfluence { get; set; }
 	public Vector2I RegistryCell { get; private set; }
+
+	public Vector2I[] RegistryCluster { get; private set; }
 	public Vector2I[] RegistryNeighborhood { get; private set; }
 	public float DefaultCellSize { get; private set; }
 	public float MaxCellSize { get; private set; }
@@ -306,6 +308,16 @@ public partial class ShipWrapper : Node
 	public void SetRegistryCell(Vector2I cell)
 	{
 		RegistryCell = cell;
+	}
+	public void SetRegistryCluster(Godot.Collections.Array<Vector2I> cluster)
+	{
+		int size = cluster.Count;
+		RegistryCluster = new Vector2I[size];
+		int idx = 0;
+		foreach (Vector2I cell in cluster)
+		{
+			RegistryCluster[idx] = cell;
+		}
 	}
 
 	public void SetRegistryNeighborhood(Godot.Collections.Array<Vector2I> neighborhood)
