@@ -81,11 +81,11 @@ public partial class ThreatDetection : Action
 
 			// Pick a random member of that group
 			RigidBody2D rand_group_member = (RigidBody2D)GetTree().GetFirstNodeInGroup(group_name);
-			ShipWrapper rand_member_wrapper = (ShipWrapper)rand_group_member.Get("ShipWrapper");
+			Godot.Collections.Array<RigidBody2D> targeted_units = (Godot.Collections.Array<RigidBody2D>)rand_group_member.Get("targeted_units");
 
-			if (rand_member_wrapper != null)
+			if (targeted_units != null)
 			{
-				ship_wrapper.SetTargetedUnits(rand_member_wrapper.TargetedUnits); 
+				ship_wrapper.SetTargetedUnits(targeted_units); 
 			}
 
 			agent.Call("group_add", group_name);

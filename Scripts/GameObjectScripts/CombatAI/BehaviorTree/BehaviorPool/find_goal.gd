@@ -16,9 +16,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if agent.goal_flag == true:
 		return SUCCESS
 	
-	var working_map: Imap = agent.working_map
+	var working_map: GDImap = agent.working_map
 	if agent.working_map == null:
-		working_map = Imap.new(radius, radius)
+		working_map = GDImap.new(radius, radius)
 	
 	imap_manager.goal_map.add_into_map(working_map, agent.imap_cell.y, agent.imap_cell.x)
 	agent.working_map = working_map

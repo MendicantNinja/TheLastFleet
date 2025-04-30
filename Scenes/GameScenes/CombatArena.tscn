@@ -903,87 +903,24 @@ texture = ExtResource("11_kx52a")
 stretch_mode = 4
 
 [node name="TestShip" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5775, 8226)
+position = Vector2(6508, 8381)
 
 [node name="TestShip2" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6243, 8240)
+position = Vector2(8210, 9556)
 
 [node name="TestShip3" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6743, 8242)
-
-[node name="TestShip4" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7211, 8256)
-
-[node name="TestShip5" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5767, 8786)
-
-[node name="TestShip6" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6235, 8800)
-
-[node name="TestShip7" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6735, 8802)
-
-[node name="TestShip8" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7203, 8816)
-
-[node name="TestShip9" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5756, 9384)
-
-[node name="TestShip10" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6224, 9398)
-
-[node name="TestShip11" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6724, 9400)
-
-[node name="TestShip12" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7192, 9414)
-
-[node name="TestShip13" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5852, 2649)
-collision_layer = 4
-
-[node name="TestShip14" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6320, 2663)
-collision_layer = 4
-
-[node name="TestShip15" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6820, 2665)
-collision_layer = 4
-
-[node name="TestShip16" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7288, 2679)
-collision_layer = 4
-
-[node name="TestShip17" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5844, 3209)
-collision_layer = 4
-
-[node name="TestShip18" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6312, 3223)
-collision_layer = 4
-
-[node name="TestShip19" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6812, 3225)
-collision_layer = 4
-
-[node name="TestShip20" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7280, 3239)
-collision_layer = 4
-
-[node name="TestShip21" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5833, 3807)
-collision_layer = 4
-
-[node name="TestShip22" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6301, 3821)
-collision_layer = 4
-
-[node name="TestShip23" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6801, 3823)
-collision_layer = 4
+position = Vector2(4734, 9676)
 
 [node name="TestShip24" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7269, 3837)
+position = Vector2(7949, 1938)
+collision_layer = 4
+
+[node name="TestShip25" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(6511, 3784)
+collision_layer = 4
+
+[node name="TestShip26" parent="." instance=ExtResource("36_4q2va")]
+position = Vector2(5240, 1938)
 collision_layer = 4
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

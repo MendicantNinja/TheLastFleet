@@ -8,8 +8,10 @@ public partial class Imap : GodotObject
 {
 	private readonly Vector2 AnchorLocation;
 	private readonly float CellSize;
-	public readonly int Height;
-	public readonly int Width;
+	[Export]
+	public int Height;
+	[Export]
+	public int Width;
 	public readonly ImapType Type;
 	// m = row, n = column (following M x N convention)
 	public float [,] MapGrid;
@@ -26,9 +28,9 @@ public partial class Imap : GodotObject
 	{
 		Width = new_width / new_cell_size;
 		Height = new_height / new_cell_size;
-        AnchorLocation = new Vector2(x, y);
+		AnchorLocation = new Vector2(x, y);
 		CellSize = new_cell_size;
-        Type = type;
+		Type = type;
 
 		MapGrid = new float[Height, Width];
 		for (int m = 0; m < Height; m++)
@@ -60,6 +62,11 @@ public partial class Imap : GodotObject
 		}
 	}
 
+	public float GetCellValue(int m, int n)
+	{
+		return MapGrid[m, n];
+	}
+
 	public Vector2I FindCellIndexFromPosition(Vector2 position)
 	{
 		int cell_row = (int)(position.Y / CellSize); // M
@@ -81,15 +88,20 @@ public partial class Imap : GodotObject
 	// Uses a linear function so that the center cell values are peak, and the outermost cell values are near 0.
 	public void PropagateInfluenceFromCenter(float magnitude = 1.0f)
 	{
-		int radius = Height;
-		Vector2 center = new Vector2((radius - 1) / 2, (radius - 1) / 2);
-		for (int m = -radius; m < radius; m++)
+		int size = Height;                  // For a grid of size (2 * r + 1)
+		int radius = (size - 1) / 2;        // This equals the original r
+		Vector2I center = new Vector2I(radius, radius);
+		// Loop over offsets from -radius to radius (inclusive)
+		for (int m = 0; m < Height; m++)
 		{
-			for (int n = radius; n < radius; n++)
+			for (int n = 0; n < Width; n++)
 			{
-				Vector2 cell_vector = new Vector2(m, n);
-				float distance = Vector2.Distance(center, cell_vector);
-				float prop_value = magnitude - magnitude * (distance / radius);
+				// Compute the Euclidean distance from the center (using only the offset)
+				Vector2I cell = new Vector2I(m, n);
+				float distance = cell.DistanceTo(center);
+				
+				// Compute a linearly decaying influence value.
+				float prop_value = magnitude - magnitude * (distance / size);
 				MapGrid[m, n] = prop_value;
 			}
 		}
@@ -99,15 +111,19 @@ public partial class Imap : GodotObject
 	// Propagation values will fall off the further away the cells are from this peak.
 	public void PropagateInfluenceAsRing(float magnitude = 1.0f, float sigma = 1.0f)
 	{
-		int radius = Height;
-		Vector2 center = new Vector2((radius - 1) / 2, (radius - 1) / 2);
-		for (int m = -radius; m < radius; m++)
+		int radius = (Height - 1) / 2;        // This equals the original r
+		Vector2I center = new Vector2I(radius, radius);
+		GD.Print(Height, " x ", Width);
+		GD.Print(center);
+		// Loop over offsets from -radius to radius (inclusive)
+		for (int m = 0; m < Height; m++)
 		{
-			for (int n = radius; n < radius; n++)
+			for (int n = 0; n < Width; n++)
 			{
-				Vector2 cell_vector = new Vector2(m, n);
-				float distance = Vector2.Distance(center, cell_vector);
+				Vector2I cell_vector = new Vector2I(m, n);
+				float distance = center.DistanceTo(cell_vector);
 				float prop_value = (float)(magnitude / (sigma * Math.Sqrt(2 * Math.PI))) * (float)Math.Exp(-Math.Pow(distance - center.X / 2, 2) / (2 * Math.Pow(sigma, 2)));
+
 				MapGrid[m, n] = prop_value;
 			}
 		}
@@ -117,25 +133,23 @@ public partial class Imap : GodotObject
 	{
 		Debug.Assert(source_map != null, "source_map is null");
 		if (source_map == null) return;
-
+		
 		int start_column = center_column + offset_column - source_map.Width / 2;
 		int start_row = center_row + offset_row - source_map.Height / 2;
-
 		for (int m = 0; m < source_map.Height; m++)
 		{
-			int target_row = m + start_row;
-			
-			for (int n = 0; m < source_map.Width; n++)
+			for (int n = 0; n < source_map.Width; n++)
 			{
+				int target_row = m + start_row;
 				int target_col = n + start_column;
 				float value = 0.0f;
 				if (target_col >= 0 && target_col < Width && target_row >= 0 && target_row < Height)
 				{
-					value = MapGrid[target_row, target_col] + source_map.MapGrid[m, n] * magnitude;
-					if (Mathf.Snapped(value, 0.1) == 0.0f) value = 0.0f;
-
+					value = source_map.MapGrid[m, n] * magnitude;
+					value += MapGrid[target_row, target_col];
+					if (Mathf.Snapped(value, 0.001) == 0.0f) value = 0.0f;
 					MapGrid[target_row, target_col] = value;
-					//UpdateGridValueEventHandler blah blah blah
+					EmitSignal(SignalName.UpdateGridValue, target_row, target_col, value);
 				}
 			}
 		}

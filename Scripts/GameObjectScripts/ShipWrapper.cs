@@ -67,18 +67,13 @@ public partial class ShipWrapper : Node
 	public List<RigidBody2D> IdleNeighbors { get; set; }
 	public List<RigidBody2D> TargetedBy { get; set; }
 
-	public void InitializeAgentImaps(ImapManager imap_manager, RigidBody2D agent, float acceleration, float bonus_acceleration, float zero_flux_bonus, float longest_weapon_range)
+	public void InitializeAgentImaps(ImapManager imap_manager, int occupancy_radius, int threat_radius, int collision_layer)
 	{
-		// Compute influence-related parameters using ShipWrapper’s properties.
-		int occupancy_radius = (int)(acceleration + bonus_acceleration + zero_flux_bonus) / 60 + 1;
-		int threat_radius = (int)(longest_weapon_range / imap_manager.DefaultCellSize) + 1;
-
-		// Retrieve the proper templates from ImapManager based on agent allegiance.
 		ImapTemplate occupancy_template;
 		ImapTemplate threat_template;
 		
 		// Assume that the parent is our agent (a RigidBody2D) so we can check its collision layer.
-		if (agent.CollisionLayer == 1)
+		if (collision_layer == 1)
 		{
 			occupancy_template = imap_manager.GetTemplate(ImapType.OccupancyMap, occupancy_radius);
 			threat_template = imap_manager.GetTemplate(ImapType.ThreatMap, threat_radius);
@@ -89,28 +84,28 @@ public partial class ShipWrapper : Node
 			threat_template = imap_manager.GetTemplate(ImapType.InverseThreatMap, threat_radius);
 		}
 		// Store these influence maps in the local dictionary.
-		TemplateMaps[ImapType.OccupancyMap] = occupancy_template.Map;
-		TemplateMaps[ImapType.ThreatMap] = threat_template.Map;
-
+		TemplateMaps[ImapType.InfluenceMap] = occupancy_template.Map;
+		TemplateMaps[ImapType.TensionMap] = threat_template.Map;
+		
+		
 		Imap composite_influence = new Imap(threat_template.Map.Width, threat_template.Map.Height);
 		Imap inverse_composite = new Imap(threat_template.Map.Width, threat_template.Map.Height);
 		foreach (ImapType type in TemplateMaps.Keys)
 		{
-			int center = threat_radius;
-			composite_influence.AddMap(TemplateMaps[type], center, center, 1.0f);
-			inverse_composite.AddMap(TemplateMaps[type], center, center, -1.0f);
+			composite_influence.AddMap(TemplateMaps[type], threat_radius, threat_radius, 1.0f);
+			inverse_composite.AddMap(TemplateMaps[type], threat_radius, threat_radius, -1.0f);
 		}
 
-		for (int m = 0; m < threat_template.Map.Height; m++)
+		for (int m = 0; m < composite_influence.Height; m++)
 		{
-			for (int n = 0; n < threat_template.Map.Width; n++)
+			for (int n = 0; n < composite_influence.Width; n++)
 			{
 				ApproxInfluence += composite_influence.MapGrid[m, n];
 			}
 		}
 
-		TemplateMaps[ImapType.OccupancyMap] = composite_influence;
-		if (IsFriendly == true)
+		TemplateMaps[ImapType.InfluenceMap] = composite_influence;
+		if (collision_layer == 1)
 		{
 			TemplateMaps[ImapType.TensionMap] = composite_influence;
 		}
@@ -118,9 +113,36 @@ public partial class ShipWrapper : Node
 		{
 			TemplateMaps[ImapType.TensionMap] = inverse_composite;
 		}
-
+		
 		WeighInfluence = new Imap(threat_template.Map.Width, threat_template.Map.Height);
-		GD.Print("Influence mapping initialized for agent: ", agent?.Name);
+	}
+
+	public void WeighCompositeInfluence(Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> neighborhood_density)
+	{
+		if (WeighInfluence != null)
+		{
+			ImapManager.Instance.WeightedImap.AddMap(WeighInfluence, ImapCell.X, ImapCell.Y, -1.0f);
+		}
+
+		float weight = 0.0f;
+		foreach (Godot.Collections.Array<Vector2I>cluster in neighborhood_density.Keys)
+		{
+			if (cluster.Contains(RegistryCell))
+			{
+				weight = Math.Abs(1.0f / neighborhood_density[cluster]);
+				
+			}
+		}
+
+		Imap agent_comp_inf = TemplateMaps[ImapType.InfluenceMap];
+		for (int m = 0; m < agent_comp_inf.Height; m++)
+		{
+			for (int n = 0; n < agent_comp_inf.Width; n++)
+			{
+				WeighInfluence.MapGrid[m, n] = agent_comp_inf.MapGrid[m, n] * weight;
+			}
+		}
+		ImapManager.Instance.WeightedImap.AddMap(WeighInfluence, ImapCell.X, ImapCell.Y, 1.0f);
 	}
 	
 	public void SetGroupName(string newGroupName)
@@ -220,7 +242,7 @@ public partial class ShipWrapper : Node
 		}
 	}
 
-	public void SetTargetedUnits(List<RigidBody2D> targeted_units)
+	public void SetTargetedUnits(Godot.Collections.Array<RigidBody2D> targeted_units)
 	{
 		TargetedUnits.Clear();
 		foreach (RigidBody2D target in targeted_units)

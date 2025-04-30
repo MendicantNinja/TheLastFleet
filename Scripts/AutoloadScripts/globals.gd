@@ -198,7 +198,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var unit_speeds: Dictionary = {}
 	for unit: Ship in group:
 		unit_positions[unit.global_position] = unit
-		var size: float = (unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1)
+		var size: float = (unit.occupancy_radius)
 		occupancy_sizes.append(size)
 		if not unit.speed in unit_speeds:
 			unit_speeds[unit.speed] = []
@@ -210,7 +210,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
 	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
-		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.default_cell_size / 2)
+		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize / 2)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
 	var offsets: Array = []

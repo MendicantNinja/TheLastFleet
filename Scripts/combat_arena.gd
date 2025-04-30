@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = false
+var debug_imap: bool = true
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
@@ -37,22 +37,28 @@ func _ready() -> void:
 	
 	imap_manager.InitializeArenaMaps()
 	
-	#if debug_imap == true:
+	if debug_imap == true:
+		var map: Object = imap_manager.ArenaInfluenceMap
+		#print(map.get_signal_list())
+		map.UpdateGridValue.connect(_on_grid_value_changed)
+		map.UpdateRowValue.connect(_on_grid_row_changed)
 		#vulnerability_map.update_grid_value.connect(_on_grid_value_changed)
 		#vulnerability_map.update_row_value.connect(_on_grid_row_changed)
+		var grid_row_size: int = map.Height
+		var grid_column_size: int = map.Width
 		#var grid_row_size: int = vulnerability_map.map_grid.size()
 		#var grid_column_size: int = vulnerability_map.map_grid[0].size()
-		#ImapDebug.size = PlayableAreaBounds.shape.size
-		#ImapDebugGrid.columns = grid_column_size
-		#for i in range(grid_row_size):
-			#imap_debug_grid.append([])
-			#for j in range(grid_column_size):
-				#var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
-				#cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.DefaultCellSize
-				#cell_instance.get_child(0).text = str(vulnerability_map.get_cell_value(i, j))
-				#cell_instance.get_child(0).visible = false
-				#ImapDebugGrid.add_child(cell_instance)
-				#imap_debug_grid[i].append(cell_instance)
+		ImapDebug.size = PlayableAreaBounds.shape.size
+		ImapDebugGrid.columns = grid_column_size
+		for i in range(grid_row_size):
+			imap_debug_grid.append([])
+			for j in range(grid_column_size):
+				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
+				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.DefaultCellSize
+				cell_instance.get_child(0).text = str(map.GetCellValue(i, j))
+				cell_instance.get_child(0).visible = false
+				ImapDebugGrid.add_child(cell_instance)
+				imap_debug_grid[i].append(cell_instance)
 	
 	imap_manager.RegisterAgents(get_tree().get_nodes_in_group(&"agent"), combat_goal)
 	
@@ -147,7 +153,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.register_agents(instantiated_units, int(combat_goal))
+	#imap_manager.RegisterAgents(instantiated_units, int(combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()
 	#ComputerAdmiral.AdmiralAI.enabled = true
 
@@ -164,8 +170,8 @@ func _physics_process(delta):
 	elif battle_over == true and (get_tree().get_node_count_in_group(&"friendly") > 0 and get_tree().get_node_count_in_group(&"enemy") > 0):
 		battle_over = false
 	
-	if not imap_manager.registry_map.is_empty() and Engine.get_physics_frames() % 60 == 0 and battle_over == false:
-		imap_manager.weigh_force_density()
+	if not imap_manager.RegistryMap.is_empty() and Engine.get_physics_frames() % 60 == 0 and battle_over == false:
+		imap_manager.WeighForceDensity()
 
 func toggle_fleet_deployment_panel() -> void:
 	if FleetDeploymentPanel.visible == false:

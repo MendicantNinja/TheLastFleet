@@ -22,7 +22,7 @@ public partial class IdentifyNearbyUnits : Action
 
 		foreach (Vector2I cell in ship_wrapper.RegistryNeighborhood)
 		{
-			if (ImapManager.Instance.RegistryMap.ContainsKey(cell)) 
+			if (!ImapManager.Instance.RegistryMap.ContainsKey(cell)) 
 				continue;
 			foreach (RigidBody2D ship in ImapManager.Instance.RegistryMap[cell])
 			{ 

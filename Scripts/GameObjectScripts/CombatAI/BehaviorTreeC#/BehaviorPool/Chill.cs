@@ -11,7 +11,7 @@ public partial class Chill : Action
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		RigidBody2D n_agent = agent as RigidBody2D;
 
-		if (Equals(steer_data.TargetPosition, Vector2.Zero) || steer_data.TargetUnit != null || ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
+		if (!Equals(steer_data.TargetPosition, Vector2.Zero) || steer_data.TargetUnit != null || ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
 		{
 			if (steer_data.BrakeFlag == true) return NodeState.SUCCESS;
 			n_agent.LinearDamp = 0.0f;

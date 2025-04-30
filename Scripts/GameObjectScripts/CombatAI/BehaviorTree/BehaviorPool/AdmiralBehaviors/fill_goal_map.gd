@@ -4,7 +4,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 480 != 0:
 		return FAILURE
 	
-	var goal_map: Imap = imap_manager.goal_map
+	var goal_map: GDImap = imap_manager.goal_map
 	var goal_value: Dictionary = agent.goal_value
 	
 	#goal_map = add_influence_map_to_goal_map(goal_map)
@@ -43,8 +43,8 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	imap_manager.goal_map = goal_map
 	return FAILURE
 
-func propagate_goal_values(goal_map: Imap, agent: Admiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> Imap:
-	var inf_map: Imap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
+func propagate_goal_values(goal_map: GDImap, agent: Admiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> GDImap:
+	var inf_map: GDImap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
 	var start_col: int = max(0, center.y - radius)
 	var end_col: int = min(center.y + radius, goal_map.width)
 	var start_row: int = max(0, center.x - radius)
@@ -64,8 +64,8 @@ func propagate_goal_values(goal_map: Imap, agent: Admiral, radius: int, center: 
 	
 	return goal_map
 
-func add_influence_map_to_goal_map(goal_map: Imap) -> Imap:
-	var inf_map: Imap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
+func add_influence_map_to_goal_map(goal_map: GDImap) -> GDImap:
+	var inf_map: GDImap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
 	var height: int = inf_map.height
 	var width: int = inf_map.width
 	
