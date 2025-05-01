@@ -1,6 +1,6 @@
 extends LeafAction
 
-func tick(agent: Admiral, blackboard: Blackboard) -> int:
+func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if agent.heuristic_goal != globals.GOAL.SKIRMISH:
 		return FAILURE
 	

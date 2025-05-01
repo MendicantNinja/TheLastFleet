@@ -1,5 +1,5 @@
 extends Node2D
-class_name Admiral
+class_name GDAdmiral
 
 @onready var AdmiralAI: BehaviorTreeRoot = $AdmiralAI
 @onready var available_units: Array = []
@@ -28,11 +28,11 @@ var iterator: int = 0
 var available_groups: Array = []
 var awaiting_orders: Array = []
 var queue_orders: Dictionary = {}
-var move_key: StringName = &"move"
-var target_key: StringName = &"target"
-var posture_key: StringName = &"posture"
-var diversion_key: StringName = &"diversion"
-var flank_key: StringName = &"flank"
+#var move_key: StringName = &"move"
+#var target_key: StringName = &"target"
+#var posture_key: StringName = &"posture"
+#var diversion_key: StringName = &"diversion"
+#var flank_key: StringName = &"flank"
 
 var fallback_flag: bool = false
 var retreat_flag: bool = false

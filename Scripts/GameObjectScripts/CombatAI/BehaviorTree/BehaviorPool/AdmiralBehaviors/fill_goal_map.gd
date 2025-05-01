@@ -1,6 +1,6 @@
 extends LeafAction
 
-func tick(agent: Admiral, blackboard: Blackboard) -> int:
+func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 480 != 0:
 		return FAILURE
 	
@@ -43,7 +43,7 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	imap_manager.goal_map = goal_map
 	return FAILURE
 
-func propagate_goal_values(goal_map: GDImap, agent: Admiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> GDImap:
+func propagate_goal_values(goal_map: GDImap, agent: GDAdmiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> GDImap:
 	var inf_map: GDImap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
 	var start_col: int = max(0, center.y - radius)
 	var end_col: int = min(center.y + radius, goal_map.width)
