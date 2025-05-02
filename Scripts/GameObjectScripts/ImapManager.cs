@@ -25,7 +25,8 @@ public partial class ImapManager : Node
 	public Imap WeightedImap;
 	public Imap GoalMap;
 
-
+	public List<Godot.Collections.Array<Vector2I>> FriendlyClusters;
+	public List<Godot.Collections.Array<Vector2I>> EnemyClusters;
 	public Godot.Collections.Dictionary WeightedEnemy;
 	public Godot.Collections.Dictionary WeightedFriendly;
 	public int DefaultRadius = 5;
@@ -186,7 +187,7 @@ public partial class ImapManager : Node
 		if (friendly_cell_density.Keys.Count == 0 || enemy_cell_density.Keys.Count == 0) return;
 
 		Godot.Collections.Dictionary enemy_neighborhood_density = new Godot.Collections.Dictionary();
-
+		List<Godot.Collections.Array<Vector2I>> n_cluster = new List<Godot.Collections.Array<Vector2I>>();
 		float max_enemy_density = 0.0f;
 		List<Vector2I> visited = new List<Vector2I>();
 		foreach (Vector2I cell in enemy_cell_density.Keys)
@@ -195,6 +196,7 @@ public partial class ImapManager : Node
 			if (!visited.Contains(cell))
 			{
 				cluster = RegistryFloodFill(cell, visited, cluster, enemy_cell_density);
+				n_cluster.Add(cluster);
 			}
 			else
 			{
@@ -214,6 +216,8 @@ public partial class ImapManager : Node
 				max_enemy_density = density;
 			}
 		}
+		EnemyClusters = n_cluster;
+		n_cluster.Clear();
 
 		Godot.Collections.Dictionary friendly_neighborhood_density = new Godot.Collections.Dictionary();
 		float max_friendly_density = 0.0f;
@@ -224,6 +228,7 @@ public partial class ImapManager : Node
 			if (!visited.Contains(cell))
 			{
 				cluster = RegistryFloodFill(cell, visited, cluster, friendly_cell_density);
+				n_cluster.Add(cluster);
 			}
 			else
 			{
@@ -243,6 +248,7 @@ public partial class ImapManager : Node
 				max_friendly_density = density;
 			}
 		}
+		FriendlyClusters = n_cluster;
 
 		if (friendly_neighborhood_density.Keys.Count == 0)
 		{
