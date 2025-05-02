@@ -1,48 +1,18 @@
-[gd_scene load_steps=5 format=3 uid="uid://cpg8q8tgtsjjp"]
+[gd_scene load_steps=4 format=3 uid="uid://cpg8q8tgtsjjp"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_va37s"]
 [ext_resource type="Texture2D" uid="uid://shiwidik664f" path="res://Art/ProjectileArt/mazen's projectiles/laser shot.png" id="2_amd1k"]
 
-[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_a5fds"]
-particle_flag_disable_z = true
-emission_shape_offset = Vector3(-4.015, 0.08, 2.725)
-emission_shape_scale = Vector3(-27, -27.22, -19.43)
-emission_shape = 5
-emission_point_count = 0
-angle_min = -720.0
-angle_max = 1.07288e-05
-angular_velocity_min = -262.86
-angular_velocity_max = 457.14
-orbit_velocity_min = -0.349
-orbit_velocity_max = 0.444
-gravity = Vector3(-149.845, -9.8, 0)
-
-[sub_resource type="Environment" id="Environment_fwkf0"]
-background_mode = 3
-ambient_light_color = Color(0.266349, 0.548874, 0.942413, 1)
-ambient_light_energy = 2.51
-glow_enabled = true
-glow_intensity = 0.16
-glow_strength = 1.84
-glow_blend_mode = 0
-glow_hdr_threshold = 1.27
-glow_hdr_scale = 0.51
-glow_hdr_luminance_cap = 63.2
-glow_map_strength = 1.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_o0sya"]
+size = Vector2(6.00008, 99)
 
 [node name="Projectile" type="Area2D"]
 script = ExtResource("1_va37s")
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+[node name="CollisionPolygon2D" type="CollisionShape2D" parent="."]
+position = Vector2(3.49999, -2.3675e-05)
 rotation = 1.5708
-polygon = PackedVector2Array(0.00011584, 32, 1.00008, 22, 2.00001, 1.99999, 1.99996, -11, 1.99989, -31, 1.99982, -51, 0.999808, -53, -3.0002, -54, -4.00004, -12, -2.99999, 2.00001, -2.99994, 17, -1.99983, 48)
+shape = SubResource("RectangleShape2D_o0sya")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_amd1k")
-
-[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
-process_material = SubResource("ParticleProcessMaterial_a5fds")
-visibility_rect = Rect2(-98.945, -100, 200, 200)
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_fwkf0")
