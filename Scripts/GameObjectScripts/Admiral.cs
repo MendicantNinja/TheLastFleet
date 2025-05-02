@@ -21,6 +21,11 @@ public partial class Admiral : Node2D
     public List<Vector2I> IsolatedCells;
     public Dictionary<Vector2I, float> PlayerVulnerability;
     public Dictionary<Vector2I, float> GoalValue;
+
+	public StringName GroupKeyPrefix = new StringName("Enemy Group ");
+	public StringName AssignNewLeaderGroup = new StringName("");
+	public int Iterator = 0;
+
     public List<string> AvailableGroups;
     public List<string> AwaitingOrders;
 }
