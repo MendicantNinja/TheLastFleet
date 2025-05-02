@@ -19,7 +19,8 @@ public partial class Admiral : Node2D
     public List<Vector2I> PlayerClusters; // RegistryMap cell
     public List<Vector2I> VulnerableCells;
     public List<Vector2I> IsolatedCells;
-    public Dictionary<Vector2I, float> PlayerVulnerability;
+    public List<Vector2I> ControlPoints;
+    public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability;
     public Dictionary<Vector2I, float> GoalValue;
 
 	public StringName GroupKeyPrefix = new StringName("Enemy Group ");

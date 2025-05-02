@@ -10,7 +10,6 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	var tension_map: GDImap = imap_manager.tension_map
 	var vulnerability_map: GDImap = imap_manager.vulnerability_map
 	
-	var enemy_influence_extrema: Dictionary = {}
 	var player_vulnerability: Dictionary = {}
 	for m in range(0, vulnerability_map.height, 1):
 		
@@ -30,9 +29,6 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 			weighted_imap.update_row_value.emit(m, funny_array)
 			continue
 		
-		var local_minimum_vuln_id: Vector2i = Vector2i.ZERO
-		var local_vmap_extrema: float = 0.0
-		var vmap_threshold: float = -0.5
 		for n in range(0, vulnerability_map.width, 1):
 			var imap_value: float = influence_map.map_grid[m][n]
 			var weighted_imap_value: float = weighted_imap.map_grid[m][n]
@@ -54,8 +50,8 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 			if imap_value > 0.0:
 				player_vulnerability[Vector2(m,n)] = vuln_value
 			vulnerability_map.update_grid_value.emit(m, n, vuln_value)
-			tension_map.update_grid_value.emit(m, n, tension_value)
 			weighted_imap.update_grid_value.emit(m, n, weighted_imap_value)
+			tension_map.update_grid_value.emit(m, n, tension_value)
 			fake_tension_map.update_grid_value.emit(m, n, fake_tension_map.map_grid[m][n])
 	
 	if player_vulnerability.is_empty():

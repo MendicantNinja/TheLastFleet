@@ -10,10 +10,7 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	var goal_positions: Array = []
 	var player_vulnerability: Dictionary = {}
 	var goal_cells: Array = []
-	if not agent.control_points.is_empty():
-		goal_positions = agent.control_points
-		return SUCCESS
-	elif not agent.player_vulnerability.is_empty():
+	if not agent.player_vulnerability.is_empty():
 		player_vulnerability = agent.player_vulnerability
 		goal_positions = player_vulnerability.keys()
 	
@@ -54,8 +51,8 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if vuln_cluster.is_empty() and iso_cluster.is_empty():
 		return FAILURE
 	
-	var funny_med_cells: Array = []
-	var iso_cluster_geo_med: Dictionary = {}
+	var geo_median_cells: Array = []
+	var isolated_geo_med: Dictionary = {}
 	var remove_iso_cluster: Array = []
 	for cluster in iso_cluster:
 		if cluster in vuln_cluster.keys():
@@ -63,21 +60,21 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 			continue
 		var cells: Array = iso_cluster[cluster]
 		var geo_med: Vector2 = globals.geometric_median_of_objects(cells)
-		iso_cluster_geo_med[cluster] = Vector2i(geo_med.x, geo_med.y)
-		funny_med_cells.append(Vector2i(geo_med.x, geo_med.y))
+		isolated_geo_med[cluster] = Vector2i(geo_med.x, geo_med.y)
+		geo_median_cells.append(Vector2i(geo_med.x, geo_med.y))
 	
 	for cluster in remove_iso_cluster: 
 		iso_cluster.erase(cluster)
 	
-	var vuln_cluster_geo_med: Dictionary = {}
+	var vulnerability_geo_med: Dictionary = {}
 	for cluster in vuln_cluster:
 		var cells: Array = vuln_cluster[cluster]
 		var geo_med: Vector2 = globals.geometric_median_of_objects(cells)
-		vuln_cluster_geo_med[cluster] = Vector2i(geo_med.x, geo_med.y)
-		funny_med_cells.append(Vector2i(geo_med.x, geo_med.y))
+		vulnerability_geo_med[cluster] = Vector2i(geo_med.x, geo_med.y)
+		geo_median_cells.append(Vector2i(geo_med.x, geo_med.y))
 	
 	var dist_to_geo_med: Dictionary = {}
-	for cell in funny_med_cells:
+	for cell in geo_median_cells:
 		var baseline: Vector2i = Vector2i.ZERO
 		var dist_to: float = cell.distance_squared_to(baseline)
 		dist_to_geo_med[dist_to] = cell
@@ -85,12 +82,12 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	var furthest_cell: Vector2i = dist_to_geo_med[dist_to_geo_med.keys().max()]
 	var goal_radius: int = Vector2i.ZERO.distance_to(furthest_cell) / 2
 	agent.goal_radius = goal_radius
-	for gm_cell in iso_cluster_geo_med:
-		var goal_cell: Vector2i = iso_cluster_geo_med[gm_cell]
+	for gm_cell in isolated_geo_med:
+		var goal_cell: Vector2i = isolated_geo_med[gm_cell]
 		agent.goal_value[goal_cell] = 1.0
 	
-	for gm_cell in vuln_cluster_geo_med:
-		var goal_cell: Vector2i = vuln_cluster_geo_med[gm_cell]
+	for gm_cell in vulnerability_geo_med:
+		var goal_cell: Vector2i = vulnerability_geo_med[gm_cell]
 		if iso_cluster.is_empty():
 			agent.goal_value[goal_cell] = 1.0
 		else:
