@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://cf0i5gfu6xnqx"]
+[gd_scene load_steps=26 format=3 uid="uid://cf0i5gfu6xnqx"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="2_kpp3g"]
@@ -15,6 +15,8 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Chill.cs" id="14_xxda7"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pursue.cs" id="15_cp2xd"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Escape.cs" id="16_if4p2"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/FindGoal.cs" id="17_xku5w"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/DetectSkirmishUnits.cs" id="18_grk4u"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_jhvh6"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="21_lqqcs"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="22_2xr57"]
@@ -105,6 +107,15 @@ script = ExtResource("7_esgr5")
 
 [node name="align" type="Node" parent="CombatBehaviorTree/main/combat steering"]
 script = ExtResource("7_bshb8")
+
+[node name="enemy stuff" type="Node" parent="CombatBehaviorTree/main"]
+script = ExtResource("4_li4id")
+
+[node name="find goal" type="Node" parent="CombatBehaviorTree/main/enemy stuff"]
+script = ExtResource("17_xku5w")
+
+[node name="detect skirmish units" type="Node" parent="CombatBehaviorTree/main/enemy stuff"]
+script = ExtResource("18_grk4u")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1

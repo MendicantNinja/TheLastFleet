@@ -36,6 +36,7 @@ public partial class ShipWrapper : Node
 	public bool MatchVelocityFlag { get; private set; }
 	[Export]
 	public bool ShieldFlag { get; private set; }
+	[Export]
 	public float ApproxInfluence { get; private set; }
 	public float TotalFlux { get; private set; }
 	public float SoftFlux { get; private set; }
@@ -51,7 +52,6 @@ public partial class ShipWrapper : Node
 	[Export]
 	public Godot.Collections.Array<RigidBody2D> SeparationNeighbors { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Vector2I ImapCell { get; private set; }
-	public Dictionary<ImapType, Vector2I> TemplateCellIndices { get; set; } = new Dictionary<ImapType, Vector2I>();
 	public Dictionary<ImapType, Imap> TemplateMaps { get; private set; } = new Dictionary<ImapType,Imap>();
 	public Imap WeighInfluence { get; set; }
 	public Vector2I RegistryCell { get; private set; }
@@ -69,7 +69,7 @@ public partial class ShipWrapper : Node
 	public List<RigidBody2D> IdleNeighbors { get; set; }
 	public List<RigidBody2D> TargetedBy { get; set; }
 
-	public void InitializeAgentImaps(ImapManager imap_manager, int occupancy_radius, int threat_radius, int collision_layer)
+	public void InitializeAgentImaps(RigidBody2D agent, ImapManager imap_manager, int occupancy_radius, int threat_radius, int collision_layer)
 	{
 		ImapTemplate occupancy_template;
 		ImapTemplate threat_template;
@@ -106,6 +106,8 @@ public partial class ShipWrapper : Node
 			}
 		}
 
+		agent.Set("approx_influence", ApproxInfluence);
+		
 		TemplateMaps[ImapType.InfluenceMap] = composite_influence;
 		if (collision_layer == 1)
 		{
@@ -132,18 +134,20 @@ public partial class ShipWrapper : Node
 			if (cluster.Contains(RegistryCell))
 			{
 				weight = Math.Abs(1.0f / neighborhood_density[cluster]);
-				
 			}
 		}
 
+		float redux_comp_inf = 0.0f;
 		Imap agent_comp_inf = TemplateMaps[ImapType.InfluenceMap];
 		for (int m = 0; m < agent_comp_inf.Height; m++)
 		{
 			for (int n = 0; n < agent_comp_inf.Width; n++)
 			{
 				WeighInfluence.MapGrid[m, n] = agent_comp_inf.MapGrid[m, n] * weight;
+				redux_comp_inf += agent_comp_inf.MapGrid[m, n] * weight;
 			}
 		}
+		//GD.Print(redux_comp_inf);
 		ImapManager.Instance.WeightedImap.AddMap(WeighInfluence, ImapCell.X, ImapCell.Y, 1.0f);
 	}
 	
@@ -231,9 +235,9 @@ public partial class ShipWrapper : Node
 		ApproxInfluence = value;
 	}
 
-	public void SetPosture(Strategy value)
+	public void SetPosture(int value)
 	{
-		Posture = value;
+		Posture = (Strategy)value;
 	}
 
 	public void SetAllWeapons(Godot.Collections.Array all_weapons)

@@ -30,8 +30,8 @@ public partial class ChooseStrategy : Action
 		else if (relative_strength > 0)
 			admiral.Set("heuristic_strat", (int)Globals.Strategy.DEFENSIVE);
 
-		admiral.Set("admiral_strength", admiral_strength);
-		admiral.Set("player_strength", player_strength);
+		admiral.AdmiralStrength = admiral_strength;
+		admiral.PlayerStrength = player_strength;
 
 		return NodeState.FAILURE;
 	}

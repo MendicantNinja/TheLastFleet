@@ -17,18 +17,17 @@ public partial class FindGoal : Action
             is_friendly = true;
             return NodeState.SUCCESS;
         }
+		
+        if (Engine.GetPhysicsFrames() % 480 == 0 || ship_wrapper.GroupLeader == false) return NodeState.SUCCESS;
 
-        if (Engine.GetPhysicsFrames() % 480 == 0 || ship_wrapper.GroupLeader == false) return NodeState.FAILURE;
+		if (ship_wrapper.SuccessfulDeploy == false) return NodeState.SUCCESS;
 
         if (ship_wrapper.CombatGoal == Globals.Goal.SKIRMISH && ship_wrapper.GoalFlag == true && ship_wrapper.TargetedUnits.Count == 0)
         {
-            ship_wrapper.SetGoalFlag(false);
             GetTree().CallGroup(ship_wrapper.GroupName, "set_goal_flag", false);
         }
 
         if (ship_wrapper.GoalFlag == true) return NodeState.SUCCESS;
-
-        SteerData steer_data = (SteerData)agent.Get("SteerData");
 
         Imap working_map = null;
 		if (working_map == null)
@@ -79,9 +78,7 @@ public partial class FindGoal : Action
 			cell_max.X * ImapManager.Instance.DefaultCellSize
 		);
 
-		agent.Call("SetNavigationPosition", target_position);
-
-
+		agent.Call("set_navigation_position", target_position);
         return NodeState.FAILURE;
     }
 

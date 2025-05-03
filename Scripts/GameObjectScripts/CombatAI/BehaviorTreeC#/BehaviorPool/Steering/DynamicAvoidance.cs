@@ -283,7 +283,7 @@ public partial class DynamicAvoidance : Action
 		
 		if (steer_data.AvoidanceBias != 0 && bias_counter == 0)
 		{
-			GD.Print(agent.Name, " avoidance bias no longer applied");
+			//GD.Print(agent.Name, " avoidance bias no longer applied");
 			steer_data.AvoidanceBias = 0;
 		}
 

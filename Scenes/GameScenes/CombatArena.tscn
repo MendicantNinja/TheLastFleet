@@ -1,30 +1,30 @@
-[gd_scene load_steps=51 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=50 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/admiral.gd" id="2_shfex"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_xxm3d"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="3_tnnyj"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_5naox"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="4_qi217"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="5_7otad"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_control_hud.gd" id="5_ojmr4"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_vrrkk"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/DetectEnemies.cs" id="6_b14u6"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/ChooseStrategy.cs" id="7_pow8f"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindEnemyWeakness.cs" id="8_47oij"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindTargetPositions.cs" id="9_3se3g"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/choose_strategy.gd" id="9_sdjo6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_target_positions.gd" id="10_4thlf"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FillGoalMap.cs" id="10_d4jl7"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/fill_goal_map.gd" id="10_yugtf"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/GroupUnits.cs" id="11_triqp"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
 [ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
@@ -35,7 +35,6 @@
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
-[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="36_4q2va"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -113,37 +112,38 @@ unique_name_in_owner = true
 rect = Rect2(0, 0, 1, 1)
 
 [node name="Admiral" type="Node2D" parent="."]
-script = ExtResource("2_shfex")
+script = ExtResource("2_2u0vw")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
-script = ExtResource("2_xxm3d")
+script = ExtResource("3_tnnyj")
+enabled = true
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
-script = ExtResource("4_5naox")
+script = ExtResource("4_qi217")
 
 [node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_vrrkk")
+script = ExtResource("5_7otad")
 
 [node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("6_jorw7")
+script = ExtResource("6_b14u6")
 
 [node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("9_sdjo6")
+script = ExtResource("7_pow8f")
 
 [node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("7_sno18")
+script = ExtResource("8_47oij")
 
 [node name="find target positions" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("10_4thlf")
+script = ExtResource("9_3se3g")
 
 [node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_vrrkk")
+script = ExtResource("5_7otad")
 
 [node name="fill goal map" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("10_yugtf")
+script = ExtResource("10_d4jl7")
 
 [node name="group units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("11_iyhuv")
+script = ExtResource("11_triqp")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -901,26 +901,5 @@ offset_right = 1925.0
 offset_bottom = 1923.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
-
-[node name="TestShip" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6508, 8381)
-
-[node name="TestShip2" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(8210, 9556)
-
-[node name="TestShip3" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(4734, 9676)
-
-[node name="TestShip24" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(7949, 1938)
-collision_layer = 4
-
-[node name="TestShip25" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(6511, 3784)
-collision_layer = 4
-
-[node name="TestShip26" parent="." instance=ExtResource("36_4q2va")]
-position = Vector2(5240, 1938)
-collision_layer = 4
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

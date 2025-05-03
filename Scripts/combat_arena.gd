@@ -12,6 +12,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
+@onready var AdmiralAI = $Admiral/AdmiralAI
 @onready var ComputerAdmiral = $Admiral
 @onready var ImapDebug = $ImapDebug
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
@@ -29,16 +30,16 @@ var deployment_spacing: int = 500
 
 signal units_deployed(units)
 func _ready() -> void:
-	ComputerAdmiral.AdmiralAI.enabled = false
-	ComputerAdmiral.heuristic_goal = combat_goal
+	AdmiralAI.ToggleRoot(false)
+	ComputerAdmiral.SetGoal(combat_goal)
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
-	
+	FleetDeploymentList.combat_goal = combat_goal
 	imap_manager.InitializeArenaMaps()
 	
 	if debug_imap == true:
-		var map: Object = imap_manager.ArenaInfluenceMap
+		var map: Object = imap_manager.GoalMap
 		#print(map.get_signal_list())
 		map.UpdateGridValue.connect(_on_grid_value_changed)
 		map.UpdateRowValue.connect(_on_grid_row_changed)
@@ -60,8 +61,6 @@ func _ready() -> void:
 				ImapDebugGrid.add_child(cell_instance)
 				imap_debug_grid[i].append(cell_instance)
 	
-	imap_manager.RegisterAgents(get_tree().get_nodes_in_group(&"agent"), combat_goal)
-	
 	FleetDeploymentList.setup_deployment_screen()
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)
@@ -81,11 +80,9 @@ func _ready() -> void:
 	
 	$CollisionBoundaryTop.position = Vector2(PlayableAreaBounds.shape.size.x/2, 0)
 	$CollisionBoundaryTop/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.x, 1 ) 
-
-	#
+	
 	$CollisionBoundaryRight.position = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y/2)
 	$CollisionBoundaryRight/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.y, 1 ) 
-	
 	
 	#$CollisionBoundaryRight.position =  Vector2(PlayableAreaBounds.shape.size.x,0)
 	#$CollisionBoundaryRight/CollisionBoundaryShape.shape.a = Vector2(0, 0)
@@ -94,7 +91,7 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	#deploy_enemy_fleet()
+	deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -117,19 +114,20 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
 		for i in range (enemy_fleet_size):
-			if i % 100 == 0:
-				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
-			if i % 3 == 0:
-				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
-			else:
-				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
+			enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
+			#if i % 100 == 0:
+				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
+			#if i % 3 == 0:
+				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
+			#else:
+				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 	var iterator: int 
 	for i in range (enemy_fleet.fleet_stats.ships.size()):
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
 		ship_instantiation.initialize(enemy_fleet.fleet_stats.ships[i])
+		ship_instantiation.collision_layer = 4
 		self.add_child(ship_instantiation)
 		ship_instantiation.is_friendly = false
-		ship_instantiation.collision_layer = 4
 		instantiated_units.push_back(ship_instantiation)
 		
 		# Deployment Positioning
@@ -141,6 +139,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y + deployment_spacing * 6 + deployment_spacing*deployment_row))
 		ship_positions[ship_instantiation.global_position] = ship_instantiation
 		var tmp_name: StringName = &"stringbean"
+		ship_instantiation.add_to_group(&"enemy")
 		ship_instantiation.posture = globals.Strategy.NEUTRAL
 		ship_instantiation.group_add(tmp_name)
 	
@@ -153,9 +152,8 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	#imap_manager.RegisterAgents(instantiated_units, int(combat_goal))
+	imap_manager.RegisterAgents(instantiated_units, int(combat_goal))
 	%TacticalDataDrawing.delayed_setup_call()
-	#ComputerAdmiral.AdmiralAI.enabled = true
 
 func _unhandled_input(event) -> void:
 	if event is InputEventKey:
@@ -195,7 +193,7 @@ func _on_switch_maps() -> void:
 	get_viewport().set_input_as_handled()
 
 func _on_enemy_ships_deployed() -> void:
-	ComputerAdmiral.AdmiralAI.enabled = true
+	AdmiralAI.ToggleRoot(true)
 
 func _on_grid_value_changed(m: int, n: int, value: float) -> void:
 	var adj_value: float = snappedf(value, 0.001)

@@ -113,8 +113,7 @@ public partial class Imap : GodotObject
 	{
 		int radius = (Height - 1) / 2;        // This equals the original r
 		Vector2I center = new Vector2I(radius, radius);
-		GD.Print(Height, " x ", Width);
-		GD.Print(center);
+		
 		// Loop over offsets from -radius to radius (inclusive)
 		for (int m = 0; m < Height; m++)
 		{
@@ -195,7 +194,7 @@ public partial class Imap : GodotObject
 			// If the entire row is zero, fill the target row with zeros
 			if (source_min == 0.0f && source_max == 0.0f)
 			{
-				Buffer.BlockCopy(zero_fill_row, 0, target_map.MapGrid, m * Width * sizeof(float), Width * sizeof(float));
+				Buffer.BlockCopy(zero_fill_row, 0, target_map.MapGrid, m * target_map.Width * sizeof(float), target_map.Width * sizeof(float));
 				continue;
 			}
 

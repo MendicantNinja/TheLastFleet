@@ -7,12 +7,9 @@ func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 240 != 0:
 		return FAILURE
 	
-	var goal_positions: Array = []
 	var player_vulnerability: Dictionary = {}
-	var goal_cells: Array = []
 	if not agent.player_vulnerability.is_empty():
 		player_vulnerability = agent.player_vulnerability
-		goal_positions = player_vulnerability.keys()
 	
 	var vulnerable_positions: Array = []
 	var isolated_targets: Array = []

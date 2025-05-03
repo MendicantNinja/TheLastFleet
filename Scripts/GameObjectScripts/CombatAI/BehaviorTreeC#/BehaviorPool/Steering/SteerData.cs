@@ -91,7 +91,6 @@ public partial class SteerData : Node
         Deceleration = (float)shipStats.Get("deceleration") + (float)shipStats.Get("bonus_deceleration");
         TurnRate = (float)shipStats.Get("turn_rate");
         TargetUnit = null;
-        TargetPosition = Vector2.Zero;
     }
     
     public void SetDelta(double value)

@@ -5,12 +5,13 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class SeekAndArrive : Action
 {
-	float target_area_radius = 100.0f;
+	float target_area_radius = 50.0f;
 	float hystersis_buffer = 2.0f;
 	float separation_buffer = 3.0f;
 	float time_to_target = 0.1f;
+	float lerp_weight = 0.1f;
 	int epsilon = 1;
-	bool debug = true;
+	bool debug = false;
 
 	public override NodeState Tick(Node agent)
 	{
@@ -59,13 +60,14 @@ public partial class SeekAndArrive : Action
 			velocity *= speed;
 			velocity -= new Vector2(n_agent.LinearVelocity.X, n_agent.LinearVelocity.Y);
 			velocity /= time_to_target;
+			steer_data.SeparationWeight = Mathf.Lerp(steer_data.SeparationWeight, 0.1f, lerp_weight);
 		}
 
 		if (distance_to < target_area_radius * 2) n_agent.LinearDamp = 0.5f;
 
 		if (distance_to < target_area_radius && n_agent.LinearVelocity.Length() > epsilon)
 		{
-			n_agent.LinearDamp = 3.0f;
+			n_agent.LinearDamp = 1.0f;
 			velocity = new Vector2(-n_agent.LinearVelocity.X, -n_agent.LinearVelocity.Y) * time_to_target;
 		}
 
@@ -81,8 +83,7 @@ public partial class SeekAndArrive : Action
 			steer_data.SeparationWeight = float.Epsilon;
 			steer_data.GoalWeight = float.Epsilon;
 			steer_data.DesiredVelocity = Vector2.Zero;
-			steer_data.SetTargetPosition(Godot.Vector2.Zero);
-			GD.Print(agent.Name, " navigated to position");
+			//GD.Print(agent.Name, " navigated to position");
 			return NodeState.SUCCESS;
 		}
 		

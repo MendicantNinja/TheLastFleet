@@ -132,8 +132,11 @@ var group_name: StringName = &"":
 
 var group_leader: bool = false:
 	set(value):
+		if value == false and successful_deploy == false and group_name.is_empty() == false:
+			ships_deployed.emit()
 		ShipWrapper.SetGroupLeader(value)
 		group_leader = value
+		
 
 var posture: globals.Strategy = globals.Strategy.NEUTRAL:
 	set(value):
@@ -152,7 +155,6 @@ var occupancy_radius: int = 0
 
 var approx_influence: float = 0.0:
 	set(value):
-		ShipWrapper.SetApproxInfluence(value)
 		approx_influence = value
 
 var registry_cluster: Array = []:
@@ -257,7 +259,7 @@ var successful_deploy: bool = false:
 var match_velocity_flag: bool = false:
 	set(value):
 		ShipWrapper.SetMatchVelocityFlag(match_velocity_flag)
-		successful_deploy = match_velocity_flag
+		match_velocity_flag = value
 
 var steer_debug: bool = true
 
@@ -453,7 +455,7 @@ func _ready() -> void:
 		is_friendly = false
 		rotation += PI/2
 	
-	ShipWrapper.InitializeAgentImaps(imap_manager, occupancy_radius, threat_radius, collision_layer)
+	ShipWrapper.InitializeAgentImaps(self, imap_manager, occupancy_radius, threat_radius, collision_layer)
 	var separation_shape: Shape2D = CircleShape2D.new()
 	var separation_radius: float = new_radius * 5.0
 	separation_shape.radius = separation_radius
@@ -631,7 +633,7 @@ func group_remove(n_group_name: StringName) -> void:
 		group_leader = false
 	if n_group_name == group_name:
 		group_name = &""
-	#print("%s removed from %s" % [name, n_group_name])
+	print("%s removed from %s" % [name, n_group_name])
 	remove_from_group(n_group_name)
 
 func group_add(n_group_name: StringName) -> void:
@@ -640,7 +642,7 @@ func group_add(n_group_name: StringName) -> void:
 			continue
 		weapon_slot.set_auto_aim(true)
 		weapon_slot.set_auto_fire(true)
-	#print("%s added to %s" % [name, n_group_name])
+	print("%s added to %s" % [name, n_group_name])
 	group_name = n_group_name
 	add_to_group(group_name)
 
@@ -896,21 +898,21 @@ func _physics_process(delta: float) -> void:
 	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.DefaultCellSize, global_position.x / imap_manager.DefaultCellSize)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
-		var center_cell_position: Vector2 = Vector2(current_imap_cell.y, current_imap_cell.x) * imap_manager.DefaultCellSize;
+		var center_cell_position: Vector2i = Vector2i(current_imap_cell.y * imap_manager.DefaultCellSize, current_imap_cell.x * imap_manager.DefaultCellSize);
 		center_cell_position.x += imap_manager.DefaultCellSize / 2.0;
 		center_cell_position.y += imap_manager.DefaultCellSize / 2.0;
 		var dist_to: float = center_cell_position.distance_to(global_position)
-		if dist_to > imap_manager.DefaultCellSize / 2.0 or imap_cell == Vector2i.ZERO:
+		if dist_to > imap_manager.DefaultCellSize * 0.45:
 			update_agent_influence.emit()
 			imap_cell = current_imap_cell
-
+	
 	var current_registry_cell: Vector2i = Vector2i(global_position.y / imap_manager.MaxCellSize, global_position.x / imap_manager.MaxCellSize)
 	if Engine.get_physics_frames() % 60 == 0 and registry_cell != current_registry_cell:
 		var center_cell_position: Vector2 = Vector2(current_registry_cell.y, current_registry_cell.x) * imap_manager.MaxCellSize
 		center_cell_position.x += imap_manager.MaxCellSize / 2.0
 		center_cell_position.y += imap_manager.MaxCellSize / 2.0
 		var dist_to: float = center_cell_position.distance_to(global_position)
-		if dist_to > imap_manager.DefaultCellSize / 2.0:
+		if dist_to >= imap_manager.DefaultCellSize / 2.0:
 			update_registry_cell.emit()
 			registry_cell = current_registry_cell
 	
@@ -1041,12 +1043,7 @@ func _on_target_in_range(value: bool) -> void:
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
-	
-	if ship_stats.ship_hull.ship_type == data.ship_type_enum.TEST:
-		CombatBehaviorTree.ToggleRoot(value)
-	else:
-		CombatBehaviorTree.toggle_root(value)
-	
+	CombatBehaviorTree.ToggleRoot(value)
 	for weapon in all_weapons:
 		weapon.AI_enabled = value
 		weapon.auto_aim = true
@@ -1161,6 +1158,8 @@ func _on_SeparationShape_body_entered(neighbor) -> void:
 	separation_neighbors = tmp_array
 
 func _on_SeparationShape_body_exited(neighbor) -> void:
+	if neighbor is StaticBody2D:
+		return
 	var tmp_array: Array = separation_neighbors
 	tmp_array.erase(neighbor)
 	separation_neighbors = tmp_array
