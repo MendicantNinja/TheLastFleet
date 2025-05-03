@@ -1,4 +1,4 @@
-[gd_scene load_steps=26 format=3 uid="uid://c2gpnr0o720b0"]
+[gd_scene load_steps=28 format=3 uid="uid://c2gpnr0o720b0"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_qqye5"]
@@ -25,6 +25,13 @@
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_px6v0"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="24_088hk"]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sohox"]
+radius = 45.0
+height = 92.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_57y0p"]
+size = Vector2(22, 28.5)
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
 
 [node name="TestShip" type="RigidBody2D"]
@@ -36,6 +43,23 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_ttka1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_sohox")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-25.75, -36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_57y0p")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27.5, 36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_57y0p")
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -125,9 +149,6 @@ texture = ExtResource("20_ar06l")
 [node name="ShipLivery" type="Sprite2D" parent="."]
 texture_filter = 1
 rotation = 1.5708
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-polygon = PackedVector2Array(44, -12, 18, -44, 3, -39, -12, -44, -20, -48, -34, -43, -40, -35, -40, -21, -46, -1, -36, 12, -41, 35, -23, 48, 3, 37, 19, 41, 46, 14)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("22_4sljk")]
 position = Vector2(11, -1)

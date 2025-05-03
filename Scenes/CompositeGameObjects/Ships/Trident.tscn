@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://10wylxljg0nw"]
+[gd_scene load_steps=32 format=3 uid="uid://10wylxljg0nw"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_vx8d1"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_vxdxy"]
@@ -28,6 +28,16 @@
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="26_06ix5"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="27_y2dbk"]
 
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ojec2"]
+radius = 52.0
+height = 210.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lwmg0"]
+size = Vector2(25, 38)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2mvne"]
+size = Vector2(45.5, 126)
+
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
 
 [node name="Trident" type="RigidBody2D"]
@@ -41,6 +51,23 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_vx8d1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-3, -1)
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_ojec2")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27, -33.5)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_lwmg0")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(80.25, 0)
+shape = SubResource("RectangleShape2D_2mvne")
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 
@@ -128,11 +155,6 @@ texture = ExtResource("14_kfouk")
 texture_filter = 1
 rotation = 1.5708
 texture = ExtResource("15_fllyn")
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-position = Vector2(-52.7971, 0)
-scale = Vector2(2.64555, 1)
-polygon = PackedVector2Array(-9.90453, 34, -6.50259, 53, 4.83722, 52, 5.59321, 41, 8.99515, 41, 9.75114, 47, 34.6987, 47, 41.5026, 47, 41.5026, 61, 57.3783, 65, 60.0243, 47, 58.5123, 2, 60.4023, -36, 57.0003, -63, 41.5026, -62, 39.9906, -49, 9.75114, -47, -5.7466, -52, -9.90453, -34, -18.9764, -34, -18.9764, 35)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("13_kiy6n")]
 position = Vector2(90, -55)
