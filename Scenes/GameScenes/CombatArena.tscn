@@ -1,4 +1,4 @@
-[gd_scene load_steps=57 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
@@ -35,6 +35,9 @@
 [ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tutorial_walkthrough.gd" id="31_awwt3"]
+[ext_resource type="Texture2D" uid="uid://sx6qwqb84tne" path="res://Art/GUIArt/fast-backward-button.svg" id="32_md01c"]
+[ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
 
@@ -127,6 +130,17 @@ colors = PackedColorArray(1, 1, 1, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_gaw57"]
 gradient = SubResource("Gradient_lqjnm")
 width = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2h44e"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 0.588235)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
@@ -291,6 +305,7 @@ position_smoothing_enabled = true
 [node name="TacticalMapLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
 process_mode = 3
+visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
 top_level = true
@@ -360,7 +375,7 @@ canvas_item_default_texture_filter = 2
 gui_snap_controls_to_pixels = false
 canvas_cull_mask = 4294967279
 size = Vector2i(9600, 9600)
-render_target_update_mode = 4
+render_target_update_mode = 0
 
 [node name="TacticalMapCamera" type="Camera2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
 unique_name_in_owner = true
@@ -762,6 +777,52 @@ fit_content = true
 scroll_active = false
 script = ExtResource("34_4p8f2")
 
+[node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+process_mode = 3
+top_level = true
+offset_left = 701.0
+offset_top = 706.0
+offset_right = 1106.0
+offset_bottom = 896.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
+script = ExtResource("31_awwt3")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VariousCanvasPopups/TutorialWalkthrough"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -58.0
+offset_top = -36.0
+offset_right = 59.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+texture_normal = ExtResource("32_md01c")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StepCounter" type="Label" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+layout_mode = 2
+text = "1/15"
+
+[node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture_normal = ExtResource("33_dc70j")
+ignore_texture_size = true
+stretch_mode = 5
+
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1
 
@@ -778,8 +839,10 @@ follow_viewport = false
 
 [node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
 self_modulate = Color(1, 1, 1, 0.34902)
-offset_right = 1925.0
-offset_bottom = 1923.0
+offset_left = -162.0
+offset_top = -10.0
+offset_right = 1763.0
+offset_bottom = 1913.0
 texture = ExtResource("11_kx52a")
 stretch_mode = 4
 

@@ -92,6 +92,7 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt_select")):
 			var to_position: Vector2 = convert_map_to_realspace(get_global_mouse_position(), map_bounds, grid_size)
 			process_move(to_position)
+			%TutorialWalkthrough.move_order = true
 		elif Input.is_action_just_pressed("zoom in") and TacticalCamera.zoom < zoom_in_limit:
 			TacticalCamera.zoom += Vector2(0.05, 0.05)
 		elif Input.is_action_just_pressed("zoom out") and TacticalCamera.zoom > zoom_out_limit:
@@ -132,6 +133,7 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_just_released("alt_select"):
 			if highlighted_group.size() > 0 and highlighted_enemy_group.size() > 0:
 				attack_targets()
+				%TutorialWalkthrough.attack_order = true
 			attack_group = false
 			selection_line_color = settings.gui_color
 			queue_redraw()
