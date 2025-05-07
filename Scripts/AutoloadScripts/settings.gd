@@ -1,7 +1,9 @@
 extends Node
 
-# If dev mode is true, railgun weapons are added to the ship.gd automatically and assigned a slot. Rather than grabbing and assigning weapons from ship stats.
+# If dev mode is true for quicker iteration or playtesting, railgun weapons are added to the ship.gd automatically and assigned a slot. Rather than grabbing and assigning weapons from ship stats.
 @onready var dev_mode = true
+# Debug mode is used for features that interfere with development, such as fog of war.
+@onready var debug_mode = true
 
 # Visuals
 var screen_size: Vector2 = DisplayServer.screen_get_size()

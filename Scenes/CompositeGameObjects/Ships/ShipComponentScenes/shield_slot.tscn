@@ -1,0 +1,20 @@
+[gd_scene load_steps=4 format=3 uid="uid://bmogmneffwvgs"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="1_0lsec"]
+[ext_resource type="Material" uid="uid://frj611bp24hs" path="res://Shaders/CombatShaders/shield_material.tres" id="2_f7132"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mtinx"]
+resource_local_to_scene = true
+
+[node name="Shields" type="StaticBody2D"]
+collision_layer = 16
+collision_mask = 31
+script = ExtResource("1_0lsec")
+
+[node name="ShieldShape" type="CollisionPolygon2D" parent="."]
+disabled = true
+
+[node name="ShieldVisuals" type="Polygon2D" parent="."]
+material = ExtResource("2_f7132")
+antialiased = true
+texture = SubResource("PlaceholderTexture2D_mtinx")

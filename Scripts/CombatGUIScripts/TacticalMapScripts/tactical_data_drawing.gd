@@ -4,17 +4,24 @@ extends Node2D
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
+
 @onready var ship_list: Array[Ship]
 @onready var ship_registry: Dictionary = imap_manager.registry_map
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
 
+@onready var VisibilityLayer: SubViewport
+@onready var DetectionTexture: TextureRect = $VisibilityLayerContainer/VisibilityLayer/DetectionRadius
+@onready var detection_list: Array[TextureRect]
+
 # Visuals
-var TacticalMapBackground: ColorRect 
+var TacticalMapBackground: ColorRect
+var conversion_coeffecient_x: float
+var conversion_coeffecient_y: float
 var grid_size: Vector2
 #var sub_line_color: Color = Color8(162, 141, 60, 255)
-var line_color: Color = Color8(255, 255, 255, 125)
+var line_color: Color = Color8(100, 100, 255, 175)
 var line_width: int = 9
 var sub_line_width: int = 5
 
@@ -27,7 +34,10 @@ var selection_line_color: Color = Color8(75, 225, 25) #settings.gui_color
 var zoom_in_limit: Vector2 = Vector2(1.0, 1.0)
 var zoom_out_limit: Vector2 = Vector2(0.15, 0.15) 
 @onready var TacticalCamera: Camera2D = %TacticalMapCamera
-var camera_feed_active: bool = false
+var camera_feed_active: bool = false:
+	set(value):
+		camera_feed_active = value
+		%CameraFeed.visible = value
 var camera_feed_ship: Ship = null # For vid feed. There can be only one!
 
 # Group Creation
@@ -56,6 +66,13 @@ func _ready():
 	grid_size = Vector2(TacticalMapBackground.size.x, TacticalMapBackground.size.y)
 	#%TacticalMapCamera.limit_right = TacticalMapBackground.size.x * 2
 	#%TacticalMapCamera.limit_bottom = TacticalMapBackground.size.x * 2
+	conversion_coeffecient_x = TacticalMapBackground.size.x/map_bounds.x
+	conversion_coeffecient_y = TacticalMapBackground.size.y/map_bounds.y
+	
+	$FogOfWar.size = TacticalMapBackground.size
+	$VisibilityLayerContainer/VisibilityLayer.size = TacticalMapBackground.size
+	$FogOfWar.material.set_shader_parameter("visibility_texture", $VisibilityLayerContainer/VisibilityLayer.get_texture())
+	
 	setup()
 	queue_redraw()
 	
@@ -63,7 +80,6 @@ func _ready():
 		if child is TextureButton:
 			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
-	
 	#stress_testing()
 	pass # Replace with function body.
 
@@ -79,6 +95,7 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_just_pressed("m2") and not (Input.is_action_pressed("select") or Input.is_action_pressed("alt_select")):
 			var to_position: Vector2 = convert_map_to_realspace(get_global_mouse_position(), map_bounds, grid_size)
 			process_move(to_position)
+			%TutorialWalkthrough.move_order = true
 		elif Input.is_action_just_pressed("zoom in") and TacticalCamera.zoom < zoom_in_limit:
 			TacticalCamera.zoom += Vector2(0.05, 0.05)
 		elif Input.is_action_just_pressed("zoom out") and TacticalCamera.zoom > zoom_out_limit:
@@ -102,7 +119,8 @@ func _unhandled_input(event) -> void:
 				manually_controlled_ship.toggle_manual_control()
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
-			manually_controlled_ship.toggle_manual_control()
+			if manually_controlled_ship != null:
+				manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
 			$"../../../ButtonList/CameraFeedButton".emit_signal("pressed")
@@ -119,6 +137,7 @@ func _unhandled_input(event) -> void:
 		elif Input.is_action_just_released("alt_select"):
 			if highlighted_group.size() > 0 and highlighted_enemy_group.size() > 0:
 				attack_targets()
+				%TutorialWalkthrough.attack_order = true
 			attack_group = false
 			selection_line_color = settings.gui_color
 			queue_redraw()
@@ -168,6 +187,7 @@ func display_map(map_value: bool) -> void:
 		TacticalMapCamera.position = self.position + Vector2(grid_size.x/2, grid_size.y * .9)
 		TacticalMapCamera.zoom = Vector2(.15, .15)
 		setup()
+		%BlackenScreenLayer.visible = true
 		%TacticalMapLayer.visible = true
 	# Hide the Tac Map
 	elif map_value == false:
@@ -175,6 +195,7 @@ func display_map(map_value: bool) -> void:
 		attack_group = false
 		#$"../..".grab_focus()
 		%TacticalMapLayer.visible = false
+		%BlackenScreenLayer.visible = false
 	  
 
 func swap_camera_feed(ship: Ship) -> void:
@@ -182,6 +203,7 @@ func swap_camera_feed(ship: Ship) -> void:
 		camera_feed_ship.camera_feed = false
 	camera_feed_ship = ship
 	ship.camera_feed = true
+	%CameraFeed.text = "[center]Camera Feed: " + ship.ship_stats.ship_name + "[/center]"
 	%CombatMap.CombatCamera.position_smoothing_enabled = false
 	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
 	
@@ -202,6 +224,23 @@ func setup() -> void:
 				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
+				
+				var texture_appended: TextureRect = DetectionTexture.duplicate()
+				$VisibilityLayerContainer/VisibilityLayer.add_child(texture_appended)
+				detection_list.append(texture_appended)
+				if ship.is_friendly == false: # We dont want enemies removing the fog of war!
+					ship.is_revealed = false 
+					texture_appended.visible = false
+					continue
+				else:
+					ship.is_revealed = true
+				var detection_diameter_tacmap: int = ship.sensor_strength * 2 * conversion_coeffecient_x
+				texture_appended.texture.width = detection_diameter_tacmap
+				texture_appended.texture.height = detection_diameter_tacmap
+				#texture_appended.pivot_offset = -(texture_appended.size) 
+				
+
+				
 	var friendly_group: Array = get_tree().get_nodes_in_group("friendly")
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
 	connect_unit_signals(friendly_group)
@@ -219,19 +258,25 @@ func update() -> void:
 	else:
 		$"../../../ButtonList/ManualControlButton".disabled = false
 		$"../../../ButtonList/CameraFeedButton".disabled = false
-	for icon in icon_list:
-		if icon.assigned_ship == null:
-			icon.free()
-			icon_list.erase(icon)
-			continue
+	for i in range(icon_list.size() - 1, -1, -1):
+		if icon_list[i] == null or icon_list[i].assigned_ship == null:
+			icon_list[i].queue_free()
+			icon_list.erase(icon_list[i])
+			detection_list[i].queue_free()
+			detection_list.erase(detection_list[i])
+	
+	for i in icon_list.size():
+		var icon = icon_list[i]
+		var radius = detection_list[i]
 		icon.position = convert_realspace_to_map(icon.assigned_ship.global_position, map_bounds, grid_size)
-
+		radius.position = icon.position + Vector2(-radius.size.x/2, -radius.size.y/2)
+	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if self.visible == true and Engine.get_physics_frames() % 10 == 0:
-		update()
+	#if self.visible == true and Engine.get_physics_frames() % 3 == 0:
+	update()
 	# Populate the map because ship registration isn't instantaneous as of 2/18/24
-	if initial_setup == false and Engine.get_physics_frames() % 70 == 0:
+	if initial_setup == false and Engine.get_physics_frames() % 62 == 0:
 			setup()
 			initial_setup = true
 
@@ -357,7 +402,7 @@ func reset_box_selection() -> void:
 	
 
 func _on_unit_selected(unit: Ship) -> void:
-	print("on unit selected")
+	#print("on unit selected")
 	get_viewport().set_input_as_handled()
 	var current_selection: Array = get_tree().get_nodes_in_group(current_group_name)
 	if current_selection.size() > 1 and unit != prev_selected_ship:

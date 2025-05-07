@@ -1,4 +1,4 @@
-[gd_scene load_steps=27 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=31 format=3 uid="uid://cu2fkh4ittsos"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_3lo0t"]
@@ -22,12 +22,24 @@
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="20_de2qj"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_fuyaf"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="22_oob2k"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="23_mqt8o"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="23_ajnna"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_n0517"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="25_q5s6h"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34wpx"]
+radius = 21.0
+height = 122.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4igvr"]
+size = Vector2(25, 38)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ylwnb"]
+size = Vector2(37, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fq2r4"]
+size = Vector2(21, 11)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
@@ -40,6 +52,30 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_p58et")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_34wpx")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27, -33.5)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_4igvr")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27.5, 33)
+shape = SubResource("RectangleShape2D_ylwnb")
+
+[node name="CollisionShape2D4" type="CollisionShape2D" parent="."]
+position = Vector2(2, 26.5)
+shape = SubResource("RectangleShape2D_fq2r4")
+
+[node name="CollisionShape2D5" type="CollisionShape2D" parent="."]
+position = Vector2(2, -27)
+shape = SubResource("RectangleShape2D_fq2r4")
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 collision_layer = 0
@@ -130,10 +166,6 @@ texture = ExtResource("20_de2qj")
 texture_filter = 1
 rotation = 1.5708
 
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-position = Vector2(10, 0)
-polygon = PackedVector2Array(54, 0, 41, -15, 31, -19, 1, -32, -19, -32, -20, -47, -50, -44, -55, -32, -55, -28, -51, -22, -60, -17, -72, 0, -61, 17, -51, 22, -56, 31, -50, 44, -19, 44, -19, 32, 3, 32, 2, 17, 27, 20, 40, 16, 4, -17, 41, 16)
-
 [node name="WeaponSlot0" parent="." instance=ExtResource("22_fuyaf")]
 position = Vector2(-3, -18)
 weapon_mount = ExtResource("22_oob2k")
@@ -157,21 +189,13 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="ShieldSlot" type="Node2D" parent="."]
-script = ExtResource("23_mqt8o")
-
-[node name="Shields" type="Area2D" parent="ShieldSlot"]
-collision_layer = 0
-collision_mask = 8
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
-shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
-
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
+
+[node name="ShieldSlot" parent="." instance=ExtResource("23_ajnna")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("25_q5s6h")]
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
 

@@ -1,7 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://dbjqnxtn41fqd"]
+[gd_scene load_steps=4 format=3 uid="uid://b8t2wmt0bt5gx"]
 
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_67t0t"]
-[ext_resource type="Texture2D" uid="uid://bnbf3uk1tgpxv" path="res://Art/ProjectileArt/mazen's projectiles/laserdownscaled.png" id="2_iutgg"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_3dbj2"]
+[ext_resource type="Texture2D" uid="uid://bnbf3uk1tgpxv" path="res://Art/ProjectileArt/mazen's projectiles/laserdownscaled.png" id="2_o8df0"]
 
 [sub_resource type="SegmentShape2D" id="SegmentShape2D_m4xyq"]
 b = Vector2(0, 0)
@@ -9,7 +9,7 @@ b = Vector2(0, 0)
 [node name="laserbeam" type="Area2D"]
 collision_layer = 0
 collision_mask = 0
-script = ExtResource("1_67t0t")
+script = ExtResource("1_3dbj2")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("SegmentShape2D_m4xyq")
@@ -17,13 +17,13 @@ disabled = true
 
 [node name="RayCast2D" type="RayCast2D" parent="."]
 target_position = Vector2(0, 0)
-collision_mask = 15
+collision_mask = 0
 collide_with_areas = true
 
 [node name="Line2D" type="Line2D" parent="."]
 points = PackedVector2Array(0, 0, 572.718, 0)
-default_color = Color(0.72336, 0.4704, 0.96, 1)
-texture = ExtResource("2_iutgg")
+default_color = Color(0.96, 0.48768, 0.2688, 1)
+texture = ExtResource("2_o8df0")
 texture_mode = 2
 round_precision = 4
 

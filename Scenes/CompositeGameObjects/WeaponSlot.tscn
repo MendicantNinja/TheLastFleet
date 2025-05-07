@@ -35,3 +35,5 @@ shape = SubResource("CircleShape2D_82o22")
 debug_color = Color(0, 0.6, 0.701961, 0)
 
 [node name="ROFTimer" type="Timer" parent="."]
+
+[node name="ContinuousFluxTimer" type="Timer" parent="."]

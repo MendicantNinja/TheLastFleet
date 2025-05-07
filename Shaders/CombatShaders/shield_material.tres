@@ -1,0 +1,30 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://frj611bp24hs"]
+
+[ext_resource type="Shader" path="res://Shaders/CombatShaders/shields.gdshader" id="1_g5yui"]
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_3nw7b"]
+noise_type = 2
+frequency = 0.2
+fractal_type = 0
+fractal_octaves = 1
+fractal_lacunarity = 0.0
+fractal_gain = 0.0
+cellular_distance_function = 1
+cellular_jitter = 0.1
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_7x70l"]
+seamless_blend_skirt = 1.0
+noise = SubResource("FastNoiseLite_3nw7b")
+
+[resource]
+shader = ExtResource("1_g5yui")
+shader_parameter/shield_color = Vector4(0, 0.4, 1, 1)
+shader_parameter/texture_size = Vector2(1, 1)
+shader_parameter/shield_px_width = 2.0
+shader_parameter/circle_radius = 0.5
+shader_parameter/ellipse_radius = Vector2(0.607, 1)
+shader_parameter/hit_positions = null
+shader_parameter/hit_radii = null
+shader_parameter/hit_timers = null
+shader_parameter/hit_count = null
+shader_parameter/shield_noise_texture = SubResource("NoiseTexture2D_7x70l")
