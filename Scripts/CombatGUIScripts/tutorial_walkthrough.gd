@@ -47,7 +47,7 @@ func _process(_delta):
 		return
 	
 	var current_step = steps[current_step_index]
-	if current_step.condition.call() and not current_step.skippable:# Check if the current step/condition is returning true or false.
+	if current_step.condition.call() and not current_step.skippable: # Check if the current step/condition is returning true or false.
 		current_step.skippable = true
 		current_step_index += 1
 		if current_step_index < steps.size():

@@ -765,7 +765,7 @@ func _physics_process(delta: float) -> void:
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
 	if manual_control == true:
 		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
-		if TacticalMapLayer.visible == false:
+		if TacticalMapLayer.visible == false and TacticalDataDrawing.camera_feed_active == false:
 			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
 			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
 				fire_weapon_system(selected_weapon_system.weapons)
@@ -778,7 +778,6 @@ func _physics_process(delta: float) -> void:
 			
 			if Input.is_action_pressed("vent_flux"):
 				vent_flux_flag = true
-	#print(TacticalDataDrawing.camera_feed_active)
 		if TacticalDataDrawing.camera_feed_active == false:
 			ManualControlHUD.update_hud()
 			if manual_camera_freelook == false:

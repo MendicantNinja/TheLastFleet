@@ -116,7 +116,8 @@ func _unhandled_input(event) -> void:
 				manually_controlled_ship.toggle_manual_control()
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
-			manually_controlled_ship.toggle_manual_control()
+			if manually_controlled_ship != null:
+				manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
 			$"../../../ButtonList/CameraFeedButton".emit_signal("pressed")
