@@ -9,6 +9,7 @@ class_name Ship
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
+@onready var ManualControlLoadingBar = %ManualControlLoadingBar
 
 @onready var ManualControlHUD = null
 @onready var CenterCombatHUD: Control = $CenterCombatHUD
@@ -182,7 +183,7 @@ func deploy_ship() -> void:
 		CombatCamera = get_tree().get_root().find_child("CombatCamera", true, false)
 		TacticalCamera = get_tree().get_root().find_child("TacticalMapCamera", true, false)
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
-	
+		ManualControlLoadingBar = get_tree().current_scene.get_node("%ManualControlLoadingBar")
 	if is_friendly == true:
 		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
 		print("deploy_ship called")
@@ -565,6 +566,11 @@ func toggle_manual_control() -> void:
 		CombatBehaviorTree.toggle_root(false)
 	
 	if manual_control == false:
+		ManualControlLoadingBar.visible = true
+		ManualControlLoadingBar.value = 0
+		ManualControlLoadingBar.create_tween().tween_property(ManualControlLoadingBar, "value", 100, 1.5)
+		await get_tree().create_timer(1.5).timeout  # delay in seconds
+		ManualControlLoadingBar.visible = false
 		manual_control = true
 		ship_select = false
 		ManualControlHUD.set_ship(self)

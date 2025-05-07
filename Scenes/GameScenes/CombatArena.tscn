@@ -777,6 +777,24 @@ fit_content = true
 scroll_active = false
 script = ExtResource("34_4p8f2")
 
+[node name="CameraFeed" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_top = -63.0
+offset_right = 216.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Camera Feed"
+
 [node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
 unique_name_in_owner = true
 process_mode = 3
@@ -822,6 +840,34 @@ layout_mode = 2
 texture_normal = ExtResource("33_dc70j")
 ignore_texture_size = true
 stretch_mode = 5
+
+[node name="ManualControlLoadingBar" type="ProgressBar" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+offset_left = 726.0
+offset_top = 945.0
+offset_right = 1037.0
+offset_bottom = 972.0
+step = 1.0
+value = 50.0
+
+[node name="ManualControlLoading" type="RichTextLabel" parent="VariousCanvasPopups/ManualControlLoadingBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -157.5
+offset_top = 1.0
+offset_right = 274.5
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Transferring Command..."
 
 [node name="SpaceBackground" type="CanvasLayer" parent="."]
 layer = -1

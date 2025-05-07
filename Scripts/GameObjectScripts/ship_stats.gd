@@ -185,7 +185,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 	weapon_slots[weapon_slot_index].weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)
 	
 # Ship Systems
-@export var ship_name: String = "Shippington" # The name of this specific ship in the fleet.
+@export var ship_name: String = "ISS Shippington" # The name of this specific ship in the fleet.
 @export var ship_hull: ShipHull 
 @export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
 @export_storage var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)

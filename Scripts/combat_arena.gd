@@ -78,6 +78,7 @@ func _ready() -> void:
 	settings.swizzle(FleetDeploymentPanel)
 	settings.swizzle(%OptionsMenuPanel)
 	settings.swizzle(%MainMenuButton)
+	settings.swizzle(%ManualControlLoadingBar)
 	settings.swizzle(All)
 	settings.swizzle(Deploy)
 	settings.swizzle(Cancel)

@@ -34,7 +34,10 @@ var selection_line_color: Color = Color8(75, 225, 25) #settings.gui_color
 var zoom_in_limit: Vector2 = Vector2(1.0, 1.0)
 var zoom_out_limit: Vector2 = Vector2(0.15, 0.15) 
 @onready var TacticalCamera: Camera2D = %TacticalMapCamera
-var camera_feed_active: bool = false
+var camera_feed_active: bool = false:
+	set(value):
+		camera_feed_active = value
+		%CameraFeed.visible = value
 var camera_feed_ship: Ship = null # For vid feed. There can be only one!
 
 # Group Creation
@@ -200,6 +203,7 @@ func swap_camera_feed(ship: Ship) -> void:
 		camera_feed_ship.camera_feed = false
 	camera_feed_ship = ship
 	ship.camera_feed = true
+	%CameraFeed.text = "[center]Camera Feed: " + ship.ship_stats.ship_name + "[/center]"
 	%CombatMap.CombatCamera.position_smoothing_enabled = false
 	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
 	
