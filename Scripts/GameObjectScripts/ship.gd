@@ -9,7 +9,7 @@ class_name Ship
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
-@onready var ManualControlLoadingBar = %ManualControlLoadingBar
+@onready var ManualControlLoadingBar
 
 @onready var ManualControlHUD = null
 @onready var CenterCombatHUD: Control = $CenterCombatHUD
