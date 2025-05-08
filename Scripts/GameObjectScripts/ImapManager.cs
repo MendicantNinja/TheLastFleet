@@ -121,7 +121,36 @@ public partial class ImapManager : Node
 			RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
 		}
 	}
+	
+	public void OnCombatArenaExiting()
+{
+	var availableAgents = GetTree().GetNodesInGroup("agent");
+	foreach (Node node in availableAgents)
+	{
+		if (node is RigidBody2D agent)
+		{
+			ShipWrapper shipWrapper = (ShipWrapper)agent.Get("ShipWrapper");
 
+			agent.RemoveFromGroup("agent");
+
+			// Disconnect signals if needed (assuming they're connected manually elsewhere)
+			// These should match the signals you connect with +Connect(...) in C#
+			agent.Disconnect("update_agent_influence",  Callable.From(() =>OnUpdateAgentInfluence(agent)));
+			agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
+			agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
+		}
+	}
+
+	RegistryMap.Clear();
+	VulnerabilityMap.ClearMap();
+	TensionMap.ClearMap();
+
+	foreach (var map in AgentMaps.Values)
+	{
+		map.ClearMap();
+	}
+}
+	
 	public void OnUpdateRegistryCell(RigidBody2D agent)
 	{
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");

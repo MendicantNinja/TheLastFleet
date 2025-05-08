@@ -230,4 +230,4 @@ func connect_ship_signals(friendly_ship: Ship) -> void:
 
 
 func _on_tree_exiting():
-	imap_manager._on_CombatArena_exiting()
+	imap_manager.OnCombatArenaExiting()
