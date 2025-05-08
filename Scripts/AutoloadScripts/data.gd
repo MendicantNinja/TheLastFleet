@@ -339,7 +339,8 @@ var localization_dictionary: Dictionary = {
 	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
 	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. Right click while in manual control to gradually raise your shields and stop enemy projectiles.",
 	&"tutorial_attack": "Finally, lets get this battle started. The last thing you should do is toggle your tactical map on with tab, click and drag to select all your friendly units, then when sighting the enemy, hold ctrl+click and drag over the enemy ships to attack them. Good luck commander.",
-	
+	&"tutorial_battle": "Eliminate all enemy ships to progress the tutorial.",
+	&"tutorial_complete": "Looks like you've eliminated the enemy and completed the simulation. Press Escape and click Main Menu to go back to the main menu.",
 }
 
 func generate_random_name(p_sector_type: sector_type_enum) -> Array[String]: # Returns first and last name

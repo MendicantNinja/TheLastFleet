@@ -368,7 +368,8 @@ func deploy_ship() -> void:
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	
 	if get_tree().current_scene.name == "CombatArena":
-		# Deployed ships can't find references to other nodes in the scene. So set the paths up here as needed.
+		# Deployed ships can't find references to other nodes in the scene since they are added at runtime. So set the paths up here as needed.
+		#Is also convenient for ship refitting.
 		TacticalDataDrawing = get_tree().get_root().find_child("TacticalDataDrawing", true, false)
 		TacticalMapLayer = get_tree().get_root().find_child("TacticalMapLayer", true, false)
 		CombatCamera = get_tree().get_root().find_child("CombatCamera", true, false)

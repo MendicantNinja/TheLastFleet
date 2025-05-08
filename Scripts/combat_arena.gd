@@ -107,6 +107,10 @@ func setup(tutorial_flag: bool = false, enemy_fleet: Fleet = Fleet.new()) -> voi
 	if tutorial_flag == false:
 		%TutorialWalkthrough.visible = false
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_DISABLED
+	if tutorial_flag == true:
+		%TutorialWalkthrough.visible = true
+		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_ALWAYS
+		
 	deploy_enemy_fleet(enemy_fleet)
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:

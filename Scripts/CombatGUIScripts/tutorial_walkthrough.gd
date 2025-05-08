@@ -5,6 +5,7 @@ var steps: Array[TutorialStep] = []
 var current_step_index: int = 0
 var move_order: bool
 var attack_order: bool
+var never_true: bool = false
 
 func _ready():
 	# Define tutorial steps. Check the current steps true or false return periodically in _process.
@@ -20,6 +21,8 @@ func _ready():
 		TutorialStep.new(&"tutorial_firing", data.get_text(&"tutorial_firing"), func(): return Input.is_action_just_pressed("select")),
 		TutorialStep.new(&"tutorial_shields", data.get_text(&"tutorial_shields"), func(): return Input.is_action_just_pressed("m2")),
 		TutorialStep.new(&"tutorial_attack", data.get_text(&"tutorial_attack"), func(): return detect_attack_order()),
+		TutorialStep.new(&"tutorial_battle", data.get_text(&"tutorial_battle"), func(): return get_tree().get_nodes_in_group("enemy").size() > 0),
+		TutorialStep.new(&"tutorial_complete", data.get_text(&"tutorial_complete"), func(): return never_true)
 	]
 	show_step_text(steps[current_step_index])
 	$HBoxContainer/StepForward.pressed.connect(func():
@@ -30,7 +33,6 @@ func _ready():
 )
 	$HBoxContainer/StepBackward.pressed.connect(func():
 		if current_step_index > 0:
-				print("step backward lambda called")
 				current_step_index -= 1
 				show_step_text(steps[current_step_index])
 )
