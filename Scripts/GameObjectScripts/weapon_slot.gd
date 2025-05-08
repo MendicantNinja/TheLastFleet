@@ -69,7 +69,6 @@ var killcast: RayCast2D = null
 var last_valid_position: Vector2 = Vector2.ZERO
 var target_unit: RID = RID()
 var current_target_id: RID = RID()
-var owner_rid: RID = RID()
 var shield_rid: RID = RID()
 
 # Special Beam Logic
@@ -95,7 +94,7 @@ func fire(ship_id: int) -> void:
 		#weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
-	projectile.global_transform = weapon_node.global_transform
+	projectile.global_transform = WeaponNode.global_transform
 	projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 	
 	if projectile.is_beam == true:
@@ -112,12 +111,6 @@ func fire(ship_id: int) -> void:
 	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
 		ROFTimer.start()
-
-func stop_continuous_beam() -> void:
-	ContinuousFluxTimer.stop()
-	if current_beam != null:
-		current_beam.queue_free()
-		current_beam = null 
 
 func stop_continuous_beam() -> void:
 	ContinuousFluxTimer.stop()

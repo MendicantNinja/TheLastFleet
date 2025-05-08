@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=15 format=3 uid="uid://cu2fkh4ittsos"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_l7xku"]

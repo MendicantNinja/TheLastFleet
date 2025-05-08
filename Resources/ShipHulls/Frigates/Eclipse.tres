@@ -22,6 +22,7 @@ ship_scaling = 1
 hull_integrity = 1000
 armor = 300
 shield_arc = 270
+shield_raise_time = 1.0
 shield_efficiency = 0.6
 shield_upkeep = 5.0
 flux = 600
