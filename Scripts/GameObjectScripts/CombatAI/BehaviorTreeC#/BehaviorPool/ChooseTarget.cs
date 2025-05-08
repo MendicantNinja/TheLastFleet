@@ -70,8 +70,9 @@ public partial class ChooseTarget : Action
 		if (ship_wrapper.GroupLeader == true)
 		{
 			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
+			return NodeState.FAILURE;
 		}
-
+		
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)
 		{
 			weapon.Set("weighted_targets", weigh_targets);
@@ -133,6 +134,12 @@ public partial class ChooseTarget : Action
 			n_target = weighted_targets[max_prob];
 		}
 		//GD.Print(agent.Name, " targeting ", n_target.Name);
+		if (!IsInstanceValid(n_target))
+		{
+			steer_data.TargetUnit = null;
+			ship_wrapper.TargetUnit = null;
+			return NodeState.FAILURE;
+		}
 		Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)n_target.Get("targeted_by");
 		steer_data.TargetUnit = n_target;
 		ship_wrapper.TargetUnit = n_target;
