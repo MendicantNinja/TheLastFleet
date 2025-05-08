@@ -367,7 +367,7 @@ func deploy_ship() -> void:
 	#print("deploy ship called")
 	# Needed to know the zoom level for GUI scaling. Only works in CombatArena, not refit.
 	
-	if get_tree().current_scene.name == "CombatArena":
+	if get_tree().current_scene.name == "CombatArena" or is_friendly == false:
 		# Deployed ships can't find references to other nodes in the scene since they are added at runtime. So set the paths up here as needed.
 		#Is also convenient for ship refitting.
 		TacticalDataDrawing = get_tree().get_root().find_child("TacticalDataDrawing", true, false)
@@ -760,7 +760,7 @@ func toggle_manual_control() -> void:
 	# NOTE: Toggle manual aim is set to false in combat_map.gd in set_manual_camera
 	if ship_select == false:
 		manual_control = false
-		CombatBehaviorTree.toggle_root(true)
+		CombatBehaviorTree.ToggleRoot(true)
 		return
 	
 	if manual_control == false:
