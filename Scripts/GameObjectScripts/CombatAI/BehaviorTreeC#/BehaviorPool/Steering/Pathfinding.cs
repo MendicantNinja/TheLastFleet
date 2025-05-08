@@ -15,24 +15,11 @@ public partial class Pathfinding : Action
 			steer_data.Initialize(agent);
 			Godot.Collections.Array all_weapons = (Godot.Collections.Array)agent.Get("all_weapons");
 			ship_wrapper.SetAllWeapons(all_weapons);
-			ship_wrapper.TargetedBy = new List<RigidBody2D>();
+			agent.Set("targeted_by", new Godot.Collections.Array<RigidBody2D>());
 		}
 		steer_data = (SteerData)agent.Get("SteerData");
-		
-		if (ship_wrapper.GroupLeader == true && ship_wrapper.SuccessfulDeploy == false && Engine.GetPhysicsFrames() % 120 == 0)
-		{
-			string group_name = ship_wrapper.GroupName;
-			int group_count = GetTree().GetNodeCountInGroup(group_name);
-			if (group_count <= 1)
-			{
-				agent.Set("group_leader", false);
-				agent.Call("group_remove", group_name);
-				agent.Set("successful_deploy", true);
-				return NodeState.SUCCESS;
-			}
-		}
 
-		if (steer_data.TargetUnit != null | steer_data.TargetPosition == Vector2.Zero)
+		if (IsInstanceValid(ship_wrapper.TargetUnit) | steer_data.TargetPosition == Vector2.Zero)
 		{
 			return NodeState.SUCCESS;
 		}

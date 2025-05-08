@@ -328,6 +328,11 @@ public partial class DynamicAvoidance : Action
 			index++;
 		}
 		
+		if (steer_data.SeparationWeight > 1.0f && ship_wrapper.CombatFlag == false) 
+		{
+			steer_data.SeparationWeight = 1.0f;
+		}
+		
 		avoidance_weight /= index;
 		if (bias_counter == 0 && ship_wrapper.CombatFlag == false)
 		{
@@ -337,7 +342,7 @@ public partial class DynamicAvoidance : Action
 		}
 		else if (ship_wrapper.CombatFlag == true)
 		{
-			avoidance_weight = 1.0f;
+			avoidance_weight = 10.0f;
 			steer_data.SeparationWeight = 10.0f;
 			steer_data.GoalWeight = 1.0f;
 		}

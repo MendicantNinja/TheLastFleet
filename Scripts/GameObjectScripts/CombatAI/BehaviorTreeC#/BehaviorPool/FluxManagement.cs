@@ -61,10 +61,17 @@ public partial class FluxManagement : Action
 
 		if (vent_flux == true && ship_wrapper.CombatFlag == true && steer_data.TargetUnit != null)
 		{
-			ShipWrapper target_wrapper = (ShipWrapper)steer_data.TargetUnit.Get("ShipWrapper");
-			target_wrapper.TargetedBy.Remove(n_agent);
+			if (ship_wrapper.TargetUnit != null)
+			{
+				Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)steer_data.TargetUnit.Get("targeted_by");
+				targeted_by.Remove(n_agent);
+				steer_data.TargetUnit.Set("targeted_by", targeted_by);
+			}
+			RigidBody2D dummy = null;
+			agent.Set("target_unit", dummy);
 			steer_data.TargetUnit = null;
-			agent.Call("set_target_for_weapons", steer_data.TargetUnit);
+			ship_wrapper.TargetUnit = null;
+			agent.Call("set_target_for_weapons", dummy);
 		}
 
 		return NodeState.FAILURE;

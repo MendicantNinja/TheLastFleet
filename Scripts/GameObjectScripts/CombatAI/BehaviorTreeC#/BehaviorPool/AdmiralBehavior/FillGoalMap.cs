@@ -10,7 +10,7 @@ public partial class FillGoalMap : Action
 	public override NodeState Tick(Node agent)
 	{
 		Admiral admiral = agent as Admiral;
-		if (Engine.GetPhysicsFrames() % 480 != 0 | admiral.GoalValue == null) return NodeState.FAILURE;
+		if (Engine.GetPhysicsFrames() % 720 != 0 | admiral.GoalValue == null) return NodeState.FAILURE;
 
 		if (admiral.AvailableGroups.Count == 0) 
 		{
@@ -23,12 +23,15 @@ public partial class FillGoalMap : Action
 		float norm_val = 0.0f;
 		foreach (Vector2I cell in goal_value.Keys)
 		{
+			if (goal_value[cell] < 0.0f) continue;
 			norm_val += 1.0f;
 		}
-
-		goal_map.ClearMap();
+		
 		if (admiral.IsolatedCells.Count == 0) norm_val = goal_value.Keys.Count;
 
+		if (norm_val == 0.0f) return NodeState.FAILURE;
+
+		goal_map.ClearMap();
 		List<Vector2I> geo_mean_cell = new List<Vector2I>();
 		Node globals = GetTree().Root.GetNode("globals");
 		foreach (string group_name in admiral.AvailableGroups)
@@ -73,7 +76,6 @@ public partial class FillGoalMap : Action
 
 	public Imap PropagateGoalValues(Imap goal_map, int radius, Vector2I center, float magnitude = 1.0f, float norm_val = 1.0f)
 	{
-		Imap inf_map = ImapManager.Instance.AgentMaps[ImapType.InfluenceMap];
 		int start_col = Math.Max(0, center.Y - radius);
 		int end_col = Math.Min(center.Y + radius, goal_map.Width);
 		int start_row = Math.Max(0, center.X - radius);
@@ -85,7 +87,12 @@ public partial class FillGoalMap : Action
 			for (int n = start_col; n < end_col; n++)
 			{
 				float distance = center.DistanceTo(new Vector2I(m, n));
-				float value = magnitude - norm_mag * (distance / radius);
+				float value = 0.0f;
+				if (goal_map.MapGrid[m, n] != 0.0f)
+				{
+					value = goal_map.MapGrid[m, n];
+				}
+				value += magnitude - norm_mag * (distance / radius);
 				goal_map.MapGrid[m, n] = value;
 				goal_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, value);
 			}

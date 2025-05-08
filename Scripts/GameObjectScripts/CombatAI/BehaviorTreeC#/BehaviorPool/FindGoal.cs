@@ -5,22 +5,13 @@ using System.Collections.Generic;
 
 public partial class FindGoal : Action
 {   const int radius = 30;
-    bool is_friendly = false;
+	Imap working_map = null;
     public override NodeState Tick(Node agent)
     {
-        if (is_friendly == true) return NodeState.SUCCESS;
+		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
+        if (ship_wrapper.IsFriendly == true) return NodeState.SUCCESS;
         
-        ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-
-        if (ship_wrapper.IsFriendly == true)
-        {
-            is_friendly = true;
-            return NodeState.SUCCESS;
-        }
-		
-        if (Engine.GetPhysicsFrames() % 480 == 0 || ship_wrapper.GroupLeader == false) return NodeState.SUCCESS;
-
-		if (ship_wrapper.SuccessfulDeploy == false) return NodeState.SUCCESS;
+        if (Engine.GetPhysicsFrames() % 720 == 0 || ship_wrapper.DeployFlag == false || ship_wrapper.GroupLeader == false) return NodeState.SUCCESS;
 
         if (ship_wrapper.CombatGoal == Globals.Goal.SKIRMISH && ship_wrapper.GoalFlag == true && ship_wrapper.TargetedUnits.Count == 0)
         {
@@ -29,17 +20,15 @@ public partial class FindGoal : Action
 
         if (ship_wrapper.GoalFlag == true) return NodeState.SUCCESS;
 
-        Imap working_map = null;
-		if (working_map == null)
+        if (working_map == null)
 		{
 			working_map = new Imap(radius, radius);
 		}
-        
-		ImapManager.Instance.GoalMap.AddIntoMap(working_map, ship_wrapper.ImapCell.Y, ship_wrapper.ImapCell.X);
-		//ship_wrapper.WorkingMap = working_map;
+
+		ImapManager.Instance.GoalMap.AddIntoMap(working_map, ship_wrapper.ImapCell.X, ship_wrapper.ImapCell.Y);
 		Dictionary<float, Vector2I> local_maximum = new Dictionary<float, Vector2I>();
-		int rows = working_map.MapGrid.GetLength(0); // Y
-		int cols = working_map.MapGrid.GetLength(1); // X
+		int rows = working_map.Height;
+		int cols = working_map.Width;
 		for (int m = 0; m < rows; m++)
 {
 			float maxVal = float.MinValue;
@@ -62,14 +51,12 @@ public partial class FindGoal : Action
 			local_maximum[maxVal] = cell;
 		}
 
-		if (local_maximum.Count == 0)
-			return NodeState.FAILURE;
+		if (local_maximum.Count == 0) return NodeState.FAILURE;
 
 		float highest_value = float.MinValue;
 		foreach (float key in local_maximum.Keys)
 		{
-			if (key > highest_value)
-				highest_value = key;
+			if (key > highest_value) highest_value = key;
 		}
 
 		Vector2I cell_max = local_maximum[highest_value];

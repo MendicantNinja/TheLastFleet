@@ -63,29 +63,3 @@ func propagate_goal_values(goal_map: GDImap, agent: GDAdmiral, radius: int, cent
 			goal_map.update_grid_value.emit(m, n, value)
 	
 	return goal_map
-
-func add_influence_map_to_goal_map(goal_map: GDImap) -> GDImap:
-	var inf_map: GDImap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
-	var height: int = inf_map.height
-	var width: int = inf_map.width
-	
-	for m in range(height):
-		var source_min: float = inf_map.map_grid[m].min()
-		var source_max: float = inf_map.map_grid[m].max()
-		if source_min <= 0.0 and source_max == 0.0:
-			var fill_zero: Array = []
-			fill_zero.resize(width)
-			fill_zero.fill(0.0)
-			goal_map.map_grid[m] = fill_zero
-			#goal_map.update_row_value.emit(m, goal_map.map_grid[m])
-			continue
-		
-		for n in range(width):
-			var value: float = inf_map.map_grid[m][n]
-			if value < 0.0:
-				value = 0.0
-			goal_map.map_grid[m][n] = -value
-			if value != 0.0:
-				goal_map.update_grid_value.emit(m, n, goal_map.map_grid[m][n])
-	
-	return goal_map

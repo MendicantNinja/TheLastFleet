@@ -12,13 +12,12 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var Deploy = %Deploy
 @onready var Cancel = %Cancel
 @onready var PlayableAreaBounds = %PlayableAreaBounds
-@onready var AdmiralAI = $Admiral/AdmiralAI
 @onready var ComputerAdmiral = $Admiral
 @onready var ImapDebug = $ImapDebug
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = true
+var debug_imap: bool = false
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
@@ -30,7 +29,6 @@ var deployment_spacing: int = 500
 
 signal units_deployed(units)
 func _ready() -> void:
-	AdmiralAI.ToggleRoot(false)
 	ComputerAdmiral.SetGoal(combat_goal)
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
@@ -111,16 +109,16 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]
 	var enemy_fleet_size: int = 10
+	ComputerAdmiral.SetNumDeployedUnits(enemy_fleet_size)
 	# Create an enemy fleets ships if no fleet was passed in.
 	if enemy_fleet.fleet_stats.ships.is_empty():
 		for i in range (enemy_fleet_size):
-			enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TEST))
-			#if i % 100 == 0:
-				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
-			#if i % 3 == 0:
-				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
-			#else:
-				#enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
+			if i % 100 == 0:
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
+			if i % 3 == 0:
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.ECLIPSE))
+			else:
+				enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 	var iterator: int 
 	for i in range (enemy_fleet.fleet_stats.ships.size()):
 		var ship_instantiation: Ship = enemy_fleet.fleet_stats.ships[i].ship_hull.ship_packed_scene.instantiate()
@@ -142,13 +140,13 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		ship_instantiation.add_to_group(&"enemy")
 		ship_instantiation.posture = globals.Strategy.NEUTRAL
 		ship_instantiation.group_add(tmp_name)
+		ship_instantiation.ShipWrapper.Deployed.connect(ComputerAdmiral.OnUnitDeployed)
 	
 	var geo_median_ship: Vector2 = globals.geometric_median_of_objects(ship_positions.keys())
 	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
 	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
 	geo_median_formation.x -= 1250
 	geo_median_formation.y -= 1000
-	new_leader.ships_deployed.connect(_on_enemy_ships_deployed)
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
@@ -168,7 +166,7 @@ func _physics_process(delta):
 	elif battle_over == true and (get_tree().get_node_count_in_group(&"friendly") > 0 and get_tree().get_node_count_in_group(&"enemy") > 0):
 		battle_over = false
 	
-	if not imap_manager.RegistryMap.is_empty() and Engine.get_physics_frames() % 60 == 0 and battle_over == false:
+	if Engine.get_physics_frames() % 60 == 0 and battle_over == false:
 		imap_manager.WeighForceDensity()
 
 func toggle_fleet_deployment_panel() -> void:
@@ -191,9 +189,6 @@ func _on_switch_maps() -> void:
 		#CombatMap.display_map(true)
 		TacticalMap.display_map(false)
 	get_viewport().set_input_as_handled()
-
-func _on_enemy_ships_deployed() -> void:
-	AdmiralAI.ToggleRoot(true)
 
 func _on_grid_value_changed(m: int, n: int, value: float) -> void:
 	var adj_value: float = snappedf(value, 0.001)

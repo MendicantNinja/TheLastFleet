@@ -17,7 +17,7 @@ public partial class DetectEnemies : Action
         List<Vector2I> player_clusters = new List<Vector2I>();
         foreach (Vector2I cell in ImapManager.Instance.RegistryMap.Keys)
         {
-            Godot.Collections.Array<RigidBody2D> agent_registry = ImapManager.Instance.RegistryMap[cell];
+            List<RigidBody2D> agent_registry = ImapManager.Instance.RegistryMap[cell];
             foreach (RigidBody2D unit in agent_registry)
             {
                 bool is_friendly = (bool)unit.Get("is_friendly");

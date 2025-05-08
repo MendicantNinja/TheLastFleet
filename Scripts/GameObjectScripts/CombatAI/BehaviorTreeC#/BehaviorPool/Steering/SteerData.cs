@@ -6,7 +6,7 @@ public partial class SteerData : Node
 {
     // Core Parameters
     [Export]
-    public RigidBody2D TargetUnit { get; set; }
+    public RigidBody2D TargetUnit { get; set; } = null;
     
     public Vector2 DesiredVelocity { get; set; } = Vector2.Zero;
     

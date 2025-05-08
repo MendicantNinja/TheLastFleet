@@ -35,7 +35,7 @@ func reset_deployment_position() -> void:
 	# 					   . . . .
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-	deployment_position.y = PlayableAreaBounds.shape.size.y * 0.7 + deployment_spacing * 2 # Start topmost row.
+	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
 	#if settings.dev_mode == true:
 		#deployment_position.y = 0 + deployment_spacing * 2
 	deployment_row = 0
@@ -90,7 +90,7 @@ func deploy_ships() -> void:
 	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
 	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
 	geo_median_formation.x -= 1000
-	geo_median_formation.y -= 1000
+	geo_median_formation.y -= 2000
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap

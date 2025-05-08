@@ -5,11 +5,11 @@ extends Node2D
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
 @onready var ship_list: Array[Ship]
-@onready var ship_registry: Dictionary = imap_manager.RegistryMap
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
 
+var ship_registry: Dictionary
 # Visuals
 var TacticalMapBackground: ColorRect 
 var grid_size: Vector2
@@ -189,7 +189,8 @@ func swap_camera_feed(ship: Ship) -> void:
 func setup() -> void:
 	#print("setup called")
 	# Check if new ships have been added or old ones died
-	var ship_arrays: Array = ship_registry.values()
+	var lol: Dictionary = imap_manager.GetRegistryMap()
+	var ship_arrays: Array = lol.values()
 	#print(ship_arrays.size())
 	for array in ship_arrays:
 		for ship in array:
@@ -287,7 +288,7 @@ func select_units() -> void:
 	var area_position: Vector2 = get_rect_start_position()
 	
 	var selection_icons: Array[TacticalMapIcon] = get_icons_in_box_selection(Rect2(area_position, size))
-	var selection: Array[Ship]
+	var selection: Array[RigidBody2D]
 	for icon in selection_icons:
 		selection.append(icon.assigned_ship)
 	#print("select_units called ", selection_icons, "and selection is ", selection)
@@ -542,7 +543,6 @@ func _on_alt_select(ship: Ship) -> void:
 	print("alt select called")
 	if not visible:
 		return
-	
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var highlighted_enemies: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 	

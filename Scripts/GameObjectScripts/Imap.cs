@@ -154,7 +154,7 @@ public partial class Imap : GodotObject
 		}
 	}
 
-	public void AddIntoMap(Imap target_map, int center_column, int center_row, float magnitude = 1.0f, int offset_column = 0, int offset_row = 0)
+	public void AddIntoMap(Imap target_map, int center_row, int center_column, float magnitude = 1.0f, int offset_column = 0, int offset_row = 0)
 	{
 		Debug.Assert(target_map != null, "target_map is null");
 

@@ -57,7 +57,10 @@ var arc_in_radians: float = 0.0
 var default_direction: Transform2D
 
 var available_targets: Dictionary = {}
-var weighted_targets: Dictionary = {}
+var weighted_targets: Dictionary = {}: # key prob pair body
+	set(value):
+		weighted_targets = value
+
 var primary_target: RID = RID()
 var current_target: RID = RID()
 var owner_rid: RID = RID()
@@ -243,43 +246,8 @@ func create_killcast() -> RayCast2D:
 	new_killcast.collide_with_bodies = true
 	new_killcast.collide_with_areas = false
 	new_killcast.collision_mask = 15
-	new_killcast.enabled = false
+	new_killcast.enabled = true
 	return new_killcast
-
-# If a weapon is not capable of firing on an existing target but more are around it,
-# this will try to find the nearest available target if it can. This function is
-# called every physics frame IF it still cannot find a valid target.
-func acquire_new_target() -> void:
-	if available_targets.is_empty():
-		return
-	var ship_ids: Array = available_targets.keys()
-	var taq_range: int = ship_ids.size() - 1
-	var rand_key_number: int = randi_range(0, taq_range)
-	var new_target_id: RID = ship_ids[rand_key_number]
-	var ship_instance: Ship = available_targets[new_target_id]
-	current_target = ship_instance.get_rid()
-	killcast.target_position = to_local(ship_instance.global_position)
-	killcast.force_raycast_update()
-
-func acquire_new_target_AI() -> void:
-	if weighted_targets.is_empty():
-		return
-	
-	var max_prob: float = weighted_targets.keys().max()
-	for prob in weighted_targets:
-		var enemy_ids: Array = weighted_targets[prob]
-		for id in enemy_ids:
-			if not available_targets.has(id):
-				continue
-			if available_targets[id] == null:
-				continue
-			if available_targets.has(id):
-				killcast.target_position = to_local(available_targets[id].global_position)
-				current_target = id
-				killcast.force_raycast_update()
-				return
-	
-	current_target = RID()
 
 # Returns a new transform to face the weapon in the direction of an "enemy" ship.
 # Returns the default transform which is the default direction it should face given nothing
@@ -315,15 +283,20 @@ func _physics_process(delta) -> void:
 		var face_direction: Transform2D = face_weapon(mouse_position)
 		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	
-	if killcast.enabled == true:
+	if killcast.enabled == true and available_targets.is_empty() == false:
 		var target_position: Vector2 = Vector2.ZERO
-		if available_targets.has(current_target):
+		if available_targets.has(primary_target):
+			target_position = to_local(available_targets[primary_target].global_position)
+		elif available_targets.has(current_target):
 			target_position = to_local(available_targets[current_target].global_position)
+		elif available_targets.is_empty() == false and AI_enabled == true:
+			acquire_new_target_AI()
+			return
 		
 		killcast.target_position = target_position
 		killcast.force_raycast_update()
 		var collider = killcast.get_collider()
-		if not collider is Ship or collider == null: # Do not shoot at obstacles
+		if collider is not Ship or collider == null: # Do not shoot at obstacles
 			can_fire = false
 		elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
 			can_fire = false
@@ -362,9 +335,6 @@ func _on_EffectiveRange_entered(body) -> void:
 	if body.get_rid() == owner_rid: 
 		return # ignore any overlap with other weapon slots
 	
-	if is_friendly == body.is_friendly and available_targets.is_empty() and killcast.enabled == true:
-		killcast.enabled = false
-	
 	if is_friendly == body.is_friendly:
 		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
 	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
@@ -380,7 +350,6 @@ func _on_EffectiveRange_entered(body) -> void:
 	if raycast_query["collider"].get_collision_layer_value(2):
 		return # ignore if an obstacle is in the way
 	
-	killcast.enabled = true
 	var ship_id = body.get_rid()
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
@@ -390,38 +359,74 @@ func _on_EffectiveRange_entered(body) -> void:
 	
 	if AI_enabled == true:
 		EffectiveRange_entered_AI(body)
-		return
 	elif current_target == RID():
 		current_target = ship_id
 
 func EffectiveRange_entered_AI(body) -> void:
 	var ship_id = body.get_rid()
 	if available_targets.has(primary_target) and current_target != primary_target:
-		killcast.target_position = to_local(body.global_position)
-		current_target = ship_id
+		killcast.target_position = to_local(available_targets[primary_target].global_position)
+		current_target = primary_target
 		killcast.force_raycast_update()
-		return
-	
-	acquire_new_target_AI()
+	else:
+		acquire_new_target_AI()
 
 # Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
 # the effective range and the current combat situation.
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
-	
-	threat_exited.emit(body)
 	available_targets.erase(ship_id)
-	if available_targets.is_empty() and killcast.enabled == true:
-		killcast.enabled = false
+
+# If a weapon is not capable of firing on an existing target but more are around it,
+# this will try to find the nearest available target if it can. This function is
+# called every physics frame IF it still cannot find a valid target.
+func acquire_new_target() -> void:
+	if available_targets.is_empty():
+		return
+	var ship_ids: Array = available_targets.keys()
+	var taq_range: int = ship_ids.size() - 1
+	var rand_key_number: int = randi_range(0, taq_range)
+	var new_target_id: RID = ship_ids[rand_key_number]
+	var ship_instance: Ship = available_targets[new_target_id]
+	current_target = ship_instance.get_rid()
+	killcast.target_position = to_local(ship_instance.global_position)
+	killcast.force_raycast_update()
+
+# Acquire a new target if:
+# A) The primary target or current target is no longer available.
+# B) The weapon cannot fire on the primary target or current target.
+func acquire_new_target_AI() -> void:
+	if weighted_targets.is_empty():
+		return
 	
-	if AI_enabled == true and current_target == ship_id and primary_target == current_target:
-		SoftlockTimer.start()
-	elif AI_enabled == true and current_target == ship_id and available_targets.size() >= 1:
-		acquire_new_target_AI()
-	elif auto_fire == true and ship_id == current_target and available_targets.size() >= 1:
-		acquire_new_target()
-	else:
-		current_target = RID()
+	var max_prob: float = weighted_targets.keys().max()
+	var max_targets: Array = weighted_targets[max_prob]
+	for target in max_targets:
+		if target == null:
+			continue
+		elif not available_targets.keys().has(target):
+			continue
+		elif available_targets.keys().has(target):
+			killcast.target_position = to_local(available_targets[target].global_position)
+			current_target = target
+			killcast.force_raycast_update()
+			return
+	
+	for prob in weighted_targets:
+		var enemies: Array = weighted_targets[prob]
+		for target in enemies:
+			if target == null:
+				continue
+			elif not available_targets.has(target):
+				continue
+			elif available_targets[target] == null:
+				continue
+			elif available_targets.has(target):
+				killcast.target_position = to_local(available_targets[target].global_position)
+				current_target = target
+				killcast.force_raycast_update()
+				return
+	current_target = RID()
 
 func _on_ROF_timeout() -> void:
 	timer_fire = true

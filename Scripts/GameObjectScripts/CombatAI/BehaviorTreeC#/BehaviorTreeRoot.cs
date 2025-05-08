@@ -33,7 +33,7 @@ public partial class BehaviorTreeRoot : BehaviorTree
 		child.Tick(agent);
 	}
 
-	private void ToggleRoot(bool value)
+	public void ToggleRoot(bool value)
 	{
 		enabled = value;
 	}

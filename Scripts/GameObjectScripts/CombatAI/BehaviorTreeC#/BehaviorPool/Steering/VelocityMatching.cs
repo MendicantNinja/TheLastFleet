@@ -27,7 +27,8 @@ public partial class VelocityMatching : Action
 		foreach (Node unit in group)
 		{
 			RigidBody2D n_unit = unit as RigidBody2D;
-			if (n_unit == null) continue;
+			if (unit == null) continue;
+
 			ShipWrapper unit_wrapper = (ShipWrapper)n_unit.Get("ShipWrapper");
 			if (unit_wrapper.CombatFlag == true)
 			{
@@ -40,7 +41,7 @@ public partial class VelocityMatching : Action
 		Array<float> group_speeds = new Array<float>();
 		foreach (Node unit in group)
 		{
-			if (unit == null) continue;
+			if (unit == null | unit.IsQueuedForDeletion()) continue;
 			SteerData unit_data = (SteerData)unit.Get("SteerData");
 			ShipWrapper unit_wrapper = (ShipWrapper)unit.Get("ShipWrapper");
 			float speed = unit_data.DefaultAcceleration;

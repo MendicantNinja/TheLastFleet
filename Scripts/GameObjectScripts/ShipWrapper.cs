@@ -11,13 +11,16 @@ public partial class ShipWrapper : Node
 	public string GroupName { get; private set; }
 	[Export]
 	public bool GroupLeader { get; private set; }
+	public Goal CombatGoal { get; private set; }
+	public Strategy Posture { get; private set; }
+
+	// Flags and states
 	[Export]
 	public bool IsFriendly { get; private set; }
 	[Export]
 	public bool FluxOverload { get; private set; }
 	[Export]
 	public bool VentFluxFlag { get; private set; }
-	public Goal CombatGoal { get; private set; }
 	[Export]
 	public bool TargetInRange { get; private set; }
 	[Export]
@@ -31,12 +34,14 @@ public partial class ShipWrapper : Node
 	[Export]
 	public bool CombatFlag { get; private set; }
 	[Export]
-	public bool SuccessfulDeploy { get; private set; }
+	public bool DeployFlag { get; private set; }
 	[Export]
 	public bool MatchVelocityFlag { get; private set; }
 	[Export]
 	public bool ShieldFlag { get; private set; }
-	[Export]
+	
+
+	// Ship hull and stats data
 	public float ApproxInfluence { get; private set; }
 	public float TotalFlux { get; private set; }
 	public float SoftFlux { get; private set; }
@@ -44,30 +49,32 @@ public partial class ShipWrapper : Node
 	public float HullIntegrity { get; private set; }
 	public float Armor { get; private set; }
 	public List<Node2D> AllWeapons { get; private set; } = new List<Node2D>();
-	public Strategy Posture { get; private set; }
+	public float AverageWeaponRange { get; private set; }
+
+	// Combat and influence map data
 	public List<RigidBody2D> TargetedUnits { get; private set; } = new List<RigidBody2D>();
 	[Export]
-	public RigidBody2D TargetUnit { get; set; }
+	public RigidBody2D TargetUnit { get; set; } = null;
 	public Godot.Collections.Array<RigidBody2D> NeighborUnits { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
-	[Export]
 	public Godot.Collections.Array<RigidBody2D> SeparationNeighbors { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Vector2I ImapCell { get; private set; }
 	public Dictionary<ImapType, Imap> TemplateMaps { get; private set; } = new Dictionary<ImapType,Imap>();
 	public Imap WeighInfluence { get; set; }
 	public Vector2I RegistryCell { get; private set; }
-
-	public Vector2I[] RegistryCluster { get; private set; }
+	public Vector2I[] RegistryCluster { get; set; }
 	public Vector2I[] RegistryNeighborhood { get; private set; }
 	public float DefaultCellSize { get; private set; }
 	public float MaxCellSize { get; private set; }
-	[Export]
-	public float AverageWeaponRange { get; private set; }
 	public List<string> AvailableNeighborGroups { get; set; }
 	public List<string> NearbyEnemyGroups { get; set; }
 	public List<string> NeighborGroups { get; set; }
 	public List<string> NearbyAttackers { get; set; }
 	public List<RigidBody2D> IdleNeighbors { get; set; }
-	public List<RigidBody2D> TargetedBy { get; set; }
+	public List<RigidBody2D> TargetedBy { get; private set; } = new List<RigidBody2D>();
+
+	// Signals
+	[Signal]
+	public delegate void DeployedEventHandler();
 
 	public void InitializeAgentImaps(RigidBody2D agent, ImapManager imap_manager, int occupancy_radius, int threat_radius, int collision_layer)
 	{
@@ -134,6 +141,7 @@ public partial class ShipWrapper : Node
 			if (cluster.Contains(RegistryCell))
 			{
 				weight = Math.Abs(1.0f / neighborhood_density[cluster]);
+				SetRegistryCluster(cluster);
 			}
 		}
 
@@ -217,7 +225,7 @@ public partial class ShipWrapper : Node
 
 	public void SetDeployFlag(bool value)
 	{
-		SuccessfulDeploy = value;
+		DeployFlag = value;
 	}
 
 	public void SetMatchVelocityFlag(bool value)
@@ -229,7 +237,7 @@ public partial class ShipWrapper : Node
 	{
 		ShieldFlag = value;
 	}
-
+	
 	public void SetApproxInfluence(float value)
 	{
 		ApproxInfluence = value;
@@ -261,9 +269,11 @@ public partial class ShipWrapper : Node
 	public void SetTargetedBy(Godot.Collections.Array<RigidBody2D> attackers)
 	{
 		TargetedBy.Clear();
+		if (attackers.Count == 0) return;
+		
 		foreach(RigidBody2D n_attacker in attackers)
 		{
-			if (n_attacker == null) continue;
+			if (!IsInstanceValid(n_attacker)) continue;
 			TargetedBy.Add(n_attacker);
 		}
 	}
@@ -303,7 +313,6 @@ public partial class ShipWrapper : Node
 		Armor = value;
 	}
 
-
 	public void SetImapCell(Vector2I cell)
 	{
 		ImapCell = cell;
@@ -313,6 +322,7 @@ public partial class ShipWrapper : Node
 	{
 		RegistryCell = cell;
 	}
+
 	public void SetRegistryCluster(Godot.Collections.Array<Vector2I> cluster)
 	{
 		int size = cluster.Count;
@@ -332,6 +342,7 @@ public partial class ShipWrapper : Node
 		foreach (Vector2I cell in neighborhood)
 		{
 			RegistryNeighborhood[idx] = cell;
+			idx++;
 		}
 	}
 

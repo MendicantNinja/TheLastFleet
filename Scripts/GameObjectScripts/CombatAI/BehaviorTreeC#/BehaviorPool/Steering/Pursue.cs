@@ -6,12 +6,13 @@ public partial class Pursue : Action
 {
 	RigidBody2D target_unit = null;
 	float prediction_window = 2.0f;
-
 	public override NodeState Tick(Node agent)
 	{
 		steer_data = (SteerData)agent.Get("SteerData");
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		if (steer_data.TargetUnit == null || ship_wrapper.TargetUnit == null)
+
+
+		if (ship_wrapper.TargetUnit == null)
 		{
 			return NodeState.SUCCESS;
 		}
@@ -33,10 +34,15 @@ public partial class Pursue : Action
 			agent.Call("set_target_for_weapons", steer_data.TargetUnit);
 			return NodeState.SUCCESS;
 		}
-
+		
 		if (steer_data.TargetUnit != target_unit)
 		{
 			target_unit = steer_data.TargetUnit;
+		}
+
+		if (target_unit == null)
+		{
+			return NodeState.SUCCESS;
 		}
 
 		Vector2 agent_pos = new Vector2(n_agent.GlobalPosition.X, n_agent.GlobalPosition.Y);
@@ -73,17 +79,16 @@ public partial class Pursue : Action
 		}
 		else if (distance_to < steer_data.ThreatRadius && distance_to > ship_wrapper.AverageWeaponRange)
 		{
-			agent.Set("combat_flag", true);
+			//agent.Set("combat_flag", true);
 			float normalized_distance = 1.0f - (distance_to - ship_wrapper.AverageWeaponRange) / (steer_data.ThreatRadius - ship_wrapper.AverageWeaponRange);
-   			steer_data.GoalWeight = Mathf.Clamp(normalized_distance, 0.1f, 0.5f);
-			velocity = direction_to * Mathf.Lerp(speed, -speed * steer_data.GoalWeight, steer_data.GoalWeight); // Gradual slowdown
+   			steer_data.GoalWeight = Mathf.Clamp(normalized_distance, 0.1f, 1.0f);
+			velocity = direction_to * Mathf.Lerp(speed, -speed, normalized_distance); // Gradual slowdown
 		}
 		else
 		{
-			float normalized_weight = Mathf.Clamp(ship_wrapper.AverageWeaponRange - distance_to / ship_wrapper.AverageWeaponRange, 0.1f, 1.0f);
-			steer_data.GoalWeight = normalized_weight / 2.0f;
-	
-			velocity = direction_to * Mathf.Lerp(0.0f, -speed * steer_data.GoalWeight, normalized_weight); // More controlled movement near combat range
+			float normalized_weight = Mathf.Clamp((ship_wrapper.AverageWeaponRange - distance_to) / ship_wrapper.AverageWeaponRange, 0.1f, 1.0f);
+			steer_data.GoalWeight = Mathf.Lerp(steer_data.GoalWeight, normalized_weight, 0.1f);
+			velocity = direction_to * Mathf.Lerp(-speed * 0.1f, -speed / normalized_weight, normalized_weight); // More controlled movement near combat range
 		}
 
 		steer_data.DesiredVelocity = velocity;

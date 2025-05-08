@@ -5,7 +5,7 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class SeekAndArrive : Action
 {
-	float target_area_radius = 50.0f;
+	float target_area_radius = 5.0f;
 	float hystersis_buffer = 2.0f;
 	float separation_buffer = 3.0f;
 	float time_to_target = 0.1f;
@@ -30,10 +30,9 @@ public partial class SeekAndArrive : Action
 		
 		velocity = direction_to_path * speed;
 		float distance_to = (steer_data.TargetPosition - agent_position).Length();
-		if (debug == false && ship_wrapper.SuccessfulDeploy == false && ship_wrapper.GroupLeader == false && distance_to < target_area_radius)
+		if (debug == false && ship_wrapper.DeployFlag == false && distance_to < target_area_radius / 2.0f)
 		{
-			agent.Set("successful_deploy", true);
-			agent.Call("group_remove", ship_wrapper.GroupName);
+			ship_wrapper.EmitSignal(ShipWrapper.SignalName.Deployed);
 		}
 
 		float sq_lin_vel = n_agent.LinearVelocity.LengthSquared();

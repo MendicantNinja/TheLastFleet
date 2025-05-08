@@ -26,7 +26,7 @@ var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
 var TacticalDataDrawing: Node2D 
 
-@onready var CombatBehaviorTree = $CombatBehaviorTree
+@onready var CombatBehaviorTree = $CombatBehaviorTreeRedux
 @onready var CombatTimer = $CombatTimer
 @onready var OverloadTimer = $OverloadTimer
 
@@ -132,11 +132,12 @@ var group_name: StringName = &"":
 
 var group_leader: bool = false:
 	set(value):
-		if value == false and successful_deploy == false and group_name.is_empty() == false:
-			ships_deployed.emit()
+		if value == true:
+			print("%s made leader of %s" % [name, group_name])
+		else:
+			print("%s is no longer group leader" % [name])
 		ShipWrapper.SetGroupLeader(value)
 		group_leader = value
-		
 
 var posture: globals.Strategy = globals.Strategy.NEUTRAL:
 	set(value):
@@ -183,7 +184,7 @@ var target_unit: RigidBody2D = null:
 	set(value):
 		target_unit = value
 
-var targeted_units: Array = []:
+var targeted_units: Array[RigidBody2D] = []:
 	set(value):
 		ShipWrapper.SetTargetedUnits(value)
 		targeted_units = value
@@ -204,10 +205,23 @@ var neighbor_groups: Array = []
 var available_neighbor_groups: Array = []
 var nearby_attackers: Array = []
 var incoming_projectiles: Array = []
-var targeted_by: Array = []:
+var targeted_by: Array[RigidBody2D] = []:
 	set(value):
-		ShipWrapper.SetTargetedBy(value)
-		targeted_by = value
+		var update_targeted_by: Array[RigidBody2D] = []
+		for attacker in value:
+			if attacker == null:
+				continue
+			if attacker is RigidBody2D:
+				update_targeted_by.append(attacker)
+		
+		for attacker in targeted_by:
+			if attacker == null:
+				continue
+			if attacker.target_unit == self and attacker is RigidBody2D:
+				update_targeted_by.append(attacker)
+		
+		ShipWrapper.SetTargetedBy(update_targeted_by)
+		targeted_by = update_targeted_by
 
 var target_in_range: bool = false:
 	set(value):
@@ -218,11 +232,6 @@ var goal_flag: bool = false:
 	set(value):
 		ShipWrapper.SetGoalFlag(value)
 		goal_flag = value
-
-var avoid_flag: bool = false:
-	set(value):
-		ShipWrapper.SetAvoidFlag(value)
-		avoid_flag = value
 
 var brake_flag: bool = false:
 	set(value):
@@ -248,13 +257,13 @@ var combat_flag: bool = false:
 
 var vent_flux_flag: bool = false:
 	set(value):
-		ShipWrapper.SetVentFlux(value)
+		ShipWrapper.SetVentFluxFlag(value)
 		vent_flux_flag = value
 
-var successful_deploy: bool = false:
+var deploy_flag: bool = false:
 	set(value):
 		ShipWrapper.SetDeployFlag(value)
-		successful_deploy = value
+		deploy_flag = value
 
 var match_velocity_flag: bool = false:
 	set(value):
@@ -331,7 +340,7 @@ signal ship_selected()
 signal destroyed()
 signal update_agent_influence()
 signal update_registry_cell()
-signal ships_deployed()
+signal ship_deployed()
 
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
@@ -384,8 +393,17 @@ func _ready() -> void:
 	
 	SteerData.SetFOFRadius(new_radius)
 	#SteerData.SetDelta(get_physics_process_delta_time())
-	if ship_stats.ship_hull.ship_type == data.ship_type_enum.TEST:
+	add_to_group(&"agent")
+	if collision_layer == 1:
 		is_friendly = true
+		name = &"Player " + ship_hull.ship_type_name
+		add_to_group(&"friendly")
+		rotation -= PI/2
+	else:
+		name = &"Enemy " + ship_hull.ship_type_name
+		add_to_group(&"enemy")
+		is_friendly = false
+		rotation += PI/2
 	
 	var dissipation_coe: float = 12
 	passive_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation)
@@ -444,20 +462,9 @@ func _ready() -> void:
 	occupancy_radius += 1
 	threat_radius = (longest_range / imap_manager.DefaultCellSize) + 1
 	
-	add_to_group(&"agent")
-	if collision_layer == 1:
-		name = &"Player " + ship_hull.ship_type_name
-		add_to_group(&"friendly")
-		rotation -= PI/2
-	else:
-		name = &"Enemy " + ship_hull.ship_type_name
-		add_to_group(&"enemy")
-		is_friendly = false
-		rotation += PI/2
-	
 	ShipWrapper.InitializeAgentImaps(self, imap_manager, occupancy_radius, threat_radius, collision_layer)
 	var separation_shape: Shape2D = CircleShape2D.new()
-	var separation_radius: float = new_radius * 5.0
+	var separation_radius: float = new_radius * 4.0
 	separation_shape.radius = separation_radius
 	sq_separation_radius = separation_radius * separation_radius
 	SeparationShape.shape = separation_shape
@@ -466,7 +473,7 @@ func _ready() -> void:
 	SeparationArea.body_exited.connect(_on_SeparationShape_body_exited)
 	
 	var avoidance_shape: Shape2D = CircleShape2D.new()
-	var avoid_radius: float = ship_stats.top_speed * (occupancy_radius - 1)
+	var avoid_radius: float = ship_stats.top_speed * (occupancy_radius + 2)
 	avoid_radius_sq = avoid_radius * avoid_radius
 	avoidance_shape.radius = avoid_radius
 	AvoidanceShape.shape = avoidance_shape
@@ -531,24 +538,24 @@ func process_damage(projectile: Projectile) -> void:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
 
 func destroy_ship() -> void:
-	# REMOVE IMAP MANAGER REFERENCES HERE
-	if imap_manager.RegistryMap.has(registry_cell):
-		var agents_registered: Array = imap_manager.RegistryMap[registry_cell]
-		agents_registered.erase(self)
-		imap_manager.RegistryMap[registry_cell] = agents_registered
+	destroyed.emit()
 	
 	remove_from_group(&"agent")
 	if is_friendly == true:
 		remove_from_group(&"friendly")
 	elif is_friendly == false:
 		remove_from_group(&"enemy")
-
+	
+	remove_from_group(group_name)
+	if group_leader == true:
+		globals.reset_group_leader(self)
+	
 	var visited_group: Array = []
-	for attacker: Ship in targeted_by:
-		if attacker == null:
+	for attacker in targeted_by:
+		if attacker == null or attacker.is_queued_for_deletion():
 			continue
 		if attacker.group_name not in visited_group:
-			var update_targets: Array = attacker.targeted_units
+			var update_targets: Array[RigidBody2D] = attacker.targeted_units
 			update_targets.erase(self)
 			get_tree().call_group(attacker.group_name, "set_targets", update_targets)
 			visited_group.append(attacker.group_name)
@@ -556,11 +563,6 @@ func destroy_ship() -> void:
 		attacker.SteerData.SetTargetUnit(null)
 		attacker.ShipWrapper.SetTargetUnit(null)
 	
-	remove_from_group(group_name)
-	if group_leader == true:
-		globals.reset_group_leader(self)
-	
-	destroyed.emit()
 	TacticalDataDrawing.setup()
 	ShipTargetIcon.visible = false
 	queue_free()
@@ -629,7 +631,7 @@ func update_flux_indicators() -> void:
 # Units/Groups
 
 func group_remove(n_group_name: StringName) -> void:
-	if group_leader and n_group_name == group_name:
+	if group_leader == true:
 		group_leader = false
 	if n_group_name == group_name:
 		group_name = &""
@@ -647,7 +649,6 @@ func group_add(n_group_name: StringName) -> void:
 	add_to_group(group_name)
 
 func set_group_leader(value: bool) -> void:
-	#print("%s made leader of %s" % [name, group_name])
 	group_leader = value
 
 func set_posture(value: globals.Strategy) -> void:
@@ -916,11 +917,6 @@ func _physics_process(delta: float) -> void:
 			update_registry_cell.emit()
 			registry_cell = current_registry_cell
 	
-	if Engine.get_physics_frames() % 120 == 0 and targeted_by.is_empty() == false:
-		for unit in targeted_by:
-			if unit == null:
-				targeted_by.erase(unit)
-	
 	# Rare GUI Updates
 	CenterCombatHUD.position = position
 	ConstantSizedGUI.scale = Vector2.ONE
@@ -1057,16 +1053,24 @@ func remove_blackboard_data(key: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	blackboard.remove_data(key)
 
-func set_targets(targets) -> void:
-	targeted_units = targets
-	if target_unit not in targets and target_unit != null:
-		target_unit.targeted_by.erase(self)
-		target_unit = null
+func set_targets(targets: Array) -> void:
+	var recast_targets: Array[RigidBody2D] = []
+	for n_target in targets:
+		if n_target == null:
+			continue
+		if n_target is RigidBody2D:
+			recast_targets.append(n_target)
+		else:
+			push_error("Expected a RigidBody2D, got: " + str(n_target))
+	targeted_units = recast_targets
 	if targets.is_empty() == false and target_position != Vector2.ZERO:
 		target_position = Vector2.ZERO
 
 func set_goal_flag(value) -> void:
 	goal_flag = value
+
+func set_deploy_flag(value) -> void:
+	deploy_flag = value
 
 func set_fallback_flag(value) -> void:
 	fallback_flag = value

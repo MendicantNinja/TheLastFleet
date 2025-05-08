@@ -29,7 +29,7 @@ public partial class GroupUnits : Action
 
 		foreach (RigidBody2D ship in battle_agents)
 		{
-			if (ship == null)
+			if (ship == null | ship.IsQueuedForDeletion())
 			{
 				GD.Print("[GroupUnits] A destroyed unit is still in memory.");
 				continue;
@@ -125,9 +125,10 @@ public partial class GroupUnits : Action
 				}
 			}
 
-			if (visited_units.Count == available_units.Count)
-				break;
+			if (visited_units.Count == available_units.Count) break;
 		}
+
+		if (visited_units.Count == available_units.Count) return NodeState.FAILURE;
 
 		// Leftovers
 		var leftover_group = new StringName(admiral.GroupKeyPrefix + admiral.Iterator);

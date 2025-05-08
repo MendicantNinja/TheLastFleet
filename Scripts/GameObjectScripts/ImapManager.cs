@@ -4,6 +4,8 @@ using Globals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using Microsoft.Win32;
 
 [GlobalClass]
 public partial class ImapManager : Node
@@ -16,8 +18,7 @@ public partial class ImapManager : Node
 	private List<ImapTemplate> InverseThreatTemplates;
 
 	public Dictionary<ImapType, Imap> AgentMaps = new Dictionary<ImapType, Imap>();
-	[Export]
-	public Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>> RegistryMap = new Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>>();
+	public Dictionary<Vector2I, List<RigidBody2D>> RegistryMap = new Dictionary<Vector2I, List<RigidBody2D>>();
 	//public Imap ArenaInfluenceMap;
 	public Imap VulnerabilityMap;
 	//public Imap InverseTensionMap;
@@ -25,15 +26,15 @@ public partial class ImapManager : Node
 	public Imap WeightedImap;
 	public Imap GoalMap;
 
-	public List<Godot.Collections.Array<Vector2I>> FriendlyClusters;
-	public List<Godot.Collections.Array<Vector2I>> EnemyClusters;
+	public List<Godot.Collections.Array<Vector2I>> FriendlyClusters = new List<Godot.Collections.Array<Vector2I>>();
+	public List<Godot.Collections.Array<Vector2I>> EnemyClusters = new List<Godot.Collections.Array<Vector2I>>();
 	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedEnemy = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
 	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedFriendly = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
 	public int DefaultRadius = 5;
 	public int ArenaWidth = 17000;
 	public int ArenaHeight = 20000;
 	public int DefaultCellSize = 250;
-	public int MaxCellSize = 2250;
+	public int MaxCellSize = 1000;
 
 	public override void _Ready()
 	{
@@ -114,12 +115,14 @@ public partial class ImapManager : Node
 			Imap map = AgentMaps[type];
 			map.AddMap(template_map, ship_wrapper.ImapCell.X, ship_wrapper.ImapCell.Y, -1.0f);
 		}
+
+		RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
 	}
 
 	public void OnUpdateRegistryCell(RigidBody2D agent)
 	{
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		Godot.Collections.Array<RigidBody2D> agent_registry = new Godot.Collections.Array<RigidBody2D>();
+		List<RigidBody2D> agent_registry = new List<RigidBody2D>();
 		Vector2I current_cell_idx = new Vector2I((int)agent.GlobalPosition.Y / MaxCellSize, (int)agent.GlobalPosition.X / MaxCellSize);
 
 		if (RegistryMap.ContainsKey(ship_wrapper.RegistryCell))
@@ -131,6 +134,7 @@ public partial class ImapManager : Node
 		{
 			agent_registry.Remove(agent);
 			RegistryMap[ship_wrapper.RegistryCell] = agent_registry;
+			// Clear out the list for the incoming conditions
 			agent_registry.Clear();
 		}
 
@@ -145,18 +149,6 @@ public partial class ImapManager : Node
 		}
 
 		RegistryMap[current_cell_idx] = agent_registry;
-
-		List<Vector2I> remove_cells = new List<Vector2I>();
-		foreach (Vector2I cell in RegistryMap.Keys)
-		{
-			if (RegistryMap[cell].Count == 0) remove_cells.Add(cell);
-		}
-
-		foreach (Vector2I cell in remove_cells)
-		{
-			RegistryMap.Remove(cell);
-		}
-		
 		Godot.Collections.Array<Vector2I> registry_neighborhood = new Godot.Collections.Array<Vector2I>();
 		int radius = 1;
 		for (int m = -radius; m <= radius; m++)
@@ -169,16 +161,34 @@ public partial class ImapManager : Node
 			}
 		}
 
+		foreach (KeyValuePair<Vector2I, List<RigidBody2D>> pair in RegistryMap)
+		{
+			List<RigidBody2D> update_list = pair.Value;
+			foreach (RigidBody2D unit in pair.Value)
+			{
+				if (!IsInstanceValid(unit))
+				{
+					update_list.Remove(unit);
+				}
+			}
+			RegistryMap[pair.Key] = update_list;
+			if (pair.Value.Count == 0 || update_list.Count == 0)
+			{
+				RegistryMap.Remove(pair.Key);
+			}
+		}
+
 		agent.Set("registry_neighborhood", registry_neighborhood);
 	}
 
 	public void WeighForceDensity()
 	{
+		if (RegistryMap.Keys.Count == 0) return;
 		Dictionary<Vector2I, float> friendly_cell_density = new Dictionary<Vector2I, float>();
 		Dictionary<Vector2I, float> enemy_cell_density = new Dictionary<Vector2I, float>();
 		foreach (Vector2I cell in RegistryMap.Keys)
 		{
-			Godot.Collections.Array<RigidBody2D> agent_registry = RegistryMap[cell];
+			List<RigidBody2D> agent_registry = RegistryMap[cell];
 			float enemy_density = 0.0f;
 			float friendly_density = 0.0f;
 			foreach (RigidBody2D agent in agent_registry)
@@ -313,6 +323,20 @@ public partial class ImapManager : Node
 		return cluster;
 	}
 
+	public Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>> GetRegistryMap()
+	{
+		Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>> GDRegistry = new Godot.Collections.Dictionary<Vector2I, Godot.Collections.Array<RigidBody2D>>();
+		foreach (KeyValuePair<Vector2I, List<RigidBody2D>> pair in RegistryMap)
+		{
+			GDRegistry[pair.Key] = new Godot.Collections.Array<RigidBody2D>();
+			foreach (RigidBody2D agent in pair.Value)
+			{
+				if (!IsInstanceValid(agent)) continue;
+				GDRegistry[pair.Key].Add(agent);
+			}
+		}
+		return GDRegistry;
+	}
 	public List<ImapTemplate> InitOccupancyMapTemplates(int max_radius, ImapType type, float magnitude = 1.0f)
 	{
 		List<ImapTemplate> new_templates = new List<ImapTemplate>();

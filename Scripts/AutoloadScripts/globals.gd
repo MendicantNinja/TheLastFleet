@@ -162,12 +162,13 @@ func find_unit_nearest_to_median(median: Vector2, unit_positions: Dictionary):
 	nearest_unit = distances_to_median[min_distance]
 	return nearest_unit
 
-
 func reset_group_leader(unit: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
 	var new_leader = null
 	var leader_key = &"leader"
-	if group.size() > 0 and group.size() <= 2:
+	if group.size() == 0:
+		return
+	elif group.size() > 0 and group.size() <= 2:
 		new_leader = group[0]
 	elif group.size() > 2:
 		var unit_positions: Dictionary = {}
@@ -210,7 +211,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
 	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
-		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize / 2)
+		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize * 1.5)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
 	var offsets: Array = []

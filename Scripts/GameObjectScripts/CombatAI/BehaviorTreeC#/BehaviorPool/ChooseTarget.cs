@@ -17,28 +17,40 @@ public partial class ChooseTarget : Action
 		}
 		
 		steer_data = (SteerData)agent.Get("SteerData");
-		if (steer_data.TargetUnit != null && ship_wrapper.TargetUnit != null)
+		if (IsInstanceValid(steer_data.TargetUnit) && IsInstanceValid(ship_wrapper.TargetUnit))
 		{
 			return NodeState.FAILURE;
 		}
 
+		if (steer_data.TargetUnit is not null && ship_wrapper.TargetUnit is not null)
+		{
+			return NodeState.FAILURE;
+		}
+		
 		RigidBody2D n_agent = agent as RigidBody2D;
 		Godot.Vector2 agent_pos = n_agent.GlobalPosition;
-		Godot.Collections.Dictionary<float, Godot.Collections.Array<int>> weigh_targets = new Godot.Collections.Dictionary<float, Godot.Collections.Array<int>>();
+		Godot.Collections.Dictionary<float, Godot.Collections.Array<Rid>> weigh_targets = new Godot.Collections.Dictionary<float, Godot.Collections.Array<Rid>>();
+		Godot.Collections.Array<RigidBody2D> valid_targets = new Godot.Collections.Array<RigidBody2D>();
 		List<RigidBody2D> evaluate_targets = new List<RigidBody2D>();
 		List<RigidBody2D> available_targets = new List<RigidBody2D>();
 		List<float> sq_dist = new List<float>();
 		foreach (RigidBody2D target in ship_wrapper.TargetedUnits)
 		{
-			if (target == null) continue;
+			if (!IsInstanceValid(target) || target.IsQueuedForDeletion()) 
+			{
+				GD.Print("target disposed or in queue for deletion");
+				continue;
+			}
+			valid_targets.Add(target);
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			float prob = (float)agent.Call("generate_combat_probability", target);
-			if (weigh_targets.ContainsKey(prob) == false)
+
+			if (!weigh_targets.ContainsKey(prob))
 			{
-				weigh_targets[prob] = new Godot.Collections.Array<int>();
+				weigh_targets[prob] = new Godot.Collections.Array<Rid>();
 			}
-			weigh_targets[prob].Append(target.GetIndex());
-		   
+			weigh_targets[prob].Add(target.GetRid());
+
 			Godot.Vector2 target_pos = target.GlobalPosition;
 			float dist = agent_pos.DistanceSquaredTo(target_pos);
 			sq_dist.Add(dist);
@@ -51,7 +63,9 @@ public partial class ChooseTarget : Action
 				evaluate_targets.Add(target);
 			}
 		}
-		
+
+		GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
+
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)
 		{
 			weapon.Set("weighted_targets", weigh_targets);
@@ -70,13 +84,7 @@ public partial class ChooseTarget : Action
 			float final_weight = 0.0f;
 			foreach (RigidBody2D attacker in target_wrapper.TargetedBy)
 			{
-				if (attacker == null) continue;
-				if (attacker == agent & steer_data.TargetUnit == null)
-				{
-					steer_data.TargetUnit = target;
-					ship_wrapper.TargetUnit = target;
-					return NodeState.FAILURE;
-				}
+				if (!IsInstanceValid(attacker)|| attacker.IsQueuedForDeletion()) continue;
 				ShipWrapper attacker_wrapper = (ShipWrapper)attacker.Get("ShipWrapper");
 				float agent_inf = Math.Abs(attacker_wrapper.ApproxInfluence);
 				float target_inf = Math.Abs(target_wrapper.ApproxInfluence);
@@ -87,7 +95,7 @@ public partial class ChooseTarget : Action
 				float dist_weight = min_distance / attacker_pos.DistanceSquaredTo(target_pos);
 				final_weight += (threat_weight + flux_weight + dist_weight + weapon_weight) / 4.0f;
 			}
-			if (final_weight < 1.0f) available_targets.Add(target);
+			if (final_weight < 3.0f) available_targets.Add(target);
 		}
 
 		Dictionary<float, RigidBody2D> weighted_targets = new Dictionary<float, RigidBody2D>();
@@ -118,7 +126,7 @@ public partial class ChooseTarget : Action
 			float max_prob = weighted_targets.Keys.Max();
 			n_target = weighted_targets[max_prob];
 		}
-
+		//GD.Print(agent.Name, " targeting ", n_target.Name);
 		Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)n_target.Get("targeted_by");
 		steer_data.TargetUnit = n_target;
 		ship_wrapper.TargetUnit = n_target;
