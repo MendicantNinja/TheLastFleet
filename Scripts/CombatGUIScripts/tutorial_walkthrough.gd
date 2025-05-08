@@ -21,7 +21,7 @@ func _ready():
 		TutorialStep.new(&"tutorial_firing", data.get_text(&"tutorial_firing"), func(): return Input.is_action_just_pressed("select")),
 		TutorialStep.new(&"tutorial_shields", data.get_text(&"tutorial_shields"), func(): return Input.is_action_just_pressed("m2")),
 		TutorialStep.new(&"tutorial_attack", data.get_text(&"tutorial_attack"), func(): return detect_attack_order()),
-		TutorialStep.new(&"tutorial_battle", data.get_text(&"tutorial_battle"), func(): return get_tree().get_nodes_in_group("enemy").size() > 0),
+		TutorialStep.new(&"tutorial_battle", data.get_text(&"tutorial_battle"), func(): return get_tree().get_nodes_in_group("enemy").size() == 0),
 		TutorialStep.new(&"tutorial_complete", data.get_text(&"tutorial_complete"), func(): return never_true)
 	]
 	show_step_text(steps[current_step_index])
