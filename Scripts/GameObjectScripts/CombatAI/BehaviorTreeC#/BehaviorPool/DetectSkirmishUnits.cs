@@ -72,6 +72,12 @@ public partial class DetectSkirmishUnits : Action
         if (ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.GoalFlag)
             return NodeState.SUCCESS;
 
+        if (ship_wrapper.TargetedUnits.Count > 0 && ship_wrapper.GoalFlag == false)
+        {
+            GetTree().CallGroup(ship_wrapper.GroupName, "set_goal_flag", true);
+            return NodeState.SUCCESS;
+        }
+
         Node globals = GetTree().Root.GetNode("globals");
 
         // Calculate our group average strength and geometric median position.
@@ -141,7 +147,7 @@ public partial class DetectSkirmishUnits : Action
             target_geo_median[cluster] = (Godot.Vector2)globals.Call("geometric_median_of_objects", unit_positions);
             target_strength[cluster] = relative_strength;
         }
-
+        
         // If there is only one cluster, assign it immediately.
         if (registry_cluster.Count == 1)
         {

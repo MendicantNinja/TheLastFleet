@@ -41,7 +41,10 @@ public partial class ChooseTarget : Action
 				GD.Print("target disposed or in queue for deletion");
 				continue;
 			}
-			valid_targets.Add(target);
+			if (ship_wrapper.GroupLeader == true)
+			{
+				valid_targets.Add(target);
+			}
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			float prob = (float)agent.Call("generate_combat_probability", target);
 
@@ -64,7 +67,10 @@ public partial class ChooseTarget : Action
 			}
 		}
 
-		GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
+		if (ship_wrapper.GroupLeader == true)
+		{
+			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
+		}
 
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)
 		{
@@ -111,7 +117,7 @@ public partial class ChooseTarget : Action
 			float dist_weight = min_distance / agent_pos.DistanceSquaredTo(target_pos);
 			float prob = (threat_weight + flux_weight + dist_weight + weapon_weight) / 4.0f;
 			float snap = (float)Math.Round(prob / snap_target) * snap_target;
-			if (snap < 0.5f) continue;
+			//if (snap < 0.5f) continue;
 			weighted_targets[prob] = target;
 		}
 

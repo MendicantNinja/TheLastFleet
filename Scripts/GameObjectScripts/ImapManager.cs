@@ -115,8 +115,11 @@ public partial class ImapManager : Node
 			Imap map = AgentMaps[type];
 			map.AddMap(template_map, ship_wrapper.ImapCell.X, ship_wrapper.ImapCell.Y, -1.0f);
 		}
-
-		RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
+		
+		if (RegistryMap.ContainsKey(ship_wrapper.RegistryCell))
+		{
+			RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
+		}
 	}
 
 	public void OnUpdateRegistryCell(RigidBody2D agent)

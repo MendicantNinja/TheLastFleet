@@ -22,7 +22,7 @@ public partial class Admiral : Node2D
 	public List<Vector2I> IsolatedCells;
 	public List<Vector2I> ControlPoints;
 	[Export]
-	public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability;
+	public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability = new Godot.Collections.Dictionary<Vector2I, float>();
 	public Dictionary<Vector2I, float> GoalValue;
 
 	public StringName GroupKeyPrefix = new StringName("Enemy Group ");

@@ -9,6 +9,10 @@
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_n0517"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="25_q5s6h"]
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_7ltrt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j1kb4"]
+
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34wpx"]
 radius = 21.0
 height = 122.0
@@ -22,10 +26,6 @@ size = Vector2(37, 24)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fq2r4"]
 size = Vector2(21, 11)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_7ltrt"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_j1kb4"]
-
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
 collision_mask = 15
@@ -37,6 +37,20 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_p58et")
+
+[node name="AvoidanceArea" type="Area2D" parent="."]
+
+[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
+shape = SubResource("CircleShape2D_7ltrt")
+debug_color = Color(0.996078, 0, 0.203922, 0.47451)
+
+[node name="SeparationArea" type="Area2D" parent="."]
+
+[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
+shape = SubResource("CircleShape2D_j1kb4")
+debug_color = Color(0, 0.643137, 0.294118, 0.533333)
+
+[node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_l7xku")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 1
@@ -61,20 +75,6 @@ shape = SubResource("RectangleShape2D_fq2r4")
 [node name="CollisionShape2D5" type="CollisionShape2D" parent="."]
 position = Vector2(2, -27)
 shape = SubResource("RectangleShape2D_fq2r4")
-
-[node name="AvoidanceArea" type="Area2D" parent="."]
-
-[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_7ltrt")
-debug_color = Color(0.996078, 0, 0.203922, 0.47451)
-
-[node name="SeparationArea" type="Area2D" parent="."]
-
-[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
-shape = SubResource("CircleShape2D_j1kb4")
-debug_color = Color(0, 0.643137, 0.294118, 0.533333)
-
-[node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_l7xku")]
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1

@@ -8,7 +8,7 @@ class_name WeaponSlot
 @onready var EffectiveRange: Area2D = $EffectiveRange
 @onready var WeaponNode: Node2D = $WeaponNode
 @onready var ROFTimer: Timer = $ROFTimer
-@onready var SoftlockTimer: Timer = $ROFTimer
+@onready var SoftlockTimer = $SoftlockTimer
 @onready var ContinuousFluxTimer = $ContinuousFluxTimer
 # Important Stuff
 @export var weapon_system_group: int = -1
@@ -149,10 +149,12 @@ func _ready():
 	add_child(killcast)
 	SoftlockTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	ROFTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	SoftlockTimer.wait_time = 10.0
+	SoftlockTimer.start()
 	timer_fire = true
 	can_fire = false
 	ROFTimer.timeout.connect(_on_ROF_timeout)
-	
+	SoftlockTimer.timeout.connect(_on_Softlock_timeout)
 	default_direction = WeaponNode.transform
 	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
 	
@@ -306,9 +308,6 @@ func _physics_process(delta) -> void:
 			target_position = to_local(available_targets[primary_target].global_position)
 		elif available_targets.has(current_target):
 			target_position = to_local(available_targets[current_target].global_position)
-		elif available_targets.is_empty() == false and AI_enabled == true:
-			acquire_new_target_AI()
-			return
 		
 		killcast.target_position = target_position
 		killcast.force_raycast_update()
@@ -337,9 +336,7 @@ func _physics_process(delta) -> void:
 			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
 				target_in_range.emit(true)
 		
-		if AI_enabled == true and available_targets.size() >= 1 and can_fire == false:
-			acquire_new_target_AI()
-		elif available_targets.size() >= 1 and can_fire == false:
+		if available_targets.size() >= 1 and can_fire == false:
 			acquire_new_target()
 
 # this function has two purposes:
@@ -385,6 +382,11 @@ func EffectiveRange_entered_AI(body) -> void:
 		killcast.target_position = to_local(available_targets[primary_target].global_position)
 		current_target = primary_target
 		killcast.force_raycast_update()
+		if SoftlockTimer.is_stopped() == false:
+			SoftlockTimer.stop()
+	elif available_targets.has(current_target):
+		killcast.target_position = to_local(available_targets[current_target].global_position)
+		killcast.force_raycast_update()
 	else:
 		acquire_new_target_AI()
 
@@ -393,6 +395,9 @@ func EffectiveRange_entered_AI(body) -> void:
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
 	available_targets.erase(ship_id)
+	
+	if ship_id == primary_target:
+		SoftlockTimer.start()
 
 # If a weapon is not capable of firing on an existing target but more are around it,
 # this will try to find the nearest available target if it can. This function is

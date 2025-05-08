@@ -488,7 +488,7 @@ func _ready() -> void:
 	
 	ShipWrapper.InitializeAgentImaps(self, imap_manager, occupancy_radius, threat_radius, collision_layer)
 	var separation_shape: Shape2D = CircleShape2D.new()
-	var separation_radius: float = new_radius * 4.0
+	var separation_radius: float = new_radius * 5.0
 	separation_shape.radius = separation_radius
 	sq_separation_radius = separation_radius * separation_radius
 	SeparationShape.shape = separation_shape
@@ -646,7 +646,7 @@ func update_flux_indicators() -> void:
 # Units/Groups
 
 func group_remove(n_group_name: StringName) -> void:
-	if group_leader == true:
+	if group_leader == true and n_group_name == group_name:
 		group_leader = false
 	if n_group_name == group_name:
 		group_name = &""
@@ -923,7 +923,6 @@ func _physics_process(delta: float) -> void:
 		if current_flux == 0.0 and vent_flux_flag == true:
 			vent_flux_flag = false
 			for weapon in all_weapons:
-				weapon.vent_flux = vent_flux_flag
 				weapon.flux_overload = false
 		
 		update_flux_indicators()
@@ -1042,8 +1041,11 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# its time-independent hence why its a one-shot
 
 func _on_target_in_range(value: bool) -> void:
+	if combat_flag == false:
+		return
+	
 	if value == false and (fallback_flag == true or retreat_flag == true):
-		target_in_range = value
+		return
 	
 	if value == true:
 		target_in_range = true
@@ -1051,9 +1053,7 @@ func _on_target_in_range(value: bool) -> void:
 	
 	var oor_count: int = 0
 	for weapon in all_weapons:
-		if target_unit.get_rid() != weapon.current_target:
-			oor_count += 1
-		elif target_unit.get_rid() == weapon.primary_target and weapon.can_fire == false:
+		if target_unit.get_rid() == weapon.primary_target and weapon.can_fire == false:
 			oor_count += 1
 	
 	if oor_count == all_weapons.size():
@@ -1061,8 +1061,6 @@ func _on_target_in_range(value: bool) -> void:
 	
 	if target_in_range == false and (posture == globals.Strategy.OFFENSIVE):
 		print("%s out of range of target %s and searching for other targets" % [name, target_unit.name])
-		target_unit.targeted_by.erase(self)
-		target_unit = null
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
@@ -1242,5 +1240,4 @@ func _on_CombatTimer_timeout():
 func _on_OverloadTimer_timeout():
 	flux_overload = false
 	for weapon in all_weapons:
-			weapon.vent_flux = true
 			weapon.flux_overload = flux_overload

@@ -166,11 +166,7 @@ public partial class ThreatDetection : Action
 				}
 			}
 		}
-		else
-		{
-			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", attackers);
-		}
-
+		
 		return NodeState.FAILURE;
 	}
 

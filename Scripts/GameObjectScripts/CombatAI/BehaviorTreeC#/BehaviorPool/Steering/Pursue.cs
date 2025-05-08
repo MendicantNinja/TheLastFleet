@@ -24,13 +24,13 @@ public partial class Pursue : Action
 
 		RigidBody2D n_agent = agent as RigidBody2D;
 		ShipWrapper target_wrapper = (ShipWrapper)ship_wrapper.TargetUnit.Get("ShipWrapper");
-		if (ship_wrapper.TargetInRange == true && (target_wrapper.FallbackFlag == true || target_wrapper.RetreatFlag == true))
+		if (ship_wrapper.CombatFlag == true && ship_wrapper.TargetInRange == false && (target_wrapper.FallbackFlag == true || target_wrapper.RetreatFlag == true))
 		{
 			Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
 			targeted_by.Remove(n_agent);
 			ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
-			steer_data.TargetUnit = null;
 			ship_wrapper.TargetUnit = null;
+			steer_data.TargetUnit = null;
 			agent.Call("set_target_for_weapons", steer_data.TargetUnit);
 			return NodeState.SUCCESS;
 		}
@@ -82,13 +82,13 @@ public partial class Pursue : Action
 			//agent.Set("combat_flag", true);
 			float normalized_distance = 1.0f - (distance_to - ship_wrapper.AverageWeaponRange) / (steer_data.ThreatRadius - ship_wrapper.AverageWeaponRange);
    			steer_data.GoalWeight = Mathf.Clamp(normalized_distance, 0.1f, 1.0f);
-			velocity = direction_to * Mathf.Lerp(speed, -speed, normalized_distance); // Gradual slowdown
+			velocity = direction_to * Mathf.Lerp(speed * 0.5f, -speed, normalized_distance); // Gradual slowdown
 		}
 		else
 		{
 			float normalized_weight = Mathf.Clamp((ship_wrapper.AverageWeaponRange - distance_to) / ship_wrapper.AverageWeaponRange, 0.1f, 1.0f);
 			steer_data.GoalWeight = Mathf.Lerp(steer_data.GoalWeight, normalized_weight, 0.1f);
-			velocity = direction_to * Mathf.Lerp(-speed * 0.1f, -speed / normalized_weight, normalized_weight); // More controlled movement near combat range
+			velocity = direction_to * Mathf.Lerp(0.0f, -speed / normalized_weight, normalized_weight); // More controlled movement near combat range
 		}
 
 		steer_data.DesiredVelocity = velocity;

@@ -61,7 +61,7 @@ public partial class FluxManagement : Action
 
 		if (vent_flux == true && ship_wrapper.CombatFlag == true && steer_data.TargetUnit != null)
 		{
-			if (ship_wrapper.TargetUnit != null)
+			if (ship_wrapper.TargetUnit is not null)
 			{
 				Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)steer_data.TargetUnit.Get("targeted_by");
 				targeted_by.Remove(n_agent);

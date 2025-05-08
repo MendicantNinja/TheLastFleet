@@ -3,8 +3,9 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_8gngj"]
 [ext_resource type="Texture2D" uid="uid://c3b47svjhauky" path="res://Art/ProjectileArt/mazen's projectiles/bulletshot.png" id="2_kw6en"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_i8mxw"]
-size = Vector2(4, 23)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sn4q3"]
+radius = 3.0
+height = 25.0
 
 [node name="Projectile" type="Area2D"]
 collision_layer = 0
@@ -13,7 +14,7 @@ script = ExtResource("1_8gngj")
 [node name="CollisionPolygon2D" type="CollisionShape2D" parent="."]
 position = Vector2(2.5, 3.59812e-06)
 rotation = 1.5708
-shape = SubResource("RectangleShape2D_i8mxw")
+shape = SubResource("CapsuleShape2D_sn4q3")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture_filter = 1

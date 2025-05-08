@@ -3,16 +3,17 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/projectile.gd" id="1_va37s"]
 [ext_resource type="Texture2D" uid="uid://shiwidik664f" path="res://Art/ProjectileArt/mazen's projectiles/laser shot.png" id="2_amd1k"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_o0sya"]
-size = Vector2(6.00008, 99)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_f4b1b"]
+radius = 5.0
+height = 50.0
 
 [node name="Projectile" type="Area2D"]
 script = ExtResource("1_va37s")
 
 [node name="CollisionPolygon2D" type="CollisionShape2D" parent="."]
-position = Vector2(3.49999, -2.3675e-05)
+position = Vector2(30, 0)
 rotation = 1.5708
-shape = SubResource("RectangleShape2D_o0sya")
+shape = SubResource("CapsuleShape2D_f4b1b")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_amd1k")
