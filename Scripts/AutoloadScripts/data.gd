@@ -160,10 +160,10 @@ var loadout_dictionary: Dictionary = {
 	ship_type_enum.TRIDENT: {
 		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.RAILGUN), 
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.COMBATLASER),
-			weapon_dictionary.get(weapon_enum.COMBATLASER), 
-			weapon_dictionary.get(weapon_enum.COMBATLASER), 
-			weapon_dictionary.get(weapon_enum.COMBATLASER),
+			weapon_dictionary.get(weapon_enum.RAILGUN),
+			weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.RAILGUN),
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
 			weapon_dictionary.get(weapon_enum.RAILGUN),
 			]
@@ -175,8 +175,8 @@ var loadout_dictionary: Dictionary = {
 			]
 	},
 	ship_type_enum.ECLIPSE: {
-		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.COMBATLASER), 
-			weapon_dictionary.get(weapon_enum.COMBATLASER), 
+		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.RAILGUN), 
 			]
 	}
 }

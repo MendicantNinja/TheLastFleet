@@ -89,7 +89,7 @@ public partial class Pursue : Action
 		{
 			float normalized_weight = Mathf.Clamp((ship_wrapper.AverageWeaponRange - distance_to) / ship_wrapper.AverageWeaponRange, 0.1f, 1.0f);
 			steer_data.GoalWeight = Mathf.Lerp(steer_data.GoalWeight, normalized_weight, 0.1f);
-			velocity = direction_to * Mathf.Lerp(0.0f, -speed / normalized_weight, normalized_weight); // More controlled movement near combat range
+			velocity = direction_to * Mathf.Lerp(0.0f, -speed, normalized_weight); // More controlled movement near combat range
 		}
 
 		steer_data.DesiredVelocity = velocity;
