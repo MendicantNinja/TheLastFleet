@@ -240,7 +240,7 @@ var targeted_by: Array[RigidBody2D] = []:
 
 var target_in_range: bool = false:
 	set(value):
-		ShipWrapper.SetGoalFlag(value)
+		#ShipWrapper.SetGoalFlag(value)
 		target_in_range = value
 
 var goal_flag: bool = false:
@@ -822,6 +822,8 @@ func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 
 func set_target_for_weapons(unit) -> void:
+	if unit is Array:
+		unit = null
 	for weapon in all_weapons:
 		weapon.set_primary_target(unit)
 
@@ -1041,6 +1043,10 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	# its time-independent hence why its a one-shot
 
 func _on_target_in_range(value: bool) -> void:
+	if target_unit == null and target_in_range == true and value == false:
+		target_in_range = value
+		return
+	
 	if combat_flag == false:
 		return
 	
@@ -1053,8 +1059,6 @@ func _on_target_in_range(value: bool) -> void:
 	
 	var oor_count: int = 0
 	for weapon in all_weapons:
-		if target_unit == null:
-			continue
 		if target_unit.get_rid() == weapon.primary_target and weapon.can_fire == false:
 			oor_count += 1
 	
@@ -1080,6 +1084,10 @@ func set_blackboard_data(key: Variant, value: Variant) -> void:
 func remove_blackboard_data(key: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	blackboard.remove_data(key)
+
+func set_target_unit(target) -> void:
+	if target is Array:
+		target_unit = null
 
 func set_targets(targets: Array) -> void:
 	var recast_targets: Array[RigidBody2D] = []

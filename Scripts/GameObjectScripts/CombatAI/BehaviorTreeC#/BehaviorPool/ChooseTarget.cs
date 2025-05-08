@@ -137,9 +137,9 @@ public partial class ChooseTarget : Action
 		steer_data.TargetUnit = n_target;
 		ship_wrapper.TargetUnit = n_target;
 		targeted_by.Add(n_agent);
-		agent.Set("target_unit", n_target);
+		agent.Set("target_unit", new Godot.Collections.Array<int>());
 		n_target.Set("targeted_by", targeted_by);
-		agent.Call("set_target_for_weapons", n_target);
+		agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
 		return NodeState.FAILURE; 
 	}
 

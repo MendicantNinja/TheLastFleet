@@ -150,7 +150,6 @@ func _ready():
 	SoftlockTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	ROFTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
 	SoftlockTimer.wait_time = 10.0
-	SoftlockTimer.start()
 	timer_fire = true
 	can_fire = false
 	ROFTimer.timeout.connect(_on_ROF_timeout)
