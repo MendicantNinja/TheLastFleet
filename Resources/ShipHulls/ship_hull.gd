@@ -32,6 +32,8 @@ class_name ShipHull
 @export var hull_integrity: int                    # Ship's total hit points (health)
 @export var armor: int                        # Ship's armor rating (used for damage mitigation)
 
+@export var shield_arc: int = 120 # Shield arc in degrees (converted to radians in shield_slot.gd). 360 is not full coverage, 375 is
+@export var shield_raise_time: float = 1.0 				  # How many seconds does it take to raise the shields?
 @export var shield_efficiency: float          # How effective the shields are at blocking damage
 @export var shield_upkeep: float              # Some variable that has to do with shields idk how
 @export var flux: int                         # Total flux the ship can buildup before overloading

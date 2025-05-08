@@ -1,4 +1,4 @@
-[gd_scene load_steps=50 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
@@ -26,15 +26,20 @@
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/GroupUnits.cs" id="11_triqp"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
-[ext_resource type="Shader" path="res://Scripts/CombatGUIScripts/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
 [ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/fog_of_war.gdshader" id="15_olg0c"]
 [ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
 [ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tutorial_walkthrough.gd" id="31_awwt3"]
+[ext_resource type="Texture2D" uid="uid://sx6qwqb84tne" path="res://Art/GUIArt/fast-backward-button.svg" id="32_md01c"]
+[ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -72,6 +77,22 @@ size = Vector2(13500, 15000)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
 size = Vector2(0, 0)
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2a6qp"]
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_avm21"]
+width = 320
+height = 180
+seamless = true
+seamless_blend_skirt = 0.75
+noise = SubResource("FastNoiseLite_2a6qp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u4shx"]
+shader = ExtResource("15_olg0c")
+shader_parameter/density = 1.0
+shader_parameter/speed = Vector2(0.01, 0.02)
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_avm21")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lgtp0"]
 shader = ExtResource("13_tuyrt")
 shader_parameter/hologram_color = Vector4(0, 0.2, 1, 1)
@@ -81,6 +102,18 @@ shader_parameter/flicker_speed = 2.0
 shader_parameter/distortion_amount = 0.1
 shader_parameter/fresnel_power = 50.0
 shader_parameter/alpha_strength = 0.7
+
+[sub_resource type="Gradient" id="Gradient_084at"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2yroj"]
+gradient = SubResource("Gradient_084at")
+width = 2000
+height = 2000
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
 
 [sub_resource type="Gradient" id="Gradient_nks55"]
 offsets = PackedFloat32Array(0.237705, 1)
@@ -97,6 +130,17 @@ colors = PackedColorArray(1, 1, 1, 1)
 [sub_resource type="GradientTexture1D" id="GradientTexture1D_gaw57"]
 gradient = SubResource("Gradient_lqjnm")
 width = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2h44e"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 0.588235)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
 bg_color = Color(0, 0, 0, 0.588235)
@@ -262,17 +306,18 @@ position_smoothing_enabled = true
 [node name="TacticalMapLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
 process_mode = 3
+visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
 top_level = true
 z_index = 1
-offset_left = 8.0
-offset_top = 5.0
-offset_right = 1540.0
-offset_bottom = 1332.0
+offset_left = 9.0
+offset_top = 66.0
+offset_right = 1541.0
+offset_bottom = 1393.0
 scale = Vector2(0.75, 0.75)
 size_flags_vertical = 1
-theme_override_colors/font_color = Color(0.493336, 0.610369, 0.988485, 1)
+theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
 theme_override_font_sizes/font_size = 22
 text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
@@ -324,12 +369,14 @@ size_flags_vertical = 4
 focus_mode = 0
 
 [node name="TacticalViewport" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer"]
+disable_3d = true
 transparent_bg = true
 handle_input_locally = false
 canvas_item_default_texture_filter = 2
 gui_snap_controls_to_pixels = false
+canvas_cull_mask = 4294967279
 size = Vector2i(9600, 9600)
-render_target_update_mode = 4
+render_target_update_mode = 0
 
 [node name="TacticalMapCamera" type="Camera2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
 unique_name_in_owner = true
@@ -343,36 +390,57 @@ limit_smoothed = true
 position_smoothing_enabled = true
 editor_draw_screen = false
 
-[node name="BroaderBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-self_modulate = Color(0.0980392, 0.0980392, 0.0980392, 0.839216)
+[node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
+unique_name_in_owner = true
+script = ExtResource("12_rlc6n")
+
+[node name="FogOfWar" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+self_modulate = Color(0.724287, 0.576944, 0.999999, 1)
+light_mask = 16
+z_index = 1
+material = SubResource("ShaderMaterial_u4shx")
+offset_right = 5400.0
+offset_bottom = 6300.0
+mouse_filter = 2
+
+[node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
 z_index = -1
+material = SubResource("ShaderMaterial_lgtp0")
+offset_right = 5850.0
+offset_bottom = 6500.0
+mouse_filter = 2
+
+[node name="VisibilityLayerContainer" type="SubViewportContainer" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+visibility_layer = 16
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VisibilityLayer" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+canvas_cull_mask = 4294966288
+size = Vector2i(5850, 6500)
+render_target_update_mode = 4
+
+[node name="DetectionRadius" type="TextureRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer/VisibilityLayer"]
+visibility_layer = 16
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -12500.0
-offset_top = -12500.0
-offset_right = 12500.0
-offset_bottom = 12500.0
+offset_left = -102924.0
+offset_top = -103249.0
+offset_right = -100924.0
+offset_bottom = -101249.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 2
-
-[node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
-unique_name_in_owner = true
-script = ExtResource("12_rlc6n")
-
-[node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
-z_index = -1
-material = SubResource("ShaderMaterial_lgtp0")
-offset_right = 5400.0
-offset_bottom = 6300.0
-mouse_filter = 2
+texture = SubResource("GradientTexture2D_2yroj")
 
 [node name="Label" type="Label" parent="TacticalMapLayer"]
-offset_left = 14.0
-offset_right = 450.0
+offset_left = 3.0
+offset_right = 439.0
 offset_bottom = 46.0
 theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
 theme_override_fonts/font = ExtResource("3_urh14")
@@ -381,13 +449,14 @@ text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
 [node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
-offset_left = 1592.0
-offset_top = 950.0
-offset_right = 1656.0
-offset_bottom = 1014.0
+offset_left = 1518.0
+offset_top = 971.0
+offset_right = 1664.0
+offset_bottom = 1035.0
 theme_override_constants/separation = 18
 
 [node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
 z_as_relative = false
@@ -447,6 +516,7 @@ text = "Take
 Control"
 
 [node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
 z_as_relative = false
@@ -669,6 +739,160 @@ theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 text = "WEAPON SYSTEMS"
 
+[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -82.5
+offset_top = -63.0
+offset_right = 82.5
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Game Paused"
+
+[node name="FPS Counter" type="RichTextLabel" parent="VariousCanvasPopups"]
+anchors_preset = -1
+anchor_left = 0.592
+anchor_top = 1.0
+anchor_right = 0.592
+anchor_bottom = 1.0
+offset_left = 634.36
+offset_top = -1078.0
+offset_right = 931.36
+offset_bottom = -1038.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+script = ExtResource("34_4p8f2")
+
+[node name="CameraFeed" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_top = -63.0
+offset_right = 216.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Camera Feed"
+
+[node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+process_mode = 3
+top_level = true
+offset_left = 701.0
+offset_top = 706.0
+offset_right = 1106.0
+offset_bottom = 896.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
+script = ExtResource("31_awwt3")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VariousCanvasPopups/TutorialWalkthrough"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -58.0
+offset_top = -36.0
+offset_right = 59.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+texture_normal = ExtResource("32_md01c")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StepCounter" type="Label" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+layout_mode = 2
+text = "1/15"
+
+[node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture_normal = ExtResource("33_dc70j")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ManualControlLoadingBar" type="ProgressBar" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+offset_left = 726.0
+offset_top = 945.0
+offset_right = 1037.0
+offset_bottom = 972.0
+step = 1.0
+value = 50.0
+
+[node name="ManualControlLoading" type="RichTextLabel" parent="VariousCanvasPopups/ManualControlLoadingBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -157.5
+offset_top = 1.0
+offset_right = 274.5
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Transferring Command..."
+
+[node name="SpaceBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="SpaceBackground"]
+offset_right = 1972.0
+offset_bottom = 1924.0
+texture = ExtResource("10_uvm3m")
+stretch_mode = 4
+
+[node name="Parallax2D" type="Parallax2D" parent="SpaceBackground"]
+scroll_scale = Vector2(0.8, 0.8)
+repeat_size = Vector2(1925, 1923)
+follow_viewport = false
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
+self_modulate = Color(1, 1, 1, 0.34902)
+offset_left = -162.0
+offset_top = -10.0
+offset_right = 1763.0
+offset_bottom = 1913.0
+texture = ExtResource("11_kx52a")
+stretch_mode = 4
+
 [node name="OptionsMenu" type="CanvasLayer" parent="."]
 
 [node name="OptionsMenuPanel" type="Panel" parent="OptionsMenu"]
@@ -866,40 +1090,24 @@ grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
-[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
-process_mode = 3
-
-[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
+[node name="BlackenScreenLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 0
 visible = false
-anchors_preset = 7
+
+[node name="BlackenBackground" type="Panel" parent="BlackenScreenLayer"]
+anchors_preset = 8
 anchor_left = 0.5
-anchor_top = 1.0
+anchor_top = 0.5
 anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -82.5
-offset_top = -63.0
-offset_right = 82.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
 grow_horizontal = 2
-grow_vertical = 0
-theme = ExtResource("33_lcetb")
-theme_override_font_sizes/normal_font_size = 24
-bbcode_enabled = true
-text = "Game Paused"
-
-[node name="SpaceBackground" type="CanvasLayer" parent="."]
-layer = -1
-
-[node name="Background" type="TextureRect" parent="SpaceBackground"]
-offset_right = 2207.0
-offset_bottom = 1924.0
-texture = ExtResource("10_uvm3m")
-stretch_mode = 4
-
-[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground"]
-self_modulate = Color(1, 1, 1, 0.34902)
-offset_right = 1925.0
-offset_bottom = 1923.0
-texture = ExtResource("11_kx52a")
-stretch_mode = 4
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

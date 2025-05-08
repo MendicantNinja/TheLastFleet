@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3 uid="uid://dmn7p3s6itxxy"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/Ship/detection_area.gd" id="1_2pa5a"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_cl75h"]
+resource_local_to_scene = true
+radius = 1.0
+
+[node name="DetectionArea" type="Area2D"]
+collision_layer = 0
+collision_mask = 4
+script = ExtResource("1_2pa5a")
+
+[node name="DetectionRadius" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_cl75h")
+debug_color = Color(0.0509804, 0.486275, 0.133333, 0)

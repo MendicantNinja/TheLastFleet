@@ -11,6 +11,7 @@ class_name Ship
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
 @onready var TacticalCamera = null
+@onready var ManualControlLoadingBar
 
 @onready var ManualControlHUD = null
 @onready var CenterCombatHUD: Control = $CenterCombatHUD
@@ -34,9 +35,9 @@ var TacticalDataDrawing: Node2D
 # Should group weapon slots in the near future instead of this, 
 # even though call_group() broke in 4.3 stable.
 @onready var ShieldSlot = $ShieldSlot
-@onready var ShieldArea = $ShieldSlot/Shields
-@onready var ShieldShape = $ShieldSlot/Shields/ShieldShape
-
+@onready var ShieldShape
+@onready var DetectionArea = $DetectionArea
+var shield_rid: RID
 
 var ShipWrapper
 var SteerData
@@ -91,6 +92,20 @@ var average_weapon_range: float = 0.0:
 	set(value):
 		ShipWrapper.SetAvgWeaponRange(value)
 		average_weapon_range = value
+
+var is_revealed: bool:
+	set(value):
+		if settings.debug_mode == true:
+			return
+		if value == true:
+			visible = value
+			tactical_map_icon.disabled = value
+			tactical_map_icon.visible = value
+		elif value == false:
+			visible = value
+			tactical_map_icon.disabled = value
+			tactical_map_icon.visible = value
+var ships_detecting_me: int = 0 # Increment this counter for enemies when entering a detection body. Decrement when exiting. See detection_area.gd in the packed scene.
 
 var is_friendly: bool = false:
 	set(value):
@@ -287,6 +302,7 @@ var goal_force: Vector2 = Vector2.ZERO:
 #var adj_template_maps: Dictionary = {}
 
 # Used for navigation and movement
+var sensor_strength: int 
 var time: float = 0.0
 var zero_flux_bonus: float = 0.0
 var time_coefficient: float = 0.1
@@ -326,7 +342,7 @@ var ship_select: bool = false:
 			ship_select = value
 		elif value == false:
 			ship_select = value
-		print("ship select called", ship_select)
+		#print("ship select called", ship_select)
 		ship_selected.emit()
 
 var collision_flag: bool = false
@@ -358,12 +374,14 @@ func deploy_ship() -> void:
 		CombatCamera = get_tree().get_root().find_child("CombatCamera", true, false)
 		TacticalCamera = get_tree().get_root().find_child("TacticalMapCamera", true, false)
 		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
-	
+		ManualControlLoadingBar = get_tree().current_scene.get_node("%ManualControlLoadingBar")
 	if is_friendly == true:
 		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
+		print("deploy_ship called")
 		settings.swizzle(ConstantSizedGUI, settings.gui_color, false)
 		settings.swizzle($ShipLivery, settings.player_color)
 		ManualControlIndicator.self_modulate = settings.player_color 
+		DetectionArea.DetectionRadius.shape.radius  = sensor_strength
 	elif is_friendly == false:
 		# Non-identical to is_friendly == true Later in development. Swap these rectangle pictures with something else. (Starsector uses diamonds for enemies).
 		settings.swizzle(ConstantSizedGUI, settings.enemy_color, false)
@@ -415,6 +433,10 @@ func _ready() -> void:
 	armor = ship_hull.armor
 	shield_radius = ShipNavigationAgent.radius
 	shield_upkeep = ship_hull.shield_upkeep / 60.0
+	ShieldShape = ShieldSlot.ShieldShape
+	ShieldSlot.shield_parameters(ship_stats.shield_arc, collision_layer, get_rid().get_id(), self)
+	ShieldSlot.shield_hit.connect(_on_Shield_Hit)
+	shield_rid = ShieldSlot.get_rid()
 	total_flux = ship_stats.flux
 	zero_flux_bonus = floor(speed / 3)
 	var target_unit_offset: Vector2 = Vector2(-shield_radius, shield_radius)
@@ -426,6 +448,8 @@ func _ready() -> void:
 	HullIntegrityIndicator.max_value = ship_stats.hull_integrity
 	HullIntegrityIndicator.value = hull_integrity
 	
+	sensor_strength = ship_stats.sensor_strength
+	DetectionArea.self_ship = self
 	# TEMPORARY FIX FOR MENDI'S AMUSEMENTON
 	#ShipSprite.modulate = self_modulate
 	
@@ -433,7 +457,7 @@ func _ready() -> void:
 	for child in get_children():
 		if child is WeaponSlot:
 			all_weapons.append(child)
-			child.detection_parameters(collision_mask, is_friendly, get_rid())
+			child.detection_parameters(collision_mask, is_friendly, get_rid(), shield_rid)
 			child.weapon_slot_fired.connect(_on_Weapon_Slot_Fired)
 			child.target_in_range.connect(_on_target_in_range)
 
@@ -513,16 +537,30 @@ func process_damage(projectile: Projectile) -> void:
 	if projectile.is_beam == true:
 		#print("projectile beam process damage was called")
 		# Armor should be done differently with beams. Probably. Playtesting needed.
-		var beam_projectile_divisor: int = projectile.beam_duration / .05
-		var beam_projectile_damage: int = int(projectile.damage/beam_projectile_divisor)
-		#print(beam_projectile_damage)
-		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
-		armor -= armor_damage_reduction
-		#armor_damage_reduction = 1
-		var hull_damage: float = armor_damage_reduction * beam_projectile_damage
-		#print(hull_damage)
-		hull_integrity -= hull_damage
-		HullIntegrityIndicator.value = hull_integrity
+		if projectile.is_continuous == false:
+			var beam_projectile_divisor: float = projectile.beam_duration * 20.0
+			var inverse_divisor: float = 1.0 / beam_projectile_divisor
+			var beam_projectile_damage: int = int(projectile.damage * inverse_divisor)
+			#print(beam_projectile_damage)
+			var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+			armor -= armor_damage_reduction
+			#armor_damage_reduction = 1
+			var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+			#print(hull_damage)
+			hull_integrity -= hull_damage
+			HullIntegrityIndicator.value = hull_integrity
+		else:
+			#var beam_projectile_divisor: int = 1 / .05
+			var beam_projectile_damage: int = int(projectile.damage * .05 )
+			#print(beam_projectile_damage)
+			var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
+			armor -= armor_damage_reduction
+			#armor_damage_reduction = 1
+			var hull_damage: float = armor_damage_reduction * beam_projectile_damage
+			#print(hull_damage)
+			hull_integrity -= hull_damage
+			HullIntegrityIndicator.value = hull_integrity
+		
 		
 	elif projectile.is_beam == false:
 		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
@@ -567,32 +605,9 @@ func destroy_ship() -> void:
 	ShipTargetIcon.visible = false
 	queue_free()
 
-func toggle_shield() -> void:
-	if shield_toggle == false and flux_overload:
-		return
-	elif vent_flux_flag == true:
-		return
-	
-	if shield_toggle == false:
-		shield_toggle = true
-		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	elif shield_toggle == true:
-		shield_toggle = false
-		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
-
 func set_shields(value: bool) -> void:
-	if value == shield_toggle:
-		return
-	
-	shield_toggle = value
-	if value == true:
-		ShieldSlot.shield_parameters(1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.connect(_on_Shield_Hit)
-	else:
-		ShieldSlot.shield_parameters(-1, shield_radius, collision_layer, get_rid().get_id())
-		ShieldSlot.shield_hit.disconnect(_on_Shield_Hit)
+		shield_toggle = value
+		ShieldSlot.toggle_shields(value)
 
 func _on_Weapon_Slot_Fired(flux_cost) -> void:
 	soft_flux += flux_cost
@@ -684,8 +699,13 @@ func _input(event: InputEvent) -> void:
 	if TacticalMapLayer == null or TacticalMapLayer.visible or TacticalDataDrawing.camera_feed_active:
 		return
 	if event is InputEventMouseButton:
-		if Input.is_action_just_pressed("m2") and manual_control:
-			toggle_shield()
+		if Input.is_action_just_pressed("m2") and manual_control and flux_overload == false:
+			if shield_toggle == true:
+				set_shields(false)
+			else:
+				set_shields(true)
+		if event.is_action_released("select"):
+				stop_firing_beams(selected_weapon_system.weapons)
 		elif Input.is_action_just_pressed("zoom in") and manual_control and zoom_value < zoom_in_limit:
 			zoom_value += Vector2(0.01, 0.01)
 		elif Input.is_action_just_pressed("zoom out") and manual_control and zoom_value > zoom_out_limit:
@@ -743,6 +763,11 @@ func toggle_manual_control() -> void:
 		return
 	
 	if manual_control == false:
+		ManualControlLoadingBar.visible = true
+		ManualControlLoadingBar.value = 0
+		ManualControlLoadingBar.create_tween().tween_property(ManualControlLoadingBar, "value", 100, 1.5)
+		await get_tree().create_timer(1.5).timeout  # delay in seconds
+		ManualControlLoadingBar.visible = false
 		manual_control = true
 		ship_select = false
 		ManualControlHUD.set_ship(self)
@@ -813,7 +838,7 @@ func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	
 	var ship_id = get_rid().get_id()
 	if (total_flux - (hard_flux + soft_flux)) < weapon_slot.weapon.flux_per_shot:
-		return  # Correct indentation
+		return 
 	weapon_slot.fire(ship_id)
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
@@ -837,6 +862,12 @@ func toggle_auto_fire(weapon_system: Array[WeaponSlot]) -> void:
 	
 	for weapon_slot in weapon_system:
 		weapon_slot.toggle_auto_fire()
+
+func stop_firing_beams(weapon_system: Array[WeaponSlot]) -> void:
+	for weapon_slot in weapon_system:
+		if weapon_slot.weapon.is_continuous == true:
+			weapon_slot.stop_continuous_beam()
+	pass
 
 func set_navigation_position(to_position: Vector2) -> void:
 	if targeted_units.is_empty() == false:
@@ -938,30 +969,27 @@ func _physics_process(delta: float) -> void:
 		return
 	
 	#if %TacticalMapLayer.visible == false: # Allow input and messing with the combat camera only if TacticalMap is not visible
-	CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
-	if TacticalMapLayer.visible == false:
-		CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
-		if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
-			fire_weapon_system(selected_weapon_system.weapons)
-		var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
-		rotate_angle = rotate_direction.angle()
-		var adjust_mass: float = (mass * 1000)
-		rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
-		move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
-		Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
-		
-	if Input.is_action_pressed("vent_flux"):
-		vent_flux_flag = true
-		for weapon in all_weapons:
-			weapon.vent_flux = vent_flux_flag
-
-#print(TacticalDataDrawing.camera_feed_active)
-	if TacticalDataDrawing.camera_feed_active == false:
-		ManualControlHUD.update_hud()
-		if manual_camera_freelook == false:
-			CombatCamera.global_position = self.global_position
+	if manual_control == true:
+		CombatCamera.position_smoothing_enabled = false # If the tactical map IS visible, we want camera movement to be snappy and instant.
+		if TacticalMapLayer.visible == false and TacticalDataDrawing.camera_feed_active == false:
+			CombatCamera.position_smoothing_enabled = true # If not visible, we want it be smooth for freelook and panning.
+			if Input.is_action_pressed("select") and flux_overload == false and vent_flux_flag == false:
+				fire_weapon_system(selected_weapon_system.weapons)
+			var rotate_direction: Vector2 = Vector2(0, Input.get_action_strength("turn_right") - Input.get_action_strength("turn_left"))
+			rotate_angle = rotate_direction.angle()
+			var adjust_mass: float = (mass * 1000)
+			rotate_angle = rotate_angle * adjust_mass * ship_stats.turn_rate
+			move_direction = Vector2(Input.get_action_strength("accelerate") - Input.get_action_strength("decelerate"),
+			Input.get_action_strength("strafe_right") - Input.get_action_strength("strafe_left")).normalized()
+			
+			if Input.is_action_pressed("vent_flux"):
+				vent_flux_flag = true
+		if TacticalDataDrawing.camera_feed_active == false:
+			ManualControlHUD.update_hud()
+			if manual_camera_freelook == false:
+				CombatCamera.global_position = self.global_position
 			#CombatCamera.position_smoothing_enabled = true # Set to false when initially set to allow "snappy" behavior.
-	
+
 	var true_direction: Vector2 = move_direction.rotated(transform.x.angle())
 	var velocity = 0.0
 	var speed_modifier: float = 0.0

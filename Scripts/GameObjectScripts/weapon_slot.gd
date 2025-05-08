@@ -9,6 +9,7 @@ class_name WeaponSlot
 @onready var WeaponNode: Node2D = $WeaponNode
 @onready var ROFTimer: Timer = $ROFTimer
 @onready var SoftlockTimer: Timer = $ROFTimer
+@onready var ContinuousFluxTimer = $ContinuousFluxTimer
 # Important Stuff
 @export var weapon_system_group: int = -1
 
@@ -39,11 +40,11 @@ var auto_fire: bool = false
 var can_look_at: bool = false
 var timer_fire: bool = false
 var can_fire: bool = false
-var flux_overload: bool = false
-var vent_flux: bool = false:
+var flux_overload: bool = false: 
 	set(value):
-		vent_flux = value
-
+		flux_overload = value
+		if flux_overload == true:
+			stop_continuous_beam()
 var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
@@ -68,6 +69,8 @@ var killcast: RayCast2D = null
 var last_valid_position: Vector2 = Vector2.ZERO
 var target_unit: RID = RID()
 var current_target_id: RID = RID()
+var owner_rid: RID = RID()
+var shield_rid: RID = RID()
 
 # Special Beam Logic
 var current_beam: Projectile = null
@@ -77,9 +80,9 @@ signal target_in_range(value)
 signal new_threats(targets)
 signal threat_exited(targets)
 
-# Called to spew forth a --> SINGLE <-- projectile scene from the given Weapon in the WeaponSlot. Firing speed is tied to delta in ship.gd.
+# Called to spew forth a --> SINGLE <-- projectile (or beam) scene from the given Weapon in the WeaponSlot.
 func fire(ship_id: int) -> void:
-	if flux_overload == true or timer_fire == false:
+	if flux_overload == true or timer_fire == false or current_beam != null:
 		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		return
@@ -92,8 +95,8 @@ func fire(ship_id: int) -> void:
 		#weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
-	projectile.global_transform = WeaponNode.global_transform
-	projectile.assign_stats(weapon, owner_rid, is_friendly)
+	projectile.global_transform = weapon_node.global_transform
+	projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 	
 	if projectile.is_beam == true:
 		current_beam = projectile
@@ -101,13 +104,26 @@ func fire(ship_id: int) -> void:
 			current_beam.projectile_freed.connect(func():
 				current_beam = null  # Clear reference after projectile is freed
 			)
-	
+		else:
+			ContinuousFluxTimer.start() # Flux per second for continuous beams.
 	get_tree().current_scene.add_child(projectile)
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
 	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
 		ROFTimer.start()
+
+func stop_continuous_beam() -> void:
+	ContinuousFluxTimer.stop()
+	if current_beam != null:
+		current_beam.queue_free()
+		current_beam = null 
+
+func stop_continuous_beam() -> void:
+	ContinuousFluxTimer.stop()
+	if current_beam != null:
+		current_beam.queue_free()
+		current_beam = null 
 
 # Only called by ship_stats.initialize() or on implicit new in the generic ship scene. Never again.
 func _init(p_weapon_mount: WeaponMount = data.weapon_mount_dictionary.get(data.weapon_mount_enum.SMALL_BALLISTIC), p_weapon: Weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)):
@@ -149,6 +165,11 @@ func _ready():
 	
 	EffectiveRange.body_entered.connect(_on_EffectiveRange_entered)
 	EffectiveRange.body_exited.connect(_on_EffectiveRange_exited)
+	
+	if weapon.is_continuous:
+		ContinuousFluxTimer.timeout.connect(func():  # Example value, replace with actual flux
+			emit_signal("weapon_slot_fired", weapon.flux_per_shot)
+	)
 
 func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	weapon_system_group = 0 # Index of 0 = weapon system 1
@@ -173,10 +194,11 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 		var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
 		ROFTimer.wait_time = interval_in_seconds
 
-func detection_parameters(mask: int, friendly_value: bool, owner_value: RID) -> void:
+func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
 	EffectiveRange.collision_mask = mask
 	is_friendly = friendly_value
 	owner_rid = owner_value
+	shield_rid = p_shield_rid
 	auto_aim = true
 	auto_fire = true
 	#set_weapon_size_and_color()
@@ -185,6 +207,8 @@ func set_auto_fire(fire_value: bool) -> void:
 	auto_fire = fire_value
 	if fire_value == false:
 		manual_aim = true
+	if weapon.is_continuous == true:
+		stop_continuous_beam()
 
 func set_auto_aim(aim_value: bool) -> void:
 	auto_aim = aim_value

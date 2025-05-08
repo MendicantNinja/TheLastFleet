@@ -55,6 +55,8 @@ func update() -> void:
 	drive_field = ship_hull.drive_field + bonus_drive_field
 	hull_integrity = ship_hull.hull_integrity + bonus_hull_integrity
 	armor = ship_hull.armor + bonus_armor
+	shield_arc = ship_hull.shield_arc
+	shield_raise_time = ship_hull.shield_raise_time
 	shield_efficiency = ship_hull.shield_efficiency + bonus_shield_efficiency
 	flux = ship_hull.flux + bonus_flux
 	flux_dissipation = ship_hull.flux_dissipation + bonus_flux_dissipation
@@ -183,7 +185,7 @@ func remove_weapon(weapon_slot_index: int) -> void:
 	weapon_slots[weapon_slot_index].weapon = data.weapon_dictionary.get(data.weapon_enum.EMPTY)
 	
 # Ship Systems
-@export var ship_name: String = "Shippington" # The name of this specific ship in the fleet.
+@export var ship_name: String = "ISS Shippington" # The name of this specific ship in the fleet.
 @export var ship_hull: ShipHull 
 @export var ship_system: ShipSystem           # The special ability or system that the ship has (e.g., "Phase Cloak", "Burn Drive")
 @export_storage var weapon_slots: Array[WeaponSlot] = []               # Array of weapons+mounts equipped in the weapon mounts? (e.g., types and positions of hardpoints, turrets)
@@ -201,6 +203,8 @@ func remove_weapon(weapon_slot_index: int) -> void:
 @export var hull_integrity: int                    # Ship's total hit points (health)
 @export var armor: int                        # Ship's armor rating (used for damage mitigation)
 
+@export var shield_arc: int
+@export var shield_raise_time: float 
 @export var shield_efficiency: float          # How effective the shields are at blocking damage
 @export var flux: int                         # Total flux the ship can buildup before overloading
 @export var flux_dissipation: int             # Rate at which flux is dissipated (flux/sec)

@@ -36,4 +36,6 @@ debug_color = Color(0, 0.6, 0.701961, 0)
 
 [node name="ROFTimer" type="Timer" parent="."]
 
+[node name="ContinuousFluxTimer" type="Timer" parent="."]
+
 [node name="SoftlockTimer" type="Timer" parent="."]

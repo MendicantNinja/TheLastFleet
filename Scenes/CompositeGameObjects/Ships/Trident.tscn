@@ -1,20 +1,29 @@
-[gd_scene load_steps=13 format=3 uid="uid://10wylxljg0nw"]
+[gd_scene load_steps=32 format=3 uid="uid://10wylxljg0nw"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_vx8d1"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_070pn"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="13_kiy6n"]
 [ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="14_kfouk"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="14_ygc3n"]
 [ext_resource type="Texture2D" uid="uid://cfd8kdvut280u" path="res://Art/ShipArt/Trident/trident_livery1.png" id="15_fllyn"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="17_ivfi0"]
 [ext_resource type="Resource" uid="uid://5xwswaf2bcpw" path="res://Resources/WeaponMounts/MediumMissile.tres" id="18_pjw2u"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="25_wx7ub"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="26_06ix5"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="27_y2dbk"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ojec2"]
+radius = 52.0
+height = 210.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lwmg0"]
+size = Vector2(25, 38)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2mvne"]
+size = Vector2(45.5, 126)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_fs6nd"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_huwv5"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vu5jp"]
 
 [node name="Trident" type="RigidBody2D"]
 z_as_relative = false
@@ -27,6 +36,22 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_vx8d1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_ojec2")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27, -33.5)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_lwmg0")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(80.25, 0)
+shape = SubResource("RectangleShape2D_2mvne")
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 
@@ -51,11 +76,6 @@ texture = ExtResource("14_kfouk")
 texture_filter = 1
 rotation = 1.5708
 texture = ExtResource("15_fllyn")
-
-[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
-position = Vector2(-52.7971, 0)
-scale = Vector2(2.64555, 1)
-polygon = PackedVector2Array(-9.90453, 34, -6.50259, 53, 4.83722, 52, 5.59321, 41, 8.99515, 41, 9.75114, 47, 34.6987, 47, 41.5026, 47, 41.5026, 61, 57.3783, 65, 60.0243, 47, 58.5123, 2, 60.4023, -36, 57.0003, -63, 41.5026, -62, 39.9906, -49, 9.75114, -47, -5.7466, -52, -9.90453, -34, -18.9764, -34, -18.9764, 35)
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("13_kiy6n")]
 position = Vector2(90, -55)
@@ -100,21 +120,13 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="ShieldSlot" type="Node2D" parent="."]
-script = ExtResource("14_ygc3n")
-
-[node name="Shields" type="Area2D" parent="ShieldSlot"]
-collision_layer = 0
-collision_mask = 8
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
-shape = SubResource("CircleShape2D_vu5jp")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
-
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 3.0
+
+[node name="ShieldSlot" parent="." instance=ExtResource("25_wx7ub")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("27_y2dbk")]
 
 [node name="OverloadTimer" type="Timer" parent="."]
 process_callback = 0
