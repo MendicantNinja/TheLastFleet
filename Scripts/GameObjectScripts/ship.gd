@@ -1053,6 +1053,8 @@ func _on_target_in_range(value: bool) -> void:
 	
 	var oor_count: int = 0
 	for weapon in all_weapons:
+		if target_unit == null:
+			continue
 		if target_unit.get_rid() == weapon.primary_target and weapon.can_fire == false:
 			oor_count += 1
 	

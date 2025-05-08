@@ -20,9 +20,9 @@ public partial class Align : Action
 			Transform2D transform_look_at = SteerData.LookingAt(agent_pos, steer_data.TargetPosition);
 			n_agent.Transform = n_agent.Transform.InterpolateWith(transform_look_at, steer_data.TurnRate * steer_data.NDelta);
 		//Vector2 steer_force = steer_data.SteeringForce;
-		agent.Set("avoidance_force", new Godot.Vector2(steer_data.AvoidanceForce.X, steer_data.AvoidanceForce.Y) * steer_data.AvoidanceWeight);
-		agent.Set("separation_force", new Godot.Vector2(steer_data.SeparationForce.X, steer_data.SeparationForce.Y) * steer_data.SeparationWeight);
-		agent.Set("goal_force", new Godot.Vector2(steer_data.DesiredVelocity.X, steer_data.DesiredVelocity.Y) * steer_data.GoalWeight);
+			agent.Set("avoidance_force", new Godot.Vector2(steer_data.AvoidanceForce.X, steer_data.AvoidanceForce.Y) * steer_data.AvoidanceWeight);
+			agent.Set("separation_force", new Godot.Vector2(steer_data.SeparationForce.X, steer_data.SeparationForce.Y) * steer_data.SeparationWeight);
+			agent.Set("goal_force", new Godot.Vector2(steer_data.DesiredVelocity.X, steer_data.DesiredVelocity.Y) * steer_data.GoalWeight);
 		}
 		else
 		{
@@ -30,9 +30,9 @@ public partial class Align : Action
 			Transform2D transform_look_at = SteerData.LookingAt(agent_pos, enemy_pos);
 			n_agent.Transform = n_agent.Transform.InterpolateWith(transform_look_at, steer_data.TurnRate * steer_data.NDelta);
 		//Vector2 steer_force = steer_data.SteeringForce;
-		agent.Set("avoidance_force", new Godot.Vector2(steer_data.AvoidanceForce.X, steer_data.AvoidanceForce.Y) * steer_data.AvoidanceWeight);
-		agent.Set("separation_force", new Godot.Vector2(steer_data.SeparationForce.X, steer_data.SeparationForce.Y) * steer_data.SeparationWeight);
-		agent.Set("goal_force", new Godot.Vector2(steer_data.DesiredVelocity.X, steer_data.DesiredVelocity.Y) * steer_data.GoalWeight);
+			agent.Set("avoidance_force", new Godot.Vector2(steer_data.AvoidanceForce.X, steer_data.AvoidanceForce.Y) * steer_data.AvoidanceWeight);
+			agent.Set("separation_force", new Godot.Vector2(steer_data.SeparationForce.X, steer_data.SeparationForce.Y) * steer_data.SeparationWeight);
+			agent.Set("goal_force", new Godot.Vector2(steer_data.DesiredVelocity.X, steer_data.DesiredVelocity.Y) * steer_data.GoalWeight);
 		}
 		/*
 		GD.Print(agent.Name, " Align");

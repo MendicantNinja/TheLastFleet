@@ -29,6 +29,8 @@ public partial class Pursue : Action
 			Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
 			targeted_by.Remove(n_agent);
 			ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
+			RigidBody2D dummy = null;
+			agent.Set("target_unit", dummy);
 			ship_wrapper.TargetUnit = null;
 			steer_data.TargetUnit = null;
 			agent.Call("set_target_for_weapons", steer_data.TargetUnit);
