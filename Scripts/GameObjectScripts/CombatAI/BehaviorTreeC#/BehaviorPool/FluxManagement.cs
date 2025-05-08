@@ -67,11 +67,10 @@ public partial class FluxManagement : Action
 				targeted_by.Remove(n_agent);
 				steer_data.TargetUnit.Set("targeted_by", targeted_by);
 			}
-			RigidBody2D dummy = null;
-			agent.Set("target_unit", dummy);
+			agent.Call("set_target_unit", new Godot.Collections.Array<int>());
 			steer_data.TargetUnit = null;
 			ship_wrapper.TargetUnit = null;
-			agent.Call("set_target_for_weapons", dummy);
+			agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
 		}
 
 		return NodeState.FAILURE;
