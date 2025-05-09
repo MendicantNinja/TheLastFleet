@@ -374,8 +374,8 @@ func deploy_ship() -> void:
 		TacticalMapLayer = get_tree().get_root().find_child("TacticalMapLayer", true, false)
 		CombatCamera = get_tree().get_root().find_child("CombatCamera", true, false)
 		TacticalCamera = get_tree().get_root().find_child("TacticalMapCamera", true, false)
-		ManualControlHUD = get_tree().current_scene.get_node("%ManualControlHUD")
-		ManualControlLoadingBar = get_tree().current_scene.get_node("%ManualControlLoadingBar")
+		ManualControlHUD = get_tree().get_root().find_child("%ManualControlHUD", true, false)
+		ManualControlLoadingBar = get_tree().get_root().find_child("%ManualControlLoadingBar", true, false)
 	if is_friendly == true:
 		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
 		print("deploy_ship called")
