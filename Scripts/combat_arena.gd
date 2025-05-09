@@ -72,7 +72,7 @@ func _ready() -> void:
 	self.units_deployed.connect(TacticalMap.connect_unit_signals)
 	TacticalMap.display_map(true)
 	
-	FleetDeploymentList.deploy_ship.connect(CombatMap._add_player_ship)
+	FleetDeploymentList.deploy_ship.connect(self._add_player_ship)
 	# Set combat boundaries using four static bodies and shapes. A>B order is important for one-way collision. I had to use Rects and do rotation magic due to global collisions.
 	$CollisionBoundaryLeft.position = Vector2(0, PlayableAreaBounds.shape.size.y/2)
 	$CollisionBoundaryLeft/CollisionBoundaryShape.shape.size = Vector2(PlayableAreaBounds.shape.size.y, 1) 
@@ -90,7 +90,9 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	deploy_enemy_fleet()
+	setup()
+	if settings.dev_mode == true:
+		deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -194,10 +196,8 @@ func toggle_options_menu() -> void:
 
 func _on_switch_maps() -> void:
 	if %TacticalMapLayer.visible == false:
-		#CombatMap.display_map(false)
 		TacticalMap.display_map(true)
 	elif %TacticalMapLayer.visible:
-		#CombatMap.display_map(true)
 		TacticalMap.display_map(false)
 	get_viewport().set_input_as_handled()
 
@@ -228,6 +228,8 @@ func connect_ship_signals(friendly_ship: Ship) -> void:
 		#ship.ship_targeted.connect(friendly_ship._on_ship_targeted)
 	pass
 
+func _add_player_ship(ship) -> void:
+	add_child(ship)
 
 func _on_tree_exiting():
 	imap_manager.OnCombatArenaExiting()

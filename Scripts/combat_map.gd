@@ -36,11 +36,11 @@ func _unhandled_input(event):
 			zoom_value += Vector2(0.01, 0.01)
 		elif Input.is_action_just_pressed("zoom out") and zoom_value > zoom_out_limit and CombatCamera.enabled:
 			zoom_value -= Vector2(0.01, 0.01)
-		if Input.is_action_just_released("camera action") and CombatCamera.enabled and manually_controlled_unit != null:
+		if Input.is_action_just_released("camera_action") and CombatCamera.enabled and manually_controlled_unit != null:
 			manually_controlled_unit.toggle_manual_camera_freelook(false)
 	elif event is InputEventMouseMotion:
 		#Middle Mouse Button Scrolling
-		if Input.is_action_pressed("camera action") and CombatCamera.enabled:
+		if Input.is_action_pressed("camera_action") and CombatCamera.enabled:
 			#print(manually_controlled_unit)
 			CombatCamera.global_position -= event.relative / CombatCamera.zoom
 			if manually_controlled_unit != null:
@@ -73,6 +73,3 @@ func set_manual_camera(unit: Ship) -> void:
 		manually_controlled_unit.toggle_manual_control()
 		manually_controlled_unit.toggle_manual_aim(manually_controlled_unit.all_weapons, false) # Needed to shut off weapons because the code is fucked.
 	manually_controlled_unit = unit # Discards the old unit, brings in the new.
-
-func _add_player_ship(ship) -> void:
-	add_child(ship)

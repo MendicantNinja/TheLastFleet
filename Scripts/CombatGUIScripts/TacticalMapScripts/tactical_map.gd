@@ -54,7 +54,7 @@ func _unhandled_input(event) -> void:
 		if Input.is_action_pressed("select") and box_selection_start > Vector2.ZERO:
 			box_selection_end = get_global_mouse_position()
 			queue_redraw()
-		elif Input.is_action_pressed("camera action"):
+		elif Input.is_action_pressed("camera_action"):
 			TacticalCamera.position -= event.relative / TacticalCamera.zoom
 	elif event is InputEventKey:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)

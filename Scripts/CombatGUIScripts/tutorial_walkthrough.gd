@@ -10,6 +10,7 @@ var never_true: bool = false
 func _ready():
 	# Define tutorial steps. Check the current steps true or false return periodically in _process.
 	steps = [
+		TutorialStep.new(&"tutorial_panning", data.get_text(&"tutorial_panning"), func(): return Input.is_action_pressed("camera_action")),
 		TutorialStep.new(&"tutorial_deployment", data.get_text(&"tutorial_deployment"), func(): return get_tree().get_nodes_in_group("friendly").size() > 0),
 		TutorialStep.new(&"tutorial_pause", data.get_text(&"tutorial_pause"), func(): return Input.is_action_just_pressed("pause")),
 		TutorialStep.new(&"tutorial_selection", data.get_text(&"tutorial_selection"), func(): return detect_move_order()),

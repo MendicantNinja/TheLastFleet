@@ -328,11 +328,12 @@ var localization_dictionary: Dictionary = {
 	&"flux": "flux",
 	# Relatively unique 1-off buttons "New Game, Load Game"
 	# Event-popups, tutorial walkthroughs, and other unique long texts.
+	&"tutorial_panning": "To zoom the camera on the map, scroll the mouse wheel up and down. To progress the tutorial, hold down the middle mouse button and move to pan the camera.",
 	&"tutorial_deployment": "Press the G key, select some ships to deploy by clicking on their icon, which highlights them, and then press the Deploy button.",
-	&"tutorial_pause": "Good! It looks like our fleet is cruising onto the battlefield. With the ships deployed, press the spacebar key to pause and unpause the game. Notice how the ships cease to move.",
+	&"tutorial_pause": "Good! It looks like our fleet is cruising onto the battlefield. With the ships deployed, press the spacebar key to pause the game.",
 	&"tutorial_selection": "Unpause the game by pressing spacebar. Now, click a friendly unit to select it. Drag select to select a group of units. Click and drag again in an empty area on the map to deselect all your units. To progress the tutorial, right click on the tactical map to start moving somewhere.",
 	&"tutorial_camera": "With the game unpaused and A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
-	&"tutorial_map": "Press the tab key to toggle the tactical map on and off. Lets try turning it on and selecting a single ship again",
+	&"tutorial_map": "Press the tab key to toggle the tactical map on and off. Lets try turning it on and then off again",
 	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship",
 	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S, rotate the ship with A/D, and strafe horizontally with Q/E. Lets try accelerating forward with W to progress the tutorial. Notice the speed indicator on the bottom right of the screen.",
 	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
