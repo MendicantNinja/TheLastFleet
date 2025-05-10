@@ -259,6 +259,9 @@ public partial class ShipWrapper : Node
 	public void SetTargetedUnits(Godot.Collections.Array<RigidBody2D> targeted_units)
 	{
 		TargetedUnits.Clear();
+		TargetUnit = null;
+		if (targeted_units.Count == 0) return;
+		
 		foreach (RigidBody2D target in targeted_units)
 		{
 			if (target == null) continue;

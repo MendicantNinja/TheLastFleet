@@ -346,6 +346,7 @@ var ship_select: bool = false:
 		ship_selected.emit()
 
 var collision_flag: bool = false
+var ai_debug: bool = true
 
 # Custom signals.
 signal alt_select()
@@ -378,7 +379,7 @@ func deploy_ship() -> void:
 		ManualControlLoadingBar =  get_tree().get_root().find_child("ManualControlLoadingBar", true, false)
 	if is_friendly == true:
 		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
-		print("deploy_ship called")
+		#print("deploy_ship called")
 		settings.swizzle(ConstantSizedGUI, settings.gui_color, false)
 		settings.swizzle($ShipLivery, settings.player_color)
 		ManualControlIndicator.self_modulate = settings.player_color 
@@ -395,23 +396,10 @@ func _ready() -> void:
 	SteerData = load("res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/SteerData.cs").new()
 	add_child(SteerData)
 	SteerData.name = &"SteerData"
-	ShipSprite.z_index = 0
-	$ShipLivery.z_index = 1
-	registry_cell = -Vector2i.ONE
-	if ship_stats == null:
-		ship_stats = ShipStats.new(data.ship_type_enum.TEST)
-	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
-	ShipNavigationAgent.max_speed = speed
-	OverloadTimer.wait_time = overload_time
-	CombatTimer.wait_time = combat_time
-	var ship_hull = ship_stats.ship_hull
-	var texture: Texture2D = ship_hull.ship_sprite
-	var texture_size: Vector2 = texture.get_size()
-	var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
-	ShipNavigationAgent.radius = new_radius
 	
-	SteerData.SetFOFRadius(new_radius)
-	#SteerData.SetDelta(get_physics_process_delta_time())
+	if ship_stats == null:
+		ship_stats = ShipStats.new(data.ship_type_enum.CHALLENGER)
+	var ship_hull = ship_stats.ship_hull
 	add_to_group(&"agent")
 	if collision_layer == 1:
 		is_friendly = true
@@ -424,6 +412,19 @@ func _ready() -> void:
 		is_friendly = false
 		rotation += PI/2
 	
+	ShipSprite.z_index = 0
+	$ShipLivery.z_index = 1
+	registry_cell = -Vector2i.ONE
+	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
+	ShipNavigationAgent.max_speed = speed
+	OverloadTimer.wait_time = overload_time
+	CombatTimer.wait_time = combat_time
+	var texture: Texture2D = ship_hull.ship_sprite
+	var texture_size: Vector2 = texture.get_size()
+	var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
+	ShipNavigationAgent.radius = new_radius
+	
+	SteerData.SetFOFRadius(new_radius)
 	var dissipation_coe: float = 12
 	passive_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation)
 	passive_flux_dissipation /= dissipation_coe
@@ -509,7 +510,11 @@ func _ready() -> void:
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	OverloadTimer.timeout.connect(_on_OverloadTimer_timeout)
 	
-	set_combat_ai(true)
+	if is_friendly == true and ai_debug == true:
+		set_combat_ai(true)
+	elif is_friendly == false and ai_debug == true:
+		for weapon: WeaponSlot in all_weapons:
+			weapon.ai_debug = true
 	deploy_ship()
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)

@@ -70,7 +70,6 @@ public partial class ChooseTarget : Action
 		if (ship_wrapper.GroupLeader == true)
 		{
 			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
-			return NodeState.FAILURE;
 		}
 		
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)

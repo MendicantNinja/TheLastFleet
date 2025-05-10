@@ -90,9 +90,14 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
+	
+	# FOR AI DEBUGGING
+	imap_manager.RegisterAgents(get_tree().get_nodes_in_group(&"agent"), int(combat_goal))
+	units_deployed.emit(get_tree().get_nodes_in_group(&"agent"))
+	
 	setup()
-	if settings.dev_mode == true:
-		deploy_enemy_fleet()
+	#if settings.dev_mode == true:
+		#deploy_enemy_fleet()
 
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -112,8 +117,7 @@ func setup(tutorial_flag: bool = false, enemy_fleet: Fleet = Fleet.new()) -> voi
 	if tutorial_flag == true:
 		%TutorialWalkthrough.visible = true
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_ALWAYS
-		
-	
+
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.

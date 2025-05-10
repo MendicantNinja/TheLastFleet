@@ -49,6 +49,7 @@ var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
 var AI_enabled: bool = false
+var ai_debug: bool = false
 
 var range_display_color: Color = Color.SNOW
 var range_display_count: int = 64
@@ -291,6 +292,9 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 	return target_transform
 
 func _physics_process(delta) -> void:
+	if ai_debug == true:
+		return
+	
 	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
 		current_beam.global_transform = WeaponNode.global_transform
 		#current_beam.rotation = self.rotation

@@ -1,4 +1,4 @@
-[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=62 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
@@ -40,6 +40,7 @@
 [ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
+[ext_resource type="PackedScene" uid="uid://dkcoqur156tp1" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="41_hgxek"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -309,6 +310,7 @@ process_mode = 3
 visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
+visible = false
 top_level = true
 z_index = 1
 offset_left = 9.0
@@ -1109,5 +1111,26 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="TestShip" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(5290, 3552)
+collision_layer = 4
+
+[node name="TestShip2" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(7066, 3538)
+collision_layer = 4
+
+[node name="TestShip3" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(6286, 3511)
+collision_layer = 4
+
+[node name="TestShip4" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(5828, 5166)
+
+[node name="TestShip5" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(6783, 5166)
+
+[node name="TestShip6" parent="." instance=ExtResource("41_hgxek")]
+position = Vector2(5277, 5327)
 
 [connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]
