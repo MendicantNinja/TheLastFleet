@@ -41,10 +41,7 @@ public partial class ChooseTarget : Action
 				GD.Print("target disposed or in queue for deletion");
 				continue;
 			}
-			if (ship_wrapper.GroupLeader == true)
-			{
-				valid_targets.Add(target);
-			}
+			valid_targets.Add(target);
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			float prob = (float)agent.Call("generate_combat_probability", target);
 
@@ -67,11 +64,7 @@ public partial class ChooseTarget : Action
 			}
 		}
 
-		if (ship_wrapper.GroupLeader == true)
-		{
-			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
-			return NodeState.FAILURE;
-		}
+		agent.Set("targeted_units", valid_targets);
 		
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)
 		{
@@ -86,6 +79,7 @@ public partial class ChooseTarget : Action
 		float min_distance = sq_dist.Min();
 		foreach (RigidBody2D target in evaluate_targets)
 		{
+			if (!valid_targets.Contains(target)) continue;
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			Godot.Vector2 target_pos = (Godot.Vector2)target.Get("global_position");
 			float final_weight = 0.0f;
@@ -108,6 +102,7 @@ public partial class ChooseTarget : Action
 		Dictionary<float, RigidBody2D> weighted_targets = new Dictionary<float, RigidBody2D>();
 		foreach (RigidBody2D target in available_targets)
 		{
+			if (!valid_targets.Contains(target)) continue;
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			Godot.Vector2 target_pos = (Godot.Vector2)target.Get("global_position");
 			float agent_inf = Math.Abs(ship_wrapper.ApproxInfluence);
