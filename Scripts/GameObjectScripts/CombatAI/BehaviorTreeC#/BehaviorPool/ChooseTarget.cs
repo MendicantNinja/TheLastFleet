@@ -41,10 +41,7 @@ public partial class ChooseTarget : Action
 				GD.Print("target disposed or in queue for deletion");
 				continue;
 			}
-			if (ship_wrapper.GroupLeader == true)
-			{
-				valid_targets.Add(target);
-			}
+			valid_targets.Add(target);
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			float prob = (float)agent.Call("generate_combat_probability", target);
 
@@ -66,11 +63,6 @@ public partial class ChooseTarget : Action
 				evaluate_targets.Add(target);
 			}
 		}
-
-		if (ship_wrapper.GroupLeader == true)
-		{
-			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
-		}
 		
 		foreach (Node2D weapon in ship_wrapper.AllWeapons)
 		{
@@ -85,6 +77,7 @@ public partial class ChooseTarget : Action
 		float min_distance = sq_dist.Min();
 		foreach (RigidBody2D target in evaluate_targets)
 		{
+			if (!valid_targets.Contains(target)) continue;
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			Godot.Vector2 target_pos = (Godot.Vector2)target.Get("global_position");
 			float final_weight = 0.0f;
@@ -107,6 +100,7 @@ public partial class ChooseTarget : Action
 		Dictionary<float, RigidBody2D> weighted_targets = new Dictionary<float, RigidBody2D>();
 		foreach (RigidBody2D target in available_targets)
 		{
+			if (!valid_targets.Contains(target)) continue;
 			ShipWrapper target_wrapper = (ShipWrapper)target.Get("ShipWrapper");
 			Godot.Vector2 target_pos = (Godot.Vector2)target.Get("global_position");
 			float agent_inf = Math.Abs(ship_wrapper.ApproxInfluence);
@@ -133,10 +127,10 @@ public partial class ChooseTarget : Action
 			n_target = weighted_targets[max_prob];
 		}
 		//GD.Print(agent.Name, " targeting ", n_target.Name);
-		if (!IsInstanceValid(n_target))
+		if (valid_targets.Count < ship_wrapper.TargetedUnits.Count)
 		{
-			steer_data.TargetUnit = null;
-			ship_wrapper.TargetUnit = null;
+			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", valid_targets);
+			GD.Print("tried to set valid targets");
 			return NodeState.FAILURE;
 		}
 		Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)n_target.Get("targeted_by");

@@ -201,7 +201,7 @@ var target_unit: RigidBody2D = null:
 
 var targeted_units: Array[RigidBody2D] = []:
 	set(value):
-		ShipWrapper.SetTargetedUnits(value)
+		ShipWrapper.SetTargetedUnits(value, SteerData)
 		targeted_units = value
 
 var neighbor_units: Array = []:
