@@ -1,11 +1,15 @@
 extends LeafAction
 
 var fof_radius: float = 0.0
-var rad_coe: float = 2.0
+var rad_coe: float = 3.0
 var time: float = 0.0
 var delta: float = 0.0
+var debug: bool = false
 
 func tick(agent: Ship, blackboard: Blackboard) -> int:
+	if debug == true:
+		return FAILURE
+	
 	if fof_radius == 0.0:
 		fof_radius = agent.ShipNavigationAgent.radius * rad_coe
 	
@@ -15,9 +19,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var neighbors: Array = agent.neighbor_units
 	var friendly_neighbors: Array = []
 	for unit in neighbors:
-		if agent.is_friendly == true and unit.is_friendly == true:
-			friendly_neighbors.append(unit)
-		elif agent.is_friendly == false and unit.is_friendly == false:
+		if unit == null:
+			continue
+		if agent.is_friendly == unit.is_friendly:
 			friendly_neighbors.append(unit)
 	
 	var velocity: Vector2 = Vector2.ZERO
@@ -49,7 +53,9 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	if time > 4.0:
 		time = 0.0
 	var separation_velocity: Vector2 = strafe_direction[strafe_direction.keys().min()] * speed * time
-	var new_velocity: Vector2 = agent.heur_velocity + separation_velocity * 0.2
+	var new_velocity: Vector2 = agent.heur_velocity * 0.8 + separation_velocity * 0.2
+	if agent.combat_flag == true:
+		new_velocity = agent.heur_velocity * 0.5 + separation_velocity * 0.5
 	agent.time = time
 	agent.heur_velocity = new_velocity.limit_length(agent.speed)
 	agent.acceleration = new_velocity.limit_length(agent.speed)

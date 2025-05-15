@@ -2,14 +2,14 @@ extends Node2D
 class_name WeaponSlot
 
 # Nodes
-@onready var weapon_mount_image: Sprite2D = $WeaponNode/WeaponMountSprite
-@onready var weapon_image: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
-@onready var effective_range_shape: CollisionShape2D = $EffectiveRange/EffectiveRangeShape
-@onready var effective_range: Area2D = $EffectiveRange
-@onready var weapon_node: Node2D = $WeaponNode
-@onready var rate_of_fire_timer: Timer = $ROFTimer
+@onready var WeaponMountImage: Sprite2D = $WeaponNode/WeaponMountSprite
+@onready var WeaponImage: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
+@onready var EffectiveRangeShape: CollisionShape2D = $EffectiveRange/EffectiveRangeShape
+@onready var EffectiveRange: Area2D = $EffectiveRange
+@onready var WeaponNode: Node2D = $WeaponNode
+@onready var ROFTimer: Timer = $ROFTimer
+@onready var SoftlockTimer = $SoftlockTimer
 @onready var ContinuousFluxTimer = $ContinuousFluxTimer
-
 # Important Stuff
 @export var weapon_system_group: int = -1
 
@@ -18,15 +18,15 @@ class_name WeaponSlot
 		if value == null:
 			return
 		weapon = value
-		if weapon_image != null:
-			weapon_image.texture = value.image
+		if WeaponImage != null:
+			WeaponImage.texture = value.image
 		else:
 			return
 @export var weapon_mount: WeaponMount:
 	set(value):
 		weapon_mount = value
-		if weapon_mount_image != null:
-			weapon_mount_image.texture = value.image
+		if WeaponMountImage != null:
+			WeaponMountImage.texture = value.image
 		else:
 			return
 
@@ -48,27 +48,35 @@ var flux_overload: bool = false:
 var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
+var AI_enabled: bool = false
+var ai_debug: bool = false
 
 var range_display_color: Color = Color.SNOW
 var range_display_count: int = 64
 var range_display_width: float = 1.0
+var softlock_wait: float = 2.0
+var arc_in_radians: float = 0.0
+var default_direction: Transform2D
 
 var available_targets: Dictionary = {}
+var weighted_targets: Dictionary = {}: # key prob pair body
+	set(value):
+		weighted_targets = value
+
+var primary_target: RID = RID()
+var current_target: RID = RID()
+var owner_rid: RID = RID()
 var killcast: RayCast2D = null
-var arc_in_radians: float = 0.0
-var target_ship_position: Vector2 = Vector2.ZERO
 var last_valid_position: Vector2 = Vector2.ZERO
-var default_direction: Transform2D
 var target_unit: RID = RID()
 var current_target_id: RID = RID()
-var owner_rid: RID = RID()
 var shield_rid: RID = RID()
 
 # Special Beam Logic
 var current_beam: Projectile = null
 
 signal weapon_slot_fired(flux)
-signal target_in_range(slot, value)
+signal target_in_range(value)
 signal new_threats(targets)
 signal threat_exited(targets)
 
@@ -87,7 +95,7 @@ func fire(ship_id: int) -> void:
 		#weapon_slot_fired.emit(weapon.flux_per_second)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
-	projectile.global_transform = weapon_node.global_transform
+	projectile.global_transform = WeaponNode.global_transform
 	projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 	
 	if projectile.is_beam == true:
@@ -103,7 +111,7 @@ func fire(ship_id: int) -> void:
 	
 	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
-		rate_of_fire_timer.start()
+		ROFTimer.start()
 
 func stop_continuous_beam() -> void:
 	ContinuousFluxTimer.stop()
@@ -123,7 +131,7 @@ func _draw() -> void:
 		return
 	
 	var divisor: float = weapon.range # Change to effective range later from shipmods? Firing arcs need a bit of a rework sometime.
-	var subdivisions: int = floor(effective_range_shape.shape.radius / divisor)
+	var subdivisions: int = floor(EffectiveRangeShape.shape.radius / divisor)
 	var start_angle: float = deg_to_rad((-weapon_mount.firing_arc / 2))
 	var end_angle: float = deg_to_rad((weapon_mount.firing_arc / 2))
 	var start_transform: Vector2 = default_direction.x.rotated(start_angle)
@@ -132,23 +140,26 @@ func _draw() -> void:
 	end_angle = end_transform.angle()
 	if display_aim == true:
 		for i in range(0, subdivisions):
-			draw_arc(weapon_node.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
+			draw_arc(WeaponNode.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
 
 func _ready():
-	weapon_mount_image.texture = weapon_mount.image
-	weapon_image.texture = weapon.image
+	WeaponMountImage.texture = weapon_mount.image
+	WeaponImage.texture = weapon.image
 	
-	
-	rate_of_fire_timer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	killcast = create_killcast()
+	add_child(killcast)
+	SoftlockTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	ROFTimer.process_callback = Timer.TIMER_PROCESS_PHYSICS
+	SoftlockTimer.wait_time = 10.0
 	timer_fire = true
 	can_fire = false
-	rate_of_fire_timer.timeout.connect(_on_ROF_timeout)
-	
-	default_direction = weapon_node.transform
+	ROFTimer.timeout.connect(_on_ROF_timeout)
+	SoftlockTimer.timeout.connect(_on_Softlock_timeout)
+	default_direction = WeaponNode.transform
 	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
 	
-	effective_range.body_entered.connect(_on_EffectiveRange_entered)
-	effective_range.body_exited.connect(_on_EffectiveRange_exited)
+	EffectiveRange.body_entered.connect(_on_EffectiveRange_entered)
+	EffectiveRange.body_exited.connect(_on_EffectiveRange_exited)
 	
 	if weapon.is_continuous:
 		ContinuousFluxTimer.timeout.connect(func():  # Example value, replace with actual flux
@@ -160,19 +171,26 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	# Give everything railguns in dev mode for empty weapons
 	if settings.dev_mode == true and p_weapon_slot.weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
+		
+		var new_shape: Shape2D = CircleShape2D.new()
+		new_shape.radius = weapon.range
+		EffectiveRangeShape.shape = new_shape
+		
+		var interval_in_seconds: float = 1.0 / weapon.fire_rate
+		ROFTimer.wait_time = interval_in_seconds
 	else:
 		weapon = p_weapon_slot.weapon
-	weapon_system_group = p_weapon_slot.weapon_system_group
-	
-	var new_shape: Shape2D = CircleShape2D.new()
-	new_shape.radius = p_weapon_slot.weapon.range
-	effective_range_shape.shape = new_shape
-	
-	var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
-	rate_of_fire_timer.wait_time = interval_in_seconds
+		weapon_system_group = p_weapon_slot.weapon_system_group
+		
+		var new_shape: Shape2D = CircleShape2D.new()
+		new_shape.radius = p_weapon_slot.weapon.range
+		EffectiveRangeShape.shape = new_shape
+		
+		var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
+		ROFTimer.wait_time = interval_in_seconds
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
-	effective_range.collision_mask = mask
+	EffectiveRange.collision_mask = mask
 	is_friendly = friendly_value
 	owner_rid = owner_value
 	shield_rid = p_shield_rid
@@ -224,26 +242,117 @@ func set_manual_aim(aim_value: bool) -> void:
 func update_flux_overload(flux_state: bool) -> void:
 	flux_overload = flux_state
 
-# Assigns the RID of the ship the player targets to the variable target_unit.
-func set_target_unit(unit) -> void:
-	if unit == null:
-		target_unit = RID()
+# Assigns the RID of the ship the player targets to the variable primary_target.
+func set_primary_target(unit) -> void:
+	if AI_enabled == true and unit == null:
+		acquire_new_target_AI()
+	elif AI_enabled == true and unit != null:
+		primary_target = unit.get_rid()
+	elif unit == null and available_targets.size() > 0:
+		acquire_new_target()
+	elif unit == null:
+		primary_target = RID()
 	else:
-		target_unit = unit.get_rid()
+		primary_target = unit.get_rid()
 
 func toggle_display_aim(toggle: bool) -> void:
 	display_aim = toggle
 	queue_redraw()
 
-func _on_ROF_timeout() -> void:
-	timer_fire = true
+# Instance a new raycast anytime an "enemy" is within the generalized effective range.
+func create_killcast() -> RayCast2D:
+	var new_killcast: RayCast2D = RayCast2D.new()
+	new_killcast.collide_with_bodies = true
+	new_killcast.collide_with_areas = false
+	new_killcast.collision_mask = 15
+	new_killcast.enabled = true
+	return new_killcast
+
+# Returns a new transform to face the weapon in the direction of an "enemy" ship.
+# Returns the default transform which is the default direction it should face given nothing
+# is actually within its effective range.
+func face_weapon(target_position: Vector2) -> Transform2D:
+	var target_transform: Transform2D = WeaponNode.transform.looking_at(target_position)
+	var scale_transform: Vector2 = WeaponNode.scale
+	target_transform = target_transform.scaled(scale_transform)
+	var dot_product: float = default_direction.x.dot(target_transform.x)
+	var angle_to_node: float = acos(dot_product)
+	
+	can_look_at = true
+	if angle_to_node > arc_in_radians or dot_product < 0:
+		can_look_at = false
+	
+	if not can_look_at and manual_aim:
+		target_transform = WeaponNode.transform.looking_at(last_valid_position)
+	elif not can_look_at and not manual_aim:
+		return default_direction
+	elif can_look_at and manual_aim:
+		last_valid_position = target_position
+	
+	return target_transform
+
+func _physics_process(delta) -> void:
+	if ai_debug == true:
+		return
+	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
+		current_beam.global_transform = WeaponNode.global_transform
+		#current_beam.rotation = self.rotation
+	if flux_overload == true:
+		return
+	if manual_aim:
+		var mouse_position = to_local(get_global_mouse_position())
+		var face_direction: Transform2D = face_weapon(mouse_position)
+		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+	
+	if killcast.enabled == true and available_targets.is_empty() == false:
+		var target_position: Vector2 = Vector2.ZERO
+		if available_targets.has(primary_target):
+			target_position = to_local(available_targets[primary_target].global_position)
+		elif available_targets.has(current_target):
+			target_position = to_local(available_targets[current_target].global_position)
+		
+		killcast.target_position = target_position
+		killcast.force_raycast_update()
+		var collider = killcast.get_collider()
+		if collider is not Ship or collider == null: # Do not shoot at obstacles
+			can_fire = false
+		elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+			can_fire = false
+		else:
+			can_fire = true
+		
+		if can_fire == true:
+			var collision_point: Vector2 = to_local(killcast.get_collision_point())
+			var dist_to: float = position.distance_to(collision_point)
+			if dist_to > weapon.range:
+				can_fire = false
+			else:
+				can_fire = true
+		
+		if (auto_aim or auto_fire):
+			var face_direction: Transform2D = face_weapon(target_position)
+			WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+		
+		if can_look_at and can_fire and timer_fire and auto_fire:
+			fire(owner_rid.get_id())
+			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
+				target_in_range.emit(true)
+		
+		if available_targets.size() >= 1 and can_fire == false:
+			acquire_new_target()
+
+# this function has two purposes:
+# A) updates the raycast every physics frame to track a ship's current position
+# B) checks to see if a ship the player targets is within the effective range of the weapon
+#func update_killcast(delta) -> void:
 
 # Creates the context for a weapon's given situation.
 func _on_EffectiveRange_entered(body) -> void:
 	if body.get_rid() == owner_rid: 
 		return # ignore any overlap with other weapon slots
-	#elif is_friendly == body.is_friendly:
-		#return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
+	
+	if is_friendly == body.is_friendly:
+		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
 	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
 		return # ignore obstacle and projectile layers, respectively
 	
@@ -257,48 +366,40 @@ func _on_EffectiveRange_entered(body) -> void:
 	if raycast_query["collider"].get_collision_layer_value(2):
 		return # ignore if an obstacle is in the way
 	
-	if not killcast:
-		killcast = create_killcast()
-		add_child(killcast)
-	
 	var ship_id = body.get_rid()
-	if killcast and target_unit == ship_id:
-		killcast.target_position = to_local(body.global_position)
-		target_in_range.emit(self, true)
-		target_engaged = true
-		killcast.force_raycast_update()
-	elif killcast:
-		killcast.target_position = to_local(body.global_position)
-		current_target_id = ship_id
-		killcast.force_raycast_update()
-	
 	if not available_targets.has(ship_id):
 		available_targets[ship_id] = body
+	
+	if not weighted_targets.has(ship_id):
 		new_threats.emit(body)
+	
+	if AI_enabled == true:
+		EffectiveRange_entered_AI(body)
+	elif current_target == RID():
+		current_target = ship_id
+
+func EffectiveRange_entered_AI(body) -> void:
+	var ship_id = body.get_rid()
+	if available_targets.has(primary_target) and current_target != primary_target:
+		killcast.target_position = to_local(available_targets[primary_target].global_position)
+		current_target = primary_target
+		killcast.force_raycast_update()
+		if SoftlockTimer.is_stopped() == false:
+			SoftlockTimer.stop()
+	elif available_targets.has(current_target):
+		killcast.target_position = to_local(available_targets[current_target].global_position)
+		killcast.force_raycast_update()
+	else:
+		acquire_new_target_AI()
 
 # Flips bools, removes references, and attempts to find other targets, all based off different ships leaving
 # the effective range and the current combat situation.
 func _on_EffectiveRange_exited(body) -> void:
 	var ship_id: RID = body.get_rid()
-	
-	threat_exited.emit(body)
-	if ship_id == target_unit:
-		target_in_range.emit(self, false)
-	
 	available_targets.erase(ship_id)
 	
-	if killcast and available_targets.is_empty():
-		target_in_range.emit(self, false)
-		killcast.queue_free()
-		killcast = null
-
-# Instance a new raycast anytime an "enemy" is within the generalized effective range.
-func create_killcast() -> RayCast2D:
-	var new_killcast: RayCast2D = RayCast2D.new()
-	new_killcast.collide_with_bodies = true
-	new_killcast.collide_with_areas = false
-	new_killcast.collision_mask = effective_range.collision_mask
-	return new_killcast
+	if ship_id == primary_target:
+		SoftlockTimer.start()
 
 # If a weapon is not capable of firing on an existing target but more are around it,
 # this will try to find the nearest available target if it can. This function is
@@ -311,82 +412,54 @@ func acquire_new_target() -> void:
 	var rand_key_number: int = randi_range(0, taq_range)
 	var new_target_id: RID = ship_ids[rand_key_number]
 	var ship_instance: Ship = available_targets[new_target_id]
-	target_unit = ship_instance.get_rid()
+	current_target = ship_instance.get_rid()
 	killcast.target_position = to_local(ship_instance.global_position)
 	killcast.force_raycast_update()
 
-# Returns a new transform to face the weapon in the direction of an "enemy" ship.
-# Returns the default transform which is the default direction it should face given nothing
-# is actually within its effective range.
-func face_weapon(target_position: Vector2) -> Transform2D:
-	var target_transform: Transform2D = weapon_node.transform.looking_at(target_position)
-	var scale_transform: Vector2 = weapon_node.scale
-	target_transform = target_transform.scaled(scale_transform)
-	var dot_product: float = default_direction.x.dot(target_transform.x)
-	var angle_to_node: float = acos(dot_product)
-	
-	can_look_at = true
-	if angle_to_node > arc_in_radians or dot_product < 0:
-		can_look_at = false
-	
-	if not can_look_at and manual_aim:
-		target_transform = weapon_node.transform.looking_at(last_valid_position)
-	elif not can_look_at and not manual_aim:
-		return default_direction
-	elif can_look_at and manual_aim:
-		last_valid_position = target_position
-	
-	return target_transform
-
-func _physics_process(delta) -> void:
-	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
-		current_beam.global_transform = weapon_node.global_transform
-	
-	if flux_overload == true:
+# Acquire a new target if:
+# A) The primary target or current target is no longer available.
+# B) The weapon cannot fire on the primary target or current target.
+func acquire_new_target_AI() -> void:
+	if weighted_targets.is_empty():
 		return
-	if manual_aim:
-		var mouse_position = to_local(get_global_mouse_position())
-		var face_direction: Transform2D = face_weapon(mouse_position)
-		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
-	if killcast:
-		update_killcast(delta)
+	
+	var max_prob: float = weighted_targets.keys().max()
+	var max_targets: Array = weighted_targets[max_prob]
+	for target in max_targets:
+		if target == null:
+			continue
+		elif not available_targets.keys().has(target):
+			continue
+		elif available_targets.keys().has(target):
+			killcast.target_position = to_local(available_targets[target].global_position)
+			current_target = target
+			killcast.force_raycast_update()
+			return
+	
+	for prob in weighted_targets:
+		var enemies: Array = weighted_targets[prob]
+		for target in enemies:
+			if target == null:
+				continue
+			elif not available_targets.has(target):
+				continue
+			elif available_targets[target] == null:
+				continue
+			elif available_targets.has(target):
+				killcast.target_position = to_local(available_targets[target].global_position)
+				current_target = target
+				killcast.force_raycast_update()
+				return
+	current_target = RID()
 
-# this function has two purposes:
-# A) updates the raycast every physics frame to track a ship's current position
-# B) checks to see if a ship the player targets is within the effective range of the weapon
-func update_killcast(delta) -> void:
-	if available_targets.is_empty():
-		killcast.queue_free()
-	
-	var target_position: Vector2 = Vector2.ZERO
-	if target_unit != null and available_targets.has(target_unit):
-		target_position = to_local(available_targets[target_unit].global_position)
-	
-	killcast.target_position = target_position
-	killcast.force_raycast_update()
-	var collider = killcast.get_collider()
-	if not collider is Ship or collider == null: # Do not shoot at obstacles
-		can_fire = false
-	elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
-		can_fire == false
+func _on_ROF_timeout() -> void:
+	timer_fire = true
+
+func _on_Softlock_timeout() -> void:
+	if not available_targets.has(primary_target):
+		acquire_new_target_AI()
+		target_in_range.emit(false)
 	else:
-		can_fire = true
-	
-	if can_fire == true:
-		var collision_point: Vector2 = to_local(killcast.get_collision_point())
-		var dist_to: float = position.distance_to(collision_point)
-		if dist_to * 0.8 > weapon.range:
-			can_fire = false
-		else:
-			can_fire = true
-			target_position = collision_point
-	
-	if (auto_aim or auto_fire):
-		var face_direction: Transform2D = face_weapon(target_position)
-		weapon_node.transform = weapon_node.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
-	
-	if can_look_at and can_fire and timer_fire and auto_fire:
-		fire(owner_rid.get_id())
-	
-	if can_fire == false and available_targets.size() > 1:
-		target_in_range.emit(self, false)
+		target_in_range.emit(true)
+		current_target = primary_target
+		killcast.target_position = to_local(available_targets[primary_target].global_position)

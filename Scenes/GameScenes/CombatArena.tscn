@@ -1,30 +1,30 @@
 [gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
 [ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/admiral.gd" id="2_shfex"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_xxm3d"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="3_tnnyj"]
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="4_5naox"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="4_qi217"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="5_7otad"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_control_hud.gd" id="5_ojmr4"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="5_vrrkk"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/DetectEnemies.cs" id="6_b14u6"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/detect_enemies.gd" id="6_jorw7"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/ChooseStrategy.cs" id="7_pow8f"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_enemy_weakness.gd" id="7_sno18"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindEnemyWeakness.cs" id="8_47oij"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindTargetPositions.cs" id="9_3se3g"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/choose_strategy.gd" id="9_sdjo6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/find_target_positions.gd" id="10_4thlf"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FillGoalMap.cs" id="10_d4jl7"]
 [ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/fill_goal_map.gd" id="10_yugtf"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/AdmiralBehaviors/group_units.gd" id="11_iyhuv"]
 [ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/GroupUnits.cs" id="11_triqp"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
 [ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
@@ -156,37 +156,38 @@ unique_name_in_owner = true
 rect = Rect2(0, 0, 1, 1)
 
 [node name="Admiral" type="Node2D" parent="."]
-script = ExtResource("2_shfex")
+script = ExtResource("2_2u0vw")
 
 [node name="AdmiralAI" type="Node" parent="Admiral"]
-script = ExtResource("2_xxm3d")
+script = ExtResource("3_tnnyj")
+enabled = true
 
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
-script = ExtResource("4_5naox")
+script = ExtResource("4_qi217")
 
 [node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_vrrkk")
+script = ExtResource("5_7otad")
 
 [node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("6_jorw7")
+script = ExtResource("6_b14u6")
 
 [node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("9_sdjo6")
+script = ExtResource("7_pow8f")
 
 [node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("7_sno18")
+script = ExtResource("8_47oij")
 
 [node name="find target positions" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
-script = ExtResource("10_4thlf")
+script = ExtResource("9_3se3g")
 
 [node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_vrrkk")
+script = ExtResource("5_7otad")
 
 [node name="fill goal map" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("10_yugtf")
+script = ExtResource("10_d4jl7")
 
 [node name="group units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
-script = ExtResource("11_iyhuv")
+script = ExtResource("11_triqp")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3
@@ -308,6 +309,7 @@ process_mode = 3
 visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
+visible = false
 top_level = true
 z_index = 1
 offset_left = 9.0
@@ -764,9 +766,9 @@ anchor_left = 0.592
 anchor_top = 1.0
 anchor_right = 0.592
 anchor_bottom = 1.0
-offset_left = 634.36
+offset_left = 488.36
 offset_top = -1078.0
-offset_right = 931.36
+offset_right = 785.36
 offset_bottom = -1038.0
 grow_horizontal = 2
 grow_vertical = 0
@@ -799,12 +801,13 @@ text = "Camera Feed"
 unique_name_in_owner = true
 process_mode = 3
 top_level = true
-offset_left = 701.0
-offset_top = 706.0
-offset_right = 1106.0
-offset_bottom = 896.0
+offset_left = 9.0
+offset_top = 97.0
+offset_right = 589.0
+offset_bottom = 457.0
 mouse_filter = 2
 theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
 script = ExtResource("31_awwt3")
 
@@ -826,6 +829,7 @@ mouse_filter = 2
 [node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
 custom_minimum_size = Vector2(16, 0)
 layout_mode = 2
+focus_mode = 0
 texture_normal = ExtResource("32_md01c")
 ignore_texture_size = true
 stretch_mode = 5
@@ -835,8 +839,10 @@ layout_mode = 2
 text = "1/15"
 
 [node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+self_modulate = Color(0.374139, 0.374139, 0.374139, 1)
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+focus_mode = 0
 texture_normal = ExtResource("33_dc70j")
 ignore_texture_size = true
 stretch_mode = 5

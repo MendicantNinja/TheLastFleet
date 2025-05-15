@@ -1,6 +1,6 @@
 @icon("res://Art/MetaIcons/BehaviorTree/category_composite.svg")
 extends BehaviorTreeNode
-class_name Composite
+class_name GodotComposite
 
 func _ready():
 	if get_child_count() < 1:

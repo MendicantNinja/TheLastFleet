@@ -7,6 +7,7 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 	var nearby_enemy_groups: Array = []
 	var idle_neighbors: Array = []
 	var neighbor_groups: Array = []
+
 	for cell in agent.registry_neighborhood:
 		if not imap_manager.registry_map.has(cell):
 			continue

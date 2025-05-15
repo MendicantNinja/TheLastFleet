@@ -1,6 +1,6 @@
 extends LeafAction
 
-func tick(agent: Admiral, blackboard: Blackboard) -> int:
+func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 240 != 0:
 		return FAILURE
 	
@@ -8,7 +8,6 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	var player_vulnerability: Dictionary = {}
 	var goal_cells: Array = []
 	if not agent.control_points.is_empty():
-		goal_positions = agent.control_points
 		return SUCCESS
 	elif not agent.player_vulnerability.is_empty():
 		player_vulnerability = agent.player_vulnerability

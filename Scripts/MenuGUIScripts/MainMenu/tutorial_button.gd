@@ -15,12 +15,10 @@ func _process(delta: float) -> void:
 
 # Not actually new game, I just copy paste code.
 func on_button_pressed() -> void:
-	var scene = load("res://Scenes/GameScenes/CombatArena.tscn") as PackedScene
-	var instance = scene.instantiate()
-	get_tree().root.add_child(instance)
-	get_tree().current_scene.queue_free()
-	get_tree().current_scene = instance
-	instance.setup(true)
+	if %TutorialList.visible == true:
+		%TutorialList.visible = false
+	else:
+		%TutorialList.visible = true
 	
 
 func on_focus_entered() -> void:

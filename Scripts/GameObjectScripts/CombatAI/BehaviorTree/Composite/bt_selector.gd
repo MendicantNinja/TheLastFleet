@@ -1,5 +1,5 @@
 @icon("res://Art/MetaIcons/BehaviorTree/selector.svg")
-extends Composite
+extends GodotComposite
 class_name CompositeSelector
 
 func tick(agent, blackboard):

@@ -162,12 +162,13 @@ func find_unit_nearest_to_median(median: Vector2, unit_positions: Dictionary):
 	nearest_unit = distances_to_median[min_distance]
 	return nearest_unit
 
-
 func reset_group_leader(unit: Ship) -> void:
 	var group: Array = get_tree().get_nodes_in_group(unit.group_name)
 	var new_leader = null
 	var leader_key = &"leader"
-	if group.size() > 0 and group.size() <= 2:
+	if group.size() == 0:
+		return
+	elif group.size() > 0 and group.size() <= 2:
 		new_leader = group[0]
 	elif group.size() > 2:
 		var unit_positions: Dictionary = {}
@@ -177,7 +178,6 @@ func reset_group_leader(unit: Ship) -> void:
 		var median: Vector2 = geometric_median_of_objects(unit_positions.keys())
 		new_leader = find_unit_nearest_to_median(median, unit_positions)
 	
-	get_tree().call_group(unit.group_name, &"set_blackboard_data", leader_key, new_leader)
 	# maybe shift orders to new leader here
 	
 	if not unit.ShipNavigationAgent.is_navigation_finished():
@@ -199,7 +199,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var unit_speeds: Dictionary = {}
 	for unit: Ship in group:
 		unit_positions[unit.global_position] = unit
-		var size: float = (unit.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1)
+		var size: float = (unit.occupancy_radius)
 		occupancy_sizes.append(size)
 		if not unit.speed in unit_speeds:
 			unit_speeds[unit.speed] = []
@@ -211,7 +211,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
 	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
-		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.default_cell_size / 2)
+		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize * 1.5)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
 	var offsets: Array = []

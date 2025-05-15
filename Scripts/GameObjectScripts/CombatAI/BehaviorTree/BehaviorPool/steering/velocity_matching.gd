@@ -1,26 +1,37 @@
 extends LeafAction
 
-var debug: bool = false
-
 func tick(agent: Ship, blackboard: Blackboard) -> int:
-	if debug == true:
+	if Engine.get_physics_frames() % 120 != 0:
 		return FAILURE
 	
-	if agent.target_position == Vector2.ZERO or agent.group_name.is_empty() == true:
+	agent.match_velocity_flag = false
+	
+	if agent.posture == globals.Strategy.OFFENSIVE or agent.posture == globals.Strategy.EVASIVE:
+		return FAILURE
+	elif agent.group_name.is_empty() == true:
 		return FAILURE
 	
-	var speeds: Array = []
+	if agent.combat_flag == false and agent.fallback_flag == false and agent.retreat_flag == false and agent.vent_flux_flag == false:
+		agent.match_velocity_flag = true
+	
 	for unit in get_tree().get_nodes_in_group(agent.group_name):
-		speeds.append(unit.linear_velocity.length())
+		if unit == null:
+			continue
+		if unit.combat_flag == true:
+			agent.match_velocity_flag = false
+			break
 	
-	var velocity: Vector2 = agent.heur_velocity
-	var min_velocity: float = speeds.min()
-	if min_velocity == 0 or min_velocity > agent.speed:
+	if agent.match_velocity_flag == false:
 		return FAILURE
 	
-	if velocity.length() > min_velocity:
-		velocity = velocity.limit_length(min_velocity)
+	var speed: Array = []
+	for unit in get_tree().get_nodes_in_group(agent.group_name):
+		if unit == null:
+			continue
+		speed.append(unit.speed)
 	
-	agent.heur_velocity = velocity
-	agent.acceleration = velocity
+	var velocity: float = agent.heur_velocity.length()
+	var min_velocity: float = speed.min()
+	agent.match_speed = min_velocity
+	
 	return FAILURE

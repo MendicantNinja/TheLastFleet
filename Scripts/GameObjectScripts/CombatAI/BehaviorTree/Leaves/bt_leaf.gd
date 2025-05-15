@@ -1,6 +1,6 @@
 @icon("res://Art/MetaIcons/BehaviorTree/action.svg")
 extends BehaviorTreeNode
-class_name Leaf
+class_name GodotLeaf
 
 func _ready():
 	if get_child_count() != 0:

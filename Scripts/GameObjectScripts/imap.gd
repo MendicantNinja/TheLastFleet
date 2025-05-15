@@ -1,5 +1,5 @@
 extends Object
-class_name Imap
+class_name GDImap
 
 var anchor_location: Vector2
 var cell_size: int 
@@ -44,7 +44,7 @@ func clear_map() -> void:
 		row_reset.resize(width)
 		row_reset.fill(0.0)
 		map_grid[m] = row_reset
-		update_row_value.emit(m, row_reset) 
+		#update_row_value.emit(m, row_reset) 
 		# Might need that for debugging but unlikely
 
 @warning_ignore("integer_division", "narrowing_conversion")
@@ -80,7 +80,7 @@ func propagate_influence_as_ring(magnitude: float = 1.0, sigma: float = 1.0) -> 
 			set_cell_value(n, m, prop_value)
 
 @warning_ignore("integer_division")
-func add_map(source_map: Imap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
+func add_map(source_map: GDImap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
 	if source_map == null:
 		assert(source_map != null, "source map required for adding maps together is null")
 	
@@ -99,7 +99,7 @@ func add_map(source_map: Imap, center_row: int, center_column: int, magnitude: f
 				update_grid_value.emit(target_row, target_col, map_grid[target_row][target_col])
 
 @warning_ignore("integer_division")
-func subtract_map(source_map: Imap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
+func subtract_map(source_map: GDImap, center_row: int, center_column: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
 	if source_map == null:
 		assert(source_map != null, "source map required for adding maps together is null")
 	
@@ -118,7 +118,7 @@ func subtract_map(source_map: Imap, center_row: int, center_column: int, magnitu
 				update_grid_value.emit(target_row, target_col, map_grid[target_row][target_col])
 
 @warning_ignore("integer_division")
-func add_into_map(target_map: Imap, center_column: int, center_row: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
+func add_into_map(target_map: GDImap, center_column: int, center_row: int, magnitude: float = 1.0, offset_column: int = 0, offset_row: int = 0) -> void:
 	if target_map == null:
 		assert(target_map != null, "target map required for adding into current map is null")
 	

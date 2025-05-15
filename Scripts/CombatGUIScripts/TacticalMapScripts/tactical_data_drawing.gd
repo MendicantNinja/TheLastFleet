@@ -6,7 +6,6 @@ extends Node2D
 
 
 @onready var ship_list: Array[Ship]
-@onready var ship_registry: Dictionary = imap_manager.registry_map
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
@@ -15,6 +14,7 @@ extends Node2D
 @onready var DetectionTexture: TextureRect = $VisibilityLayerContainer/VisibilityLayer/DetectionRadius
 @onready var detection_list: Array[TextureRect]
 
+var ship_registry: Dictionary
 # Visuals
 var TacticalMapBackground: ColorRect
 var conversion_coeffecient_x: float
@@ -104,7 +104,7 @@ func _unhandled_input(event) -> void:
 		if Input.is_action_pressed("select") and box_selection_start > Vector2.ZERO:
 			box_selection_end = get_global_mouse_position()
 			queue_redraw()
-		elif Input.is_action_pressed("camera action"):
+		elif Input.is_action_pressed("camera_action"):
 			TacticalCamera.position -= event.relative / TacticalCamera.zoom
 	elif event is InputEventKey:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
@@ -211,7 +211,8 @@ func swap_camera_feed(ship: Ship) -> void:
 func setup() -> void:
 	#print("setup called")
 	# Check if new ships have been added or old ones died
-	var ship_arrays: Array = ship_registry.values()
+	var lol: Dictionary = imap_manager.GetRegistryMap()
+	var ship_arrays: Array = lol.values()
 	#print(ship_arrays.size())
 	for array in ship_arrays:
 		for ship in array:
@@ -332,7 +333,7 @@ func select_units() -> void:
 	var area_position: Vector2 = get_rect_start_position()
 	
 	var selection_icons: Array[TacticalMapIcon] = get_icons_in_box_selection(Rect2(area_position, size))
-	var selection: Array[Ship]
+	var selection: Array[RigidBody2D]
 	for icon in selection_icons:
 		selection.append(icon.assigned_ship)
 	#print("select_units called ", selection_icons, "and selection is ", selection)
@@ -496,7 +497,7 @@ func move_new_unit(to_position: Vector2) -> void:
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	new_leader.set_group_leader(true)
-	get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
+	#get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
 	  #.o.       ooooooooooooo ooooooooooooo       .o.         .oooooo.   oooo    oooo 
@@ -587,7 +588,6 @@ func _on_alt_select(ship: Ship) -> void:
 	print("alt select called")
 	if not visible:
 		return
-	
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	var highlighted_enemies: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
 	

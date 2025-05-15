@@ -103,7 +103,7 @@ func process_damage(projectile: Projectile) -> void:
 func toggle_shields(value: bool) -> void:
 	#var pass_through = 0
 	if value == true:
-		print("toggle shields called true")
+		#print("toggle shields called true")
 		ShieldShape.disabled = false
 		
 		ShieldVisuals.visible = true
@@ -138,12 +138,11 @@ func toggle_shields(value: bool) -> void:
 			await get_tree().create_timer(step_duration).timeout # Raise Shields Gradually
 		#polygon_array.append(Vector2(0, 0))
 	elif value == false:
-		ShieldShape.disabled = true
+		ShieldShape.set_deferred("disabled", true)
 		perimeter_points.clear()
 		ShieldShape.set_polygon(perimeter_points)
 		ShieldVisuals.set_polygon(perimeter_points)
 		ShieldVisuals.visible = value
-	pass
 	# Setup the shields parameters initially.
 func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: Ship) -> void:
 	add_collision_exception_with(ship)

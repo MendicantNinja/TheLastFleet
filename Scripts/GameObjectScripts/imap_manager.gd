@@ -1,5 +1,5 @@
 extends Node
-class_name ImapManager
+class_name GDImapManager
 
 var arena_width: int = 17000
 var arena_height: int = 20000
@@ -27,24 +27,25 @@ var friendly_cluster: Array = []
 var enemy_cluster: Array = []
 var template_maps: Dictionary = {}
 var agent_maps: Dictionary = {}
-var vulnerability_map: Imap
-var tension_map: Imap
-var weighted_imap: Imap
-var goal_map: Imap
+var vulnerability_map: GDImap
+var tension_map: GDImap
+var weighted_imap: GDImap
+var goal_map: GDImap
 var weighted_friendly: Dictionary = {}
 var weighted_enemy: Dictionary = {}
 var working_maps: Dictionary = {}
 var visited: Array = []
 
 func _init():
-	var occupancy_templates: ImapTemplate = ImapTemplate.new()
-	var threat_templates: ImapTemplate = ImapTemplate.new()
-	var invert_occupancy_templates: ImapTemplate = ImapTemplate.new()
-	var invert_threat_templates: ImapTemplate = ImapTemplate.new()
+	var longest_range: int = 2250 / default_cell_size
+	var occupancy_templates: GDImapTemplate = GDImapTemplate.new()
+	var threat_templates: GDImapTemplate = GDImapTemplate.new()
+	var invert_occupancy_templates: GDImapTemplate = GDImapTemplate.new()
+	var invert_threat_templates: GDImapTemplate = GDImapTemplate.new()
 	occupancy_templates.init_occupancy_map_templates(default_radius)
-	threat_templates.init_threat_map_templates(default_radius)
+	threat_templates.init_threat_map_templates(longest_range)
 	invert_occupancy_templates.init_occupancy_map_templates(default_radius, -1.0)
-	invert_threat_templates.init_threat_map_templates(default_radius, -1.0)
+	invert_threat_templates.init_threat_map_templates(longest_range, -1.0)
 	occupancy_templates.type = TemplateType.OCCUPANCY_TEMPLATE
 	threat_templates.type = TemplateType.THREAT_TEMPLATE
 	invert_occupancy_templates.type = TemplateType.INVERT_OCCUPANCY_TEMPLATE
@@ -54,7 +55,7 @@ func _init():
 	template_maps[invert_occupancy_templates.type] = invert_occupancy_templates
 	template_maps[invert_threat_templates.type] = invert_threat_templates
 
-func register_map(map: Imap) -> void:
+func register_map(map: GDImap) -> void:
 	agent_maps[map.map_type] = map
 
 func register_agents(agents: Array, goal: int = 0) -> void:
@@ -67,9 +68,9 @@ func register_agents(agents: Array, goal: int = 0) -> void:
 @warning_ignore("narrowing_conversion", "integer_division")
 func _on_agent_influence_changed(registered_cell: Vector2i, current_cell_idx: Vector2i, agent: Ship) -> void:
 	for imap_type in agent_maps:
-		var template_map: Imap = agent.template_maps[imap_type]
-		var map: Imap = agent_maps[imap_type]
-		#var adjust_imap: Imap = map.correct_influence(template_map, agent_cell, agent.global_position)
+		var template_map: GDImap = agent.template_maps[imap_type]
+		var map: GDImap = agent_maps[imap_type]
+		#var adjust_imap: GDImap = map.correct_influence(template_map, agent_cell, agent.global_position)
 		
 		var distance_to: float = 0.0
 		if agent.template_cell_indices.has(imap_type):
@@ -120,8 +121,8 @@ func _on_agent_destroyed(agent: Ship) -> void:
 	var cell_column: int = agent.global_position.x / default_cell_size
 	var cell_row: int = agent.global_position.y / default_cell_size
 	for imap_type in agent_maps:
-		var template_map: Imap = agent.template_maps[imap_type]
-		var map: Imap = agent_maps[imap_type]
+		var template_map: GDImap = agent.template_maps[imap_type]
+		var map: GDImap = agent_maps[imap_type]
 		map.add_map(template_map, cell_row, cell_column, -1.0)
 
 func _on_CombatArena_exiting() -> void:

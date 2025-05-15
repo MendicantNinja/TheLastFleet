@@ -1,10 +1,10 @@
 extends LeafAction
 
-func tick(agent: Admiral, blackboard: Blackboard) -> int:
+func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 480 != 0:
 		return FAILURE
 	
-	var goal_map: Imap = imap_manager.goal_map
+	var goal_map: GDImap = imap_manager.goal_map
 	var goal_value: Dictionary = agent.goal_value
 	
 	#goal_map = add_influence_map_to_goal_map(goal_map)
@@ -43,8 +43,8 @@ func tick(agent: Admiral, blackboard: Blackboard) -> int:
 	imap_manager.goal_map = goal_map
 	return FAILURE
 
-func propagate_goal_values(goal_map: Imap, agent: Admiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> Imap:
-	var inf_map: Imap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
+func propagate_goal_values(goal_map: GDImap, agent: GDAdmiral, radius: int, center: Vector2i, magnitude: float = 1.0, norm_val: float = 1.0) -> GDImap:
+	var inf_map: GDImap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
 	var start_col: int = max(0, center.y - radius)
 	var end_col: int = min(center.y + radius, goal_map.width)
 	var start_row: int = max(0, center.x - radius)
@@ -61,31 +61,5 @@ func propagate_goal_values(goal_map: Imap, agent: Admiral, radius: int, center: 
 			value += magnitude - n_mag * (distance / radius)
 			goal_map.map_grid[m][n] = value
 			goal_map.update_grid_value.emit(m, n, value)
-	
-	return goal_map
-
-func add_influence_map_to_goal_map(goal_map: Imap) -> Imap:
-	var inf_map: Imap = imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP]
-	var height: int = inf_map.height
-	var width: int = inf_map.width
-	
-	for m in range(height):
-		var source_min: float = inf_map.map_grid[m].min()
-		var source_max: float = inf_map.map_grid[m].max()
-		if source_min <= 0.0 and source_max == 0.0:
-			var fill_zero: Array = []
-			fill_zero.resize(width)
-			fill_zero.fill(0.0)
-			goal_map.map_grid[m] = fill_zero
-			#goal_map.update_row_value.emit(m, goal_map.map_grid[m])
-			continue
-		
-		for n in range(width):
-			var value: float = inf_map.map_grid[m][n]
-			if value < 0.0:
-				value = 0.0
-			goal_map.map_grid[m][n] = -value
-			if value != 0.0:
-				goal_map.update_grid_value.emit(m, n, goal_map.map_grid[m][n])
 	
 	return goal_map

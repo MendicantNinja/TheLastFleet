@@ -1,7 +1,5 @@
 extends LeafAction
 
-var target_position: Vector2 = Vector2.ZERO
-var occupancy_radius: float = 0.0
 var delta: float = 0.0
 var time: float = 0.0
 
@@ -14,29 +12,31 @@ func tick(agent: Ship, blackboard: Blackboard) -> int:
 		time = 0.0
 		return SUCCESS
 	
-	if occupancy_radius == 0.0:
+	if delta == 0.0:
 		delta = get_physics_process_delta_time()
-		var radius: int = agent.template_maps[imap_manager.MapType.OCCUPANCY_MAP].width - 1
-		occupancy_radius = (radius * imap_manager.default_cell_size) * target_coefficient
 	
 	var velocity: Vector2 = Vector2.ZERO
 	agent.heur_velocity = velocity
 	
-	if agent.group_leader == false and agent.target_position != target_position:
-		target_position = agent.target_position
-	elif agent.group_leader == true and target_position != agent.target_position:
-		target_position = agent.target_position
-		
-		if not imap_manager.working_maps.has(agent.group_name):
-			var cell = Vector2i(agent.target_position.y / imap_manager.default_cell_size, agent.target_position.x / imap_manager.default_cell_size)
-			var height: int = default_radius * imap_manager.default_cell_size
-			var width: int = default_radius * imap_manager.default_cell_size
-			var working_map: Imap = Imap.new(width, height, 0.0, 0.0, imap_manager.default_cell_size)
-			working_map.map_type = imap_manager.MapType.INFLUENCE_MAP
-			imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP].add_into_map(working_map, cell.y, cell.x)
-			imap_manager.working_maps[agent.group_name] = working_map
 	
-	var direction_to_path: Vector2 = agent.global_position.direction_to(target_position)
+	# In the future leaders will determine if they need to stop before encountering a group of enemies
+	# in the same area. That functionality does not exist yet, or at least, is up for consideration but
+	# not right now.
+	#if agent.group_leader == false and agent.target_position != target_position:
+		#target_position = agent.target_position
+	#elif agent.group_leader == true and target_position != agent.target_position:
+		#target_position = agent.target_position
+		#
+		#if not imap_manager.working_maps.has(agent.group_name):
+			#var cell = Vector2i(agent.target_position.y / imap_manager.default_cell_size, agent.target_position.x / imap_manager.default_cell_size)
+			#var height: int = default_radius * imap_manager.default_cell_size
+			#var width: int = default_radius * imap_manager.default_cell_size
+			#var working_map: Imap = Imap.new(width, height, 0.0, 0.0, imap_manager.default_cell_size)
+			#working_map.map_type = imap_manager.MapType.INFLUENCE_MAP
+			#imap_manager.agent_maps[imap_manager.MapType.INFLUENCE_MAP].add_into_map(working_map, cell.y, cell.x)
+			#imap_manager.working_maps[agent.group_name] = working_map
+	
+	var direction_to_path: Vector2 = agent.global_position.direction_to(agent.target_position)
 	
 	var speed_modifier: float = 0.0
 	if (agent.soft_flux + agent.hard_flux) == 0.0 and speed_modifier != agent.zero_flux_bonus:

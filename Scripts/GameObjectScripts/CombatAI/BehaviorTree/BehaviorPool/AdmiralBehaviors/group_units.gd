@@ -3,7 +3,7 @@ extends LeafAction
 var strength_modifier: float = 1.0
 var tmp_name: StringName = &"tmp"
 
-func tick(agent: Admiral, blackboard: Blackboard) -> int:
+func tick(agent: GDAdmiral, blackboard: Blackboard) -> int:
 	if Engine.get_physics_frames() % 240 != 0:
 		return FAILURE
 	

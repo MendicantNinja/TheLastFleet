@@ -51,7 +51,7 @@ func set_ship(ship: Ship) -> void:
 func setup_ship_registry() -> void: 
 	#ship_registry = imap_manager.registry_map.values()
 	ship_registry.clear()
-	ship_dictionary = imap_manager.registry_map
+	ship_dictionary =  imap_manager.GetRegistryMap()
 	var ship_arrays: Array = ship_dictionary.values()
 	for array in ship_arrays:
 		for ship in array:

@@ -12,14 +12,14 @@ var group_iterator: int = 0
 var deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
-
+var combat_goal: int = 0
 signal units_deployed(units)
 signal deploy_ship(ship)
 
 func _ready():
-	%All.pressed.connect(self.on_all_pressed)
-	%Cancel.pressed.connect(self.on_cancel_pressed)
-	%Deploy.pressed.connect(self.deploy_ships)
+	%All.pressed.connect(on_all_pressed)
+	%Cancel.pressed.connect(on_cancel_pressed)
+	%Deploy.pressed.connect(deploy_ships)
 	connect_buttons_lazy()
 	pass
 
@@ -28,6 +28,7 @@ func connect_buttons_lazy() -> void:
 		if child is TextureButton:
 			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
+
 # Reset this when a ship moves off of it's deployment position.
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -37,8 +38,8 @@ func reset_deployment_position() -> void:
 	# 					   . . . . <- ending position
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
 	deployment_position.y = PlayableAreaBounds.shape.size.y + deployment_spacing * 2 # Start topmost row.
-	if settings.debug_mode == true:
-		deployment_position.y = 5000 + deployment_spacing * 2
+	#if settings.debug_mode == true:
+		#deployment_position.y =  + deployment_spacing * 2
 	deployment_row = 0
 
 func on_icon_toggled(toggled_on: bool, this_icon: ShipIcon) -> void:
@@ -68,7 +69,6 @@ func deploy_ships() -> void:
 		if ship_icon == null or ship_icon.disabled:
 			continue
 		var ship_instantiation: Ship = ship_icon.ship.ship_hull.ship_packed_scene.instantiate()
-		ship_instantiation.is_friendly = true
 		ship_instantiation.collision_layer = 1
 		ship_instantiation.initialize(ship_icon.ship)
 		ship_icon.disabled = true
@@ -84,6 +84,7 @@ func deploy_ships() -> void:
 		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row))
 		ship_positions[ship_instantiation.global_position] = ship_instantiation
 		ship_instantiation.posture = globals.Strategy.NEUTRAL
+		ship_instantiation.add_to_group(&"friendly")
 		ship_instantiation.group_add(n_group_name)
 		iterator += 1
 	group_iterator += 1
@@ -91,11 +92,11 @@ func deploy_ships() -> void:
 	var new_leader: Ship = globals.find_unit_nearest_to_median(geo_median_ship, ship_positions)
 	var geo_median_formation: Vector2 = globals.geometric_median_of_objects(positions)
 	geo_median_formation.x -= 1000
-	geo_median_formation.y -= 1000
+	geo_median_formation.y -= 2000
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.register_agents(instantiated_units, int($"../../..".combat_goal))
+	imap_manager.RegisterAgents(instantiated_units, combat_goal)
 	%TacticalDataDrawing.delayed_setup_call()
 	
 	#var TDD = %TacticalDataDrawing # Used for debugging ship_registry and deployed ships

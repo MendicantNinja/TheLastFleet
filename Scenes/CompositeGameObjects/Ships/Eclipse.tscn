@@ -1,30 +1,17 @@
-[gd_scene load_steps=31 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=15 format=3 uid="uid://cu2fkh4ittsos"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="2_3lo0t"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="3_qa2sg"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="4_vxhja"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pathfinding.gd" id="5_l4wk6"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="6_x8egb"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/dynamic_avoidance.gd" id="7_wdwtq"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="8_boijx"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/identify_nearby_units.gd" id="9_vxtfh"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="10_0e18h"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="11_n3cja"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/vent_flux.gd" id="12_j1iu8"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="13_ewbox"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="14_iex7f"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/kiting.gd" id="15_ojcxh"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="16_bx147"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="17_t3uge"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_1p88k"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_j2tpj"]
+[ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_l7xku"]
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="20_de2qj"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_fuyaf"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="22_oob2k"]
 [ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="23_ajnna"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_n0517"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="25_q5s6h"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7ltrt"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_j1kb4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34wpx"]
 radius = 21.0
@@ -39,8 +26,6 @@ size = Vector2(37, 24)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fq2r4"]
 size = Vector2(21, 11)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
-
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
 collision_mask = 15
@@ -52,6 +37,20 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_p58et")
+
+[node name="AvoidanceArea" type="Area2D" parent="."]
+
+[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
+shape = SubResource("CircleShape2D_7ltrt")
+debug_color = Color(0.996078, 0, 0.203922, 0.47451)
+
+[node name="SeparationArea" type="Area2D" parent="."]
+
+[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
+shape = SubResource("CircleShape2D_j1kb4")
+debug_color = Color(0, 0.643137, 0.294118, 0.533333)
+
+[node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_l7xku")]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 z_index = 1
@@ -76,86 +75,6 @@ shape = SubResource("RectangleShape2D_fq2r4")
 [node name="CollisionShape2D5" type="CollisionShape2D" parent="."]
 position = Vector2(2, -27)
 shape = SubResource("RectangleShape2D_fq2r4")
-
-[node name="AvoidanceArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 0
-
-[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_7nfqu")
-
-[node name="CombatBehaviorTree" type="Node" parent="."]
-script = ExtResource("2_3lo0t")
-enabled = false
-
-[node name="main" type="Node" parent="CombatBehaviorTree"]
-script = ExtResource("3_qa2sg")
-
-[node name="navigation" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_vxhja")
-
-[node name="pathfinding" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("5_l4wk6")
-
-[node name="seek and arrive" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("6_x8egb")
-
-[node name="separation" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("17_t3uge")
-
-[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("7_wdwtq")
-
-[node name="align" type="Node" parent="CombatBehaviorTree/main/navigation"]
-script = ExtResource("8_boijx")
-
-[node name="combat" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_vxhja")
-
-[node name="identify nearby units" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("9_vxtfh")
-
-[node name="threat detection" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("10_0e18h")
-
-[node name="choose target" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("11_n3cja")
-
-[node name="vent flux" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("12_j1iu8")
-
-[node name="chill" type="Node" parent="CombatBehaviorTree/main/combat"]
-script = ExtResource("13_ewbox")
-
-[node name="combat steering" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_vxhja")
-
-[node name="pursue" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("14_iex7f")
-
-[node name="kiting" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("15_ojcxh")
-
-[node name="escape" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("16_bx147")
-
-[node name="separation" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("17_t3uge")
-
-[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("7_wdwtq")
-
-[node name="align" type="Node" parent="CombatBehaviorTree/main/combat steering"]
-script = ExtResource("8_boijx")
-
-[node name="enemy evaluation" type="Node" parent="CombatBehaviorTree/main"]
-script = ExtResource("4_vxhja")
-
-[node name="find goal" type="Node" parent="CombatBehaviorTree/main/enemy evaluation"]
-script = ExtResource("18_1p88k")
-
-[node name="detect skirmish units" type="Node" parent="CombatBehaviorTree/main/enemy evaluation"]
-script = ExtResource("19_j2tpj")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -196,6 +115,9 @@ wait_time = 4.0
 [node name="ShieldSlot" parent="." instance=ExtResource("23_ajnna")]
 
 [node name="DetectionArea" parent="." instance=ExtResource("25_q5s6h")]
+
+[node name="OverloadTimer" type="Timer" parent="."]
+process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
 
