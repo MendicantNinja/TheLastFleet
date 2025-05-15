@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://825w50grrkcp"]
+[gd_scene load_steps=18 format=3 uid="uid://825w50grrkcp"]
 
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/main_menu.gd" id="1_a5rc2"]
 [ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
@@ -11,8 +11,12 @@
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="6_4abs8"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial_button.gd" id="8_cro0t"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/skirmish_button.gd" id="8_jhx2c"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial_list.gd" id="10_mtb2c"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/fleet_refit_button.gd" id="11_laxuc"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial1_button.gd" id="11_t2okj"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial2_button.gd" id="12_lmynl"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/galaxy_button.gd" id="12_mn1n7"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial3_button.gd" id="13_saknw"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -87,6 +91,77 @@ theme = ExtResource("4_dnp8m")
 text = "TUTORIAL"
 scroll_active = false
 
+[node name="TutorialList" type="VBoxContainer" parent="ListContainer/Tutorial"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 542.0
+offset_top = -50.0
+offset_right = 1042.0
+offset_bottom = 258.0
+grow_vertical = 2
+script = ExtResource("10_mtb2c")
+
+[node name="Tutorial1" type="TextureButton" parent="ListContainer/Tutorial/TutorialList"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("11_t2okj")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/Tutorial/TutorialList/Tutorial1"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "1. Basic Controls and Camera"
+scroll_active = false
+
+[node name="Tutorial2" type="TextureButton" parent="ListContainer/Tutorial/TutorialList"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("12_lmynl")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/Tutorial/TutorialList/Tutorial2"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "2: Selection and Tactics"
+scroll_active = false
+
+[node name="Tutorial3" type="TextureButton" parent="ListContainer/Tutorial/TutorialList"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("13_saknw")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/Tutorial/TutorialList/Tutorial3"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "3: Manual Control and Weapons"
+scroll_active = false
+
 [node name="NewGameButton" type="TextureButton" parent="ListContainer"]
 unique_name_in_owner = true
 visible = false
@@ -157,6 +232,7 @@ scroll_active = false
 
 [node name="RefitButton" type="TextureButton" parent="ListContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 texture_normal = ExtResource("3_x54xu")
 texture_hover = ExtResource("6_4abs8")
@@ -177,6 +253,7 @@ scroll_active = false
 
 [node name="GalacticMap" type="TextureButton" parent="ListContainer"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 2
 texture_normal = ExtResource("3_x54xu")
 texture_hover = ExtResource("6_4abs8")

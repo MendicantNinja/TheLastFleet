@@ -163,9 +163,9 @@ var loadout_dictionary: Dictionary = {
 			weapon_dictionary.get(weapon_enum.RAILGUN),
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.RAILGUN),
-			weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.RAILGUN),
+			weapon_dictionary.get(weapon_enum.COMBATLASER),
+			weapon_dictionary.get(weapon_enum.COMBATLASER), 
+			weapon_dictionary.get(weapon_enum.COMBATLASER),
 			]
 	},
 	ship_type_enum.CHALLENGER: {
@@ -175,8 +175,8 @@ var loadout_dictionary: Dictionary = {
 			]
 	},
 	ship_type_enum.ECLIPSE: {
-		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.RAILGUN), 
+		loadout_enum.DEFAULT: [weapon_dictionary.get(weapon_enum.COMBATLASER), 
+			weapon_dictionary.get(weapon_enum.CBEAM), 
 			]
 	}
 }
@@ -278,6 +278,12 @@ enum sector_type_enum {
 	PIRATES = 3,
 	NEBULA = 4,
 }
+enum tutorial_type_enum {
+	NONE,
+	BASICS,
+	TACTICS,
+	MANUAL,
+}
 
 var localization_dictionary: Dictionary = {
 	# Random names
@@ -328,20 +334,23 @@ var localization_dictionary: Dictionary = {
 	&"flux": "flux",
 	# Relatively unique 1-off buttons "New Game, Load Game"
 	# Event-popups, tutorial walkthroughs, and other unique long texts.
-	&"tutorial_panning": "To zoom the camera on the map, scroll the mouse wheel up and down. To progress the tutorial, hold down the middle mouse button and move to pan the camera.",
+	&"tutorial_panning": "Let's get started with the basics for any strategy game: camera controls. To zoom the camera on the map, scroll the mouse wheel up and down. To progress the tutorial, hold down the middle mouse button and move to pan the camera.",
 	&"tutorial_deployment": "Press the G key, select some ships to deploy by clicking on their icon, which highlights them, and then press the Deploy button.",
 	&"tutorial_pause": "Good! It looks like our fleet is cruising onto the battlefield. With the ships deployed, press the spacebar key to pause the game.",
-	&"tutorial_selection": "Unpause the game by pressing spacebar. Now, click a friendly unit to select it. Drag select to select a group of units. Click and drag again in an empty area on the map to deselect all your units. To progress the tutorial, right click on the tactical map to start moving somewhere.",
-	&"tutorial_camera": "With the game unpaused and A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
 	&"tutorial_map": "Press the tab key to toggle the tactical map on and off. Lets try turning it on and then off again",
-	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship",
-	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S, rotate the ship with A/D, and strafe horizontally with Q/E. Lets try accelerating forward with W to progress the tutorial. Notice the speed indicator on the bottom right of the screen.",
-	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
-	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
-	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. Right click while in manual control to gradually raise your shields and stop enemy projectiles.",
+	
+	&"tutorial_selection": "Welcome to the tactics tutorial. To get started, click a friendly unit to select it. Drag select to select a group of units. Click and drag again in an empty area on the map to deselect all your units. To progress the tutorial, right click on the tactical map to start moving somewhere.",
 	&"tutorial_attack": "Finally, lets get this battle started. The last thing you should do is toggle your tactical map on with tab, click and drag to select all your friendly units, then when sighting the enemy, hold ctrl+click and drag over the enemy ships to attack them. Good luck commander.",
 	&"tutorial_battle": "Eliminate all enemy ships to progress the tutorial.",
 	&"tutorial_complete": "Looks like you've eliminated the enemy and completed the simulation. Press Escape and click Main Menu to go back to the main menu.",
+	
+	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship",
+	&"tutorial_camera": "Lets get into the combat arena and manual control of ships. The game unpaused and A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
+	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S. Notice the speed indicator on the bottom right of the screen. Strafing horizontally is done with Q/E and is slower than accelerating. Lastly, you can progress the tutorial by rotating the ship with A/D. Lets try rotating to the right to progress the tutorial.",
+	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
+	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
+	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. Right click while in manual control to gradually raise your shields and stop enemy projectiles.",
+	#Tutorial complete
 }
 
 func generate_random_name(p_sector_type: sector_type_enum) -> Array[String]: # Returns first and last name

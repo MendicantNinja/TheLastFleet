@@ -309,6 +309,7 @@ process_mode = 3
 visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
+visible = false
 top_level = true
 z_index = 1
 offset_left = 9.0
@@ -800,12 +801,13 @@ text = "Camera Feed"
 unique_name_in_owner = true
 process_mode = 3
 top_level = true
-offset_left = 701.0
-offset_top = 706.0
-offset_right = 1106.0
-offset_bottom = 896.0
+offset_left = 9.0
+offset_top = 97.0
+offset_right = 589.0
+offset_bottom = 457.0
 mouse_filter = 2
 theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
 script = ExtResource("31_awwt3")
 
@@ -836,6 +838,7 @@ layout_mode = 2
 text = "1/15"
 
 [node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+self_modulate = Color(0.374139, 0.374139, 0.374139, 1)
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 texture_normal = ExtResource("33_dc70j")

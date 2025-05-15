@@ -346,7 +346,7 @@ var ship_select: bool = false:
 		ship_selected.emit()
 
 var collision_flag: bool = false
-
+var ai_debug: bool = false
 # Custom signals.
 signal alt_select()
 signal camera_removed()
@@ -377,8 +377,7 @@ func deploy_ship() -> void:
 		ManualControlHUD =  get_tree().get_root().find_child("ManualControlHUD", true, false)
 		ManualControlLoadingBar =  get_tree().get_root().find_child("ManualControlLoadingBar", true, false)
 	if is_friendly == true:
-		#ConstantSizedGUI.modulate = Color8(64, 255, 0, 200) # green
-		print("deploy_ship called")
+		#print("deploy_ship called")
 		settings.swizzle(ConstantSizedGUI, settings.gui_color, false)
 		settings.swizzle($ShipLivery, settings.player_color)
 		ManualControlIndicator.self_modulate = settings.player_color 
@@ -509,10 +508,20 @@ func _ready() -> void:
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	OverloadTimer.timeout.connect(_on_OverloadTimer_timeout)
 	
-	set_combat_ai(true)
+	#set_combat_ai(true)
+	#if is_friendly == true and ai_debug == true:
+		#set_combat_ai(true)
+	#elif is_friendly == false and ai_debug == true:
+		#for weapon: WeaponSlot in all_weapons:
+			#weapon.ai_debug = true
 	deploy_ship()
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
+
+func tutorial_setup() -> void:
+	if is_friendly == false:
+		for weapon: WeaponSlot in all_weapons:
+			weapon.ai_debug = true
 
 func process_damage(projectile: Projectile) -> void:
 	## Spawn bullet hole directly on the ship

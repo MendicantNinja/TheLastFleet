@@ -103,7 +103,7 @@ func process_damage(projectile: Projectile) -> void:
 func toggle_shields(value: bool) -> void:
 	#var pass_through = 0
 	if value == true:
-		print("toggle shields called true")
+		#print("toggle shields called true")
 		ShieldShape.disabled = false
 		
 		ShieldVisuals.visible = true
