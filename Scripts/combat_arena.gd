@@ -120,10 +120,16 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 		if tutorial_enum == 1: # Basic movement and camera tutorial.
 			%TutorialWalkthrough.setup(tutorial_enum) # skip deployment, we dont want enemy ships
 		elif tutorial_enum == 2: # Tactics Tutorial.
+			deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+			deployment_position.y = PlayableAreaBounds.shape.size.y/2
+			deployment_row = 0
 			deploy_enemy_fleet(enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
 		elif tutorial_enum == 3: # Manual Control Tutorial
 			setup_enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
+			deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+			deployment_position.y = PlayableAreaBounds.shape.size.y/2# Start at the (bottommost, we're deploying enemies now) row.
+			deployment_row = 0
 			deploy_enemy_fleet(setup_enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
 		get_tree().call_group("enemy", "set_combat_ai", false)
@@ -133,7 +139,7 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.
-	reset_deployment_position()
+	#reset_deployment_position()
 	var positions: Array = []
 	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]

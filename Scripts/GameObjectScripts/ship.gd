@@ -508,7 +508,7 @@ func _ready() -> void:
 	AvoidanceArea.area_exited.connect(_on_AvoidanceShape_area_exited)
 	OverloadTimer.timeout.connect(_on_OverloadTimer_timeout)
 	
-	#set_combat_ai(true)
+	set_combat_ai(true)
 	#if is_friendly == true and ai_debug == true:
 		#set_combat_ai(true)
 	#elif is_friendly == false and ai_debug == true:
@@ -524,21 +524,6 @@ func tutorial_setup() -> void:
 			weapon.ai_debug = true
 
 func process_damage(projectile: Projectile) -> void:
-	## Spawn bullet hole directly on the ship
-	#var decal = preload("res://bulletdecal.tscn").instantiate()
-	#add_child(decal)
-	#
-	## Get ship sprite dimensions for random placement
-	#var sprite_size = ShipSprite.texture.get_size() * ShipSprite.scale
-	#
-	## Place decal randomly within ship bounds, using a smaller area to ensure decals stay within visible ship
-	#decal.position = Vector2(
-		#randf_range(-sprite_size.x/3, sprite_size.x/3),  # Using /3 instead of /2 to keep decals more centered
-		#randf_range(-sprite_size.y/3, sprite_size.y/3)   # Using /3 instead of /2 to keep decals more centered
-	#)
-	#decal.rotation = randf_range(0, 2 * PI)
-	#decal.scale = Vector2.ONE * randf_range(0.8, 1.2)
-	#
 	## Regular damage processing
 
 	combat_flag = true

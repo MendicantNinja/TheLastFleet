@@ -829,6 +829,7 @@ mouse_filter = 2
 [node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
 custom_minimum_size = Vector2(16, 0)
 layout_mode = 2
+focus_mode = 0
 texture_normal = ExtResource("32_md01c")
 ignore_texture_size = true
 stretch_mode = 5
@@ -841,6 +842,7 @@ text = "1/15"
 self_modulate = Color(0.374139, 0.374139, 0.374139, 1)
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
+focus_mode = 0
 texture_normal = ExtResource("33_dc70j")
 ignore_texture_size = true
 stretch_mode = 5

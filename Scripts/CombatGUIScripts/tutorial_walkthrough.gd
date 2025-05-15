@@ -52,12 +52,15 @@ func setup(tutorial_type: data.tutorial_type_enum) -> void:
 	if tutorial_type == 1: # Basics
 		steps = [ TutorialStep.new(&"tutorial_panning", data.get_text(&"tutorial_panning"), func(): return Input.is_action_just_pressed("camera_action")),
 		TutorialStep.new(&"tutorial_deployment", data.get_text(&"tutorial_deployment"), func(): return get_tree().get_nodes_in_group("friendly").size() > 0),
+		TutorialStep.new(&"tutorial_camera", data.get_text(&"tutorial_camera"), func(): return Input.is_action_just_pressed("camera_feed")),
 		TutorialStep.new(&"tutorial_map", data.get_text(&"tutorial_map"), func(): return Input.is_action_just_pressed("toggle_map")),
 		TutorialStep.new(&"tutorial_pause", data.get_text(&"tutorial_pause"), func(): return Input.is_action_just_pressed("pause")),
+		TutorialStep.new(&"tutorial_complete", data.get_text(&"tutorial_complete"), func(): return never_true)
 		]
 	
 	elif tutorial_type == 2: # Tactics
 		steps = [
+		TutorialStep.new(&"tutorial_deployment", data.get_text(&"tutorial_deployment"), func(): return get_tree().get_nodes_in_group("friendly").size() > 0),
 		TutorialStep.new(&"tutorial_selection", data.get_text(&"tutorial_selection"), func(): return detect_move_order()),
 		TutorialStep.new(&"tutorial_attack", data.get_text(&"tutorial_attack"), func(): return detect_attack_order()),
 		TutorialStep.new(&"tutorial_battle", data.get_text(&"tutorial_battle"), func(): return get_tree().get_nodes_in_group("enemy").size() == 0),
@@ -66,10 +69,12 @@ func setup(tutorial_type: data.tutorial_type_enum) -> void:
 	
 	elif tutorial_type == 3: # Manual
 		steps = [ 
+		TutorialStep.new(&"tutorial_manual", data.get_text(&"tutorial_manual"), func(): return Input.is_action_just_pressed("take_manual_control")),
 		TutorialStep.new(&"tutorial_movement", data.get_text(&"tutorial_movement"), func(): return Input.is_action_just_pressed("turn_right")),
 		TutorialStep.new(&"tutorial_weapons", data.get_text(&"tutorial_weapons"), func(): return Input.is_action_just_pressed("select_weapon_1")),
 		TutorialStep.new(&"tutorial_firing", data.get_text(&"tutorial_firing"), func(): return Input.is_action_just_pressed("select")),
 		TutorialStep.new(&"tutorial_shields", data.get_text(&"tutorial_shields"), func(): return Input.is_action_just_pressed("m2")),
+		TutorialStep.new(&"tutorial_battle", data.get_text(&"tutorial_battle"), func(): return get_tree().get_nodes_in_group("enemy").size() == 0),
 		TutorialStep.new(&"tutorial_complete", data.get_text(&"tutorial_complete"), func(): return never_true)
 		]
 	else:
