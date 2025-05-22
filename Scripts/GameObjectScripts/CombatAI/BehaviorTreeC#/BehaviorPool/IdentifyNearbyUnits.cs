@@ -1,8 +1,5 @@
 using Godot;
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
 
 public partial class IdentifyNearbyUnits : Action

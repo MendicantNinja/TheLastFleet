@@ -69,7 +69,7 @@ public partial class DetectSkirmishUnits : Action
         }
 
         // Already has targets or goal flag set
-        if (ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.GoalFlag)
+        if (ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.GoalFlag == true)
             return NodeState.SUCCESS;
 
         if (ship_wrapper.TargetedUnits.Count > 0 && ship_wrapper.GoalFlag == false)
@@ -108,8 +108,8 @@ public partial class DetectSkirmishUnits : Action
                 continue;
 
             ShipWrapper unit_wrapper = (ShipWrapper)unit.Get("ShipWrapper");
-            if (unit_wrapper.RegistryCell.X < 0 || unit_wrapper.RegistryCell.Y < 0)
-                continue;
+            if (unit_wrapper.RegistryCell.X < 0 || unit_wrapper.RegistryCell.Y < 0) continue;
+            else if (!ship_wrapper.RegistryNeighborhood.Contains(unit_wrapper.RegistryCell)) continue;
 
             if (!player_registry_cells.Contains(unit_wrapper.RegistryCell))
                 player_registry_cells.Add(unit_wrapper.RegistryCell);
@@ -122,8 +122,14 @@ public partial class DetectSkirmishUnits : Action
         }
 
         if (player_registry_cells.Count == 0)
+        {
+            if (ship_wrapper.GoalFlag == true)
+            {
+                GetTree().CallGroup(ship_wrapper.GroupName, "set_goal_flag", false);
+            }
             return NodeState.SUCCESS;
-
+        }
+        
         // For each cluster, calculate its aggregated strength and geographic median.
         Dictionary<ClusterKey, float> target_strength = new Dictionary<ClusterKey, float>();
         Dictionary<ClusterKey, Godot.Vector2> target_geo_median = new Dictionary<ClusterKey, Godot.Vector2>();
@@ -185,7 +191,7 @@ public partial class DetectSkirmishUnits : Action
         Godot.Collections.Array<RigidBody2D> target_units_final = registry_cluster[selectedCluster];
         GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", target_units_final);
         GetTree().CallGroup(ship_wrapper.GroupName, "set_goal_flag", true);
-        
+        GD.Print("hello");
         return NodeState.SUCCESS;
     }
 }

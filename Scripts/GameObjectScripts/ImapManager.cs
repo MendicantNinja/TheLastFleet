@@ -1,11 +1,8 @@
 using Godot;
 using InfluenceMap;
-using Globals;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using Microsoft.Win32;
 
 [GlobalClass]
 public partial class ImapManager : Node
@@ -34,7 +31,7 @@ public partial class ImapManager : Node
 	public int ArenaWidth = 17000;
 	public int ArenaHeight = 20000;
 	public int DefaultCellSize = 250;
-	public int MaxCellSize = 1000;
+	public int MaxCellSize = 2250;
 
 	public override void _Ready()
 	{
@@ -123,33 +120,33 @@ public partial class ImapManager : Node
 	}
 	
 	public void OnCombatArenaExiting()
-{
-	var availableAgents = GetTree().GetNodesInGroup("agent");
-	foreach (Node node in availableAgents)
 	{
-		if (node is RigidBody2D agent)
+		var availableAgents = GetTree().GetNodesInGroup("agent");
+		foreach (Node node in availableAgents)
 		{
-			ShipWrapper shipWrapper = (ShipWrapper)agent.Get("ShipWrapper");
+			if (node is RigidBody2D agent)
+			{
+				ShipWrapper shipWrapper = (ShipWrapper)agent.Get("ShipWrapper");
 
-			agent.RemoveFromGroup("agent");
+				agent.RemoveFromGroup("agent");
 
-			// Disconnect signals if needed (assuming they're connected manually elsewhere)
-			// These should match the signals you connect with +Connect(...) in C#
-			agent.Disconnect("update_agent_influence",  Callable.From(() =>OnUpdateAgentInfluence(agent)));
-			agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
-			agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
+				// Disconnect signals if needed (assuming they're connected manually elsewhere)
+				// These should match the signals you connect with +Connect(...) in C#
+				agent.Disconnect("update_agent_influence",  Callable.From(() =>OnUpdateAgentInfluence(agent)));
+				agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
+				agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
+			}
+		}
+
+		RegistryMap.Clear();
+		VulnerabilityMap.ClearMap();
+		TensionMap.ClearMap();
+
+		foreach (var map in AgentMaps.Values)
+		{
+			map.ClearMap();
 		}
 	}
-
-	RegistryMap.Clear();
-	VulnerabilityMap.ClearMap();
-	TensionMap.ClearMap();
-
-	foreach (var map in AgentMaps.Values)
-	{
-		map.ClearMap();
-	}
-}
 	
 	public void OnUpdateRegistryCell(RigidBody2D agent)
 	{
@@ -182,7 +179,7 @@ public partial class ImapManager : Node
 
 		RegistryMap[current_cell_idx] = agent_registry;
 		Godot.Collections.Array<Vector2I> registry_neighborhood = new Godot.Collections.Array<Vector2I>();
-		int radius = 1;
+		int radius = 2;
 		for (int m = -radius; m <= radius; m++)
 		{
 			for (int n = -radius; n <= radius; n++)

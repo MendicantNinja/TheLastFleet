@@ -80,7 +80,7 @@ public partial class FindEnemyWeakness : Action
 				target_cells[cell] = enemy_vuln_norm[cell];
 			}
 		}
-
+		
 		admiral.PlayerVulnerability = target_cells;
 		return NodeState.FAILURE;
 	}

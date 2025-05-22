@@ -11,7 +11,7 @@ public partial class Chill : Action
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		RigidBody2D n_agent = agent as RigidBody2D;
 
-		if (!Equals(steer_data.TargetPosition, Vector2.Zero) || steer_data.TargetUnit != null || ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
+		if (!Equals(steer_data.TargetPosition, Vector2.Zero) || IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetedUnits.Count > 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
 		{
 			if (steer_data.BrakeFlag == true) return NodeState.SUCCESS;
 			n_agent.LinearDamp = 0.0f;
@@ -19,14 +19,17 @@ public partial class Chill : Action
 		}
 
 		float current_speed = n_agent.LinearVelocity.Length();
-		if (Mathf.Floor(current_speed) > float.Epsilon)
+		if (current_speed > 1.0f)
 		{
 			steer_data.DesiredVelocity = Vector2.Zero;
-			steer_data.AvoidanceForce = Vector2.Zero;
-			steer_data.SeparationForce = Vector2.Zero;
-			n_agent.LinearDamp = 5.0f;
+			steer_data.AvoidanceWeight = 0.0f;
+			steer_data.SeparationWeight = 0.0f;
+			steer_data.CohesionWeight = 0.0f;
+			agent.Set("acceleration", Godot.Vector2.Zero);
+			//n_agent.LinearVelocity = Godot.Vector2.Zero;
+			n_agent.LinearDamp = 10.0f;
 		}
-		else if (current_speed <= float.Epsilon)
+		else if (current_speed <= 1.0f)
 		{
 			n_agent.LinearDamp = 0.0f;
 		}

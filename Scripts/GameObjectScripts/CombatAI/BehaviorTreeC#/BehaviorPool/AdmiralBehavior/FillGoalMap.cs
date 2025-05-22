@@ -27,10 +27,10 @@ public partial class FillGoalMap : Action
 			norm_val += 1.0f;
 		}
 		
-		if (admiral.IsolatedCells.Count == 0) norm_val = goal_value.Keys.Count;
+		if (norm_val == 0 && goal_value.Keys.Count > 0) norm_val = 1.0f;
 
 		if (norm_val == 0.0f) return NodeState.FAILURE;
-
+		
 		goal_map.ClearMap();
 		List<Vector2I> geo_mean_cell = new List<Vector2I>();
 		Node globals = GetTree().Root.GetNode("globals");

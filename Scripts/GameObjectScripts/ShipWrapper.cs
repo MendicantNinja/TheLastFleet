@@ -193,8 +193,14 @@ public partial class ShipWrapper : Node
 		CombatGoal = MapGoal[value];
 	}
 
-	public void SetTargetInRange(bool value)
+	public void SetTargetInRange(bool value, SteerData steer_data)
 	{
+		if (value == false)
+		{
+			TargetUnit = null;
+			steer_data.SetTargetUnit(null);
+			return;
+		}
 		TargetInRange = value;
 	}
 

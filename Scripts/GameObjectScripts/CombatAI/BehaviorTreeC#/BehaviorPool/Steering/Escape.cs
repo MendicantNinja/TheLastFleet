@@ -18,8 +18,6 @@ public partial class Escape : Action
 			speed += steer_data.ZeroFluxBonus;
 		}
 
-		RigidBody2D n_agent = agent as RigidBody2D;
-
 		steer_data.DesiredVelocity = steer_data.MoveDirection * speed;
 		return NodeState.FAILURE;
 	}

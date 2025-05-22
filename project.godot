@@ -181,6 +181,8 @@ avoidance/layer_3="EnemyShip"
 [physics]
 
 common/physics_jitter_fix=0.2
+2d/default_gravity=0.0
+2d/default_gravity_vector=Vector2(0, 0)
 2d/default_linear_damp=0.0
 2d/solver/contact_max_allowed_penetration=0.01
 

@@ -155,7 +155,7 @@ public partial class ThreatDetection : Action
 			{
 				string group_name = nearby_group_strength[strength];
 				float group_relative_strength = Mathf.Abs(strength / total_attacker_strength);
-				if (relative_strength >= 1.0f)
+				if (relative_strength + group_relative_strength >= 1.0f)
 				{
 					GetTree().CallGroup(group_name, "group_add", ship_wrapper.GroupName);
 					if (group_name != ship_wrapper.GroupName)

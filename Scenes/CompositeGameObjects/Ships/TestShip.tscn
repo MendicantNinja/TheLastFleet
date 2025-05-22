@@ -1,6 +1,7 @@
-[gd_scene load_steps=24 format=3 uid="uid://dkcoqur156tp1"]
+[gd_scene load_steps=25 format=3 uid="uid://dkcoqur156tp1"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
+[ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_14d1x"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="2_mkeft"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="3_1k0ti"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="4_mdrgk"]
@@ -37,6 +38,8 @@ gravity_scale = 0.0
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_sc1ei")
+
+[node name="ForceDebug" parent="." instance=ExtResource("2_14d1x")]
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 collision_layer = 0

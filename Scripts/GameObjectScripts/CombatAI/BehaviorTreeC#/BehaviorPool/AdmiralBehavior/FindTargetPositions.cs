@@ -67,7 +67,8 @@ public partial class FindTargetPositions : Action
 				}
 			}
 		}
-		
+
+		admiral.GoalValue = new Dictionary<Vector2I, float>();
 		if (vulnerability_cluster.Count == 0 && isolated_clusters.Count == 0) return NodeState.FAILURE;
 
 		Node globals = GetTree().Root.GetNode("globals");
@@ -75,11 +76,12 @@ public partial class FindTargetPositions : Action
 		Dictionary<Godot.Collections.Array<Vector2I>, Vector2I> isolated_geo_med = new Dictionary<Godot.Collections.Array<Vector2I>, Vector2I>();
 		foreach (Godot.Collections.Array<Vector2I> cluster in isolated_clusters.Keys)
 		{
+			/*
 			if (vulnerability_cluster.ContainsKey(cluster))
 			{
 				continue;
 			}
-
+			*/
 			Godot.Collections.Array<Vector2I> cells = isolated_clusters[cluster];
 			Godot.Vector2 geo_med = (Godot.Vector2)globals.Call("geometric_median_of_objects", cells);
 			isolated_geo_med[cluster] = new Vector2I((int)geo_med.X, (int)geo_med.Y);
@@ -104,9 +106,8 @@ public partial class FindTargetPositions : Action
 		}
 
 		Vector2I furthest_cell = dist_to_geo_med[dist_to_geo_med.Keys.Max()];
-		int goal_radius = (int)(Vector2I.Zero.DistanceTo(furthest_cell) / 2.0f);
+		int goal_radius = (int)(baseline.DistanceTo(furthest_cell) / 2.0f);
 		admiral.GoalRadius = goal_radius;
-		admiral.GoalValue = new Dictionary<Vector2I, float>();
 		foreach (Godot.Collections.Array<Vector2I> gm_cell in isolated_geo_med.Keys)
 		{
 			Vector2I goal_cell = isolated_geo_med[gm_cell];

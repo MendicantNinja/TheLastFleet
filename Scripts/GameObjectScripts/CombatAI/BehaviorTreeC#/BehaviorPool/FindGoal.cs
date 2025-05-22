@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 public partial class FindGoal : Action
-{   const int radius = 30;
+{   const int radius = 50;
 	Imap working_map = null;
     public override NodeState Tick(Node agent)
     {
@@ -31,7 +31,7 @@ public partial class FindGoal : Action
 		int cols = working_map.Width;
 		for (int m = 0; m < rows; m++)
 {
-			float maxVal = float.MinValue;
+			float maxVal = 0.0f;
 			int n = -1;
 
 			for (int i = 0; i < cols; i++)
@@ -53,7 +53,7 @@ public partial class FindGoal : Action
 
 		if (local_maximum.Count == 0) return NodeState.FAILURE;
 
-		float highest_value = float.MinValue;
+		float highest_value = 0.0f;
 		foreach (float key in local_maximum.Keys)
 		{
 			if (key > highest_value) highest_value = key;

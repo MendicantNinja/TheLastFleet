@@ -7,6 +7,7 @@ class_name Ship
 @onready var AvoidanceShape = $AvoidanceArea/AvoidanceShape
 @onready var SeparationArea = $SeparationArea
 @onready var SeparationShape = $SeparationArea/SeparationShape
+@onready var ForceDebug = $ForceDebug
 
 # Camera references needed for GUI scaling and some other things, signaling up is difficult. Processing overhead is terrible. Memory is insanely cheap for 2D games. Would have to involve passing the ships as a parameter and would be called repeatedly in process.
 @onready var CombatCamera = null
@@ -240,7 +241,9 @@ var targeted_by: Array[RigidBody2D] = []:
 
 var target_in_range: bool = false:
 	set(value):
-		#ShipWrapper.SetGoalFlag(value)
+		if value == false:
+			print("%s out of range of target %s and searching for other targets" % [name, target_unit.name])
+		ShipWrapper.SetTargetInRange(value, SteerData)
 		target_in_range = value
 
 var goal_flag: bool = false:
@@ -255,6 +258,10 @@ var brake_flag: bool = false:
 
 var retreat_flag: bool = false:
 	set(value):
+		if retreat_flag == false and value == true:
+			print(name, " is retreating")
+		elif retreat_flag == true and value == false:
+			print(name, " is no longer retreating")
 		ShipWrapper.SetRetreatFlag(value)
 		retreat_flag = value
 
@@ -289,14 +296,22 @@ var steer_debug: bool = true
 
 var separation_force: Vector2 = Vector2.ZERO:
 	set(value):
+		ForceDebug.separation_force = value
 		separation_force = value
 
 var avoidance_force: Vector2 = Vector2.ZERO:
 	set(value):
+		ForceDebug.avoidance_force = value
 		avoidance_force = value
+
+var cohesion_force: Vector2 = Vector2.ZERO:
+	set(value):
+		ForceDebug.cohesion_force = value
+		cohesion_force = value
 
 var goal_force: Vector2 = Vector2.ZERO:
 	set(value):
+		ForceDebug.goal_force = value
 		goal_force = value
 
 #var adj_template_maps: Dictionary = {}
@@ -346,7 +361,7 @@ var ship_select: bool = false:
 		ship_selected.emit()
 
 var collision_flag: bool = false
-var ai_debug: bool = true
+var ai_debug: bool = false
 
 # Custom signals.
 signal alt_select()
@@ -390,6 +405,9 @@ func deploy_ship() -> void:
 		settings.swizzle($ShipLivery, settings.enemy_color)
 
 func _ready() -> void:
+	if steer_debug == true:
+		ForceDebug.force_debug = true
+	
 	ShipWrapper = load("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
 	add_child(ShipWrapper)
 	ShipWrapper.name = &"ShipWrapper"
@@ -424,7 +442,6 @@ func _ready() -> void:
 	var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
 	ShipNavigationAgent.radius = new_radius
 	
-	SteerData.SetFOFRadius(new_radius)
 	var dissipation_coe: float = 12
 	passive_flux_dissipation = (ship_stats.flux_dissipation + ship_stats.bonus_flux_dissipation)
 	passive_flux_dissipation /= dissipation_coe
@@ -487,7 +504,7 @@ func _ready() -> void:
 	occupancy_radius = (ship_stats.acceleration + ship_stats.bonus_acceleration + zero_flux_bonus) / 60
 	occupancy_radius += 1
 	threat_radius = (longest_range / imap_manager.DefaultCellSize) + 1
-	
+	SteerData.SetOccupancyRadius(occupancy_radius * imap_manager.DefaultCellSize)
 	ShipWrapper.InitializeAgentImaps(self, imap_manager, occupancy_radius, threat_radius, collision_layer)
 	var separation_shape: Shape2D = CircleShape2D.new()
 	var separation_radius: float = new_radius * 5.0
@@ -515,6 +532,8 @@ func _ready() -> void:
 	elif is_friendly == false and ai_debug == true:
 		for weapon: WeaponSlot in all_weapons:
 			weapon.ai_debug = true
+	else:
+		set_combat_ai(true)
 	deploy_ship()
 	self.mouse_entered.connect(_on_mouse_entered)
 	self.mouse_exited.connect(_on_mouse_exited)
@@ -889,8 +908,6 @@ func set_navigation_position(to_position: Vector2) -> void:
 func _physics_process(delta: float) -> void:
 	if NavigationServer2D.map_get_iteration_id(ShipNavigationAgent.get_navigation_map()) == 0:
 		return
-	if steer_debug == true:
-		queue_redraw()
 	
 	# Calculating flux dissipation in multiple places throughout the code is prone to disaster. Put any additions or subtractions in here.
 	if Engine.get_physics_frames() % 5 == 0 and flux_overload == false:
@@ -928,7 +945,9 @@ func _physics_process(delta: float) -> void:
 		if soft_flux < 0.0:
 			soft_flux = 0.0
 		var current_flux: float = hard_flux + soft_flux
-		if current_flux == 0.0 and vent_flux_flag == true:
+		if floor(current_flux) == 0.0 and vent_flux_flag == true:
+			soft_flux = 0.0
+			hard_flux = 0.0
 			vent_flux_flag = false
 			for weapon in all_weapons:
 				weapon.flux_overload = false
@@ -963,11 +982,6 @@ func _physics_process(delta: float) -> void:
 		# if one wants to make the manually controlled hud less transparent than friendly ships
 		#var current_color: Color = ConstantSizedGUI.modulate
 		#ConstantSizedGUI.modulate = Color(current_color.r, current_color.g, current_color.b, 255)
-	
-	if linear_damp > 0.0 and sleeping == true:
-		linear_damp = 0.0
-		if collision_flag == true:
-			collision_flag = false
 	
 	if camera_feed == true:
 		CombatCamera.global_position = self.global_position
@@ -1026,11 +1040,6 @@ func _physics_process(delta: float) -> void:
 	# sigmoid
 	#velocity = ship_stats.acceleration / (1 + exp(-time))
 
-func _draw():
-	draw_line(Vector2.ZERO, transform.basis_xform_inv(avoidance_force), Color.RED)
-	draw_line(Vector2.ZERO, transform.basis_xform_inv(separation_force), Color.YELLOW)
-	draw_line(Vector2.ZERO, transform.basis_xform_inv(goal_force), Color.GREEN)
-
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	var force: Vector2 = acceleration
 	
@@ -1070,9 +1079,6 @@ func _on_target_in_range(value: bool) -> void:
 	
 	if oor_count == all_weapons.size():
 		target_in_range = false
-	
-	if target_in_range == false and (posture == globals.Strategy.OFFENSIVE):
-		print("%s out of range of target %s and searching for other targets" % [name, target_unit.name])
 
 func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
@@ -1218,8 +1224,13 @@ func _on_AvoidanceShape_body_entered(body) -> void:
 	neighbor_units = tmp_array
 
 func _on_AvoidanceShape_body_exited(body) -> void:
-	var tmp_array = neighbor_units
-	tmp_array.erase(body)
+	if body == self or body is StaticBody2D:
+		return
+	var tmp_array = []
+	for unit in neighbor_units:
+		if body == unit:
+			continue
+		tmp_array.append(unit)
 	neighbor_units = tmp_array
 
 func _on_AvoidanceShape_area_entered(projectile) -> void:
