@@ -245,6 +245,7 @@ func update_flux_overload(flux_state: bool) -> void:
 # Assigns the RID of the ship the player targets to the variable primary_target.
 func set_primary_target(unit) -> void:
 	if AI_enabled == true and unit == null:
+		primary_target = RID()
 		acquire_new_target_AI()
 	elif AI_enabled == true and unit != null:
 		primary_target = unit.get_rid()

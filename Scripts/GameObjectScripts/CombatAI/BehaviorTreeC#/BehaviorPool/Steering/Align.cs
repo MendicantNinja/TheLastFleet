@@ -9,7 +9,7 @@ public partial class Align : Action
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		if (ship_wrapper.FallbackFlag == true || ship_wrapper.VentFluxFlag == true || ship_wrapper.RetreatFlag == true)
 		{
-			return NodeState.FAILURE;
+			return NodeState.SUCCESS;
 		}
 
 		RigidBody2D n_agent = agent as RigidBody2D;

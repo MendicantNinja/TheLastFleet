@@ -55,9 +55,6 @@ script = ExtResource("19_tmvyf")
 [node name="separation" type="Node" parent="main/retreat"]
 script = ExtResource("7_53mr1")
 
-[node name="seek and arrive" type="Node" parent="main/retreat"]
-script = ExtResource("8_jr1hb")
-
 [node name="dynamic avoidance" type="Node" parent="main/retreat"]
 script = ExtResource("9_heqg7")
 
@@ -67,14 +64,14 @@ script = ExtResource("10_m4qwl")
 [node name="combat" type="Node" parent="main"]
 script = ExtResource("3_5kf7k")
 
+[node name="assess retreat" type="Node" parent="main/combat"]
+script = ExtResource("11_ckcrd")
+
 [node name="identify nearby units" type="Node" parent="main/combat"]
 script = ExtResource("11_8wnrg")
 
 [node name="threat detection" type="Node" parent="main/combat"]
 script = ExtResource("12_uy7mw")
-
-[node name="assess retreat" type="Node" parent="main/combat"]
-script = ExtResource("11_ckcrd")
 
 [node name="choose target" type="Node" parent="main/combat"]
 script = ExtResource("13_f6ufu")

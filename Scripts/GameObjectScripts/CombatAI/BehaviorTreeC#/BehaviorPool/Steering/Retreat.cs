@@ -18,6 +18,14 @@ public partial class Retreat : Action
             speed += steer_data.ZeroFluxBonus;
         }
 
+        if (steer_data.SeparationForce != Vector2.Zero)
+        {
+            steer_data.SeparationForce = Vector2.Zero;
+        }
+
+        // Check to see if there are no nearby agents, and if there are none, set the vent flux flag
+        // Use rotate_angle
+        
         steer_data.DesiredVelocity = move_direction * speed;
         return NodeState.FAILURE;
     }

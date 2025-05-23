@@ -5,6 +5,7 @@ using System.Threading;
 
 public partial class AssessRetreat : Action
 {
+    float ratio = 1.0f;
     public override NodeState Tick(Node agent)
     {
         if (Engine.GetPhysicsFrames() % 240 != 0) return NodeState.FAILURE;
@@ -75,7 +76,8 @@ public partial class AssessRetreat : Action
         // it is strike two.
         float total_strength = admiral_strength + player_strength;
         bool strike_two = false;
-
+        
+        /*
         if (ship_wrapper.IsFriendly == true)
         {
             GD.Print(agent.Name);
@@ -88,12 +90,13 @@ public partial class AssessRetreat : Action
             GD.Print((float)admiral_strength / total_strength);
             GD.Print();
         }
+        */
 
-        if (ship_wrapper.IsFriendly == true && (float)player_strength / total_strength <= 0.5f)
+        if (ship_wrapper.IsFriendly == true && (float)player_strength / total_strength <= ratio)
         {
             strike_two = true;
         }
-        else if (ship_wrapper.IsFriendly == false && (float)admiral_strength / total_strength <= 0.5f)
+        else if (ship_wrapper.IsFriendly == false && (float)admiral_strength / total_strength <= ratio)
         {
             strike_two = true;
         }
@@ -125,7 +128,7 @@ public partial class AssessRetreat : Action
             {
                 if (!IsInstanceValid(unit) || unit.IsQueuedForDeletion()) continue;
                 ShipWrapper unit_wrapper = (ShipWrapper)unit.Get("ShipWrapper");
-
+                
                 if (ship_wrapper.IsFriendly == true && ship_wrapper.IsFriendly == unit_wrapper.IsFriendly)
                 {
                     nearby_player_units++;
@@ -146,19 +149,41 @@ public partial class AssessRetreat : Action
         }
         
         // Assume problem spot here
-        if (nearby_player_units == 0 || nearby_admiral_units == 0) return NodeState.FAILURE;
-
-        if (ship_wrapper.IsFriendly == true && (float)nearby_player_units / nearby_admiral_units <= 0.5f)
+        if (ship_wrapper.IsFriendly == true && nearby_player_units == 0)
+        {
+            agent.Set("retreat_flag", true);  
+        }
+        else if (ship_wrapper.IsFriendly == false && nearby_admiral_units == 0)
         {
             agent.Set("retreat_flag", true);
         }
-        else if (ship_wrapper.IsFriendly == false && (float)nearby_admiral_units / nearby_player_units <= 0.5f)
+
+        if (nearby_player_units == 0 || nearby_admiral_units == 0) return NodeState.FAILURE;
+
+        int total_units = nearby_admiral_units + nearby_player_units;
+        if (ship_wrapper.IsFriendly == true && (float)nearby_player_units / total_units <= ratio)
+        {
+            agent.Set("retreat_flag", true);
+        }
+        else if (ship_wrapper.IsFriendly == false && (float)nearby_admiral_units / total_units <= ratio)
         {
             agent.Set("retreat_flag", true);
         }
         else if (ship_wrapper.RetreatFlag == true)
         {
             agent.Set("retreat_flag", false);
+        }
+
+        if (IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetUnit is not null)
+        {
+            RigidBody2D n_agent = agent as RigidBody2D;
+            Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
+			targeted_by.Remove(n_agent);
+			ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
+			agent.Call("set_target_unit", new Godot.Collections.Array<int>());
+			ship_wrapper.TargetUnit = null;
+			steer_data.TargetUnit = null;
+			agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
         }
         
         return NodeState.FAILURE;

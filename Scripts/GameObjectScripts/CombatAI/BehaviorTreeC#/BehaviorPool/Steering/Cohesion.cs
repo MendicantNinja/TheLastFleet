@@ -38,7 +38,7 @@ public partial class Cohesion : Action
         }
 
         arithmetic_median /= count;
-        if (arithmetic_median == Vector2.Zero)
+        if (arithmetic_median == Vector2.Zero || arithmetic_median == agent_pos)
         {
             steer_data.CohesionWeight = 0.0f;
             return NodeState.FAILURE;
@@ -48,20 +48,20 @@ public partial class Cohesion : Action
             steer_data.CohesionWeight = 1.0f;
         }
         /*
-                    float relative_dist = Vector2.DistanceSquared(agent_pos, arithmetic_median);
-                    float max_distance = 0.0f;
-                    foreach (Vector2 position in neighbor_positions)
+            float relative_dist = Vector2.DistanceSquared(agent_pos, arithmetic_median);
+            float max_distance = 0.0f;
+            foreach (Vector2 position in neighbor_positions)
+                {
+                    float dist = Vector2.DistanceSquared(position, arithmetic_median);
+                    if (dist > max_distance)
                     {
-                        float dist = Vector2.DistanceSquared(position, arithmetic_median);
-                        if (dist > max_distance)
-                        {
-                            max_distance = dist;
-                        }
+                        max_distance = dist;
                     }
+                }
 
-                    float dist_weight = relative_dist / max_distance;
-                    float inf_weight = ship_wrapper.ApproxInfluence / max_influence;
-                    */
+            float dist_weight = relative_dist / max_distance;
+            float inf_weight = ship_wrapper.ApproxInfluence / max_influence;
+        */
 
         Vector2 direction_to = SteerData.DirectionTo(agent_pos, arithmetic_median);
 

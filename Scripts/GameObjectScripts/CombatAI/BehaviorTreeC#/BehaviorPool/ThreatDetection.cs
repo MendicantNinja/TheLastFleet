@@ -19,7 +19,7 @@ public partial class ThreatDetection : Action
 		{
 			return NodeState.FAILURE;
 		}
-		else if (ship_wrapper.VentFluxFlag || ship_wrapper.FallbackFlag || ship_wrapper.RetreatFlag)
+		else if (ship_wrapper.VentFluxFlag == true || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
 		{
 			return NodeState.FAILURE;
 		}

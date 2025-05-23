@@ -11,7 +11,7 @@ public partial class ChooseTarget : Action
 	public override NodeState Tick(Node agent)
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		if (ship_wrapper.TargetedUnits.Count == 0 || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true || ship_wrapper.VentFluxFlag == true)
+		if (ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true || ship_wrapper.VentFluxFlag == true || ship_wrapper.TargetedUnits.Count == 0)
 		{
 			return NodeState.FAILURE;
 		}

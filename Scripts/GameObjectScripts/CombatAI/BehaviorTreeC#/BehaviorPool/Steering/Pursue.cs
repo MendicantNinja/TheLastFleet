@@ -9,12 +9,12 @@ public partial class Pursue : Action
 	public override NodeState Tick(Node agent)
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		if (!IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetUnit is null)
+		if (ship_wrapper.RetreatFlag == true || !IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetUnit is null)
 		{
 			return NodeState.SUCCESS;
 		}
 		
-		if (ship_wrapper.VentFluxFlag == true || ship_wrapper.FallbackFlag == true || ship_wrapper.RetreatFlag == true)
+		if (ship_wrapper.VentFluxFlag == true || ship_wrapper.FallbackFlag == true)
 		{
 			return NodeState.FAILURE;
 		}
@@ -29,7 +29,7 @@ public partial class Pursue : Action
 
 		RigidBody2D n_agent = agent as RigidBody2D;
 		ShipWrapper target_wrapper = (ShipWrapper)ship_wrapper.TargetUnit.Get("ShipWrapper");
-		if (ship_wrapper.CombatFlag == true && ship_wrapper.TargetInRange == false && (target_wrapper.FallbackFlag == true || target_wrapper.RetreatFlag == true))
+		if (ship_wrapper.CombatFlag == true && ship_wrapper.TargetInRange == false && target_wrapper.FallbackFlag == true)
 		{
 			Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
 			targeted_by.Remove(n_agent);

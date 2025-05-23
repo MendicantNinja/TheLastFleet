@@ -9,7 +9,7 @@ public partial class FindGoal : Action
     public override NodeState Tick(Node agent)
     {
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-        if (ship_wrapper.IsFriendly == true) return NodeState.SUCCESS;
+        if (ship_wrapper.IsFriendly == true || ship_wrapper.RetreatFlag == true) return NodeState.SUCCESS;
         
         if (Engine.GetPhysicsFrames() % 720 == 0 || ship_wrapper.DeployFlag == false || ship_wrapper.GroupLeader == false) return NodeState.SUCCESS;
 

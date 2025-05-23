@@ -258,7 +258,7 @@ var brake_flag: bool = false:
 
 var retreat_flag: bool = false:
 	set(value):
-		if retreat_flag == false and value == true:
+		if value == true:
 			print(name, " is retreating")
 		elif retreat_flag == true and value == false:
 			print(name, " is no longer retreating")
@@ -846,11 +846,11 @@ func toggle_manual_camera_freelook(toggle_status: bool) -> void:
 	 #`888'    `888'       888       o  .8'     `888.   888         `88b    d88'  8       `888  oo     .d8P 
 	  #`8'      `8'       o888ooooood8 o88o     o8888o o888o         `Y8bood8P'  o8o        `8  8""88888P'  
 
-func set_target_for_weapons(unit) -> void:
-	if unit is Array:
-		unit = null
+func set_target_for_weapons(target) -> void:
+	if target is not RigidBody2D:
+		target = null
 	for weapon in all_weapons:
-		weapon.set_primary_target(unit)
+		weapon.set_primary_target(target)
 
 func fire_weapon_system(weapon_system: Array[WeaponSlot]) -> void:
 	if vent_flux_flag == true or flux_overload == true:
@@ -1098,7 +1098,9 @@ func remove_blackboard_data(key: Variant) -> void:
 	blackboard.remove_data(key)
 
 func set_target_unit(target) -> void:
-	if target is Array:
+	if target is RigidBody2D:
+		target_unit = target
+	else:
 		target_unit = null
 
 func set_targets(targets: Array) -> void:
@@ -1128,8 +1130,8 @@ func generate_combat_probability(enemy: Ship) -> float:
 	var target_inf: float = abs(enemy.approx_influence)
 	var threat_weight: float = agent_inf / (agent_inf + target_inf)
 	var flux_weight: float = total_flux / (enemy.total_flux + total_flux)
-	var weapon_weight: float = all_weapons.size() / (enemy.all_weapons.size() + all_weapons.size())
-	var prob: float = (threat_weight + flux_weight + weapon_weight) / 3.0
+	var weapon_modifier: float = enemy.all_weapons.size() / all_weapons.size()
+	var prob: float = (threat_weight + flux_weight) / (2.0 * weapon_modifier)
 	return prob
 
 # Feel like this is obvious if you need to write a comment to make more sense of it be my guest.
