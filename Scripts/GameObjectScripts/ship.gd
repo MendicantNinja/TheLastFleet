@@ -582,7 +582,9 @@ func destroy_ship() -> void:
 	remove_from_group(group_name)
 	if group_leader == true:
 		globals.reset_group_leader(self)
-	
+	for weapon in all_weapons:
+		if weapon.current_beam != null:
+			weapon.stop_continuous_beam()
 	var visited_group: Array = []
 	for attacker in targeted_by:
 		if attacker == null or attacker.is_queued_for_deletion():

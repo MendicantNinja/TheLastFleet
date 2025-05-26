@@ -1,14 +1,14 @@
-[gd_scene load_steps=11 format=3 uid="uid://c2gpnr0o720b0"]
+[gd_scene load_steps=12 format=3 uid="uid://c2gpnr0o720b0"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
+[ext_resource type="PackedScene" uid="uid://cjllo8sl6lu3f" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_8fsu5"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_twxmv"]
+[ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_bgygg"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_ar06l"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_4sljk"]
 [ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="22_tl4ag"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_px6v0"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="24_088hk"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_7nfqu"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sohox"]
 radius = 45.0
@@ -27,19 +27,9 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_ttka1")
 
-[node name="AvoidanceArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 0
+[node name="AvoidanceArea" parent="." instance=ExtResource("2_8fsu5")]
 
-[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_7nfqu")
-
-[node name="SeparationArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 0
-
-[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
-shape = SubResource("CircleShape2D_7nfqu")
+[node name="SeparationArea" parent="." instance=ExtResource("3_bgygg")]
 
 [node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_twxmv")]
 

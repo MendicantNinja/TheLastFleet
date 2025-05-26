@@ -162,7 +162,7 @@ var loadout_dictionary: Dictionary = {
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
 			weapon_dictionary.get(weapon_enum.RAILGUN),
 			weapon_dictionary.get(weapon_enum.RAILGUN), 
-			weapon_dictionary.get(weapon_enum.RAILGUN), 
+			weapon_dictionary.get(weapon_enum.COMBATLASER), 
 			weapon_dictionary.get(weapon_enum.COMBATLASER),
 			weapon_dictionary.get(weapon_enum.COMBATLASER), 
 			weapon_dictionary.get(weapon_enum.COMBATLASER),

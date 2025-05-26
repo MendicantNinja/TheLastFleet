@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://cjodxcc5hk7h0"]
+[gd_resource type="Resource" script_class="Weapon" load_steps=4 format=3 uid="uid://cjodxcc5hk7h0"]
 
 [ext_resource type="Texture2D" uid="uid://xivfxiqcx6a5" path="res://Art/WeaponArt/plasma_gun.png" id="1_jcdet"]
-[ext_resource type="AudioStream" uid="uid://dfhsrfw5vapis" path="res://Sounds/Combat/WeaponSounds/C-Beam/plasmapistol_shot-46304.mp3" id="1_tcg7j"]
 [ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_tmndf"]
 [ext_resource type="PackedScene" uid="uid://dbjqnxtn41fqd" path="res://Scenes/CompositeGameObjects/Projectiles/CesiumLanceProjectile.tscn" id="3_1dliw"]
 
@@ -12,7 +11,6 @@ item_enum = 6
 weapon_size = 1
 image = ExtResource("1_jcdet")
 armament_points = 0
-firing_sound = ExtResource("1_tcg7j")
 projectile_scene = ExtResource("3_1dliw")
 projectile_speed = 0.0
 damage_type = 3

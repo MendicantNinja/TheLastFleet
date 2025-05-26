@@ -1,17 +1,15 @@
 [gd_scene load_steps=15 format=3 uid="uid://cu2fkh4ittsos"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
+[ext_resource type="PackedScene" uid="uid://cjllo8sl6lu3f" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_4ia47"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_l7xku"]
+[ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_0sd6m"]
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="20_de2qj"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_fuyaf"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="22_oob2k"]
 [ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="23_ajnna"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="24_n0517"]
 [ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="25_q5s6h"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_7ltrt"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_j1kb4"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_34wpx"]
 radius = 21.0
@@ -38,17 +36,9 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_p58et")
 
-[node name="AvoidanceArea" type="Area2D" parent="."]
+[node name="AvoidanceArea" parent="." instance=ExtResource("2_4ia47")]
 
-[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_7ltrt")
-debug_color = Color(0.996078, 0, 0.203922, 0.47451)
-
-[node name="SeparationArea" type="Area2D" parent="."]
-
-[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
-shape = SubResource("CircleShape2D_j1kb4")
-debug_color = Color(0, 0.643137, 0.294118, 0.533333)
+[node name="SeparationArea" parent="." instance=ExtResource("3_0sd6m")]
 
 [node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_l7xku")]
 

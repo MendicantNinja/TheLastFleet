@@ -800,6 +800,7 @@ text = "Camera Feed"
 [node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
 unique_name_in_owner = true
 process_mode = 3
+visible = false
 top_level = true
 offset_left = 9.0
 offset_top = 97.0

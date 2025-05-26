@@ -2,14 +2,12 @@
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_2pkbv"]
+[ext_resource type="PackedScene" uid="uid://cjllo8sl6lu3f" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_sc7p2"]
+[ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_4aruk"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_jhvh6"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="21_lqqcs"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="22_2xr57"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_0nlic"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_vl5ll"]
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_3xm5p"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_gh8vd"]
 radius = 40.0
@@ -24,19 +22,9 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_sc1ei")
 
-[node name="AvoidanceArea" type="Area2D" parent="."]
-collision_layer = 0
-collision_mask = 0
+[node name="AvoidanceArea" parent="." instance=ExtResource("2_sc7p2")]
 
-[node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_vl5ll")
-debug_color = Color(0, 0.6, 0.701961, 0)
-
-[node name="SeparationArea" type="Area2D" parent="."]
-
-[node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
-shape = SubResource("CircleShape2D_3xm5p")
-debug_color = Color(0, 0.6, 0.701961, 0)
+[node name="SeparationArea" parent="." instance=ExtResource("3_4aruk")]
 
 [node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_2pkbv")]
 

@@ -90,9 +90,9 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	
-	#if settings.dev_mode == true:
-		#deploy_enemy_fleet(enemy_fleet)
+	# Comment this back in if you need ships to deploy and are starting CombatArena as the main scene.
+	if settings.dev_mode == true:
+		deploy_enemy_fleet()
 	
 func reset_deployment_position() -> void:
 	# Start outside the map. Spawn ships starting at the top left quadrant of our 3 rowed, 7 columned rectangular ship formation.
@@ -100,12 +100,16 @@ func reset_deployment_position() -> void:
 	# starting position -> . . . . 
 	# 					   . . . .
 	# 					   . . . . <- ending position
+	#deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+	#deployment_position.y = 0 - deployment_spacing * 2# Start at the (bottommost, we're deploying enemies now) row.
+	
+	# For debugging
 	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-	deployment_position.y = 0 - deployment_spacing * 2# Start at the (bottommost, we're deploying enemies now) row.
+	deployment_position.y = PlayableAreaBounds.shape.size.y/2 # Deploy at the center
 	deployment_row = 0
 
 # Called after ready to import parameters like tutorial mode or the enemy fleet.
-func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = data.tutorial_type_enum.NONE) -> void:
+func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = 0) -> void:
 	var setup_enemy_fleet: Fleet = enemy_fleet
 	if tutorial_enum == 0:
 		%TutorialWalkthrough.visible = false
@@ -116,20 +120,13 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 		%TutorialWalkthrough.visible = true
 		$TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/FogOfWar.visible = false
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_ALWAYS
-		
 		if tutorial_enum == 1: # Basic movement and camera tutorial.
 			%TutorialWalkthrough.setup(tutorial_enum) # skip deployment, we dont want enemy ships
 		elif tutorial_enum == 2: # Tactics Tutorial.
-			deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-			deployment_position.y = PlayableAreaBounds.shape.size.y/2
-			deployment_row = 0
 			deploy_enemy_fleet(enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
 		elif tutorial_enum == 3: # Manual Control Tutorial
 			setup_enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
-			deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-			deployment_position.y = PlayableAreaBounds.shape.size.y/2# Start at the (bottommost, we're deploying enemies now) row.
-			deployment_row = 0
 			deploy_enemy_fleet(setup_enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
 		get_tree().call_group("enemy", "set_combat_ai", false)
@@ -139,7 +136,7 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.
-	#reset_deployment_position()
+	reset_deployment_position()
 	var positions: Array = []
 	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]

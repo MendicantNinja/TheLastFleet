@@ -11,6 +11,7 @@ var shield_radius: float = 0.0
 var shield_raise_time: float = 1.0
 var aabb : Rect2 # Axis-Aligned Bounding Box, used to make an ellipse.
 var shield_color: Color
+var is_friendly: bool
 
 var theta: float
 var samples: int # More points = more of an accurate circle shape
@@ -25,6 +26,7 @@ func _ready() -> void:
 # Used for processing hit shaders with a timer. Process is good for vfx since it's called every frame.
 const MAX_HITS := 32
 var hits: Array[Dictionary] = [] # each hit = {pos, radius, timer}
+
 func _process(delta) -> void:
 	if hits.size() == 0:
 		set_process(false)
@@ -156,11 +158,16 @@ func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: S
 	shield_radius = aabb.size.x/2
 	ShieldVisuals.texture.size = aabb.size
 	theta = deg_to_rad(shield_arc)
-	samples = 30 # More points = more of an accurate circle shape, worse performance.
+	is_friendly = ship.is_friendly
+	# Samples = More points = more of an accurate circle shape, worse performance.
+	# Via this formula: 15 samples for a 60 degree shield.
+	# 60 samples for a 240 degree shield 
+	samples = shield_arc/4 
 	ship_id = id
 
 	ShieldVisuals.material.set_shader_parameter("circle_radius", shield_radius)
 	
+	# For omni shields, when that gets polished in.
 	#var shield_transform: Transform2D = global_transform
 	#var look_at_projectile: Transform2D = shield_transform.looking_at(projectile.global_position)
 	#var dot_product: float = shield_transform.x.dot(look_at_projectile.x)
