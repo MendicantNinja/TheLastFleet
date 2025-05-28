@@ -46,7 +46,6 @@ shapes/paths/geometry_color=Color(0.101961, 1, 0.701961, 0.188235)
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
-window/size/mode=3
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/energy_saving/keep_screen_on=false
@@ -182,6 +181,8 @@ avoidance/layer_3="EnemyShip"
 [physics]
 
 common/physics_jitter_fix=0.2
+2d/default_gravity=0.0
+2d/default_gravity_vector=Vector2(0, 0)
 2d/default_linear_damp=0.0
 2d/solver/contact_max_allowed_penetration=0.01
 

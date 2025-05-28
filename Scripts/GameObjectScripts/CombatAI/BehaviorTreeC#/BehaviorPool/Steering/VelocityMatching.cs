@@ -8,8 +8,8 @@ public partial class VelocityMatching : Action
 		if (Engine.GetPhysicsFrames() % 120 != 0) return NodeState.FAILURE;
 
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		
-		if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE || ship_wrapper.Posture == Globals.Strategy.EVASIVE) 
+
+		if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE || ship_wrapper.Posture == Globals.Strategy.EVASIVE)
 		{
 			return NodeState.FAILURE;
 		}
@@ -18,7 +18,7 @@ public partial class VelocityMatching : Action
 			return NodeState.FAILURE;
 		}
 
-		if (ship_wrapper.CombatFlag == false && ship_wrapper.FallbackFlag == false && ship_wrapper.RetreatFlag == false && ship_wrapper.VentFluxFlag)
+		if (ship_wrapper.CombatFlag == false && ship_wrapper.FallbackFlag == false && ship_wrapper.RetreatFlag == false && ship_wrapper.VentFluxFlag == false)
 		{
 			agent.Set("match_velocity_flag", true);
 		}

@@ -1,8 +1,5 @@
 using Godot;
-using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
 
 public partial class IdentifyNearbyUnits : Action
@@ -25,23 +22,23 @@ public partial class IdentifyNearbyUnits : Action
 			{ 
 				if (!IsInstanceValid(ship) || ship.IsQueuedForDeletion()) continue;
 
-				ShipWrapper unit = (ShipWrapper) ship.Get("ShipWrapper");
-				if (unit.GroupName == ship_wrapper.GroupName && unit.GroupName.Length > 0 && ship_wrapper.GroupName.Length > 0)
+				ShipWrapper unit_wrapper = (ShipWrapper) ship.Get("ShipWrapper");
+				if (unit_wrapper.GroupName == ship_wrapper.GroupName && unit_wrapper.GroupName.Length > 0 && ship_wrapper.GroupName.Length > 0)
 				{
 					continue;
 				}
 					
-				if (unit.IsFriendly == ship_wrapper.IsFriendly && unit.GroupName.Length == 0)
+				if (unit_wrapper.IsFriendly == ship_wrapper.IsFriendly && unit_wrapper.GroupName.Length == 0)
 				{
 					idle_neighbors.Add(ship);
 				}
-				else if (unit.IsFriendly != ship_wrapper.IsFriendly && unit.GroupName.Length > 0 && !nearby_enemy_groups.Contains(unit.GroupName))
+				else if (unit_wrapper.IsFriendly != ship_wrapper.IsFriendly && unit_wrapper.GroupName.Length > 0 && !nearby_enemy_groups.Contains(unit_wrapper.GroupName))
 				{
-					nearby_enemy_groups.Add(unit.GroupName);
+					nearby_enemy_groups.Add(unit_wrapper.GroupName);
 				}
-				else if (unit.IsFriendly == ship_wrapper.IsFriendly && unit.GroupName.Length > 0 && !neighbor_groups.Contains(unit.GroupName))
+				else if (unit_wrapper.IsFriendly == ship_wrapper.IsFriendly && unit_wrapper.GroupName.Length > 0 && !neighbor_groups.Contains(unit_wrapper.GroupName))
 				{
-					neighbor_groups.Add(unit.GroupName);
+					neighbor_groups.Add(unit_wrapper.GroupName);
 				}
 			}
 		}
@@ -51,10 +48,10 @@ public partial class IdentifyNearbyUnits : Action
 		{
 			if (!IsInstanceValid(ship) || ship.IsQueuedForDeletion()) continue;
 
-			ShipWrapper unit = (ShipWrapper)ship.Get("ShipWrapper");
-			if (!nearby_attackers.Contains(unit.GroupName) && nearby_enemy_groups.Contains(unit.GroupName))
+			ShipWrapper unit_wrapper = (ShipWrapper)ship.Get("ShipWrapper");
+			if (!nearby_attackers.Contains(unit_wrapper.GroupName) && nearby_enemy_groups.Contains(unit_wrapper.GroupName))
 			{
-				nearby_attackers.Add(unit.GroupName);
+				nearby_attackers.Add(unit_wrapper.GroupName);
 			}
 		}
 
@@ -64,13 +61,13 @@ public partial class IdentifyNearbyUnits : Action
 		{
 			if (!IsInstanceValid(ship) || ship.IsQueuedForDeletion()) continue;
 
-			ShipWrapper unit = (ShipWrapper)ship.Get("ShipWrapper");
-			foreach (RigidBody2D attacker_ship in unit.TargetedBy)
+			ShipWrapper unit_wrapper = (ShipWrapper)ship.Get("ShipWrapper");
+			foreach (RigidBody2D attacker_ship in unit_wrapper.TargetedBy)
 			{
 				if (!IsInstanceValid(attacker_ship) || attacker_ship.IsQueuedForDeletion()) continue;
 
 				ShipWrapper attacker = (ShipWrapper)attacker_ship.Get("ShipWrapper");
-				if (!nearby_attackers.Contains(attacker.GroupName) && nearby_enemy_groups.Contains(unit.GroupName))
+				if (!nearby_attackers.Contains(attacker.GroupName) && nearby_enemy_groups.Contains(unit_wrapper.GroupName))
 				{
 					//GD.Print(attacker.GroupName, " is attacking ", ship_wrapper.GroupName);
 					nearby_attackers.Add(attacker.GroupName);
@@ -88,10 +85,10 @@ public partial class IdentifyNearbyUnits : Action
 			{
 				if (!IsInstanceValid(ship) || ship.IsQueuedForDeletion()) continue;
 
-				ShipWrapper unit = (ShipWrapper)ship.Get("ShipWrapper");
+				ShipWrapper unit_wrapper = (ShipWrapper)ship.Get("ShipWrapper");
 				SteerData unit_steering = (SteerData)ship.Get("SteerData");
 
-				if (unit.TargetedUnits.Count == 0 && unit_steering.TargetPosition == Vector2.Zero && ship_wrapper.CombatFlag == false)
+				if (unit_wrapper.TargetedUnits.Count == 0 && unit_steering.TargetPosition == Vector2.Zero && ship_wrapper.CombatFlag == false)
 				{
 					availability_count++;
 				}

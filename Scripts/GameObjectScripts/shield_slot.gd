@@ -97,7 +97,6 @@ func process_damage(projectile: Projectile) -> void:
 		#var debug =  projectile.damage/500.0 * .5
 		#print("projectile damage is", debug)
 	register_hit(local_pos/aabb.size, hit_radius)
-	pass
 
 
 func toggle_shields(value: bool) -> void:

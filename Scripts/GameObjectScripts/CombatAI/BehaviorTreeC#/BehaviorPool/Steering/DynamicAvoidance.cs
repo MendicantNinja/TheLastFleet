@@ -10,7 +10,7 @@ public partial class DynamicAvoidance : Action
 	float epsilon = 0.01f;
 	bool debug = false;
 	float ttc_min = 4.0f;
-	float ttc_default = 8.0f;
+	float ttc_default = 16.0f;
 	float ttc_max = 20.0f;
 	float lerp_weight = 0.1f;
 	float stop_coe = 0.1f;
@@ -18,13 +18,12 @@ public partial class DynamicAvoidance : Action
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		steer_data = (SteerData)agent.Get("SteerData");
+		steer_data.AvoidanceForce = Vector2.Zero;
 		RigidBody2D n_agent = agent as RigidBody2D;
 		
 		Vector2 steering_force = steer_data.SteeringForce;
 		if (debug == true || steer_data.BrakeFlag == true || ship_wrapper.NeighborUnits == null || ship_wrapper.NeighborUnits.Count == 0)
 		{
-			steer_data.AvoidanceWeight = 0.0f;
-			steer_data.GoalWeight = 1.0f;
 			steering_force = steer_data.SteeringForce;
 			agent.Set("acceleration", new Godot.Vector2(steering_force.X, steering_force.Y));
 			return NodeState.FAILURE;
@@ -32,11 +31,10 @@ public partial class DynamicAvoidance : Action
 
 		Vector2 agent_lv = new(n_agent.LinearVelocity.X, n_agent.LinearVelocity.Y);
 		Vector2 agent_pos = new(n_agent.GlobalPosition.X, n_agent.GlobalPosition.Y);
-		float speed = steer_data.DefaultAcceleration;
-		if (ship_wrapper.SoftFlux + ship_wrapper.HardFlux == 0.0f) speed += steer_data.ZeroFluxBonus;
+		if (ship_wrapper.SoftFlux + ship_wrapper.HardFlux == 0.0f) steer_data.CurrentSpeed += steer_data.ZeroFluxBonus;
 
 		List<RigidBody2D> valid_neighbors = new List<RigidBody2D>();
-		valid_neighbors = ship_wrapper.SeparationNeighbors.OfType<RigidBody2D>().Where(unit => unit != null && (bool)unit.Get("steer_data") == false).ToList();
+		valid_neighbors = ship_wrapper.NeighborUnits.OfType<RigidBody2D>().Where(unit => IsInstanceValid(unit) && (bool)unit.Get("brake_flag") == false).ToList();
 		int total_neighbors = valid_neighbors.Count;
 		int batch_data_count = 5;
 		float[] neighbor_data = new float[total_neighbors * batch_data_count]; // Total size: neighbors * data per neighbor
@@ -50,10 +48,10 @@ public partial class DynamicAvoidance : Action
 			neighbor_data[index++] = neighbor.LinearVelocity.Y; // Store vel_y
 			neighbor_data[index++] = neighbor_steer_data.AvoidRadius; // Store radii
 		}
+		
 		if (index == 0)
 		{
-			steer_data.AvoidanceWeight = 0.0f;
-			steer_data.GoalWeight = 1.0f;
+			//steer_data.AvoidanceWeight = 0.0f;
 			agent.Set("acceleration", new Godot.Vector2(steering_force.X, steering_force.Y));
 			return NodeState.FAILURE;
 		}
@@ -68,7 +66,8 @@ public partial class DynamicAvoidance : Action
 		int remainder_start = neighbor_data.Length / (vector_length * batch_data_count) * vector_length * batch_data_count;
 		int array_size = batch_size * vector_length + (remainder > 0 ? remainder : 0);
 		float[] time_to_collision = new float[array_size];
-		Vector2[] avoid_velocities = new Vector2[array_size];
+		Vector2[] avoid_direction = new Vector2[array_size];
+		float local_ttc_min = float.MaxValue;
 		index = 0;
 		for (int i = 0; i + vector_length <= total_neighbors; i += vector_length)
 		{
@@ -129,11 +128,11 @@ public partial class DynamicAvoidance : Action
 			//Vector2 projection = new Vector2(batch_pos_x[batch_min_idx], batch_pos_y[batch_min_idx]);
 			float dot = Vector2.Dot(avoid_rel_vel, avoid_rel_pos);
 			float magSq = avoid_rel_pos.LengthSquared();
-			Vector2 properProjection = (magSq > epsilon) ? (dot / magSq) * avoid_rel_pos : Vector2.Zero;
+			Vector2 projection = (magSq > epsilon) ? (dot / magSq) * avoid_rel_pos : Vector2.Zero;
 			//projection *= rel_dot[batch_min_idx] / mag_rel_pos[batch_min_idx];
 			//Vector2 translation = steer_data.DesiredVelocity + (avoid_rel_vel - projection);
-			Vector2 lateralComponent = avoid_rel_vel - properProjection;
-			Vector2 properTranslation = steer_data.DesiredVelocity + lateralComponent;
+			Vector2 lateralComponent = avoid_rel_vel - projection;
+			Vector2 translation = steer_data.DesiredVelocity + lateralComponent;
 			float neighbor_speed = new Vector2(batch_vel_x[batch_min_idx], batch_vel_y[batch_min_idx]).LengthSquared();
 
 			if (neighbor_speed <= epsilon) bias_counter++;
@@ -151,42 +150,21 @@ public partial class DynamicAvoidance : Action
 			
 			if (steer_data.AvoidanceBias != 0)
 			{
-				properTranslation = (steer_data.AvoidanceBias > 0) ? new Vector2(-avoid_rel_vel.Y, avoid_rel_vel.X)  // Counterclockwise avoidance
+				translation = (steer_data.AvoidanceBias > 0) ? new Vector2(-avoid_rel_vel.Y, avoid_rel_vel.X)  // Counterclockwise avoidance
 												 				   : new Vector2(avoid_rel_vel.Y, -avoid_rel_vel.X); // Clockwise avoidance
 			}
 
-			Vector2 avoid_direction = Vector2.Normalize(properTranslation);
-			Vector2 avoid_velocity = avoid_direction * speed;
-			if (steer_data.AvoidanceBias != 0 && ttc > ttc_default && ttc < ttc_max)
+			Vector2 direction = Vector2.Normalize(translation);
+			if (ttc < ttc_min)
 			{
-				//GD.Print(agent.Name, " ttc (avoidance bias != 0): ", ttc);
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_default) / (ttc_max - ttc_default), 0.0f, 1.0f);
-				avoid_velocity = avoid_direction * speed * brake_weight;
-				//avoid_velocity = Vector2.Normalize(avoid_rel_pos) * agent_lv.Length() * brake_weight;
+				direction = Vector2.Normalize(-agent_lv);
 			}
-			else if (ttc > ttc_default && ttc < ttc_max)
+			if (ttc < local_ttc_min)
 			{
-				//GD.Print(agent.Name, " ttc (avoidance bias == 0): ", ttc);
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_default) / (ttc_max - ttc_default), 0.0f, 1.0f);
-				avoid_velocity = Vector2.Lerp(avoid_velocity, -agent_lv, brake_weight);
-			}
-			else if (steer_data.AvoidanceBias != 0 && ttc > ttc_min && ttc < ttc_default)
-			{
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_min) / (ttc_default - ttc_min), 0.0f, 1.0f);
-				avoid_velocity = avoid_direction * speed * 2.0f / brake_weight;
-				//back_up_counter += bu_increment;
-			}
-			else if (ttc > ttc_min && ttc < ttc_default)
-			{
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_min) / (ttc_default - ttc_min), 0.0f, 1.0f);
-				avoid_velocity = Vector2.Lerp(Vector2.Zero, -agent_lv, brake_weight);
-			}
-			else if (ttc <= ttc_min)
-			{
-				avoid_velocity = -agent_lv / stop_coe;
+				local_ttc_min = ttc;
 			}
 			time_to_collision[index] = ttc;
-			avoid_velocities[index] = avoid_velocity;
+			avoid_direction[index] = direction;
 			index++;
 		}
 		
@@ -220,12 +198,12 @@ public partial class DynamicAvoidance : Action
 			float ttc = ini_dist / -closing_speed;
 			if (ttc > ttc_max) continue;
 
-			float dot = Vector2.Dot(rel_vel, rel_vel);
+			//float dot = Vector2.Dot(rel_vel, rel_vel);
 			float magSq = rel_pos.LengthSquared();
-			Vector2 properProjection = (magSq > epsilon) ? (dot / magSq) * rel_pos : Vector2.Zero;
+			Vector2 projection = (magSq > epsilon) ? (rel_dot / magSq) * rel_pos : Vector2.Zero;
 			//Vector2 projection = rel_pos * (rel_dot / mag_rel_pos); // Project velocity
 			//Vector2 translation = steer_data.DesiredVelocity + (rel_vel - projection);
-			Vector2 properTranslation = steer_data.DesiredVelocity + properProjection;
+			Vector2 translation = steer_data.DesiredVelocity + projection;
 			float neighbor_speed = new Vector2(vel_x, vel_y).LengthSquared();
 
 			if (neighbor_speed <= epsilon) bias_counter++;
@@ -242,42 +220,23 @@ public partial class DynamicAvoidance : Action
 			
 			if (steer_data.AvoidanceBias != 0)
 			{
-				properTranslation = (steer_data.AvoidanceBias > 0) ? new Vector2(-rel_vel.Y, rel_vel.X)  // Counterclockwise avoidance
+				translation = (steer_data.AvoidanceBias > 0) ? new Vector2(-rel_vel.Y, rel_vel.X)  // Counterclockwise avoidance
 												 				   : new Vector2(rel_vel.Y, -rel_vel.X);
 			}
 
-			Vector2 avoid_direction = Vector2.Normalize(properTranslation);
-			Vector2 avoid_velocity = avoid_direction * speed;
-			if (steer_data.AvoidanceBias != 0 && ttc > ttc_default && ttc < ttc_max)
+			Vector2 direction = Vector2.Normalize(translation);
+			if (ttc < ttc_min)
 			{
-				//GD.Print(agent.Name, " ttc (avoidance bias != 0): ", ttc);
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_default) / (ttc_max - ttc_default), 0.0f, 1.0f);
-				avoid_velocity = avoid_direction * speed * brake_weight;
+				direction = Vector2.Normalize(-agent_lv);
 			}
-			else if (ttc > ttc_default && ttc < ttc_max)
+			
+			if (ttc < local_ttc_min)
 			{
-				//GD.Print(agent.Name, " ttc (avoidance bias == 0): ", ttc);
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_default) / (ttc_max - ttc_default), 0.0f, 1.0f);
-				avoid_velocity = Vector2.Lerp(avoid_velocity, -agent_lv, brake_weight);
-			}
-			else if (steer_data.AvoidanceBias != 0 && ttc > ttc_min && ttc < ttc_default)
-			{
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_min) / (ttc_default - ttc_min), 0.0f, 1.0f);
-				avoid_velocity = avoid_direction * speed * 2.0F / brake_weight;
-				//back_up_counter += bu_increment;
-			}
-			else if (ttc > ttc_min && ttc < ttc_default)
-			{
-				float brake_weight = 1.0f - Mathf.Clamp((ttc - ttc_min) / (ttc_default - ttc_min), 0.0f, 1.0f);
-				avoid_velocity = Vector2.Lerp(Vector2.Zero, -agent_lv, brake_weight);
-			}
-			else if (ttc <= ttc_min)
-			{
-				avoid_velocity = -agent_lv / stop_coe;
+				local_ttc_min = ttc;
 			}
 
 			time_to_collision[index] = ttc;
-			avoid_velocities[index] = avoid_velocity; // Store the computed avoidance velocity
+			avoid_direction[index] = direction; // Store the computed avoidance velocity
 			index++;
 		}
 		
@@ -287,47 +246,25 @@ public partial class DynamicAvoidance : Action
 			steer_data.AvoidanceBias = 0;
 		}
 
-		if (index == 0)
+		if (index == 0 || local_ttc_min == 0.0f)
 		{
-			steer_data.AvoidanceWeight = 0.0f;
 			steer_data.GoalWeight = 1.0f;
 			agent.Set("acceleration", new Godot.Vector2(steering_force.X, steering_force.Y));
 			return NodeState.FAILURE;
 		}
 
 		Array.Resize(ref time_to_collision, index);
-		Array.Resize(ref avoid_velocities, index);
-		
-		float local_ttc_min = float.MaxValue;
-		index = 0;
-		foreach (float ttc in time_to_collision)
-		{
-			if (ttc < local_ttc_min)
-			{
-				local_ttc_min = ttc;
-			}
-			index++;
-		}
-
-		if (local_ttc_min == 0.0f)
-		{
-			steer_data.AvoidanceWeight = 0.0f;
-			steer_data.GoalWeight = 1.0f;
-			agent.Set("acceleration", new Godot.Vector2(steering_force.X, steering_force.Y));
-			return NodeState.FAILURE;
-		}
-		
+		Array.Resize(ref avoid_direction, index);
 		index = 0;
 		Vector2 aggregate_vel = Vector2.Zero;
-		float avoidance_weight = 0.0f;
+		//float avoidance_weight = 0.0f;
 		foreach (float ttc in time_to_collision)
 		{
-			float weight = local_ttc_min / (ttc + epsilon);
-			aggregate_vel += avoid_velocities[index] * weight;
-			avoidance_weight += weight;
+			float weight =  1.0f / (ttc + epsilon);
+			aggregate_vel += avoid_direction[index] * weight;
 			index++;
 		}
-		
+		/*
 		if (steer_data.SeparationWeight > 1.0f && ship_wrapper.CombatFlag == false) 
 		{
 			steer_data.SeparationWeight = 1.0f;
@@ -338,22 +275,22 @@ public partial class DynamicAvoidance : Action
 		{
 			avoidance_weight = Mathf.Clamp(avoidance_weight, 0.0f, 1.0f);
 			steer_data.SeparationWeight = Mathf.Lerp(steer_data.SeparationWeight, 0.1f, lerp_weight * 2.0f);
-			steer_data.GoalWeight = Mathf.Lerp(steer_data.GoalWeight, 0.1f, lerp_weight / 2.0f);
 		}
 		else if (ship_wrapper.CombatFlag == true)
 		{
 			avoidance_weight = 10.0f;
 			steer_data.SeparationWeight = 10.0f;
-			steer_data.GoalWeight = 1.0f;
 		}
 		else
 		{
 			steer_data.SeparationWeight = 0.01f;
-			steer_data.GoalWeight = 0.01f;
 		}
-		
-		steer_data.AvoidanceForce = aggregate_vel;
-		steer_data.AvoidanceWeight = avoidance_weight;
+		*/
+
+		steer_data.AvoidanceForce = Vector2.Normalize(aggregate_vel) * steer_data.CurrentSpeed;
+		float avoidance_urgency = (ttc_max - local_ttc_min) / (ttc_max - ttc_default);
+		if (avoidance_urgency < 0.0f) avoidance_urgency = 0.0f;
+		steer_data.AvoidanceWeight = avoidance_urgency;
 		steering_force = steer_data.SteeringForce;
 		agent.Set("acceleration", new Godot.Vector2(steering_force.X, steering_force.Y));
 		return NodeState.FAILURE;

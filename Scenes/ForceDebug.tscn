@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://37wveyuf0rjm"]
+
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/force_debug.gd" id="1_k0gsl"]
+
+[node name="ForceDebug" type="Node2D"]
+z_index = 3
+script = ExtResource("1_k0gsl")

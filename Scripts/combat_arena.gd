@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = false
+var debug_imap: bool = true
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
@@ -28,6 +28,7 @@ var deployment_row: int = 0
 var deployment_spacing: int = 500
 
 signal units_deployed(units)
+
 func _ready() -> void:
 	ComputerAdmiral.SetGoal(combat_goal)
 	process_mode = PROCESS_MODE_PAUSABLE

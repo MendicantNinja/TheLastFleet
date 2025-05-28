@@ -1,7 +1,8 @@
-[gd_scene load_steps=20 format=3 uid="uid://c2noldww8g5st"]
+[gd_scene load_steps=21 format=3 uid="uid://c2noldww8g5st"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_6jg18"]
 [ext_resource type="PackedScene" uid="uid://chlj4nfewaemy" path="res://Scenes/CompositeGameObjects/CombatBehaviorTree.tscn" id="2_asysm"]
+[ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_iqnov"]
 [ext_resource type="Texture2D" uid="uid://bpdt55pm4f7di" path="res://Art/ShipArt/prototype9_v2.png" id="12_gfp81"]
 [ext_resource type="Texture2D" uid="uid://c750umbh4ihc6" path="res://Art/ShipArt/prototype9v1_livery.png" id="13_yfhmf"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="14_b3w6e"]
@@ -45,6 +46,8 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_6jg18")
+
+[node name="ForceDebug" parent="." instance=ExtResource("2_iqnov")]
 
 [node name="CombatBehaviorTree" parent="." instance=ExtResource("2_asysm")]
 
@@ -266,6 +269,8 @@ mouse_filter = 2
 action_mode = 0
 button_mask = 0
 stretch_mode = 0
+
+[node name="RetreatTimer" type="Timer" parent="."]
 
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

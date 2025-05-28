@@ -455,8 +455,9 @@ func process_move(to_position: Vector2) -> void:
 	move_new_unit(to_position)
 # Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
-	get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
-	get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
+	if get_tree().get_node_count_in_group(highlight_enemy_name) > 0:
+		get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
+		get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
 	unit_leader.set_navigation_position(to_position)
 	get_viewport().set_input_as_handled()
 
@@ -585,7 +586,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
-	print("alt select called")
+	#print("alt select called")
 	if not visible:
 		return
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)

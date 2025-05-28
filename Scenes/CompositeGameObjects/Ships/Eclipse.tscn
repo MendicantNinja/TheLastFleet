@@ -1,7 +1,8 @@
-[gd_scene load_steps=15 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=16 format=3 uid="uid://dpm2lpeghyvgt"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_l7xku"]
+[ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_umy7s"]
 [ext_resource type="Texture2D" uid="uid://30iy2samt3sx" path="res://Art/ShipArt/Eclipse/eclipse.png" id="20_de2qj"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_fuyaf"]
 [ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="22_oob2k"]
@@ -37,6 +38,8 @@ continuous_cd = 1
 contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_p58et")
+
+[node name="ForceDebug" parent="." instance=ExtResource("2_umy7s")]
 
 [node name="AvoidanceArea" type="Area2D" parent="."]
 
@@ -120,6 +123,8 @@ wait_time = 4.0
 process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
+
+[node name="RetreatTimer" type="Timer" parent="."]
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]

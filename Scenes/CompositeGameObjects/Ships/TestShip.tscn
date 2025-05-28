@@ -1,20 +1,35 @@
-[gd_scene load_steps=11 format=3 uid="uid://cf0i5gfu6xnqx"]
+[gd_scene load_steps=25 format=3 uid="uid://dkcoqur156tp1"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_sc1ei"]
-[ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_2pkbv"]
+[ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_14d1x"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="2_mkeft"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="3_1k0ti"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="4_mdrgk"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pathfinding.cs" id="5_drts0"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="5_k8gr7"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Separation.cs" id="6_5caa8"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="6_sci3q"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/SeekAndArrive.cs" id="7_03teh"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/DynamicAvoidance.cs" id="8_kt3ne"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Align.cs" id="9_qpdlo"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/ChooseTarget.cs" id="10_fxom5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/FluxManagement.cs" id="11_b2enn"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/UseShield.cs" id="12_f5gw4"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Chill.cs" id="13_5mwfp"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pursue.cs" id="14_8084u"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Escape.cs" id="15_y2i30"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_jhvh6"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="21_lqqcs"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="22_2xr57"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_0nlic"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_vl5ll"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_seyge"]
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_3xm5p"]
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_w3cvt"]
+radius = 45.0
+height = 92.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_gh8vd"]
-radius = 40.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_eo6mu"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tnpgt"]
+size = Vector2(22, 28.5)
 
 [node name="TestShip" type="RigidBody2D"]
 collision_mask = 15
@@ -24,21 +39,95 @@ contact_monitor = true
 max_contacts_reported = 10
 script = ExtResource("1_sc1ei")
 
+[node name="ForceDebug" parent="." instance=ExtResource("2_14d1x")]
+
 [node name="AvoidanceArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 0
 
 [node name="AvoidanceShape" type="CollisionShape2D" parent="AvoidanceArea"]
-shape = SubResource("CircleShape2D_vl5ll")
-debug_color = Color(0, 0.6, 0.701961, 0)
+shape = SubResource("CircleShape2D_seyge")
 
 [node name="SeparationArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
 
 [node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
-shape = SubResource("CircleShape2D_3xm5p")
-debug_color = Color(0, 0.6, 0.701961, 0)
+shape = SubResource("CircleShape2D_seyge")
 
-[node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_2pkbv")]
+[node name="CombatBehaviorTreeRedux" type="Node" parent="."]
+script = ExtResource("2_mkeft")
+
+[node name="main" type="Node" parent="CombatBehaviorTreeRedux"]
+script = ExtResource("3_1k0ti")
+
+[node name="navigation" type="Node" parent="CombatBehaviorTreeRedux/main"]
+script = ExtResource("4_mdrgk")
+
+[node name="pathfinding" type="Node" parent="CombatBehaviorTreeRedux/main/navigation"]
+script = ExtResource("5_drts0")
+
+[node name="separation" type="Node" parent="CombatBehaviorTreeRedux/main/navigation"]
+script = ExtResource("6_5caa8")
+
+[node name="seek and arrive" type="Node" parent="CombatBehaviorTreeRedux/main/navigation"]
+script = ExtResource("7_03teh")
+
+[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTreeRedux/main/navigation"]
+script = ExtResource("8_kt3ne")
+
+[node name="align" type="Node" parent="CombatBehaviorTreeRedux/main/navigation"]
+script = ExtResource("9_qpdlo")
+
+[node name="combat" type="Node" parent="CombatBehaviorTreeRedux/main"]
+script = ExtResource("4_mdrgk")
+
+[node name="choose target" type="Node" parent="CombatBehaviorTreeRedux/main/combat"]
+script = ExtResource("10_fxom5")
+
+[node name="flux management" type="Node" parent="CombatBehaviorTreeRedux/main/combat"]
+script = ExtResource("11_b2enn")
+
+[node name="use shield" type="Node" parent="CombatBehaviorTreeRedux/main/combat"]
+script = ExtResource("12_f5gw4")
+
+[node name="chill" type="Node" parent="CombatBehaviorTreeRedux/main/combat"]
+script = ExtResource("13_5mwfp")
+
+[node name="combat steering" type="Node" parent="CombatBehaviorTreeRedux/main"]
+script = ExtResource("4_mdrgk")
+
+[node name="pursue" type="Node" parent="CombatBehaviorTreeRedux/main/combat steering"]
+script = ExtResource("14_8084u")
+
+[node name="escape" type="Node" parent="CombatBehaviorTreeRedux/main/combat steering"]
+script = ExtResource("15_y2i30")
+
+[node name="separation" type="Node" parent="CombatBehaviorTreeRedux/main/combat steering"]
+script = ExtResource("6_5caa8")
+
+[node name="dynamic avoidance" type="Node" parent="CombatBehaviorTreeRedux/main/combat steering"]
+script = ExtResource("8_kt3ne")
+
+[node name="align" type="Node" parent="CombatBehaviorTreeRedux/main/combat steering"]
+script = ExtResource("9_qpdlo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_w3cvt")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-25.75, -36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_tnpgt")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27.5, 36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_tnpgt")
 
 [node name="ShipSprite" type="Sprite2D" parent="."]
 texture_filter = 1
@@ -48,9 +137,6 @@ texture = ExtResource("20_jhvh6")
 [node name="ShipLivery" type="Sprite2D" parent="."]
 texture_filter = 1
 rotation = 1.5708
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("CircleShape2D_gh8vd")
 
 [node name="WeaponSlot0" parent="." instance=ExtResource("21_lqqcs")]
 position = Vector2(11, -1)
@@ -76,23 +162,16 @@ debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
 debug_path_custom_point_size = 13.0
 debug_path_custom_line_width = 3.0
 
-[node name="ShieldSlot" type="Node2D" parent="."]
-script = ExtResource("22_2xr57")
-
-[node name="Shields" type="Area2D" parent="ShieldSlot"]
-collision_layer = 0
-collision_mask = 8
-input_pickable = false
-
-[node name="ShieldShape" type="CollisionShape2D" parent="ShieldSlot/Shields"]
-shape = SubResource("CircleShape2D_eo6mu")
-debug_color = Color(0.203922, 0.639216, 0, 0.0862745)
-
 [node name="CombatTimer" type="Timer" parent="."]
 process_callback = 0
 wait_time = 4.0
 
-[node name="OverloadTimer" type="Timer" parent="."]
-process_callback = 0
+[node name="ShieldSlot" parent="." instance=ExtResource("5_k8gr7")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("6_sci3q")]
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("23_0nlic")]
+
+[node name="OverloadTimer" type="Timer" parent="."]
+
+[node name="RetreatTimer" type="Timer" parent="."]

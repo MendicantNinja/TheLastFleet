@@ -19,11 +19,10 @@ public partial class Pathfinding : Action
 		}
 		steer_data = (SteerData)agent.Get("SteerData");
 
-		if (IsInstanceValid(ship_wrapper.TargetUnit) | steer_data.TargetPosition == Vector2.Zero)
+		if (steer_data.TargetPosition == Vector2.Zero || IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.RetreatFlag == true)
 		{
 			return NodeState.SUCCESS;
 		}
-		else if (steer_data.GoalWeight <= 0.001f) steer_data.GoalWeight = 1.0f;
 
 		if (ship_wrapper.GroupLeader == true)
 		{

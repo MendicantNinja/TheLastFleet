@@ -193,8 +193,14 @@ public partial class ShipWrapper : Node
 		CombatGoal = MapGoal[value];
 	}
 
-	public void SetTargetInRange(bool value)
+	public void SetTargetInRange(bool value, SteerData steer_data)
 	{
+		if (value == false)
+		{
+			TargetUnit = null;
+			steer_data.TargetUnit = null;
+			return;
+		}
 		TargetInRange = value;
 	}
 
@@ -369,8 +375,8 @@ public partial class ShipWrapper : Node
 		AverageWeaponRange = avg;
 	}
 
-	public void SetTargetUnit(RigidBody2D target)
+	public void SetTargetUnit(GodotObject target)
 	{
-		TargetUnit = target;
+		TargetUnit = target as RigidBody2D;
 	}
 }

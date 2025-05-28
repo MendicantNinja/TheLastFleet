@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://buewiugebpfxq"]
+[gd_scene load_steps=21 format=3 uid="uid://buewiugebpfxq"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="1_wwtmt"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="2_ft2w7"]
@@ -11,28 +11,21 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/DynamicAvoidance.cs" id="9_heqg7"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Align.cs" id="10_m4qwl"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/IdentifyNearbyUnits.cs" id="11_8wnrg"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AssessRetreat.cs" id="11_ckcrd"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/ThreatDetection.cs" id="12_uy7mw"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/ChooseTarget.cs" id="13_f6ufu"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/FluxManagement.cs" id="14_eenst"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/UseShield.cs" id="15_8tmg2"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Chill.cs" id="16_flye4"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pursue.cs" id="17_4cw7c"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Escape.cs" id="18_tonnn"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Retreat.cs" id="19_tmvyf"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Cohesion.cs" id="19_yx6o5"]
 
 [node name="CombatBehaviorTreeRedux" type="Node"]
 script = ExtResource("1_wwtmt")
 
 [node name="main" type="Node" parent="."]
 script = ExtResource("2_ft2w7")
-
-[node name="enemy stuff" type="Node" parent="main"]
-script = ExtResource("3_5kf7k")
-
-[node name="find goal" type="Node" parent="main/enemy stuff"]
-script = ExtResource("4_tsoqx")
-
-[node name="detect skirmish units" type="Node" parent="main/enemy stuff"]
-script = ExtResource("5_ddnue")
 
 [node name="navigation" type="Node" parent="main"]
 script = ExtResource("3_5kf7k")
@@ -52,8 +45,41 @@ script = ExtResource("9_heqg7")
 [node name="align" type="Node" parent="main/navigation"]
 script = ExtResource("10_m4qwl")
 
+[node name="retreat" type="Node" parent="main"]
+script = ExtResource("3_5kf7k")
+
+[node name="retreat" type="Node" parent="main/retreat"]
+script = ExtResource("19_tmvyf")
+
+[node name="separation" type="Node" parent="main/retreat"]
+script = ExtResource("7_53mr1")
+
+[node name="dynamic avoidance" type="Node" parent="main/retreat"]
+script = ExtResource("9_heqg7")
+
+[node name="align" type="Node" parent="main/retreat"]
+script = ExtResource("10_m4qwl")
+
+[node name="fallback" type="Node" parent="main"]
+script = ExtResource("3_5kf7k")
+
+[node name="fallback" type="Node" parent="main/fallback"]
+script = ExtResource("19_tmvyf")
+
+[node name="separation" type="Node" parent="main/fallback"]
+script = ExtResource("7_53mr1")
+
+[node name="dynamic avoidance" type="Node" parent="main/fallback"]
+script = ExtResource("9_heqg7")
+
+[node name="align" type="Node" parent="main/fallback"]
+script = ExtResource("10_m4qwl")
+
 [node name="combat" type="Node" parent="main"]
 script = ExtResource("3_5kf7k")
+
+[node name="assess retreat" type="Node" parent="main/combat"]
+script = ExtResource("11_ckcrd")
 
 [node name="identify nearby units" type="Node" parent="main/combat"]
 script = ExtResource("11_8wnrg")
@@ -79,14 +105,23 @@ script = ExtResource("3_5kf7k")
 [node name="pursue" type="Node" parent="main/combat steering"]
 script = ExtResource("17_4cw7c")
 
-[node name="escape" type="Node" parent="main/combat steering"]
-script = ExtResource("18_tonnn")
-
 [node name="separation" type="Node" parent="main/combat steering"]
 script = ExtResource("7_53mr1")
+
+[node name="cohesion" type="Node" parent="main/combat steering"]
+script = ExtResource("19_yx6o5")
 
 [node name="dynamic avoidance" type="Node" parent="main/combat steering"]
 script = ExtResource("9_heqg7")
 
 [node name="align" type="Node" parent="main/combat steering"]
 script = ExtResource("10_m4qwl")
+
+[node name="enemy stuff" type="Node" parent="main"]
+script = ExtResource("3_5kf7k")
+
+[node name="find goal" type="Node" parent="main/enemy stuff"]
+script = ExtResource("4_tsoqx")
+
+[node name="detect skirmish units" type="Node" parent="main/enemy stuff"]
+script = ExtResource("5_ddnue")

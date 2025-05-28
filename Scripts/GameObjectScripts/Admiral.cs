@@ -23,7 +23,7 @@ public partial class Admiral : Node2D
 	public List<Vector2I> ControlPoints;
 	[Export]
 	public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability = new Godot.Collections.Dictionary<Vector2I, float>();
-	public Dictionary<Vector2I, float> GoalValue;
+	public Dictionary<Vector2I, float> GoalValue = new Dictionary<Vector2I, float>();
 
 	public StringName GroupKeyPrefix = new StringName("Enemy Group ");
 	public StringName AssignNewLeaderGroup = new StringName("");

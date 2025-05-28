@@ -5,11 +5,12 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class SeekAndArrive : Action
 {
-	float target_area_radius = 5.0f;
+	float target_area_radius = 10.0f;
 	float hystersis_buffer = 2.0f;
 	float separation_buffer = 3.0f;
 	float time_to_target = 0.1f;
 	float lerp_weight = 0.1f;
+	float prediction_window = 2.0f;
 	int epsilon = 1;
 	bool debug = false;
 
@@ -17,8 +18,8 @@ public partial class SeekAndArrive : Action
 	{
 		ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 		steer_data = (SteerData)agent.Get("SteerData");
-
-		Vector2 velocity = Vector2.Zero;
+		steer_data.DesiredVelocity = Vector2.Zero;
+		Vector2 velocity;
 		RigidBody2D n_agent = agent as RigidBody2D;
 		Vector2 agent_position = new Vector2(n_agent.GlobalPosition.X, n_agent.GlobalPosition.Y);
 		Vector2 direction_to_path = SteerData.DirectionTo(agent_position, steer_data.TargetPosition);
@@ -27,6 +28,7 @@ public partial class SeekAndArrive : Action
 		{
 			speed += steer_data.ZeroFluxBonus;
 		}
+		steer_data.CurrentSpeed = speed;
 		
 		velocity = direction_to_path * speed;
 		float distance_to = (steer_data.TargetPosition - agent_position).Length();
@@ -35,6 +37,9 @@ public partial class SeekAndArrive : Action
 			ship_wrapper.EmitSignal(ShipWrapper.SignalName.Deployed);
 		}
 
+		Vector2 predict_pos = agent_position + new Vector2(n_agent.LinearVelocity.X, n_agent.LinearVelocity.Y) * prediction_window;
+		direction_to_path = SteerData.DirectionTo(predict_pos, steer_data.TargetPosition);
+		velocity = direction_to_path * speed;
 		float sq_lin_vel = n_agent.LinearVelocity.LengthSquared();
 		float brake_distance = hystersis_buffer * sq_lin_vel / (2 * speed);
 		if (distance_to <= brake_distance && steer_data.BrakeFlag == false)
@@ -59,7 +64,6 @@ public partial class SeekAndArrive : Action
 			velocity *= speed;
 			velocity -= new Vector2(n_agent.LinearVelocity.X, n_agent.LinearVelocity.Y);
 			velocity /= time_to_target;
-			steer_data.SeparationWeight = Mathf.Lerp(steer_data.SeparationWeight, 0.1f, lerp_weight);
 		}
 
 		if (distance_to < target_area_radius * 2) n_agent.LinearDamp = 0.5f;
@@ -75,14 +79,17 @@ public partial class SeekAndArrive : Action
 			agent.Set("target_position", Godot.Vector2.Zero);
 			agent.Set("acceleration", Godot.Vector2.Zero);
 			agent.Set("linear_velocity", Godot.Vector2.Zero);
-			agent.Set("linear_damp", 0.0f);
 			steer_data.BrakeFlag = false;
 			agent.Set("brake_flag", steer_data.BrakeFlag);
 			steer_data.SeparationForce = Vector2.Zero;
-			steer_data.SeparationWeight = float.Epsilon;
-			steer_data.GoalWeight = float.Epsilon;
+			steer_data.CohesionForce = Vector2.Zero;
+			steer_data.AvoidanceForce = Vector2.Zero;
+			steer_data.SeparationWeight = 0.0f;
+			steer_data.AvoidanceWeight = 0.0f;
+			steer_data.CohesionWeight = 0.0f;
+			//steer_data.GoalWeight = float.Epsilon;
 			steer_data.DesiredVelocity = Vector2.Zero;
-			//GD.Print(agent.Name, " navigated to position");
+			GD.Print(agent.Name, " navigated to position");
 			return NodeState.SUCCESS;
 		}
 		

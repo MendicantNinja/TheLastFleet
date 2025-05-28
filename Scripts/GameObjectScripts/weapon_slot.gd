@@ -245,6 +245,7 @@ func update_flux_overload(flux_state: bool) -> void:
 # Assigns the RID of the ship the player targets to the variable primary_target.
 func set_primary_target(unit) -> void:
 	if AI_enabled == true and unit == null:
+		primary_target = RID()
 		acquire_new_target_AI()
 	elif AI_enabled == true and unit != null:
 		primary_target = unit.get_rid()
@@ -294,6 +295,7 @@ func face_weapon(target_position: Vector2) -> Transform2D:
 func _physics_process(delta) -> void:
 	if ai_debug == true:
 		return
+	
 	if current_beam != null: # Do not put this after flux overload. We don't really want an already in-progress beam to stop changing positions on overload.
 		current_beam.global_transform = WeaponNode.global_transform
 		#current_beam.rotation = self.rotation

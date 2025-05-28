@@ -55,7 +55,6 @@ func _physics_process(delta) -> void:
 			beam_end = to_local(beam_raycast.get_collision_point())  # Stop at collision
 			beam_line.points[1] = beam_end
 			
-			
 			if beam_damage_timer.is_stopped() == true:
 				#print("Emitting signal for beam weapon")
 				_on_projectile_collision(target)

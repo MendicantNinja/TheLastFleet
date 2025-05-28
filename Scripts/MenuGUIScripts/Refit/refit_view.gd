@@ -18,7 +18,7 @@ func _ready():
 	settings.swizzle(%MainMenuButton)
 	update_refit_list()
 	update_weapon_list()
-	
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	pass
