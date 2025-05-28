@@ -37,6 +37,15 @@ modulate = Color(0.25098, 1, 0, 0.784314)
 z_index = 1
 anchors_preset = 0
 
+[node name="ShipNameDebugText" type="RichTextLabel" parent="ConstantSizedGUI"]
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 0
+offset_left = 30.0
+offset_top = -108.0
+offset_right = 330.0
+offset_bottom = -84.0
+mouse_filter = 2
+
 [node name="HardFluxIndicator" type="TextureProgressBar" parent="ConstantSizedGUI"]
 physics_interpolation_mode = 0
 texture_filter = 1

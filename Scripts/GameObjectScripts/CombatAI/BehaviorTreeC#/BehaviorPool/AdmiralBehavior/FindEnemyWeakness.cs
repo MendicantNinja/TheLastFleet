@@ -69,15 +69,20 @@ public partial class FindEnemyWeakness : Action
 			float value = player_vulnerability[cell];
 			float norm_value = 2.0f * ((value - vuln_min) / (vuln_max - vuln_min)) - 1.0f;
 			enemy_vuln_norm[cell] = norm_value;
+			//vulnerability_map.EmitSignal(Imap.SignalName.UpdateGridValue, cell.X, cell.Y, norm_value);
 		}
+
 		Godot.Collections.Dictionary<Vector2I, float> target_cells = new Godot.Collections.Dictionary<Vector2I, float>();
 		float norm_max = enemy_vuln_norm.Values.Max();
 		float norm_min = enemy_vuln_norm.Values.Min();
+		//GD.Print(norm_max);
+		//GD.Print(norm_min);
 		foreach (Vector2I cell in enemy_vuln_norm.Keys)
 		{
 			if (enemy_vuln_norm[cell] == norm_max || enemy_vuln_norm[cell] == norm_min)
 			{
 				target_cells[cell] = enemy_vuln_norm[cell];
+				//GD.Print(cell);
 			}
 		}
 		

@@ -270,5 +270,7 @@ action_mode = 0
 button_mask = 0
 stretch_mode = 0
 
+[node name="RetreatTimer" type="Timer" parent="."]
+
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="NavigationTimer" to="." method="_on_NavigationTimer_timeout"]

@@ -586,7 +586,7 @@ func reset_group_affiliation(group_select: Array) -> void:
 			available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
-	print("alt select called")
+	#print("alt select called")
 	if not visible:
 		return
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)

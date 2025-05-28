@@ -108,6 +108,8 @@ wait_time = 4.0
 
 [node name="OverloadTimer" type="Timer" parent="."]
 
+[node name="RetreatTimer" type="Timer" parent="."]
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
 [connection signal="timeout" from="CombatTimer" to="." method="_on_CombatTimer_timeout"]

@@ -1,5 +1,4 @@
 using Godot;
-using System;
 using Vector2 = System.Numerics.Vector2;
 
 public partial class Align : Action
@@ -7,7 +6,7 @@ public partial class Align : Action
 	public override NodeState Tick(Node agent)
 	{
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
-		if (ship_wrapper.FallbackFlag == true || ship_wrapper.VentFluxFlag == true || ship_wrapper.RetreatFlag == true)
+		if (ship_wrapper.FallbackFlag == true || ship_wrapper.VentFluxFlag == true)
 		{
 			return NodeState.SUCCESS;
 		}
@@ -24,6 +23,10 @@ public partial class Align : Action
 		{
 			Vector2 enemy_pos = new(steer_data.TargetUnit.GlobalPosition.X, steer_data.TargetUnit.GlobalPosition.Y);
 			transform_look_at = SteerData.LookingAt(agent_pos, enemy_pos);
+		}
+		else if (steer_data.RotateDirection != Vector2.Zero)
+		{
+			transform_look_at = SteerData.LookingAt(agent_pos, steer_data.RotateDirection);
 		}
 		else
 		{

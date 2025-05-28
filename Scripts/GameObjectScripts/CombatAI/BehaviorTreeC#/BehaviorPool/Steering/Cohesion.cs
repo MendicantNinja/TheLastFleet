@@ -24,10 +24,10 @@ public partial class Cohesion : Action
         foreach (RigidBody2D neighbor in GetTree().GetNodesInGroup(ship_wrapper.GroupName))
         {
             if (!IsInstanceValid(neighbor) || neighbor.IsQueuedForDeletion()) continue;
+            if (ship_wrapper.SeparationNeighbors.Contains(neighbor)) continue;
 
             ShipWrapper neighbor_wrapper = (ShipWrapper)neighbor.Get("ShipWrapper");
-            if (ship_wrapper.IsFriendly != neighbor_wrapper.IsFriendly) continue;
-            else if (neighbor_wrapper.FallbackFlag == true || neighbor_wrapper.VentFluxFlag == true || neighbor_wrapper.RetreatFlag == true) continue;
+            if (neighbor_wrapper.FallbackFlag == true || neighbor_wrapper.VentFluxFlag == true || neighbor_wrapper.RetreatFlag == true) continue;
 
             Vector2 neighbor_pos = new Vector2(neighbor.GlobalPosition.X, neighbor.GlobalPosition.Y);
             arithmetic_median += neighbor_pos;

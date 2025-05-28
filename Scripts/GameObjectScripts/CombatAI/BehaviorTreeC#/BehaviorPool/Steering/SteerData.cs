@@ -24,6 +24,7 @@ public partial class SteerData : Node
 
     public int AvoidanceBias = 0;
     public Vector2 MoveDirection { get; set; } = Vector2.Zero;
+    public Vector2 RotateDirection { get; set; } = Vector2.Zero;
     public bool BrakeFlag { get; set; }
     
     // --- Steering Behavior Forces ---

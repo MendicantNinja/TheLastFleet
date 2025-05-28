@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://buewiugebpfxq"]
+[gd_scene load_steps=21 format=3 uid="uid://buewiugebpfxq"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="1_wwtmt"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="2_ft2w7"]
@@ -18,7 +18,6 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/UseShield.cs" id="15_8tmg2"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Chill.cs" id="16_flye4"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pursue.cs" id="17_4cw7c"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Escape.cs" id="18_tonnn"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Retreat.cs" id="19_tmvyf"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Cohesion.cs" id="19_yx6o5"]
 
@@ -61,6 +60,21 @@ script = ExtResource("9_heqg7")
 [node name="align" type="Node" parent="main/retreat"]
 script = ExtResource("10_m4qwl")
 
+[node name="fallback" type="Node" parent="main"]
+script = ExtResource("3_5kf7k")
+
+[node name="fallback" type="Node" parent="main/fallback"]
+script = ExtResource("19_tmvyf")
+
+[node name="separation" type="Node" parent="main/fallback"]
+script = ExtResource("7_53mr1")
+
+[node name="dynamic avoidance" type="Node" parent="main/fallback"]
+script = ExtResource("9_heqg7")
+
+[node name="align" type="Node" parent="main/fallback"]
+script = ExtResource("10_m4qwl")
+
 [node name="combat" type="Node" parent="main"]
 script = ExtResource("3_5kf7k")
 
@@ -90,9 +104,6 @@ script = ExtResource("3_5kf7k")
 
 [node name="pursue" type="Node" parent="main/combat steering"]
 script = ExtResource("17_4cw7c")
-
-[node name="escape" type="Node" parent="main/combat steering"]
-script = ExtResource("18_tonnn")
 
 [node name="separation" type="Node" parent="main/combat steering"]
 script = ExtResource("7_53mr1")

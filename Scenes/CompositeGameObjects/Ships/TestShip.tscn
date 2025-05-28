@@ -173,3 +173,5 @@ wait_time = 4.0
 [node name="CenterCombatHUD" parent="." instance=ExtResource("23_0nlic")]
 
 [node name="OverloadTimer" type="Timer" parent="."]
+
+[node name="RetreatTimer" type="Timer" parent="."]

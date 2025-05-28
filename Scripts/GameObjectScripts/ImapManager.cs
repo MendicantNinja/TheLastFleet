@@ -28,7 +28,7 @@ public partial class ImapManager : Node
 	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedEnemy = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
 	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedFriendly = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
 	public int DefaultRadius = 5;
-	public int ArenaWidth = 17000;
+	public int ArenaWidth = 15000;
 	public int ArenaHeight = 20000;
 	public int DefaultCellSize = 250;
 	public int MaxCellSize = 2250;
@@ -112,10 +112,17 @@ public partial class ImapManager : Node
 			Imap map = AgentMaps[type];
 			map.AddMap(template_map, ship_wrapper.ImapCell.X, ship_wrapper.ImapCell.Y, -1.0f);
 		}
-		
+
 		if (RegistryMap.ContainsKey(ship_wrapper.RegistryCell))
 		{
 			RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
+		}
+
+		if (agent.IsConnected("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent))))
+		{
+			agent.Disconnect("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent)));
+			agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
+			agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
 		}
 	}
 	
@@ -179,7 +186,7 @@ public partial class ImapManager : Node
 
 		RegistryMap[current_cell_idx] = agent_registry;
 		Godot.Collections.Array<Vector2I> registry_neighborhood = new Godot.Collections.Array<Vector2I>();
-		int radius = 2;
+		int radius = 1;
 		for (int m = -radius; m <= radius; m++)
 		{
 			for (int n = -radius; n <= radius; n++)

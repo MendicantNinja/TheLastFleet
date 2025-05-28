@@ -28,6 +28,7 @@ var deployment_row: int = 0
 var deployment_spacing: int = 500
 
 signal units_deployed(units)
+
 func _ready() -> void:
 	ComputerAdmiral.SetGoal(combat_goal)
 	process_mode = PROCESS_MODE_PAUSABLE

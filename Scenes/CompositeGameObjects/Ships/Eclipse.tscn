@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cu2fkh4ittsos"]
+[gd_scene load_steps=16 format=3 uid="uid://dpm2lpeghyvgt"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_p58et"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_l7xku"]
@@ -123,6 +123,8 @@ wait_time = 4.0
 process_callback = 0
 
 [node name="CenterCombatHUD" parent="." instance=ExtResource("24_n0517")]
+
+[node name="RetreatTimer" type="Timer" parent="."]
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]

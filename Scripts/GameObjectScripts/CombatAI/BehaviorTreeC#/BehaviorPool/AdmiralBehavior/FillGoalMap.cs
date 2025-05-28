@@ -10,7 +10,7 @@ public partial class FillGoalMap : Action
 	public override NodeState Tick(Node agent)
 	{
 		Admiral admiral = agent as Admiral;
-		if (Engine.GetPhysicsFrames() % 720 != 0 | admiral.GoalValue == null) return NodeState.FAILURE;
+		if (Engine.GetPhysicsFrames() % 720 != 0 | admiral.GoalValue is null) return NodeState.FAILURE;
 
 		if (admiral.AvailableGroups.Count == 0) 
 		{
@@ -27,7 +27,7 @@ public partial class FillGoalMap : Action
 			norm_val += 1.0f;
 		}
 		
-		if (norm_val == 0 && goal_value.Keys.Count > 0) norm_val = 1.0f;
+		//if (norm_val == 0.0f && goal_value.Keys.Count > 0) norm_val = 1.0f;
 
 		if (norm_val == 0.0f) return NodeState.FAILURE;
 		
@@ -88,7 +88,7 @@ public partial class FillGoalMap : Action
 			{
 				float distance = center.DistanceTo(new Vector2I(m, n));
 				float value = 0.0f;
-				if (goal_map.MapGrid[m, n] != 0.0f)
+				if (goal_map.MapGrid[m, n] <= 0.0f)
 				{
 					value = goal_map.MapGrid[m, n];
 				}

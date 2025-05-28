@@ -23,6 +23,7 @@ class_name Ship
 @onready var FluxPip = CenterCombatHUD.FluxPip
 @onready var ManualControlIndicator = CenterCombatHUD.ManualControlIndicator
 @onready var ShipTargetIcon = CenterCombatHUD.ShipTargetIcon
+@onready var ShipNameDebugText = CenterCombatHUD.ShipNameDebugText
 
 var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
@@ -31,6 +32,7 @@ var TacticalDataDrawing: Node2D
 @onready var CombatBehaviorTree = $CombatBehaviorTreeRedux
 @onready var CombatTimer = $CombatTimer
 @onready var OverloadTimer = $OverloadTimer
+@onready var RetreatTimer = $RetreatTimer
 
 # Temporary variables
 # Should group weapon slots in the near future instead of this, 
@@ -196,6 +198,7 @@ var registry_neighborhood: Array = []:
 
 var heur_velocity: Vector2 = Vector2.ZERO
 var combat_time: float = 5.0
+var retreat_time: float = 10.0
 var target_unit: RigidBody2D = null:
 	set(value):
 		target_unit = value
@@ -230,18 +233,12 @@ var targeted_by: Array[RigidBody2D] = []:
 			if attacker is RigidBody2D:
 				update_targeted_by.append(attacker)
 		
-		for attacker in targeted_by:
-			if attacker == null:
-				continue
-			if attacker.target_unit == self and attacker is RigidBody2D:
-				update_targeted_by.append(attacker)
-		
 		ShipWrapper.SetTargetedBy(update_targeted_by)
 		targeted_by = update_targeted_by
 
 var target_in_range: bool = false:
 	set(value):
-		if value == false:
+		if value == false and target_unit != null:
 			print("%s out of range of target %s and searching for other targets" % [name, target_unit.name])
 		ShipWrapper.SetTargetInRange(value, SteerData)
 		target_in_range = value
@@ -405,9 +402,6 @@ func deploy_ship() -> void:
 		settings.swizzle($ShipLivery, settings.enemy_color)
 
 func _ready() -> void:
-	if steer_debug == true:
-		ForceDebug.force_debug = true
-	
 	ShipWrapper = load("res://Scripts/GameObjectScripts/ShipWrapper.cs").new()
 	add_child(ShipWrapper)
 	ShipWrapper.name = &"ShipWrapper"
@@ -430,13 +424,21 @@ func _ready() -> void:
 		is_friendly = false
 		rotation += PI/2
 	
+	if steer_debug == true:
+		ForceDebug.force_debug = true
+		ShipNameDebugText.add_text(name)
+	
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
 	registry_cell = -Vector2i.ONE
 	speed = ship_stats.top_speed + ship_stats.bonus_top_speed
 	ShipNavigationAgent.max_speed = speed
+	
 	OverloadTimer.wait_time = overload_time
 	CombatTimer.wait_time = combat_time
+	RetreatTimer.wait_time = retreat_time
+	RetreatTimer.timeout.connect(_on_RetreatTimer_timeout)
+	
 	var texture: Texture2D = ship_hull.ship_sprite
 	var texture_size: Vector2 = texture.get_size()
 	var new_radius: float = sqrt(texture_size.x**2 + texture_size.y**2) / 2
@@ -628,7 +630,10 @@ func destroy_ship() -> void:
 	
 	TacticalDataDrawing.setup()
 	ShipTargetIcon.visible = false
-	queue_free()
+	if retreat_flag == true and hull_integrity > 0.0:
+		RetreatTimer.start()
+	else:
+		queue_free()
 
 func set_shields(value: bool) -> void:
 		shield_toggle = value
@@ -954,6 +959,9 @@ func _physics_process(delta: float) -> void:
 		
 		update_flux_indicators()
 	
+	if target_unit == null and target_in_range == true:
+		_on_target_in_range(false)
+	
 	var current_imap_cell: Vector2i = Vector2i(global_position.y / imap_manager.DefaultCellSize, global_position.x / imap_manager.DefaultCellSize)
 	if Engine.get_physics_frames() % 60 == 0 and current_imap_cell != imap_cell:
 		var center_cell_position: Vector2i = Vector2i(current_imap_cell.y * imap_manager.DefaultCellSize, current_imap_cell.x * imap_manager.DefaultCellSize);
@@ -1261,10 +1269,16 @@ func _on_AvoidanceShape_area_exited(projectile) -> void:
 		incoming_projectiles.erase(projectile)
 
 func _on_body_entered(body):
-	pass
+	if retreat_flag == true and body is StaticBody2D and body is not ShieldSlot:
+		print(name, " successfully retreated")
+		set_collision_mask_value(2, false)
+		destroy_ship()
 
 func _on_CombatTimer_timeout():
 	combat_flag = false
+
+func _on_RetreatTimer_timeout():
+	queue_free()
 
 func _on_OverloadTimer_timeout():
 	flux_overload = false

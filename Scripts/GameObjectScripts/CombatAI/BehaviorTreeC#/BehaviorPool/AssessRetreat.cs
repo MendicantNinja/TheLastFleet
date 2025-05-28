@@ -1,7 +1,6 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Threading;
+using Vector2 = System.Numerics.Vector2;
 
 public partial class AssessRetreat : Action
 {
@@ -44,15 +43,14 @@ public partial class AssessRetreat : Action
         // If the ratio of attackers to number of units in the current agent group is less or equal to a 1 to 2 ratio,
         // it is strike one.
         // This might yield a false positive since it is not a guarantee that all members of the group are aware of the agent.
+        // It also not a guarantee that this is an accurate representation of the total troop strength, since a single unit in a group
+        // is surrounded by units aligned to their faction.
         float group_ratio = (float)GetTree().GetNodeCountInGroup(ship_wrapper.GroupName) / attacker_count;
         bool strike_one = false;
         if (group_ratio < 0.5f) strike_one = true;
 
         // If the agent does not cross the first hurdle, back out and save further analysis for other agents.
         if (strike_one == false && ship_wrapper.RetreatFlag == false) return NodeState.FAILURE;
-
-        // If the agent crosses the first hurdle and is already retreating, back out now.
-        if (strike_one == true && ship_wrapper.RetreatFlag == true) return NodeState.FAILURE;
         
         float admiral_strength = 0.0f;
         float player_strength = 0.0f;
@@ -72,31 +70,15 @@ public partial class AssessRetreat : Action
         if (player_strength == 0) player_strength += Mathf.Epsilon;
 
         admiral_strength = Mathf.Abs(admiral_strength);
+
         // If the respective strength ratio shows that strength of the opposing size is greater than or equal to a 1 to 2 ratio,
         // it is strike two.
-        float total_strength = admiral_strength + player_strength;
         bool strike_two = false;
-        
-        /*
-        if (ship_wrapper.IsFriendly == true)
-        {
-            GD.Print(agent.Name);
-            GD.Print((float)player_strength / total_strength);
-            GD.Print();
-        }
-        else if (ship_wrapper.IsFriendly == false)
-        {
-            GD.Print(agent.Name);
-            GD.Print((float)admiral_strength / total_strength);
-            GD.Print();
-        }
-        */
-
-        if (ship_wrapper.IsFriendly == true && (float)player_strength / total_strength <= ratio)
+        if (ship_wrapper.IsFriendly == true && (float)player_strength / admiral_strength <= ratio)
         {
             strike_two = true;
         }
-        else if (ship_wrapper.IsFriendly == false && (float)admiral_strength / total_strength <= ratio)
+        else if (ship_wrapper.IsFriendly == false && (float)admiral_strength / player_strength <= ratio)
         {
             strike_two = true;
         }
@@ -108,6 +90,7 @@ public partial class AssessRetreat : Action
             if (ship_wrapper.RetreatFlag == true)
             {
                 agent.Set("retreat_flag", false);
+                steer_data.RotateDirection = Vector2.Zero;
             }
             return NodeState.FAILURE;
         }
@@ -172,18 +155,21 @@ public partial class AssessRetreat : Action
         else if (ship_wrapper.RetreatFlag == true)
         {
             agent.Set("retreat_flag", false);
+            steer_data.RotateDirection = Vector2.Zero;
         }
 
-        if (IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetUnit is not null)
+        if (ship_wrapper is null) agent.QueueFree();
+        
+        if (IsInstanceValid(ship_wrapper.TargetUnit) || !ship_wrapper.TargetUnit.IsQueuedForDeletion() || ship_wrapper.TargetUnit is not null)
         {
             RigidBody2D n_agent = agent as RigidBody2D;
             Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
-			targeted_by.Remove(n_agent);
-			ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
-			agent.Call("set_target_unit", new Godot.Collections.Array<int>());
-			ship_wrapper.TargetUnit = null;
-			steer_data.TargetUnit = null;
-			agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
+            targeted_by.Remove(n_agent);
+            ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
+            agent.Call("set_target_unit", new Godot.Collections.Array<int>());
+            ship_wrapper.TargetUnit = null;
+            //steer_data.TargetUnit = null;
+            agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
         }
         
         return NodeState.FAILURE;
