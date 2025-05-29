@@ -50,13 +50,12 @@ public partial class SteerData : Node
             float total_weight = GoalWeight + SeparationWeight + AvoidanceWeight + CohesionWeight;
             if (total_weight == 0.0f) return aggregated;
             float reweigh_cohesion = CohesionWeight / total_weight;
-
+            
             aggregated = SeparationForce * SeparationWeight +
                             AvoidanceForce * AvoidanceWeight +
                             CohesionForce * reweigh_cohesion +
                             DesiredVelocity;
             
-            aggregated /= total_weight;
             return aggregated;
         }
     }
@@ -88,9 +87,9 @@ public partial class SteerData : Node
 		TargetPosition = new Vector2(vector.X, vector.Y);
 	}
 
-    public void SetTargetUnit(RigidBody2D target)
+    public void SetTargetUnit(GodotObject target)
     {
-        TargetUnit = target;
+        TargetUnit = target as RigidBody2D;
     }
 
     public void SetThreatRadius(float radius)

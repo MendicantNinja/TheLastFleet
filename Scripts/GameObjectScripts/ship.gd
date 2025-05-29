@@ -702,13 +702,11 @@ func set_posture(value: globals.Strategy) -> void:
 # Temporary workaround for now, not exactly great but whatever
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 	ShipWrapper.WeighCompositeInfluence(neighborhood_density)
-	#if weigh_influence != null:
-		#imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
-	#var weight: float = 0.0
-	#for cluster in neighborhood_density:
-		#if registry_cell in cluster:
-			#weight = 1 / neighborhood_density[cluster]
-			#registry_cluster = cluster
+	for cluster in neighborhood_density:
+		if registry_cell in cluster:
+			var lol = name
+			var weight = 1 / neighborhood_density[cluster]
+			registry_cluster = cluster
 	#
 	#var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
 	#for m in range(0, composite_influence.height):

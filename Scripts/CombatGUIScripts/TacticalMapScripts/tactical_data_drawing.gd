@@ -529,7 +529,11 @@ func attack_targets() -> void:
 			if unit.group_leader == true:
 				leader = unit
 				break
-		var targets_available: Array = leader.targeted_units
+		var targets_available: Array
+		if leader != null:
+			targets_available = leader.targeted_units
+		elif leader == null:
+			targets_available = existing_group[existing_group.size() - 1].targeted_units
 		if targets_available == targeted_group:
 			return
 	

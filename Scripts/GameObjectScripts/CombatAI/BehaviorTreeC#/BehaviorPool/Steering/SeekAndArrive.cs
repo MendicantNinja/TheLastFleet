@@ -41,7 +41,7 @@ public partial class SeekAndArrive : Action
 		direction_to_path = SteerData.DirectionTo(predict_pos, steer_data.TargetPosition);
 		velocity = direction_to_path * speed;
 		float sq_lin_vel = n_agent.LinearVelocity.LengthSquared();
-		float brake_distance = hystersis_buffer * sq_lin_vel / (2 * speed);
+		float brake_distance = hystersis_buffer * sq_lin_vel / (2.0f * speed);
 		if (distance_to <= brake_distance && steer_data.BrakeFlag == false)
 		{
 			steer_data.BrakeFlag = true;

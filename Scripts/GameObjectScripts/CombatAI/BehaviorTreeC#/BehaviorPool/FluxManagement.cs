@@ -29,7 +29,6 @@ public partial class FluxManagement : Action
 		{
 			agent.Set("vent_flux_flag", vent_flux);
 			agent.Set("fallback_flag", vent_flux);
-			steer_data.MoveDirection = Vector2.Zero;
 		}
 
 		if (vent_flux == true && floor_flux == 0.0f)
@@ -50,13 +49,12 @@ public partial class FluxManagement : Action
 			vent_flux = true;
 		}
 
-		RigidBody2D n_agent = agent as RigidBody2D;
 		if (vent_flux == true && ship_wrapper.CombatFlag == true && ship_wrapper.FallbackFlag == false)
 		{
 			ship_wrapper.Set("fallback_flag", vent_flux);
-			steer_data.MoveDirection = -Vector2.Normalize(new Vector2(n_agent.LinearVelocity.X, n_agent.LinearVelocity.Y));
 		}
 
+		RigidBody2D n_agent = agent as RigidBody2D;
 		if (vent_flux == true && ship_wrapper.CombatFlag == true && IsInstanceValid(ship_wrapper.TargetUnit))
 		{
 			Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)steer_data.TargetUnit.Get("targeted_by");

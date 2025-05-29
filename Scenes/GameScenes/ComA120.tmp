@@ -1,0 +1,1114 @@
+[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
+
+[ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
+[ext_resource type="Script" path="res://Scripts/combat_map.gd" id="2_moq8i"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="3_tnnyj"]
+[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
+[ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="4_qi217"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="5_7otad"]
+[ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_control_hud.gd" id="5_ojmr4"]
+[ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/DetectEnemies.cs" id="6_b14u6"]
+[ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
+[ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/ChooseStrategy.cs" id="7_pow8f"]
+[ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
+[ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindEnemyWeakness.cs" id="8_47oij"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FindTargetPositions.cs" id="9_3se3g"]
+[ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FillGoalMap.cs" id="10_d4jl7"]
+[ext_resource type="Texture2D" uid="uid://b4o6bhblapi7p" path="res://Art/Backgrounds/Large 1024x1024/Blue Nebula/Blue_Nebula_04-1024x1024.png" id="10_uvm3m"]
+[ext_resource type="Texture2D" uid="uid://bobh10sl4inor" path="res://Art/Backgrounds/Large 1024x1024/Starfields/Starfield_01-1024x1024.png" id="11_kx52a"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/GroupUnits.cs" id="11_triqp"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/tactical_data_drawing.gd" id="12_rlc6n"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
+[ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
+[ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
+[ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/fog_of_war.gdshader" id="15_olg0c"]
+[ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
+[ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
+[ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tutorial_walkthrough.gd" id="31_awwt3"]
+[ext_resource type="Texture2D" uid="uid://sx6qwqb84tne" path="res://Art/GUIArt/fast-backward-button.svg" id="32_md01c"]
+[ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
+[ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
+
+[sub_resource type="Environment" id="Environment_a8xk6"]
+background_mode = 5
+ambient_light_source = 1
+ambient_light_color = Color(0.266349, 0.548874, 0.942413, 1)
+ambient_light_energy = 2.51
+reflected_light_source = 1
+glow_intensity = 0.16
+glow_strength = 1.84
+glow_blend_mode = 0
+glow_hdr_threshold = 1.27
+glow_hdr_scale = 0.51
+glow_hdr_luminance_cap = 63.2
+glow_map_strength = 1.0
+
+[sub_resource type="NavigationPolygon" id="NavigationPolygon_ooheh"]
+vertices = PackedVector2Array(17067.7, 20026, 60.9688, 20026, 49.0234, 20.8125, 16964.3, -40.8125)
+polygons = Array[PackedInt32Array]([PackedInt32Array(0, 1, 2, 3)])
+outlines = Array[PackedVector2Array]([PackedVector2Array(-1, -29, 11, 20076, 17118, 20076, 17014, -91)])
+agent_radius = 50.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_uu0x8"]
+size = Vector2(0, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_us2n3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7h4jy"]
+size = Vector2(0, 0)
+
+[sub_resource type="SegmentShape2D" id="SegmentShape2D_4kp6c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nv86b"]
+size = Vector2(13500, 15000)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ekgw8"]
+size = Vector2(0, 0)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2a6qp"]
+frequency = 0.02
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_avm21"]
+width = 320
+height = 180
+seamless = true
+seamless_blend_skirt = 0.75
+noise = SubResource("FastNoiseLite_2a6qp")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_u4shx"]
+shader = ExtResource("15_olg0c")
+shader_parameter/density = 1.0
+shader_parameter/speed = Vector2(0.01, 0.02)
+shader_parameter/noise_texture = SubResource("NoiseTexture2D_avm21")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lgtp0"]
+shader = ExtResource("13_tuyrt")
+shader_parameter/hologram_color = Vector4(0, 0.2, 1, 1)
+shader_parameter/emission_strength = 1.0
+shader_parameter/scanline_intensity = 0.02
+shader_parameter/flicker_speed = 2.0
+shader_parameter/distortion_amount = 0.1
+shader_parameter/fresnel_power = 50.0
+shader_parameter/alpha_strength = 0.7
+
+[sub_resource type="Gradient" id="Gradient_084at"]
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_2yroj"]
+gradient = SubResource("Gradient_084at")
+width = 2000
+height = 2000
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(0, 0)
+metadata/_snap_enabled = true
+
+[sub_resource type="Gradient" id="Gradient_nks55"]
+offsets = PackedFloat32Array(0.237705, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_va1as"]
+gradient = SubResource("Gradient_nks55")
+width = 10
+
+[sub_resource type="Gradient" id="Gradient_lqjnm"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_gaw57"]
+gradient = SubResource("Gradient_lqjnm")
+width = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2h44e"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 0.588235)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1s3u7"]
+bg_color = Color(0, 0, 0, 0.588235)
+
+[node name="CombatArena" type="Node2D"]
+script = ExtResource("1_fx56v")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_a8xk6")
+
+[node name="OnScreenNotifier" type="VisibleOnScreenNotifier2D" parent="."]
+unique_name_in_owner = true
+rect = Rect2(0, 0, 1, 1)
+
+[node name="Admiral" type="Node2D" parent="."]
+script = ExtResource("2_2u0vw")
+
+[node name="AdmiralAI" type="Node" parent="Admiral"]
+script = ExtResource("3_tnnyj")
+enabled = true
+
+[node name="main" type="Node" parent="Admiral/AdmiralAI"]
+script = ExtResource("4_qi217")
+
+[node name="assess situation" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("5_7otad")
+
+[node name="detect enemies" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("6_b14u6")
+
+[node name="choose strategy" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("7_pow8f")
+
+[node name="find enemy weakness" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("8_47oij")
+
+[node name="find target positions" type="Node" parent="Admiral/AdmiralAI/main/assess situation"]
+script = ExtResource("9_3se3g")
+
+[node name="macro" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("5_7otad")
+
+[node name="fill goal map" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("10_d4jl7")
+
+[node name="group units" type="Node" parent="Admiral/AdmiralAI/main/macro"]
+script = ExtResource("11_triqp")
+
+[node name="ImapDebug" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ImapGridContainer" type="GridContainer" parent="ImapDebug"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/h_separation = -1
+theme_override_constants/v_separation = -1
+
+[node name="Music" type="AudioStreamPlayer2D" parent="."]
+bus = &"Music"
+playback_type = 1
+
+[node name="GUI" type="AudioStreamPlayer2D" parent="."]
+bus = &"Music"
+playback_type = 1
+
+[node name="NavigationRegion2D" type="NavigationRegion2D" parent="."]
+navigation_polygon = SubResource("NavigationPolygon_ooheh")
+
+[node name="CollisionBoundaryLeft" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryLeft"]
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_uu0x8")
+one_way_collision = true
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryRight" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryRight"]
+rotation = -1.5708
+shape = SubResource("RectangleShape2D_us2n3")
+one_way_collision = true
+one_way_collision_margin = 100.0
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryTop" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryTop"]
+rotation = 3.14159
+shape = SubResource("RectangleShape2D_7h4jy")
+one_way_collision = true
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="CollisionBoundaryBottom" type="StaticBody2D" parent="."]
+collision_layer = 2
+collision_mask = 7
+
+[node name="CollisionBoundaryShape" type="CollisionShape2D" parent="CollisionBoundaryBottom"]
+shape = SubResource("SegmentShape2D_4kp6c")
+one_way_collision = true
+one_way_collision_margin = 100.0
+debug_color = Color(0.862745, 0.054902, 0, 1)
+
+[node name="PlayableArea" type="Area2D" parent="."]
+
+[node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
+unique_name_in_owner = true
+position = Vector2(6759, 7498)
+shape = SubResource("RectangleShape2D_nv86b")
+debug_color = Color(0.333333, 1, 0.870588, 0.0392157)
+
+[node name="CombatMap" type="Node2D" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+script = ExtResource("2_moq8i")
+
+[node name="CombatCamera" type="Camera2D" parent="CombatMap"]
+process_callback = 0
+limit_left = 0
+limit_top = 0
+limit_right = 5000
+limit_bottom = 5000
+position_smoothing_enabled = true
+editor_draw_limits = true
+editor_draw_drag_margin = true
+
+[node name="TacticalMap" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="SelectionArea" type="Area2D" parent="TacticalMap"]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 0
+
+[node name="SelectionShape" type="CollisionShape2D" parent="TacticalMap/SelectionArea"]
+unique_name_in_owner = true
+shape = SubResource("RectangleShape2D_ekgw8")
+debug_color = Color(1, 1, 0, 0.231373)
+
+[node name="TacticalCamera" type="Camera2D" parent="TacticalMap"]
+unique_name_in_owner = true
+anchor_mode = 0
+enabled = false
+zoom = Vector2(0.5, 0.5)
+process_callback = 0
+limit_left = 0
+limit_top = 0
+position_smoothing_enabled = true
+
+[node name="TacticalMapLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+process_mode = 3
+visible = false
+
+[node name="TutorialText" type="Label" parent="TacticalMapLayer"]
+visible = false
+top_level = true
+z_index = 1
+offset_left = 9.0
+offset_top = 66.0
+offset_right = 1541.0
+offset_bottom = 1393.0
+scale = Vector2(0.75, 0.75)
+size_flags_vertical = 1
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_fonts/font = ExtResource("3_urh14")
+theme_override_font_sizes/font_size = 22
+text = "OBJECTIVE: DEFEAT ALL ENEMY SHIPS
+
+CONTROLS 
+(Camera)
+Hold middle mouse and drag to pan the camera. Mouse scroll up and down to zoom.
+
+(Anywhere)
+Space = Pause
+Escape = Options Menu
+Tab = Swap between tactical/combat camera
+G = Call For Reinforcements
+
+(Tactical Map):
+Left click selects. Left click and drag box selects. Left click anywhere empty to deselect all.
+Right click creates a move order for selected ships.
+Left click and drag + control with friendly ships selected box selects an enemy group and orders them to attack.
+
+(With a single ship selected)
+T = Toggle manual control.
+F = Toggle Camera Feed
+
+(In Manual Control)
+Left click to fire. Right click for shields. 
+W/S to accel/decel,
+A/D to rotate, 
+Q/E to strafe horizontally.
+(Over an enemy ship) R = Set enemy as target. 
+
+F1 = Hide This Tutorial Text
+
+
+
+
+
+
+
+
+
+"
+
+[node name="TacticalViewportContainer" type="SubViewportContainer" parent="TacticalMapLayer"]
+offset_left = -3884.0
+offset_top = -3908.0
+offset_right = 5716.0
+offset_bottom = 5692.0
+size_flags_vertical = 4
+focus_mode = 0
+
+[node name="TacticalViewport" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+canvas_item_default_texture_filter = 2
+gui_snap_controls_to_pixels = false
+canvas_cull_mask = 4294967279
+size = Vector2i(9600, 9600)
+render_target_update_mode = 0
+
+[node name="TacticalMapCamera" type="Camera2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
+unique_name_in_owner = true
+zoom = Vector2(0.25, 0.25)
+process_callback = 0
+limit_left = -400000
+limit_top = -400000
+limit_right = 400000
+limit_bottom = 400000
+limit_smoothed = true
+position_smoothing_enabled = true
+editor_draw_screen = false
+
+[node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
+unique_name_in_owner = true
+script = ExtResource("12_rlc6n")
+
+[node name="FogOfWar" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+self_modulate = Color(0.724287, 0.576944, 0.999999, 1)
+light_mask = 16
+z_index = 1
+material = SubResource("ShaderMaterial_u4shx")
+offset_right = 5400.0
+offset_bottom = 6300.0
+mouse_filter = 2
+
+[node name="TacticalMapBackground" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+z_index = -1
+material = SubResource("ShaderMaterial_lgtp0")
+offset_right = 5850.0
+offset_bottom = 6500.0
+mouse_filter = 2
+
+[node name="VisibilityLayerContainer" type="SubViewportContainer" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
+visibility_layer = 16
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VisibilityLayer" type="SubViewport" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer"]
+disable_3d = true
+transparent_bg = true
+handle_input_locally = false
+canvas_cull_mask = 4294966288
+size = Vector2i(5850, 6500)
+render_target_update_mode = 4
+
+[node name="DetectionRadius" type="TextureRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/VisibilityLayerContainer/VisibilityLayer"]
+visibility_layer = 16
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -102924.0
+offset_top = -103249.0
+offset_right = -100924.0
+offset_bottom = -101249.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("GradientTexture2D_2yroj")
+
+[node name="Label" type="Label" parent="TacticalMapLayer"]
+offset_left = 3.0
+offset_right = 439.0
+offset_bottom = 46.0
+theme_override_colors/font_color = Color(0.0980392, 0.352941, 1, 1)
+theme_override_fonts/font = ExtResource("3_urh14")
+theme_override_font_sizes/font_size = 32
+text = "TACTICAL DISPLAY"
+metadata/_edit_use_anchors_ = true
+
+[node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
+offset_left = 1518.0
+offset_top = 971.0
+offset_right = 1664.0
+offset_bottom = 1035.0
+theme_override_constants/separation = 18
+
+[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
+self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+focus_mode = 0
+action_mode = 0
+texture_normal = ExtResource("13_w2mg8")
+texture_pressed = ExtResource("14_wbn2k")
+texture_hover = ExtResource("14_wbn2k")
+texture_disabled = ExtResource("16_dqw4y")
+script = ExtResource("15_o3rb6")
+
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("16_dosly")
+
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = -1.0
+offset_right = 25.0
+offset_bottom = 22.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -23.0
+offset_top = 38.0
+offset_right = 23.0
+offset_bottom = 78.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+bbcode_enabled = true
+text = "Take 
+Control"
+
+[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+unique_name_in_owner = true
+self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+focus_mode = 0
+action_mode = 0
+texture_normal = ExtResource("13_w2mg8")
+texture_pressed = ExtResource("14_wbn2k")
+texture_hover = ExtResource("14_wbn2k")
+texture_disabled = ExtResource("16_dqw4y")
+script = ExtResource("20_ebklc")
+
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("19_1hyx4")
+
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = -1.0
+offset_right = 24.0
+offset_bottom = 25.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = 37.0
+offset_right = 28.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+bbcode_enabled = true
+text = "Camera Feed"
+
+[node name="ManualControlHUD" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+visible = false
+script = ExtResource("5_ojmr4")
+
+[node name="ProxWarningContainer" type="Control" parent="ManualControlHUD"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="HUDWrapper" type="Control" parent="ManualControlHUD"]
+modulate = Color(0.25098, 1, 0, 0.784314)
+z_index = 3
+z_as_relative = false
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+grow_vertical = 0
+
+[node name="HardFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_left = 105.0
+offset_top = -220.0
+offset_right = 205.0
+offset_bottom = -210.0
+scale = Vector2(0.75, 0.75)
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_va1as")
+
+[node name="SoftFluxIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
+physics_interpolation_mode = 0
+show_behind_parent = true
+texture_filter = 1
+layout_mode = 0
+offset_right = 100.0
+offset_bottom = 10.0
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_va1as")
+
+[node name="BarOutliner" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 102.0
+offset_bottom = 12.0
+texture = ExtResource("5_wtw0b")
+stretch_mode = 2
+
+[node name="FluxPip" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
+layout_mode = 0
+offset_left = -2.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 14.0
+texture = ExtResource("6_ftacq")
+
+[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/HardFluxIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -54.6667
+offset_top = -2.66667
+offset_right = 4.33333
+offset_bottom = 18.3333
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "FLUX"
+
+[node name="HullIntegrityIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_left = 105.0
+offset_top = -202.0
+offset_right = 205.0
+offset_bottom = -192.0
+scale = Vector2(0.75, 0.75)
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_gaw57")
+
+[node name="BarOutLiner2" type="TextureRect" parent="ManualControlHUD/HUDWrapper/HullIntegrityIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 104.0
+offset_bottom = 12.0
+texture = ExtResource("5_wtw0b")
+stretch_mode = 2
+
+[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/HullIntegrityIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -54.6667
+offset_top = -2.66667
+offset_right = 5.33329
+offset_bottom = 21.3333
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "HULL"
+
+[node name="SpeedIndicator" type="TextureProgressBar" parent="ManualControlHUD/HUDWrapper"]
+physics_interpolation_mode = 0
+texture_filter = 1
+layout_mode = 0
+offset_left = 1844.0
+offset_top = -17.0
+offset_right = 1944.0
+offset_bottom = -7.0
+scale = Vector2(0.75, 0.75)
+rounded = true
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture1D_gaw57")
+
+[node name="BarOutLiner2" type="TextureRect" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+layout_mode = 0
+offset_top = -2.0
+offset_right = 104.0
+offset_bottom = 12.0
+texture = ExtResource("5_wtw0b")
+stretch_mode = 2
+
+[node name="Label" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -66.6667
+offset_top = -2.66667
+offset_right = -6.66671
+offset_bottom = 21.3333
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "SPEED"
+
+[node name="Speedometer" type="Label" parent="ManualControlHUD/HUDWrapper/SpeedIndicator"]
+texture_filter = 1
+layout_mode = 0
+offset_left = -0.000193238
+offset_top = -26.6667
+offset_right = 59.9998
+offset_bottom = -2.6667
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/font_size = 10
+text = "0"
+
+[node name="IndicatorDecor" type="TextureRect" parent="ManualControlHUD/HUDWrapper"]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -190.0
+offset_right = 440.0
+grow_vertical = 0
+texture = ExtResource("9_lucm6")
+
+[node name="WeaponSystems" type="RichTextLabel" parent="ManualControlHUD/HUDWrapper"]
+layout_mode = 0
+offset_left = 66.0
+offset_top = -178.0
+offset_right = 219.0
+offset_bottom = -138.0
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+text = "WEAPON SYSTEMS"
+
+[node name="VariousCanvasPopups" type="CanvasLayer" parent="."]
+process_mode = 3
+
+[node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -82.5
+offset_top = -63.0
+offset_right = 82.5
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Game Paused"
+
+[node name="FPS Counter" type="RichTextLabel" parent="VariousCanvasPopups"]
+anchors_preset = -1
+anchor_left = 0.592
+anchor_top = 1.0
+anchor_right = 0.592
+anchor_bottom = 1.0
+offset_left = 488.36
+offset_top = -1078.0
+offset_right = 785.36
+offset_bottom = -1038.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+script = ExtResource("34_4p8f2")
+
+[node name="CameraFeed" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -216.0
+offset_top = -63.0
+offset_right = 216.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Camera Feed"
+
+[node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+process_mode = 3
+top_level = true
+offset_left = 701.0
+offset_top = 706.0
+offset_right = 1106.0
+offset_bottom = 896.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
+script = ExtResource("31_awwt3")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VariousCanvasPopups/TutorialWalkthrough"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -58.0
+offset_top = -36.0
+offset_right = 59.0
+offset_bottom = 4.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 0)
+layout_mode = 2
+texture_normal = ExtResource("32_md01c")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="StepCounter" type="Label" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+layout_mode = 2
+text = "1/15"
+
+[node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+texture_normal = ExtResource("33_dc70j")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="ManualControlLoadingBar" type="ProgressBar" parent="VariousCanvasPopups"]
+unique_name_in_owner = true
+visible = false
+offset_left = 726.0
+offset_top = 945.0
+offset_right = 1037.0
+offset_bottom = 972.0
+step = 1.0
+value = 50.0
+
+[node name="ManualControlLoading" type="RichTextLabel" parent="VariousCanvasPopups/ManualControlLoadingBar"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -157.5
+offset_top = 1.0
+offset_right = 274.5
+offset_bottom = 64.0
+grow_horizontal = 2
+grow_vertical = 0
+theme = ExtResource("33_lcetb")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "Transferring Command..."
+
+[node name="SpaceBackground" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="TextureRect" parent="SpaceBackground"]
+offset_right = 1972.0
+offset_bottom = 1924.0
+texture = ExtResource("10_uvm3m")
+stretch_mode = 4
+
+[node name="Parallax2D" type="Parallax2D" parent="SpaceBackground"]
+scroll_scale = Vector2(0.8, 0.8)
+repeat_size = Vector2(1925, 1923)
+follow_viewport = false
+
+[node name="BackgroundDetails(Stars)" type="TextureRect" parent="SpaceBackground/Parallax2D"]
+self_modulate = Color(1, 1, 1, 0.34902)
+offset_left = -162.0
+offset_top = -10.0
+offset_right = 1763.0
+offset_bottom = 1913.0
+texture = ExtResource("11_kx52a")
+stretch_mode = 4
+
+[node name="OptionsMenu" type="CanvasLayer" parent="."]
+
+[node name="OptionsMenuPanel" type="Panel" parent="OptionsMenu"]
+unique_name_in_owner = true
+visible = false
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -289.0
+offset_top = -325.0
+offset_right = 306.0
+offset_bottom = 363.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+
+[node name="OptionsList" type="VBoxContainer" parent="OptionsMenu/OptionsMenuPanel"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 15.0
+offset_top = 17.0
+offset_right = 518.0
+offset_bottom = 907.0
+scale = Vector2(0.7, 0.7)
+script = ExtResource("6_5ty2s")
+
+[node name="MainMenuButton" type="TextureButton" parent="OptionsMenu/OptionsMenuPanel/OptionsList"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="MainMenuLabel" type="RichTextLabel" parent="OptionsMenu/OptionsMenuPanel/OptionsList/MainMenuButton"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = -6.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Main Menu"
+scroll_active = false
+
+[node name="BlackenBackground2" type="Panel" parent="OptionsMenu/OptionsMenuPanel"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -969.5
+offset_top = -564.0
+offset_right = 16030.5
+offset_bottom = 19436.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="FleetDeployment" type="CanvasLayer" parent="."]
+
+[node name="FleetDeploymentPanel" type="Panel" parent="FleetDeployment"]
+unique_name_in_owner = true
+visible = false
+z_index = 2
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -517.0
+offset_top = -240.0
+offset_right = 509.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+
+[node name="FleetDeploymentList" type="GridContainer" parent="FleetDeployment/FleetDeploymentPanel"]
+unique_name_in_owner = true
+layout_mode = 1
+offset_left = 14.0
+offset_top = 5.0
+offset_right = 1010.0
+offset_bottom = 376.0
+theme_override_constants/h_separation = 30
+columns = 10
+script = ExtResource("5_mfr8c")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="FleetDeployment/FleetDeploymentPanel"]
+layout_mode = 0
+offset_left = 80.0
+offset_top = 378.0
+offset_right = 1836.0
+offset_bottom = 478.0
+scale = Vector2(0.5, 0.5)
+theme_override_constants/separation = 128
+
+[node name="Deploy" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Deploy"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Deploy"
+scroll_active = false
+
+[node name="All" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/All"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]All"
+scroll_active = false
+
+[node name="Cancel" type="TextureButton" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer"]
+unique_name_in_owner = true
+self_modulate = Color(1, 1, 1, 0.27451)
+z_index = 3
+layout_mode = 2
+texture_normal = ExtResource("6_kf7d4")
+texture_hover = ExtResource("7_qn7ha")
+
+[node name="RichTextLabel2" type="RichTextLabel" parent="FleetDeployment/FleetDeploymentPanel/HBoxContainer/Cancel"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("4_hilki")
+bbcode_enabled = true
+text = "[center]Cancel (G)"
+scroll_active = false
+
+[node name="BlackenBackground" type="Panel" parent="FleetDeployment/FleetDeploymentPanel"]
+show_behind_parent = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 16040.0
+offset_bottom = 19460.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[node name="BlackenScreenLayer" type="CanvasLayer" parent="."]
+unique_name_in_owner = true
+layer = 0
+visible = false
+
+[node name="BlackenBackground" type="Panel" parent="BlackenScreenLayer"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -960.0
+offset_top = -540.0
+offset_right = 960.0
+offset_bottom = 540.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_1s3u7")
+
+[connection signal="tree_exiting" from="." to="." method="_on_tree_exiting"]

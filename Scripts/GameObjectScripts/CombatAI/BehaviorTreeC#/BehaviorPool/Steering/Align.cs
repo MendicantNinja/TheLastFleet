@@ -13,7 +13,7 @@ public partial class Align : Action
 
 		RigidBody2D n_agent = agent as RigidBody2D;
 		Vector2 agent_pos = new(n_agent.GlobalPosition.X, n_agent.GlobalPosition.Y);
-		Transform2D transform_look_at = new Transform2D();
+		Transform2D transform_look_at;
 		SteerData steer_data = (SteerData)agent.Get("SteerData");
 		if (steer_data.TargetPosition != Vector2.Zero & (!IsInstanceValid(ship_wrapper.TargetUnit) || ship_wrapper.TargetUnit is null || ship_wrapper.TargetUnit.IsQueuedForDeletion()))
 		{

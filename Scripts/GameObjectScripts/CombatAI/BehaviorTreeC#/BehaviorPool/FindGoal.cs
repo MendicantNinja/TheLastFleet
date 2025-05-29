@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 
 public partial class FindGoal : Action
-{   const int radius = 50;
+{   const int radius = 30;
 	Imap working_map = null;
     public override NodeState Tick(Node agent)
     {

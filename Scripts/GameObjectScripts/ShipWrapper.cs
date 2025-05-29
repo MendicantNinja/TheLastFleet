@@ -125,7 +125,7 @@ public partial class ShipWrapper : Node
 			TemplateMaps[ImapType.TensionMap] = inverse_composite;
 		}
 		
-		WeighInfluence = new Imap(threat_template.Map.Width, threat_template.Map.Height);
+		WeighInfluence = new Imap(composite_influence.Width, composite_influence.Height);
 	}
 
 	public void WeighCompositeInfluence(Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> neighborhood_density)
@@ -140,7 +140,7 @@ public partial class ShipWrapper : Node
 		{
 			if (cluster.Contains(RegistryCell))
 			{
-				weight = Math.Abs(1.0f / neighborhood_density[cluster]);
+				weight = 1.0f / neighborhood_density[cluster];
 				SetRegistryCluster(cluster);
 			}
 		}

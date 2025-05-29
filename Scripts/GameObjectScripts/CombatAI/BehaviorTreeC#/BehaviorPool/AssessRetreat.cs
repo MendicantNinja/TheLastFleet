@@ -10,6 +10,7 @@ public partial class AssessRetreat : Action
         if (Engine.GetPhysicsFrames() % 240 != 0) return NodeState.FAILURE;
 
         ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
+        SteerData steer_data = (SteerData)agent.Get("SteerData");
         if (ship_wrapper.TargetedBy is null || ship_wrapper.TargetedBy.Count == 0) return NodeState.FAILURE;
         if (GetTree().GetNodeCountInGroup(ship_wrapper.GroupName) == 0) return NodeState.FAILURE;
         
@@ -157,10 +158,8 @@ public partial class AssessRetreat : Action
             agent.Set("retreat_flag", false);
             steer_data.RotateDirection = Vector2.Zero;
         }
-
-        if (ship_wrapper is null) agent.QueueFree();
         
-        if (IsInstanceValid(ship_wrapper.TargetUnit) || !ship_wrapper.TargetUnit.IsQueuedForDeletion() || ship_wrapper.TargetUnit is not null)
+        if (ship_wrapper.TargetUnit is not null || IsInstanceValid(ship_wrapper.TargetUnit) || !ship_wrapper.TargetUnit.IsQueuedForDeletion())
         {
             RigidBody2D n_agent = agent as RigidBody2D;
             Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");
@@ -168,7 +167,7 @@ public partial class AssessRetreat : Action
             ship_wrapper.TargetUnit.Set("targeted_by", targeted_by);
             agent.Call("set_target_unit", new Godot.Collections.Array<int>());
             ship_wrapper.TargetUnit = null;
-            //steer_data.TargetUnit = null;
+            steer_data.TargetUnit = null;
             agent.Call("set_target_for_weapons", new Godot.Collections.Array<int>());
         }
         
