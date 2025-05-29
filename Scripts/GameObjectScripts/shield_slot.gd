@@ -1,4 +1,4 @@
-extends StaticBody2D
+extends RigidBody2D
 class_name ShieldSlot
 
 @onready var ShieldShape: CollisionPolygon2D = $ShieldShape
@@ -28,6 +28,7 @@ const MAX_HITS := 32
 var hits: Array[Dictionary] = [] # each hit = {pos, radius, timer}
 
 func _process(delta) -> void:
+	self.global_transform = owner.global_transform
 	if hits.size() == 0:
 		set_process(false)
 		return
@@ -148,6 +149,11 @@ func toggle_shields(value: bool) -> void:
 	# Setup the shields parameters initially.
 func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: Ship) -> void:
 	add_collision_exception_with(ship)
+	#if ship.is_friendly:
+		#collision_layer = 5
+	#else:
+		#collision_layer = 20
+	owner = ship
 	ShieldVisuals.material = shield_material.duplicate(true) 
 	shield_raise_time = ship.ship_stats.shield_raise_time
 	var rectangle = ship.ShipSprite.get_rect()
@@ -166,7 +172,7 @@ func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: S
 	ship_id = id
 
 	ShieldVisuals.material.set_shader_parameter("circle_radius", shield_radius)
-	
+	position = Vector2.ZERO
 	# For omni shields, when that gets polished in.
 	#var shield_transform: Transform2D = global_transform
 	#var look_at_projectile: Transform2D = shield_transform.looking_at(projectile.global_position)

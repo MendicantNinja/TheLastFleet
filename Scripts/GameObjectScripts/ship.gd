@@ -1091,7 +1091,7 @@ func set_targets(targets: Array) -> void:
 	for n_target in targets:
 		if n_target == null:
 			continue
-		if n_target is RigidBody2D:
+		if n_target is Ship:
 			recast_targets.append(n_target)
 		else:
 			push_error("Expected a RigidBody2D, got: " + str(n_target))
@@ -1186,7 +1186,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 	return valid_paths
 
 func _on_SeparationShape_body_entered(neighbor) -> void:
-	if neighbor == self or neighbor is StaticBody2D:
+	if neighbor == self or neighbor is StaticBody2D or neighbor is ShieldSlot:
 		return
 	var n_neighbor: RigidBody2D = neighbor as RigidBody2D
 	var tmp_array: Array = separation_neighbors

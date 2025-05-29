@@ -19,7 +19,7 @@ size = Vector2(22, 28.5)
 
 [node name="TestShip" type="RigidBody2D"]
 z_as_relative = false
-collision_mask = 15
+collision_mask = 31
 input_pickable = true
 gravity_scale = 0.0
 continuous_cd = 1

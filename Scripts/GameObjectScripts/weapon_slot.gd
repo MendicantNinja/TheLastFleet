@@ -1,6 +1,7 @@
 extends Node2D
 class_name WeaponSlot
 
+
 # Nodes
 @onready var WeaponMountImage: Sprite2D = $WeaponNode/WeaponMountSprite
 @onready var WeaponImage: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
@@ -312,6 +313,11 @@ func _physics_process(delta) -> void:
 		var face_direction: Transform2D = face_weapon(mouse_position)
 		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	
+	if available_targets.is_empty() == true:
+		can_fire = false
+		if current_beam != null and current_beam.is_continuous:
+			stop_continuous_beam()
+	
 	if killcast.enabled == true and available_targets.is_empty() == false:
 		var target_position: Vector2 = Vector2.ZERO
 		if available_targets.has(primary_target):
@@ -322,7 +328,10 @@ func _physics_process(delta) -> void:
 		killcast.target_position = target_position
 		killcast.force_raycast_update()
 		var collider = killcast.get_collider()
-		if collider == null or not (collider is Ship or collider is ShieldSlot):
+		# Do not attempt to put these conditionals in the same line. You will regret it.
+		if collider == null:
+			can_fire = false
+		if not (collider is Ship or collider is ShieldSlot):
 			can_fire = false
 		elif (collider is Ship or collider is ShieldSlot) and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
 			can_fire = false
@@ -363,8 +372,8 @@ func _on_EffectiveRange_entered(body) -> void:
 	
 	if is_friendly == body.is_friendly:
 		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
-	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
-		return # ignore obstacle and projectile layers, respectively
+	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4) or body.get_collision_layer_value(5): 
+		return # ignore obstacle and projectile and shield layers, respectively
 	
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_transform.origin, body.global_position, 7, [self, owner_rid])
