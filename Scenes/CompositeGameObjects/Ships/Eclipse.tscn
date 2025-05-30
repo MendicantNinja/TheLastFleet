@@ -38,6 +38,7 @@ max_contacts_reported = 10
 script = ExtResource("1_p58et")
 
 [node name="ForceDebug" parent="." instance=ExtResource("2_umy7s")]
+
 [node name="AvoidanceArea" parent="." instance=ExtResource("2_4ia47")]
 
 [node name="SeparationArea" parent="." instance=ExtResource("3_0sd6m")]
