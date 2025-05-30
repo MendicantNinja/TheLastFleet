@@ -331,6 +331,8 @@ var acceleration: Vector2 = Vector2.ZERO:
 
 var target_position: Vector2 = Vector2.ZERO:
 	set(value):
+		if is_friendly == true:
+			move_order_updated.emit(value)
 		SteerData.SetTargetPosition(value)
 		target_position = value
 
@@ -372,6 +374,7 @@ signal destroyed()
 signal update_agent_influence()
 signal update_registry_cell()
 signal ship_deployed()
+signal move_order_updated(value)
 
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
