@@ -60,21 +60,21 @@ func setup_ship_registry() -> void:
 func _unhandled_key_input(event) -> void:
 	if self.visible == true:
 		if event.ctrl_pressed == true:
-			if (event.keycode == KEY_1 and event.pressed):
+			if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0] != null):
 				weapon_system_scene_list[0].toggle_autofire_pip()
-			elif (event.keycode == KEY_2 and event.pressed):
+			elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1] != null):
 				weapon_system_scene_list[1].toggle_autofire_pip()
-			elif (event.keycode == KEY_3 and event.pressed):
+			elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2] != null):
 				weapon_system_scene_list[2].toggle_autofire_pip()
-			elif (event.keycode == KEY_4 and event.pressed):
+			elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3] != null):
 				weapon_system_scene_list[3].toggle_autofire_pip()
-			elif (event.keycode == KEY_5 and event.pressed):
+			elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4] != null):
 				weapon_system_scene_list[4].toggle_autofire_pip()
-			elif (event.keycode == KEY_6 and event.pressed):
+			elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5] != null):
 				weapon_system_scene_list[5].toggle_autofire_pip()
-			elif (event.keycode == KEY_7 and event.pressed):
+			elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6] != null):
 				weapon_system_scene_list[6].toggle_autofire_pip()
-			elif (event.keycode == KEY_8 and event.pressed):
+			elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7] != null):
 				weapon_system_scene_list[7].toggle_autofire_pip()
 
 	if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0] != null):
