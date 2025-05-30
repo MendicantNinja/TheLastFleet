@@ -25,6 +25,7 @@ gradient = SubResource("Gradient_lqjnm")
 width = 10
 
 [node name="CenterCombatHUD" type="Control"]
+process_mode = 3
 top_level = true
 layout_mode = 3
 anchors_preset = 0
@@ -143,7 +144,7 @@ offset_right = 34.0
 offset_bottom = 30.0
 texture = ExtResource("7_spiim")
 
-[node name="TacticalMapIcon" type="TextureButton" parent="."]
+[node name="CombatMapIconDeprecated" type="TextureButton" parent="."]
 visible = false
 self_modulate = Color(1, 1, 1, 0.588235)
 z_index = 1

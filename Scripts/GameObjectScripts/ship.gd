@@ -571,6 +571,8 @@ func process_damage(projectile: Projectile) -> void:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
 
 func destroy_ship() -> void:
+	if manual_control == true:
+		toggle_manual_control()
 	destroyed.emit()
 	
 	remove_from_group(&"agent")
@@ -753,11 +755,12 @@ func highlight_selection(select_value: bool = false) -> void:
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:
-	# NOTE: Toggle manual aim is set to false in combat_map.gd in set_manual_camera
-	if ship_select == false:
-		manual_control = false
-		CombatBehaviorTree.ToggleRoot(true)
-		return
+	# NOTE: If there are issues with combat AI not being flipped back on when leaving manual control. Uncomment this.
+	# It should be fine given set_combat_ai() called later on in this method toggles the root.
+	#if ship_select == false:
+		#manual_control = false
+		#CombatBehaviorTree.ToggleRoot(true)
+		#return
 	
 	if manual_control == false:
 		ManualControlLoadingBar.visible = true
