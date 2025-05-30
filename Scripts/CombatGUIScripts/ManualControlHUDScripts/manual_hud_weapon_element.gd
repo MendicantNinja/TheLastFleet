@@ -4,7 +4,8 @@ var Number1: RichTextLabel = null
 var NameCount1: RichTextLabel = null
 var AutofireIndicator: TextureButton = null
 var weapon_subtype_scene = load("res://Scenes/GUIScenes/CombatGUIScenes/ManualHUDWeaponSubtype.tscn")
-var weapon_system_reference = null
+var weapon_system_reference: WeaponSystem = null
+var weapon_system_index: int 
 var gui_position = Vector2(69, 36)
 
 
@@ -16,6 +17,7 @@ func initialize(weapon_system: WeaponSystem) -> void:
 	Number1 = $Row1/Number
 	NameCount1 = $Row1/NameCount
 	AutofireIndicator = $Row1/AutofireIndicator
+	weapon_system_index = weapon_system.weapons[0].weapon_system_group
 	Number1.text = str(weapon_system.weapons[0].weapon_system_group+1) + "."
 	gui_position.x -= 8 * weapon_system.weapons[0].weapon_system_group
 	#gui_position.y += 25 * weapon_system.weapons[0].weapon_system_group

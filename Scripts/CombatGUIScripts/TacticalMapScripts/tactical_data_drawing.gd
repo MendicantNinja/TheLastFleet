@@ -246,9 +246,6 @@ func setup() -> void:
 	var enemy_group: Array = get_tree().get_nodes_in_group("enemy")
 	connect_unit_signals(friendly_group)
 	connect_unit_signals(enemy_group)
-	get_tree().call_group("enemy", "display_icon", visible)
-	get_tree().call_group("friendly", "display_icon", visible)    
-
 	update()
 
 func update() -> void:

@@ -15,7 +15,12 @@ func _process(delta: float) -> void:
 
 # Not actually new game, I just copy paste code.
 func on_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://Scenes/GameScenes/CombatArena.tscn")
+	var scene = load("res://Scenes/GameScenes/CombatArena.tscn") as PackedScene
+	var instance = scene.instantiate()
+	get_tree().root.add_child(instance)
+	get_tree().current_scene.queue_free()
+	get_tree().current_scene = instance
+	instance.setup(Fleet.new(), 0)
 
 func on_focus_entered() -> void:
 	pass

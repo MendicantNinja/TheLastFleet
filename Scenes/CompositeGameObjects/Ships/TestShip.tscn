@@ -18,6 +18,9 @@
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Chill.cs" id="13_5mwfp"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pursue.cs" id="14_8084u"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Escape.cs" id="15_y2i30"]
+[ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_2pkbv"]
+[ext_resource type="PackedScene" uid="uid://cjllo8sl6lu3f" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_sc7p2"]
+[ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_4aruk"]
 [ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_jhvh6"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="21_lqqcs"]
 [ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_0nlic"]
@@ -32,7 +35,7 @@ height = 92.0
 size = Vector2(22, 28.5)
 
 [node name="TestShip" type="RigidBody2D"]
-collision_mask = 15
+collision_mask = 31
 input_pickable = true
 gravity_scale = 0.0
 contact_monitor = true
@@ -51,6 +54,7 @@ shape = SubResource("CircleShape2D_seyge")
 [node name="SeparationArea" type="Area2D" parent="."]
 collision_layer = 0
 collision_mask = 0
+[node name="AvoidanceArea" parent="." instance=ExtResource("2_sc7p2")]
 
 [node name="SeparationShape" type="CollisionShape2D" parent="SeparationArea"]
 shape = SubResource("CircleShape2D_seyge")
@@ -122,6 +126,7 @@ z_index = 1
 position = Vector2(-25.75, -36)
 rotation = 1.5708
 shape = SubResource("RectangleShape2D_tnpgt")
+[node name="SeparationArea" parent="." instance=ExtResource("3_4aruk")]
 
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
 z_index = 1

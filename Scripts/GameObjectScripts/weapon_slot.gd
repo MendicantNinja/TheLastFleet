@@ -1,6 +1,7 @@
 extends Node2D
 class_name WeaponSlot
 
+
 # Nodes
 @onready var WeaponMountImage: Sprite2D = $WeaponNode/WeaponMountSprite
 @onready var WeaponImage: Sprite2D = $WeaponNode/WeaponMountSprite/WeaponSprite
@@ -89,10 +90,9 @@ func fire(ship_id: int) -> void:
 	if manual_aim and can_look_at == false:
 		return
 	
-	if weapon.flux_per_shot > 0.0:
-		weapon_slot_fired.emit(weapon.flux_per_shot)
-	#elif weapon.flux_per_second > 0.0:
-		#weapon_slot_fired.emit(weapon.flux_per_second)
+	if weapon.is_beam == false and weapon.is_continuous == false:
+		if weapon.flux_per_shot > 0.0:
+			weapon_slot_fired.emit(weapon.flux_per_shot)
 	
 	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
 	projectile.global_transform = WeaponNode.global_transform
@@ -142,7 +142,15 @@ func _draw() -> void:
 		for i in range(0, subdivisions):
 			draw_arc(WeaponNode.transform.origin, (i + 1) * divisor, start_angle, end_angle, range_display_count, range_display_color, range_display_width, true)
 
-func _ready():
+# Warning! Use set_weapon_slot() below rather than ready if the property 
+# you are messing with depends on the type of weapon.
+# The actual weapon used in combat is not assigned in ready, but in set_weapon_slot.
+#func _ready():
+	#pass
+
+func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
+	weapon_system_group = 0 # Index of 0 = weapon system 1
+	
 	WeaponMountImage.texture = weapon_mount.image
 	WeaponImage.texture = weapon.image
 	
@@ -158,16 +166,10 @@ func _ready():
 	default_direction = WeaponNode.transform
 	arc_in_radians = deg_to_rad(weapon_mount.firing_arc / 2.0)
 	
+	# Move this to set_weapon_slot below if this is giving trouble. See method comment above.
 	EffectiveRange.body_entered.connect(_on_EffectiveRange_entered)
 	EffectiveRange.body_exited.connect(_on_EffectiveRange_exited)
 	
-	if weapon.is_continuous:
-		ContinuousFluxTimer.timeout.connect(func():  # Example value, replace with actual flux
-			emit_signal("weapon_slot_fired", weapon.flux_per_shot)
-	)
-
-func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
-	weapon_system_group = 0 # Index of 0 = weapon system 1
 	# Give everything railguns in dev mode for empty weapons
 	if settings.dev_mode == true and p_weapon_slot.weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
 		weapon = data.weapon_dictionary.get(data.weapon_enum.RAILGUN)
@@ -188,6 +190,13 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 		
 		var interval_in_seconds: float = 1.0 / p_weapon_slot.weapon.fire_rate
 		ROFTimer.wait_time = interval_in_seconds
+	if weapon.is_continuous == true:
+		ContinuousFluxTimer.timeout.connect(on_continuous_flux_timer_timeout)
+
+func on_continuous_flux_timer_timeout() -> void:
+	emit_signal("weapon_slot_fired", weapon.flux_per_shot*.05) 
+	# Flux per shot == flux per second in the case of continuous beams.
+
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
 	EffectiveRange.collision_mask = mask
@@ -202,8 +211,8 @@ func set_auto_fire(fire_value: bool) -> void:
 	auto_fire = fire_value
 	if fire_value == false:
 		manual_aim = true
-	if weapon.is_continuous == true:
-		stop_continuous_beam()
+		if weapon.is_continuous == true:
+			stop_continuous_beam()
 
 func set_auto_aim(aim_value: bool) -> void:
 	auto_aim = aim_value
@@ -306,6 +315,11 @@ func _physics_process(delta) -> void:
 		var face_direction: Transform2D = face_weapon(mouse_position)
 		WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
 	
+	if available_targets.is_empty() == true:
+		can_fire = false
+		if current_beam != null and current_beam.is_continuous:
+			stop_continuous_beam()
+	
 	if killcast.enabled == true and available_targets.is_empty() == false:
 		var target_position: Vector2 = Vector2.ZERO
 		if available_targets.has(primary_target):
@@ -316,9 +330,12 @@ func _physics_process(delta) -> void:
 		killcast.target_position = target_position
 		killcast.force_raycast_update()
 		var collider = killcast.get_collider()
-		if collider is not Ship or collider == null: # Do not shoot at obstacles
+		# Do not attempt to put these conditionals in the same line. You will regret it.
+		if collider == null:
 			can_fire = false
-		elif collider is Ship and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
+		if not (collider is Ship or collider is ShieldSlot):
+			can_fire = false
+		elif (collider is Ship or collider is ShieldSlot) and is_friendly == collider.is_friendly: # Do not shoot at friendly ships
 			can_fire = false
 		else:
 			can_fire = true
@@ -334,12 +351,14 @@ func _physics_process(delta) -> void:
 		if (auto_aim or auto_fire):
 			var face_direction: Transform2D = face_weapon(target_position)
 			WeaponNode.transform = WeaponNode.transform.interpolate_with(face_direction, delta * weapon.turn_rate)
+			if can_fire == false or can_look_at == false:
+				if current_beam != null and current_beam.is_continuous:
+					stop_continuous_beam()
 		
 		if can_look_at and can_fire and timer_fire and auto_fire:
 			fire(owner_rid.get_id())
 			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
 				target_in_range.emit(true)
-		
 		if available_targets.size() >= 1 and can_fire == false:
 			acquire_new_target()
 
@@ -355,8 +374,8 @@ func _on_EffectiveRange_entered(body) -> void:
 	
 	if is_friendly == body.is_friendly:
 		return # ignore friendly ships if its a player (true == true) and vice versa for enemy ships (false == false)
-	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4): 
-		return # ignore obstacle and projectile layers, respectively
+	elif body.get_collision_layer_value(2) or body.get_collision_layer_value(4) or body.get_collision_layer_value(5): 
+		return # ignore obstacle and projectile and shield layers, respectively
 	
 	var space_state: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var query: PhysicsRayQueryParameters2D = PhysicsRayQueryParameters2D.create(global_transform.origin, body.global_position, 7, [self, owner_rid])

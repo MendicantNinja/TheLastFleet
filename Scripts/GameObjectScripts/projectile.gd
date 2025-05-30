@@ -47,6 +47,8 @@ func _physics_process(delta) -> void:
 			queue_free()
 	elif is_beam == true:
 		beam_end = beam_raycast.target_position  # Default to max length
+		#if owner_rid.is_valid() == false:
+			#queue_free()
 		if beam_raycast.is_colliding():
 			var target = beam_raycast.get_collider()
 			if target is Projectile:
@@ -99,7 +101,7 @@ func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: boo
 				emit_signal("projectile_freed")  # Emit signal after freeing
 )
 		beam_raycast.collision_mask = 31
-		#beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
+		beam_line.set_point_position(1, Vector2(range, 0)) # Where is the beam drawn.
 
 # What happens when the projectile hits? We have damage and the collided_object_instance for the enemy to calculate.
 func _on_projectile_collision(body) -> void:

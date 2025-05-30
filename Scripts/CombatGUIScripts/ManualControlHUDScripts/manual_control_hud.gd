@@ -60,70 +60,46 @@ func setup_ship_registry() -> void:
 func _unhandled_key_input(event) -> void:
 	if self.visible == true:
 		if event.ctrl_pressed == true:
-			if (event.keycode == KEY_1 and event.pressed):
+			if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0] != null):
 				weapon_system_scene_list[0].toggle_autofire_pip()
-			elif (event.keycode == KEY_2 and event.pressed):
+			elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1] != null):
 				weapon_system_scene_list[1].toggle_autofire_pip()
-			elif (event.keycode == KEY_3 and event.pressed):
+			elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2] != null):
 				weapon_system_scene_list[2].toggle_autofire_pip()
-			elif (event.keycode == KEY_4 and event.pressed):
+			elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3] != null):
 				weapon_system_scene_list[3].toggle_autofire_pip()
-			elif (event.keycode == KEY_5 and event.pressed):
+			elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4] != null):
 				weapon_system_scene_list[4].toggle_autofire_pip()
-			elif (event.keycode == KEY_6 and event.pressed):
+			elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5] != null):
 				weapon_system_scene_list[5].toggle_autofire_pip()
-			elif (event.keycode == KEY_7 and event.pressed):
+			elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6] != null):
 				weapon_system_scene_list[6].toggle_autofire_pip()
-			elif (event.keycode == KEY_8 and event.pressed):
+			elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7] != null):
 				weapon_system_scene_list[7].toggle_autofire_pip()
-		if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[0].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[0]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[1].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[1]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[2].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[2]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[3].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[3]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[4].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[4]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[5].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[5]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[6].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[6]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
-		elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7].weapon_system_reference != null):
-			settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
-			current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
-			current_ship.selected_weapon_system = weapon_system_scene_list[7].weapon_system_reference
-			selected_weapon_system_scene = weapon_system_scene_list[7]
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+
+	if (event.keycode == KEY_1 and event.pressed and weapon_system_scene_list[0] != null):
+		swap_weapon_system(0)
+	elif (event.keycode == KEY_2 and event.pressed and weapon_system_scene_list[1] != null):
+		swap_weapon_system(1)
+	elif (event.keycode == KEY_3 and event.pressed and weapon_system_scene_list[2] != null):
+		swap_weapon_system(2)
+	elif (event.keycode == KEY_4 and event.pressed and weapon_system_scene_list[3] != null):
+		swap_weapon_system(3)
+	elif (event.keycode == KEY_5 and event.pressed and weapon_system_scene_list[4] != null):
+		swap_weapon_system(4)
+	elif (event.keycode == KEY_6 and event.pressed and weapon_system_scene_list[5] != null):
+		swap_weapon_system(5)
+	elif (event.keycode == KEY_7 and event.pressed and weapon_system_scene_list[6] != null):
+		swap_weapon_system(6)
+	elif (event.keycode == KEY_8 and event.pressed and weapon_system_scene_list[7] != null):
+		swap_weapon_system(7)
+		
+func swap_weapon_system(weapon_index_number: int) -> void:
+	settings.swizzle(selected_weapon_system_scene.NameCount1, Color8(255, 255, 255, 255))
+	current_ship.stop_firing_beams(current_ship.selected_weapon_system.weapons)
+	current_ship.selected_weapon_system = weapon_system_scene_list[weapon_index_number].weapon_system_reference
+	selected_weapon_system_scene = weapon_system_scene_list[weapon_index_number]
+	settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 
 func setup_weapon_systems() -> void:
 	for child in $HUDWrapper.get_children():
@@ -131,23 +107,25 @@ func setup_weapon_systems() -> void:
 			child.queue_free()
 	weapon_system_spacing = Vector2(62, 36)
 	weapon_system_scene_list.clear()
+	weapon_system_scene_list.resize(8)
 	if current_ship == null:
 		return
 	for weapon_system in current_ship.weapon_systems:
 		var weapon_system_instance: GridContainer = weapon_system_scene.instantiate()
 		if weapon_system.weapons.is_empty() == false:
-			weapon_system_scene_list.append(weapon_system_instance)
 			weapon_system_instance.initialize(weapon_system)
+			weapon_system_scene_list.insert(weapon_system_instance.weapon_system_index, weapon_system_instance)
 			$HUDWrapper.add_child(weapon_system_instance)
 			weapon_system_instance.position.x = IndicatorDecor.position.x + weapon_system_instance.gui_position.x
 			weapon_system_instance.position.y =  IndicatorDecor.position.y + weapon_system_spacing.y
 			weapon_system_spacing.y += weapon_system_instance.size.y + 5
 	#
 	for weapon_system_scene in weapon_system_scene_list:
-		if weapon_system_scene.NameCount1 != null:
-			selected_weapon_system_scene = weapon_system_scene_list[0]
-			current_ship.selected_weapon_system = selected_weapon_system_scene.weapon_system_reference
-			settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
+		if weapon_system_scene != null:
+			if weapon_system_scene.NameCount1 != null:
+				selected_weapon_system_scene = weapon_system_scene_list[0]
+				current_ship.selected_weapon_system = selected_weapon_system_scene.weapon_system_reference
+				settings.swizzle_and_brighten(selected_weapon_system_scene.NameCount1)
 			#return
 	
 	if weapon_system_spacing.y >= 36 + 25*6:

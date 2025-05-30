@@ -592,6 +592,8 @@ func process_damage(projectile: Projectile) -> void:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
 
 func destroy_ship() -> void:
+	if manual_control == true:
+		toggle_manual_control()
 	destroyed.emit()
 	
 	remove_from_group(&"agent")
@@ -603,7 +605,9 @@ func destroy_ship() -> void:
 	remove_from_group(group_name)
 	if group_leader == true:
 		globals.reset_group_leader(self)
-	
+	for weapon in all_weapons:
+		if weapon.current_beam != null:
+			weapon.stop_continuous_beam()
 	var visited_group: Array = []
 	for attacker in targeted_by:
 		if attacker == null or attacker.is_queued_for_deletion():
@@ -775,11 +779,12 @@ func highlight_selection(select_value: bool = false) -> void:
 	get_viewport().set_input_as_handled()
 
 func toggle_manual_control() -> void:
-	# NOTE: Toggle manual aim is set to false in combat_map.gd in set_manual_camera
-	if ship_select == false:
-		manual_control = false
-		CombatBehaviorTree.ToggleRoot(true)
-		return
+	# NOTE: If there are issues with combat AI not being flipped back on when leaving manual control. Uncomment this.
+	# It should be fine given set_combat_ai() called later on in this method toggles the root.
+	#if ship_select == false:
+		#manual_control = false
+		#CombatBehaviorTree.ToggleRoot(true)
+		#return
 	
 	if manual_control == false:
 		ManualControlLoadingBar.visible = true
@@ -1105,7 +1110,7 @@ func set_targets(targets: Array) -> void:
 	for n_target in targets:
 		if n_target == null:
 			continue
-		if n_target is RigidBody2D:
+		if n_target is Ship:
 			recast_targets.append(n_target)
 		else:
 			push_error("Expected a RigidBody2D, got: " + str(n_target))
@@ -1200,7 +1205,7 @@ func raycast_sweep(sweep_vectors: Array[Vector2], local_target_pos: Vector2) -> 
 	return valid_paths
 
 func _on_SeparationShape_body_entered(neighbor) -> void:
-	if neighbor == self or neighbor is StaticBody2D:
+	if neighbor == self or neighbor is StaticBody2D or neighbor is ShieldSlot:
 		return
 	var n_neighbor: RigidBody2D = neighbor as RigidBody2D
 	var tmp_array: Array = separation_neighbors

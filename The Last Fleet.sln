@@ -1,6 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "The Last Fleet", "The Last Fleet.csproj", "{347FCF46-0459-4F48-8A68-4818AAE4CF12}"
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,5 +14,11 @@ Global
 		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
 		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
 		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DC38BE4C-6460-46F8-BC83-A00A6315BA4B}
 	EndGlobalSection
 EndGlobal
