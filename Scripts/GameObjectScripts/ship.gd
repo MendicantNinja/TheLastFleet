@@ -108,6 +108,7 @@ var is_revealed: bool:
 			visible = value
 			tactical_map_icon.disabled = value
 			tactical_map_icon.visible = value
+
 var ships_detecting_me: int = 0 # Increment this counter for enemies when entering a detection body. Decrement when exiting. See detection_area.gd in the packed scene.
 
 var is_friendly: bool = false:
@@ -259,6 +260,7 @@ var retreat_flag: bool = false:
 			print(name, " is retreating")
 		elif retreat_flag == true and value == false:
 			print(name, " is no longer retreating")
+		tactical_map_icon.toggle_retreat_animation(value)
 		ShipWrapper.SetRetreatFlag(value)
 		retreat_flag = value
 

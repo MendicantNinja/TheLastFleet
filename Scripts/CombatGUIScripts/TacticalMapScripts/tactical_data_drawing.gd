@@ -225,7 +225,6 @@ func setup() -> void:
 				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
-				
 				var texture_appended: TextureRect = DetectionTexture.duplicate()
 				$VisibilityLayerContainer/VisibilityLayer.add_child(texture_appended)
 				detection_list.append(texture_appended)

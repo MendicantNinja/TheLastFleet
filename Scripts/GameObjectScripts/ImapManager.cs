@@ -118,12 +118,23 @@ public partial class ImapManager : Node
 			RegistryMap[ship_wrapper.RegistryCell].Remove(agent);
 		}
 
-		if (agent.IsConnected("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent))))
+		List<Vector2I> registry_clean_up = new List<Vector2I>();
+		foreach (Vector2I cell in RegistryMap.Keys)
 		{
-			agent.Disconnect("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent)));
-			agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
-			agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
+			if (RegistryMap[cell].Count == 0) registry_clean_up.Add(cell);
 		}
+
+		foreach (Vector2I cell in registry_clean_up)
+		{
+			RegistryMap.Remove(cell);
+		}
+
+		if (agent.IsConnected("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent))))
+			{
+				agent.Disconnect("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(agent)));
+				agent.Disconnect("destroyed", Callable.From(() => OnAgentDestroyed(agent)));
+				agent.Disconnect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(agent)));
+			}
 	}
 	
 	public void OnCombatArenaExiting()
@@ -197,12 +208,13 @@ public partial class ImapManager : Node
 			}
 		}
 
+		List<Vector2I> remove_registry_cell = new List<Vector2I>();
 		foreach (KeyValuePair<Vector2I, List<RigidBody2D>> pair in RegistryMap)
 		{
 			List<RigidBody2D> update_list = pair.Value;
 			foreach (RigidBody2D unit in pair.Value)
 			{
-				if (!IsInstanceValid(unit))
+				if (!IsInstanceValid(unit) || unit.IsQueuedForDeletion())
 				{
 					update_list.Remove(unit);
 				}
@@ -210,8 +222,13 @@ public partial class ImapManager : Node
 			RegistryMap[pair.Key] = update_list;
 			if (pair.Value.Count == 0 || update_list.Count == 0)
 			{
-				RegistryMap.Remove(pair.Key);
+				remove_registry_cell.Add(pair.Key);
 			}
+		}
+
+		foreach (Vector2I registry_cell in remove_registry_cell)
+		{
+			RegistryMap.Remove(registry_cell);
 		}
 
 		agent.Set("registry_neighborhood", registry_neighborhood);
@@ -237,23 +254,34 @@ public partial class ImapManager : Node
 			{
 				if (!IsInstanceValid(agent) || agent.IsQueuedForDeletion())
 					continue;
-				
+
 				clean_agent_registry.Add(agent);
 				float approx_influence = (float)agent.Get("approx_influence");
 
 				// Influence > 0 indicates friendly; influence < 0 indicates enemy.
 				if (approx_influence > 0.0f)
+				{
 					friendly_density += approx_influence;
+				}
+
 				if (approx_influence < 0.0f)
+				{
 					enemy_density += approx_influence;
+				}
+
 			}
 
 			RegistryMap[cell] = clean_agent_registry;
 
 			if (friendly_density > 0.0f)
+			{
 				friendly_cell_density[cell] = friendly_density;
+			}
+
 			if (enemy_density < 0.0f)
+			{
 				enemy_cell_density[cell] = enemy_density;
+			}
 		}
 
 		// Exit if one side is empty.
@@ -280,13 +308,19 @@ public partial class ImapManager : Node
 			// Calculate the aggregate density for this cluster.
 			float density = 0.0f;
 			foreach (Vector2I n_cell in cluster)
+			{
 				density += enemy_cell_density[n_cell];
+			}
 
 			if (density < 0.0f)
+			{
 				enemy_neighborhood_density[cluster] = density;
+			}
 
 			if (density < 0.0f && density < max_enemy_density)
+			{
 				max_enemy_density = density;
+			}
 		}
 		// Store enemy clusters.
 		EnemyClusters = enemyClusters;
@@ -304,19 +338,26 @@ public partial class ImapManager : Node
 			Godot.Collections.Array<Vector2I> cluster = new Godot.Collections.Array<Vector2I>();
 			if (!visited.Contains(cell))
 			{
-				cluster = RegistryFloodFill(cell, visited, cluster, enemy_cell_density);
+				cluster = RegistryFloodFill(cell, visited, cluster, friendly_cell_density);
 				friendlyClusters.Add(cluster);
 			}
 
 			float density = 0.0f;
 			foreach (Vector2I n_cell in cluster)
+			{
 				density += friendly_cell_density[n_cell];
+			}
+
 
 			if (density > 0.0f)
+			{
 				friendly_neighborhood_density[cluster] = density;
+			}
 
 			if (density > 0.0f && density > max_friendly_density)
+			{
 				max_friendly_density = density;
+			}
 		}
 		// Store friendly clusters.
 		FriendlyClusters = friendlyClusters;

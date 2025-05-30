@@ -108,7 +108,7 @@ public partial class FindTargetPositions : Action
 		foreach (Vector2I gm_cell in isolated_geo_med.Keys)
 		{
 			Vector2I goal_cell = isolated_geo_med[gm_cell];
-			admiral.GoalValue[goal_cell] = 2.0f;
+			admiral.GoalValue[goal_cell] = 1.0f;
 		}
 
 		foreach (Vector2I gm_cell in vulnerability_geo_med.Keys)

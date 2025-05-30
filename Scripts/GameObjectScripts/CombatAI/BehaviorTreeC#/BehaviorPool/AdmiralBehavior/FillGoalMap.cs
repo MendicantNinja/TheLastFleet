@@ -93,7 +93,7 @@ public partial class FillGoalMap : Action
 				{
 					value = goal_map.MapGrid[m, n];
 				}
-				value += magnitude - norm_mag * (distance / radius);
+				value += magnitude - magnitude * (distance / radius);
 				goal_map.MapGrid[m, n] = value;
 				goal_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, value);
 			}
