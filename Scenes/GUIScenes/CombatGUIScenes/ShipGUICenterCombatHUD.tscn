@@ -155,7 +155,7 @@ texture = ExtResource("7_spiim")
 
 [node name="CombatMapIconDeprecated" type="TextureButton" parent="."]
 visible = false
-self_modulate = Color(1, 1, 1, 0.588235)
+modulate = Color(1, 1, 1, 0.607843)
 z_index = 1
 layout_mode = 1
 anchors_preset = 8

@@ -67,6 +67,7 @@ public partial class FillGoalMap : Action
 			
 			Vector2I max_cell = geo_mean_cell[max_idx];
 			int radius = (int)max_cell.DistanceTo(goal_cell);
+			GD.Print(goal_cell, " : ", goal_value[goal_cell]);
 			goal_map = PropagateGoalValues(goal_map, radius, goal_cell, goal_value[goal_cell], norm_val);
 		}
 
@@ -88,11 +89,11 @@ public partial class FillGoalMap : Action
 			{
 				float distance = center.DistanceTo(new Vector2I(m, n));
 				float value = 0.0f;
-				if (goal_map.MapGrid[m, n] <= 0.0f)
+				if (goal_map.MapGrid[m, n] != 0.0f)
 				{
 					value = goal_map.MapGrid[m, n];
 				}
-				value += magnitude - norm_mag * (distance / radius);
+				value += magnitude - magnitude * (distance / radius);
 				goal_map.MapGrid[m, n] = value;
 				goal_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, value);
 			}

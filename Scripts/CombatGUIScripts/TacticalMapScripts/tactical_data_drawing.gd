@@ -1,5 +1,6 @@
 extends Node2D
 @onready var TacticalMapLayer = %TacticalMapLayer
+@onready var MoveIndicatorManager = $MoveIndicatorManager
 @onready var TacticalViewport: SubViewport = $".."
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
@@ -9,11 +10,9 @@ extends Node2D
 
 @onready var icon_list: Array
 @onready var TacticalMapIconScene = load("res://Scenes/GUIScenes/CombatGUIScenes/TacticalMapShipIcon.tscn")
-
 @onready var VisibilityLayer: SubViewport
 @onready var DetectionTexture: TextureRect = $VisibilityLayerContainer/VisibilityLayer/DetectionRadius
 @onready var detection_list: Array[TextureRect]
-
 var ship_registry: Dictionary
 # Visuals
 var TacticalMapBackground: ColorRect
@@ -72,14 +71,15 @@ func _ready():
 	$FogOfWar.size = TacticalMapBackground.size
 	$VisibilityLayerContainer/VisibilityLayer.size = TacticalMapBackground.size
 	$FogOfWar.material.set_shader_parameter("visibility_texture", $VisibilityLayerContainer/VisibilityLayer.get_texture())
-	
 	setup()
 	queue_redraw()
-	
 	for child in $"../../../ButtonList".get_children():
 		if child is TextureButton:
 			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
+	MoveIndicatorManager.add_indicator.connect(_on_add_indicator)
+	MoveIndicatorManager.global_map_size = map_bounds
+	MoveIndicatorManager.tactical_map_size = grid_size
 	#stress_testing()
 	pass # Replace with function body.
 
@@ -163,6 +163,8 @@ func connect_unit_signals(units: Array) -> void:
 			continue
 		if n_unit.is_friendly == true and not n_unit.alt_select.is_connected(_on_alt_select):
 			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))
+			n_unit.move_order_updated.connect(MoveIndicatorManager._on_move_order_updated.bind(n_unit))
+			n_unit.destroyed.connect(MoveIndicatorManager._on_remove_indicator_for_unit.bind(n_unit))
 			n_unit.ship_selected.connect(_on_unit_selected.bind(n_unit))
 		if n_unit.is_friendly == false and not n_unit.alt_select.is_connected(_on_alt_select):
 			n_unit.alt_select.connect(_on_alt_select.bind(n_unit))    
@@ -206,7 +208,6 @@ func swap_camera_feed(ship: Ship) -> void:
 	%CameraFeed.text = "[center]Camera Feed: " + ship.ship_stats.ship_name + "[/center]"
 	%CombatMap.CombatCamera.position_smoothing_enabled = false
 	%CombatMap.CombatCamera.global_position = camera_feed_ship.global_position
-	
 
 func setup() -> void:
 	#print("setup called")
@@ -225,7 +226,6 @@ func setup() -> void:
 				ship.tactical_map_icon = tactical_map_icon
 				tactical_map_icon.setup(ship)
 				icon_list.append(tactical_map_icon)
-				
 				var texture_appended: TextureRect = DetectionTexture.duplicate()
 				$VisibilityLayerContainer/VisibilityLayer.add_child(texture_appended)
 				detection_list.append(texture_appended)
@@ -268,15 +268,15 @@ func update() -> void:
 		var radius = detection_list[i]
 		icon.position = convert_realspace_to_map(icon.assigned_ship.global_position, map_bounds, grid_size)
 		radius.position = icon.position + Vector2(-radius.size.x/2, -radius.size.y/2)
-	
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#if self.visible == true and Engine.get_physics_frames() % 3 == 0:
 	update()
 	# Populate the map because ship registration isn't instantaneous as of 2/18/24
 	if initial_setup == false and Engine.get_physics_frames() % 62 == 0:
-			setup()
-			initial_setup = true
+		setup()
+		initial_setup = true
 
 func convert_realspace_to_map(global_pos: Vector2, global_map_size: Vector2, tactical_map_size: Vector2) -> Vector2:
 	return Vector2(
@@ -397,7 +397,6 @@ func reset_box_selection() -> void:
 	box_selection_start = Vector2.ZERO
 	box_selection_end = Vector2.ZERO
 	queue_redraw()
-	
 
 func _on_unit_selected(unit: Ship) -> void:
 	#print("on unit selected")
@@ -450,6 +449,7 @@ func process_move(to_position: Vector2) -> void:
 	
 	reset_group_affiliation(highlighted_group)
 	move_new_unit(to_position)
+
 # Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	if get_tree().get_node_count_in_group(highlight_enemy_name) > 0:
@@ -526,7 +526,11 @@ func attack_targets() -> void:
 			if unit.group_leader == true:
 				leader = unit
 				break
-		var targets_available: Array = leader.targeted_units
+		var targets_available: Array
+		if leader != null:
+			targets_available = leader.targeted_units
+		elif leader == null:
+			targets_available = existing_group[existing_group.size() - 1].targeted_units
 		if targets_available == targeted_group:
 			return
 	
@@ -623,6 +627,8 @@ func _on_alt_select(ship: Ship) -> void:
 	
 	ship.highlight_selection(highlight_value)
 
+func _on_add_indicator(indicator) -> void:
+	add_child(indicator)
 
 # I could make this a global with a callable as the parameter.
 func performance_testing():

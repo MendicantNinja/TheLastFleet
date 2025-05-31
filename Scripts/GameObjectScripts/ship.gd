@@ -108,6 +108,7 @@ var is_revealed: bool:
 			visible = value
 			tactical_map_icon.disabled = value
 			tactical_map_icon.visible = value
+
 var ships_detecting_me: int = 0 # Increment this counter for enemies when entering a detection body. Decrement when exiting. See detection_area.gd in the packed scene.
 
 var is_friendly: bool = false:
@@ -259,6 +260,7 @@ var retreat_flag: bool = false:
 			print(name, " is retreating")
 		elif retreat_flag == true and value == false:
 			print(name, " is no longer retreating")
+		tactical_map_icon.toggle_retreat_animation(value)
 		ShipWrapper.SetRetreatFlag(value)
 		retreat_flag = value
 
@@ -329,6 +331,8 @@ var acceleration: Vector2 = Vector2.ZERO:
 
 var target_position: Vector2 = Vector2.ZERO:
 	set(value):
+		if is_friendly == true:
+			move_order_updated.emit(value)
 		SteerData.SetTargetPosition(value)
 		target_position = value
 
@@ -370,6 +374,7 @@ signal destroyed()
 signal update_agent_influence()
 signal update_registry_cell()
 signal ship_deployed()
+signal move_order_updated(value)
 
 # Want to call a custom overriden _init when instantiating a packed scene? You're not allowed :(, so call this function after instantiating a ship but before ready()ing it in the node tree.
 func initialize(p_ship_stats: ShipStats = ShipStats.new(data.ship_type_enum.TEST)) -> void:
@@ -695,13 +700,11 @@ func set_posture(value: globals.Strategy) -> void:
 # Temporary workaround for now, not exactly great but whatever
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:
 	ShipWrapper.WeighCompositeInfluence(neighborhood_density)
-	#if weigh_influence != null:
-		#imap_manager.weighted_imap.add_map(weigh_influence, imap_cell.x, imap_cell.y, -1.0)
-	#var weight: float = 0.0
-	#for cluster in neighborhood_density:
-		#if registry_cell in cluster:
-			#weight = 1 / neighborhood_density[cluster]
-			#registry_cluster = cluster
+	for cluster in neighborhood_density:
+		if registry_cell in cluster:
+			var lol = name
+			var weight = 1 / neighborhood_density[cluster]
+			registry_cluster = cluster
 	#
 	#var composite_influence: Imap = template_maps[imap_manager.MapType.INFLUENCE_MAP]
 	#for m in range(0, composite_influence.height):

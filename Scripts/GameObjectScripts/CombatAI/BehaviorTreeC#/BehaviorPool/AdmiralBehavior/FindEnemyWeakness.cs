@@ -48,7 +48,7 @@ public partial class FindEnemyWeakness : Action
 					player_vulnerability[new Vector2I(m, n)] = vuln_value;
 				}
 
-				vulnerability_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, vuln_value);
+				//vulnerability_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, vuln_value);
 				weighted_imap.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, weighted_imap_value);
 				tension_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, tension_value);
 				inverse_tension_map.EmitSignal(Imap.SignalName.UpdateGridValue, m, n, inverse_tension_map.MapGrid[m,n]);
@@ -69,7 +69,7 @@ public partial class FindEnemyWeakness : Action
 			float value = player_vulnerability[cell];
 			float norm_value = 2.0f * ((value - vuln_min) / (vuln_max - vuln_min)) - 1.0f;
 			enemy_vuln_norm[cell] = norm_value;
-			//vulnerability_map.EmitSignal(Imap.SignalName.UpdateGridValue, cell.X, cell.Y, norm_value);
+			vulnerability_map.EmitSignal(Imap.SignalName.UpdateGridValue, cell.X, cell.Y, norm_value);
 		}
 
 		Godot.Collections.Dictionary<Vector2I, float> target_cells = new Godot.Collections.Dictionary<Vector2I, float>();

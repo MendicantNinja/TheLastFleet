@@ -4,8 +4,3 @@
 
 [resource]
 shader = ExtResource("1_6oleh")
-shader_parameter/glow_intensity = 0.4
-shader_parameter/flicker_intensity = 0.1
-shader_parameter/grid_scale = 20.0
-shader_parameter/hologram_color = Vector4(1, 0.6, 0.5, 1)
-shader_parameter/time_speed = 1.0

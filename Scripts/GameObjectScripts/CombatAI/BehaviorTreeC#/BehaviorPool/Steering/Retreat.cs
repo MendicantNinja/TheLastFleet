@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Runtime.Serialization.Formatters;
 using Godot;
 using Vector2 = System.Numerics.Vector2;
 
@@ -43,6 +44,7 @@ public partial class Retreat : Action
             foreach (RigidBody2D attacker in ship_wrapper.TargetedBy)
             {
                 if (!IsInstanceValid(attacker) || attacker.IsQueuedForDeletion()) continue;
+                if (valid_attackers.Contains(attacker)) continue;
                 valid_attackers.Add(attacker);
                 arithmetic_mean += new Vector2(attacker.GlobalPosition.X, attacker.GlobalPosition.Y);
                 count++;

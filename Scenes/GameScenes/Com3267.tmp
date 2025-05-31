@@ -1,4 +1,4 @@
-[gd_scene load_steps=62 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
@@ -29,7 +29,6 @@
 [ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/tactical_map.gdshader" id="13_tuyrt"]
 [ext_resource type="Texture2D" uid="uid://cvd1axgyjtqu8" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonUnpressed.png" id="13_w2mg8"]
 [ext_resource type="Texture2D" uid="uid://cwimesxhlxj3q" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonPressed.png" id="14_wbn2k"]
-[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/move_indicator_manager.gd" id="15_f3jdm"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/manual_control_button.gd" id="15_o3rb6"]
 [ext_resource type="Shader" path="res://Shaders/CombatGUIShaders/fog_of_war.gdshader" id="15_olg0c"]
 [ext_resource type="Texture2D" uid="uid://km8n2sfuspmy" path="res://Art/MetaIcons/BehaviorTree/selector.svg" id="16_dosly"]
@@ -41,7 +40,6 @@
 [ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
 [ext_resource type="Theme" uid="uid://dpl7ydmem76qd" path="res://ThemesandFonts/Themes/FighterCockpit.tres" id="33_lcetb"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/fps_counter.gd" id="34_4p8f2"]
-[ext_resource type="Texture2D" uid="uid://ctnanl4ksjg31" path="res://Art/MetaIcons/BehaviorTree/succeed.svg" id="34_gsbob"]
 
 [sub_resource type="Environment" id="Environment_a8xk6"]
 background_mode = 5
@@ -260,7 +258,6 @@ one_way_collision_margin = 100.0
 debug_color = Color(0.862745, 0.054902, 0, 1)
 
 [node name="PlayableArea" type="Area2D" parent="."]
-position = Vector2(-9, 2)
 
 [node name="PlayableAreaBounds" type="CollisionShape2D" parent="PlayableArea"]
 unique_name_in_owner = true
@@ -397,9 +394,6 @@ editor_draw_screen = false
 [node name="TacticalDataDrawing" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
 unique_name_in_owner = true
 script = ExtResource("12_rlc6n")
-
-[node name="MoveIndicatorManager" type="Node2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
-script = ExtResource("15_f3jdm")
 
 [node name="FogOfWar" type="ColorRect" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing"]
 self_modulate = Color(0.724287, 0.576944, 0.999999, 1)
@@ -750,18 +744,15 @@ text = "WEAPON SYSTEMS"
 process_mode = 3
 
 [node name="GamePausedText" type="RichTextLabel" parent="VariousCanvasPopups"]
-unique_name_in_owner = true
-process_mode = 3
 visible = false
 anchors_preset = 7
 anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-offset_left = -83.0
-offset_top = -91.0
-offset_right = 82.0
-offset_bottom = -28.0
+offset_left = -82.5
+offset_top = -63.0
+offset_right = 82.5
 grow_horizontal = 2
 grow_vertical = 0
 theme = ExtResource("33_lcetb")
@@ -810,13 +801,12 @@ text = "Camera Feed"
 unique_name_in_owner = true
 process_mode = 3
 top_level = true
-offset_left = 6.0
-offset_top = 66.0
-offset_right = 586.0
-offset_bottom = 426.0
+offset_left = 701.0
+offset_top = 706.0
+offset_right = 1106.0
+offset_bottom = 896.0
 mouse_filter = 2
 theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 24
 theme_override_styles/normal = SubResource("StyleBoxFlat_2h44e")
 script = ExtResource("31_awwt3")
 
@@ -838,7 +828,6 @@ mouse_filter = 2
 [node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
 custom_minimum_size = Vector2(16, 0)
 layout_mode = 2
-focus_mode = 0
 texture_normal = ExtResource("32_md01c")
 ignore_texture_size = true
 stretch_mode = 5
@@ -848,30 +837,11 @@ layout_mode = 2
 text = "1/15"
 
 [node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
-self_modulate = Color(0.374139, 0.374139, 0.374139, 1)
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-focus_mode = 0
 texture_normal = ExtResource("33_dc70j")
 ignore_texture_size = true
 stretch_mode = 5
-
-[node name="Succeed" type="Sprite2D" parent="VariousCanvasPopups/TutorialWalkthrough"]
-visible = false
-self_modulate = Color(0, 1, 0, 1)
-position = Vector2(42, 333)
-scale = Vector2(5.25, 3.3125)
-texture = ExtResource("34_gsbob")
-
-[node name="ContinueLabel" type="RichTextLabel" parent="VariousCanvasPopups/TutorialWalkthrough"]
-layout_mode = 0
-offset_left = 335.0
-offset_top = 332.0
-offset_right = 586.0
-offset_bottom = 387.0
-theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 15
-text = "<--- Click to progress the tutorial"
 
 [node name="ManualControlLoadingBar" type="ProgressBar" parent="VariousCanvasPopups"]
 unique_name_in_owner = true

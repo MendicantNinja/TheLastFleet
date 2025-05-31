@@ -4,6 +4,7 @@ class_name TacticalMapIcon
 @onready var Direction: TextureRect 
 @onready var Outline: TextureButton 
 @onready var assigned_ship: Ship
+@onready var RetreatAnimation = $AnimationPlayer
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -31,7 +32,15 @@ func setup(ship: Ship) -> void:
 		Outline.self_modulate = Color8(175, 47, 34, 255)
 		Direction.self_modulate = Color8(175, 47, 34, 255)
 		material = load("res://Shaders/CombatGUIShaders/tactical_map_ship_icon_enemy.tres")
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#print(Outline.button_pressed)
 	pass
+
+func toggle_retreat_animation(value: bool) -> void:
+	if value == true:
+		RetreatAnimation.play(&"retreat_flash")
+		print("retreating unit should flash")
+	elif value == false:
+		RetreatAnimation.play(&"RESET")
