@@ -33,6 +33,10 @@ func setup(ship: Ship) -> void:
 		Direction.self_modulate = Color8(175, 47, 34, 255)
 		material = load("res://Shaders/CombatGUIShaders/tactical_map_ship_icon_enemy.tres")
 
+#func _draw()
+## draw_circle(position: Vector2, radius: float, color: Color, filled: bool = true, width: float = -1.0, antialiased: bool = false)
+#draw_circle()
+
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	#print(Outline.button_pressed)

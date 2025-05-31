@@ -836,7 +836,7 @@ grow_vertical = 0
 mouse_filter = 2
 
 [node name="StepBackward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
-custom_minimum_size = Vector2(16, 0)
+custom_minimum_size = Vector2(64, 32)
 layout_mode = 2
 focus_mode = 0
 texture_normal = ExtResource("32_md01c")
@@ -849,7 +849,7 @@ text = "1/15"
 
 [node name="StepForward" type="TextureButton" parent="VariousCanvasPopups/TutorialWalkthrough/HBoxContainer"]
 self_modulate = Color(0.374139, 0.374139, 0.374139, 1)
-custom_minimum_size = Vector2(16, 16)
+custom_minimum_size = Vector2(64, 16)
 layout_mode = 2
 focus_mode = 0
 texture_normal = ExtResource("33_dc70j")
@@ -865,12 +865,12 @@ texture = ExtResource("34_gsbob")
 
 [node name="ContinueLabel" type="RichTextLabel" parent="VariousCanvasPopups/TutorialWalkthrough"]
 layout_mode = 0
-offset_left = 335.0
-offset_top = 332.0
-offset_right = 586.0
-offset_bottom = 387.0
+offset_left = 378.0
+offset_top = 335.0
+offset_right = 579.0
+offset_bottom = 390.0
 theme = ExtResource("7_u21w5")
-theme_override_font_sizes/normal_font_size = 15
+theme_override_font_sizes/normal_font_size = 12
 text = "<--- Click to progress the tutorial"
 
 [node name="ManualControlLoadingBar" type="ProgressBar" parent="VariousCanvasPopups"]

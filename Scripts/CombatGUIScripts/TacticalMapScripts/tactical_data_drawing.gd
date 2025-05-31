@@ -111,8 +111,10 @@ func _unhandled_input(event) -> void:
 	elif event is InputEventKey:
 		var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 		var highlighted_enemy_group: Array = get_tree().get_nodes_in_group(highlight_enemy_name)
-		if Input.is_action_pressed("take_manual_control") and TacticalCamera.enabled and prev_selected_ship != null:
+		if Input.is_action_pressed("take_manual_control") and TacticalCamera.enabled :
 			#if self.visible:
+			if prev_selected_ship == null:
+				return
 			$"../../../ButtonList/ManualControlButton".emit_signal("pressed")
 			switch_maps.emit()
 			reset_box_selection()
@@ -122,6 +124,7 @@ func _unhandled_input(event) -> void:
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
 			if manually_controlled_ship != null:
+				# Turn on MC for the new ship.
 				manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
