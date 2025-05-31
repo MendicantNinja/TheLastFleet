@@ -546,8 +546,10 @@ func _ready() -> void:
 
 func tutorial_setup() -> void:
 	if is_friendly == false:
+		set_combat_ai(false)
 		for weapon: WeaponSlot in all_weapons:
 			weapon.ai_debug = true
+		
 
 func process_damage(projectile: Projectile) -> void:
 	## Regular damage processing

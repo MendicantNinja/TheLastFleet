@@ -131,7 +131,6 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 			setup_enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 			deploy_enemy_fleet(setup_enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
-		get_tree().call_group("enemy", "set_combat_ai", false)
 		get_tree().call_group("enemy", "tutorial_setup")
 
 	
