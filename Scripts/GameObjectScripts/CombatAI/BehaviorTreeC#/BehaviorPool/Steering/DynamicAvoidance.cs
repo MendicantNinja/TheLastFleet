@@ -39,7 +39,7 @@ public partial class DynamicAvoidance : Action
 		int batch_data_count = 5;
 		float[] neighbor_data = new float[total_neighbors * batch_data_count]; // Total size: neighbors * data per neighbor
 		int index = 0; // Tracks the position within neighbor units
-		foreach (RigidBody2D neighbor in valid_neighbors)
+		foreach (RigidBody2D neighbor in ship_wrapper.NeighborUnits)
 		{
 			SteerData neighbor_steer_data = (SteerData)neighbor.Get("SteerData");
 			neighbor_data[index++] = neighbor.GlobalPosition.X; // Store pos_x

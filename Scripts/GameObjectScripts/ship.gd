@@ -549,7 +549,6 @@ func tutorial_setup() -> void:
 		set_combat_ai(false)
 		for weapon: WeaponSlot in all_weapons:
 			weapon.ai_debug = true
-		
 
 func process_damage(projectile: Projectile) -> void:
 	## Regular damage processing
@@ -1091,10 +1090,10 @@ func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
 	CombatBehaviorTree.ToggleRoot(value)
-	for weapon in all_weapons:
-		weapon.AI_enabled = value
-		weapon.auto_aim = true
-		weapon.auto_fire = true
+	#for weapon in all_weapons:
+		#weapon.AI_enabled = value
+		#weapon.auto_aim = true
+		#weapon.auto_fire = true
 
 func set_blackboard_data(key: Variant, value: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
@@ -1226,7 +1225,7 @@ func _on_SeparationShape_body_exited(neighbor) -> void:
 	separation_neighbors = tmp_array
 
 func _on_AvoidanceShape_body_entered(body) -> void:
-	if body == self or body is StaticBody2D:
+	if body == self or body is ShieldSlot or body is StaticBody2D:
 		return
 	var tmp_array = neighbor_units
 	tmp_array.append(body)

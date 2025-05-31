@@ -75,6 +75,7 @@ var shield_rid: RID = RID()
 
 # Special Beam Logic
 var current_beam: Projectile = null
+var projectile_inst: Projectile = null
 
 signal weapon_slot_fired(flux)
 signal target_in_range(value)
@@ -192,6 +193,8 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 		ROFTimer.wait_time = interval_in_seconds
 	if weapon.is_continuous == true:
 		ContinuousFluxTimer.timeout.connect(on_continuous_flux_timer_timeout)
+	
+	projectile_inst = weapon.create_projectile().instantiate()
 
 func on_continuous_flux_timer_timeout() -> void:
 	emit_signal("weapon_slot_fired", weapon.flux_per_shot*.05) 
@@ -359,7 +362,9 @@ func _physics_process(delta) -> void:
 			fire(owner_rid.get_id())
 			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
 				target_in_range.emit(true)
-		if available_targets.size() >= 1 and can_fire == false:
+		if available_targets.size() >= 1 and can_fire == false and AI_enabled == true:
+			acquire_new_target_AI()
+		elif available_targets.size() >= 1 and can_fire == false and AI_enabled == false:
 			acquire_new_target()
 
 # this function has two purposes:
