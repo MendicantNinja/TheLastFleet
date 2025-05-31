@@ -12,8 +12,9 @@ var tween: Tween = create_tween()
 func _ready():
 	
 	
-	tween.tween_property(next_button, "self_modulate", Color(2, 2, 2, 2), 0.5)
-	tween.tween_property(next_button, "self_modulate", Color(0.3, 0.3, 0.3, 1), 0.5)
+	tween.tween_property(next_button, "self_modulate", Color(2, 2, 2, 2), .7)
+	tween.tween_property(next_button, "self_modulate", Color(0.3, 0.3, 0.3, 1), .7)
+	tween.set_ease(Tween.EASE_OUT_IN)
 	tween.set_loops()
 	tween.stop()
 	next_button.pressed.connect(func():
@@ -36,11 +37,15 @@ func _process(_delta):
 	
 	var current_step = steps[current_step_index]
 	if current_step.skippable == false:
+		$Succeed.visible = false
+		$ContinueLabel.visible = false
 		tween.stop()
 		next_button.self_modulate = Color(0.3, 0.3, 0.3, 1)
 		
 	if current_step.condition.call() and not current_step.skippable: # Check if the current step/condition is returning true or false.
 		current_step.skippable = true
+		$Succeed.visible = true
+		$ContinueLabel.visible = true
 		tween.play()
 
 		#current_step_index += 1

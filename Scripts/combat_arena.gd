@@ -91,8 +91,9 @@ func _ready() -> void:
 	$CollisionBoundaryBottom.position =  Vector2(0,0)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.a = Vector2(0, PlayableAreaBounds.shape.size.y)
 	$CollisionBoundaryBottom/CollisionBoundaryShape.shape.b = Vector2(PlayableAreaBounds.shape.size.x, PlayableAreaBounds.shape.size.y)
-	# Comment this back in if you need ships to deploy and are starting CombatArena as the main scene.
-	if settings.dev_mode == true:
+	
+	# If we're loading directly into the combat arena scene without calling setup() do this.
+	if get_tree().get_current_scene() == self:
 		deploy_enemy_fleet()
 	
 func reset_deployment_position() -> void:
@@ -192,6 +193,7 @@ func _unhandled_input(event) -> void:
 			toggle_fleet_deployment_panel()
 		elif (event.keycode == KEY_ESCAPE and event.pressed):
 			toggle_options_menu()
+				
 
 func _physics_process(delta):
 	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):

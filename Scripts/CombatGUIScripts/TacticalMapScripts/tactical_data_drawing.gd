@@ -84,7 +84,9 @@ func _ready():
 	pass # Replace with function body.
 
 func _unhandled_input(event) -> void:
-	# We don't want tactical map taking input when it's not visible.
+	if (Input.is_action_pressed("pause")): # Special Case where we want processing even if tac map is invisible.
+		pause_game()
+	# We don't want tactical map trying to scan for input when it's not visible.
 	if TacticalMapLayer.visible == false:
 		return
 	if event is InputEventMouseButton:
@@ -146,8 +148,6 @@ func _unhandled_input(event) -> void:
 				$"../../../TutorialText".visible = false
 			elif $"../../../TutorialText".visible == false:
 				$"../../../TutorialText".visible = true
-		elif (event.keycode == KEY_SPACE and event.pressed):
-			pause_game()
 
 func pause_game() -> void:
 			if get_tree().paused == false:
