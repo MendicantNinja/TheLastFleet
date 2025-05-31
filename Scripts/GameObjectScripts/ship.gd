@@ -1090,10 +1090,10 @@ func set_combat_ai(value: bool) -> void:
 	if value == true and group_leader == true and ShipNavigationAgent.is_navigation_finished() == false:
 		set_navigation_position(position)
 	CombatBehaviorTree.ToggleRoot(value)
-	#for weapon in all_weapons:
-		#weapon.AI_enabled = value
-		#weapon.auto_aim = true
-		#weapon.auto_fire = true
+	for weapon in all_weapons:
+		weapon.AI_enabled = value
+		weapon.auto_aim = true
+		weapon.auto_fire = true
 
 func set_blackboard_data(key: Variant, value: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
@@ -1115,7 +1115,7 @@ func set_targets(targets: Array) -> void:
 		if n_target == null:
 			continue
 		if n_target is Ship:
-			recast_targets.append(n_target)
+			recast_targets.append(n_target as RigidBody2D)
 		else:
 			push_error("Expected a RigidBody2D, got: " + str(n_target))
 	targeted_units = recast_targets
@@ -1232,7 +1232,7 @@ func _on_AvoidanceShape_body_entered(body) -> void:
 	neighbor_units = tmp_array
 
 func _on_AvoidanceShape_body_exited(body) -> void:
-	if body == self or body is StaticBody2D:
+	if body == self or body is StaticBody2D or body is ShieldSlot:
 		return
 	var tmp_array = []
 	for unit in neighbor_units:
