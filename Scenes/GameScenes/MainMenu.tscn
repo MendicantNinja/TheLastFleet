@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://825w50grrkcp"]
+[gd_scene load_steps=19 format=3 uid="uid://825w50grrkcp"]
 
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/main_menu.gd" id="1_a5rc2"]
 [ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial2_button.gd" id="12_lmynl"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/galaxy_button.gd" id="12_mn1n7"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial3_button.gd" id="13_saknw"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/exit_game_button.gd" id="16_2sxot"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -228,6 +229,26 @@ grow_vertical = 2
 mouse_filter = 1
 theme = ExtResource("4_dnp8m")
 text = "SKIRMISH"
+scroll_active = false
+
+[node name="ExitGame" type="TextureButton" parent="ListContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("16_2sxot")
+
+[node name="ButtonText" type="RichTextLabel" parent="ListContainer/ExitGame"]
+clip_contents = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+theme = ExtResource("4_dnp8m")
+text = "EXIT GAME"
 scroll_active = false
 
 [node name="RefitButton" type="TextureButton" parent="ListContainer"]
