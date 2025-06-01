@@ -344,12 +344,12 @@ var localization_dictionary: Dictionary = {
 	&"tutorial_battle": "Eliminate all enemy ships to progress the tutorial.",
 	&"tutorial_complete": "Looks like you've completed the simulation. Press Escape and click Main Menu to go back to the main menu.",
 	
-	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship",
+	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship. You can break out of this by selecting another ship and swapping to it with T. Or break out no matter what ship is selected by pressing U in the tactical map.",
 	&"tutorial_camera": "Let's do a closeup view of your ships. With A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
 	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S. Notice the speed indicator on the bottom right of the screen. Strafing horizontally is done with Q/E and is slower than accelerating. Lastly, you can progress the tutorial by rotating the ship with A/D. Lets try rotating to the right to progress the tutorial.",
 	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
 	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
-	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. Right click while in manual control to gradually raise your shields and stop enemy projectiles.",
+	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. You can vent flux at 3x the speed but in a vulnerable state by pressing V to vent flux. Right click while in manual control to gradually raise your shields and stop enemy projectiles which will progress the tutorial.",
 	#Tutorial complete
 }
 
