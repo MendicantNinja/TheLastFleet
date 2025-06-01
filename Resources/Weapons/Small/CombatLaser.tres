@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=4 format=3 uid="uid://befmksxei6g1n"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_0nlti"]
+[ext_resource type="Texture2D" uid="uid://dh6if35ud3t4y" path="res://Art/WeaponArt/laser.png" id="1_yqmun"]
+[ext_resource type="PackedScene" uid="uid://b8t2wmt0bt5gx" path="res://Scenes/CompositeGameObjects/Projectiles/CombatLaserProjectile.tscn" id="2_5po0r"]
+
+[resource]
+script = ExtResource("1_0nlti")
+weapon_name = "Combat Laser"
+item_enum = 9
+weapon_size = 0
+image = ExtResource("1_yqmun")
+armament_points = 0
+projectile_scene = ExtResource("2_5po0r")
+projectile_speed = 0.0
+damage_type = 3
+damage_per_shot = 200
+fire_rate = 1.0
+range = 1000.0
+accuracy = 1.0
+turn_rate = 10.0
+beam_duration = 0.0
+is_beam = true
+is_continuous = true
+flux_per_shot = 100
+dps = 0

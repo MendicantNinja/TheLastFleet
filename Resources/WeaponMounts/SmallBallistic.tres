@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="WeaponMount" load_steps=3 format=3 uid="uid://bsulm5ksx0f40"]
+
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="1_eeycj"]
+[ext_resource type="Texture2D" uid="uid://6nf82yps6low" path="res://Art/WeaponArt/weapon_mount_small.png" id="1_uv2ls"]
+
+[resource]
+script = ExtResource("1_eeycj")
+weapon_mount_type = 0
+weapon_mount_size = 0
+image = ExtResource("1_uv2ls")
+firing_arc = 90
+is_fixed = false

@@ -1,0 +1,28 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://cn4qxnv5ko6qy"]
+
+[ext_resource type="AudioStream" uid="uid://dgqc5w5yvbpj8" path="res://Sounds/Combat/WeaponSounds/railgun/railgun_fire.wav" id="1_n7geu"]
+[ext_resource type="Texture2D" uid="uid://d28462np5cvo0" path="res://Art/WeaponArt/rail_gun_downscaled.png" id="2_uuupf"]
+[ext_resource type="PackedScene" uid="uid://c58hhw2bcdtio" path="res://Scenes/CompositeGameObjects/Projectiles/RailgunProjectile.tscn" id="3_vlu4r"]
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="4_lqapl"]
+
+[resource]
+script = ExtResource("4_lqapl")
+weapon_name = "Railgun"
+item_enum = 5
+weapon_size = 0
+image = ExtResource("2_uuupf")
+armament_points = 0
+firing_sound = ExtResource("1_n7geu")
+projectile_scene = ExtResource("3_vlu4r")
+projectile_speed = 1000.0
+damage_type = 0
+damage_per_shot = 150
+fire_rate = 1.0
+range = 700.0
+accuracy = 2.0
+turn_rate = 10.0
+beam_duration = 0.0
+is_beam = false
+is_continuous = false
+flux_per_shot = 50
+dps = 0

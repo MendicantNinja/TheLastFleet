@@ -1,0 +1,40 @@
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://b7xdeawffwjdn"]
+
+[ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="1_rmqwx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tux8b"]
+bg_color = Color(1, 1, 1, 0.196078)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 1, 1, 0.784314)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[resource]
+ItemList/colors/font_color = Color(0.137255, 0.784314, 0.901961, 1)
+ItemList/colors/font_hovered_color = Color(0.95, 0.95, 0.95, 1)
+ItemList/colors/font_outline_color = Color(0, 0, 0, 1)
+ItemList/colors/font_selected_color = Color(1, 1, 1, 1)
+ItemList/colors/guide_color = Color(0.7, 0.7, 0.7, 0.25)
+ItemList/constants/h_separation = 4
+ItemList/constants/icon_margin = 4
+ItemList/constants/line_separation = 2
+ItemList/constants/outline_size = 0
+ItemList/constants/v_separation = 4
+ItemList/font_sizes/font_size = 16
+ItemList/fonts/font = ExtResource("1_rmqwx")
+ItemList/styles/cursor = null
+ItemList/styles/cursor_unfocused = null
+ItemList/styles/focus = null
+ItemList/styles/hovered = null
+ItemList/styles/panel = null
+ItemList/styles/selected = null
+ItemList/styles/selected_focus = null
+Panel/styles/panel = SubResource("StyleBoxFlat_tux8b")
+RichTextLabel/colors/default_color = Color(1, 1, 1, 1)
+RichTextLabel/font_sizes/normal_font_size = 48
+RichTextLabel/fonts/normal_font = ExtResource("1_rmqwx")

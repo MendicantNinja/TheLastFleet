@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="Ship" load_steps=2 format=3 uid="uid://jwkun5icey3r"]
+
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_j7c8r"]
+
+[resource]
+script = ExtResource("1_j7c8r")
+ship_type_name = ""
+ship_description = ""
+ship_type = 0
+ship_size = 0
+ship_system = 0
+base_mods = []
+weapon_slots = []
+ship_scaling = 1
+width_offset = 0.0
+height_offset = 0.0
+hull_integrity = 0
+armor = 0
+shield_efficiency = 0.0
+flux = 0
+flux_dissipation = 0
+top_speed = 0
+acceleration = 0.0
+deceleration = 0.0
+turn_rate = 0.0
+mass = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 0.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 0
+skeleton_crew = 0
+fighter_bays = 0
+base_cr = 65.0
+cr_recovery_rate = 2.0
+cr_deployment_cost = 0.0
+deployment_points = 0
+sensor_strength = 0.0
+stealth = 0.0
+repair_rate = 0.0

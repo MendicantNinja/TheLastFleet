@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="ShipHull" load_steps=9 format=3 uid="uid://b1uex2ha5mxr7"]
+
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_ym4py"]
+[ext_resource type="PackedScene" uid="uid://10wylxljg0nw" path="res://Scenes/CompositeGameObjects/Ships/Trident.tscn" id="2_eac8x"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_puj4g"]
+[ext_resource type="Texture2D" uid="uid://bsspmak0y2qqd" path="res://Art/ShipArt/Trident/trident_base.png" id="3_ir3qh"]
+[ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="5_kmkao"]
+[ext_resource type="Resource" uid="uid://bxnfy7jr0gpbd" path="res://Resources/WeaponMounts/SmallEnergy.tres" id="6_ttjyd"]
+[ext_resource type="Resource" uid="uid://c4sqknryk4b6p" path="res://Resources/WeaponMounts/MediumEnergy.tres" id="7_7inq4"]
+[ext_resource type="Resource" uid="uid://5xwswaf2bcpw" path="res://Resources/WeaponMounts/MediumMissile.tres" id="8_yv4i0"]
+
+[resource]
+script = ExtResource("1_ym4py")
+ship_type_name = "Trident"
+ship_description = "Double hanger carrier - vysl"
+ship_type = 6
+ship_size = 3
+ship_tech = 1
+ship_packed_scene = ExtResource("2_eac8x")
+ship_system = 1
+weapon_mounts = Array[ExtResource("2_puj4g")]([ExtResource("5_kmkao"), ExtResource("5_kmkao"), ExtResource("6_ttjyd"), ExtResource("6_ttjyd"), ExtResource("7_7inq4"), ExtResource("7_7inq4"), ExtResource("8_yv4i0"), ExtResource("8_yv4i0")])
+base_mods = []
+ship_sprite = ExtResource("3_ir3qh")
+ship_scaling = 1
+hull_integrity = 2500
+armor = 700
+shield_arc = 270
+shield_raise_time = 5.0
+shield_efficiency = 0.4
+shield_upkeep = 1.5
+flux = 1500
+flux_dissipation = 200
+top_speed = 80
+acceleration = 30.0
+deceleration = 15.0
+turn_rate = 0.8
+mass = 0.0
+drive_field = 10
+deployment_points = 1.0
+base_cr = 65.0
+cr_recovery_rate = 2.0
+cr_deployment_cost = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 0.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 0
+skeleton_crew = 0
+fighter_bays = 0
+sensor_strength = 3000
+sensor_profile = 0
+repair_rate = 0.0

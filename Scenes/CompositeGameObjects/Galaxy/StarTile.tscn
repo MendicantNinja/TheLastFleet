@@ -1,0 +1,32 @@
+[gd_scene load_steps=6 format=3 uid="uid://4tnk0av7f6mh"]
+
+[ext_resource type="Script" path="res://Scripts/SectorMapScripts/star_tile.gd" id="1_ncju2"]
+[ext_resource type="Texture2D" uid="uid://dq6tocumognpw" path="res://Art/GUIArt/sector_map_star.png" id="2_diab4"]
+[ext_resource type="Script" path="res://Scripts/SectorMapScripts/star.gd" id="2_k5bq0"]
+[ext_resource type="Texture2D" uid="uid://cqwcxld508po0" path="res://Art/GUIArt/sector_map_star_hover.png" id="3_qs61l"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ll7np"]
+blend_mode = 1
+
+[node name="StarTile1" type="ColorRect"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color(0.1025, 0.2665, 0.41, 0)
+script = ExtResource("1_ncju2")
+
+[node name="Star" type="TextureButton" parent="."]
+material = SubResource("CanvasItemMaterial_ll7np")
+layout_mode = 0
+offset_left = -49.0
+offset_top = -40.0
+offset_right = 1802.0
+offset_bottom = 1581.0
+scale = Vector2(0.0505974, 0.0505974)
+texture_normal = ExtResource("2_diab4")
+texture_hover = ExtResource("3_qs61l")
+script = ExtResource("2_k5bq0")
+metadata/_edit_use_anchors_ = true
+
+[connection signal="mouse_entered" from="Star" to="Star" method="_on_mouse_entered"]
+[connection signal="mouse_exited" from="Star" to="Star" method="_on_mouse_exited"]
+[connection signal="pressed" from="Star" to="Star" method="_on_pressed"]

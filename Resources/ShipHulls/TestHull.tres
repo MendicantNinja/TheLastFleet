@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="ShipHull" load_steps=5 format=3 uid="uid://b0opng4g4kosx"]
+
+[ext_resource type="Script" path="res://Resources/ShipHulls/ship_hull.gd" id="1_ipljx"]
+[ext_resource type="Script" path="res://Resources/WeaponMounts/weapon_mount.gd" id="2_236ag"]
+[ext_resource type="PackedScene" uid="uid://cf0i5gfu6xnqx" path="res://Scenes/CompositeGameObjects/Ships/TestShip.tscn" id="2_ohvm0"]
+[ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="3_iuuak"]
+
+[resource]
+script = ExtResource("1_ipljx")
+ship_type_name = ""
+ship_description = ""
+ship_type = 11
+ship_size = 0
+ship_tech = 0
+ship_packed_scene = ExtResource("2_ohvm0")
+ship_system = 0
+weapon_mounts = Array[ExtResource("2_236ag")]([null, null, null])
+base_mods = []
+ship_sprite = ExtResource("3_iuuak")
+ship_scaling = 1
+hull_integrity = 500
+armor = 100
+shield_efficiency = 20.0
+shield_upkeep = 10.0
+flux = 1000
+flux_dissipation = 50
+top_speed = 100
+acceleration = 100.0
+deceleration = 50.0
+turn_rate = 0.7
+mass = 1.0
+drive_field = 10
+deployment_points = 1.0
+base_cr = 65.0
+cr_recovery_rate = 2.0
+cr_deployment_cost = 0.0
+cargo_capacity = 0
+supplies_per_month = 0.0
+supplies_per_deployment = 0.0
+fuel_capacity = 0
+fuel_usage_per_lightyear = 0.0
+crew_capacity = 0
+skeleton_crew = 0
+fighter_bays = 0
+sensor_strength = 3000
+sensor_profile = 0
+repair_rate = 0.0

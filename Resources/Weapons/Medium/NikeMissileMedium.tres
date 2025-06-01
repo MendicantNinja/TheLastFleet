@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=2 format=3 uid="uid://dakuwo6s28bep"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_kwmns"]
+
+[resource]
+script = ExtResource("1_kwmns")
+weapon_name = "Nike Missile Launcher"
+item_enum = 7
+weapon_size = 1
+armament_points = 0
+projectile_speed = 10.0
+damage_type = 1
+damage_per_shot = 0
+fire_rate = 1.0
+range = 600.0
+beam = false
+accuracy = 1.0
+turn_rate = 10.0
+flux_per_shot = 0
+dps = 0
+flux_per_second = 0

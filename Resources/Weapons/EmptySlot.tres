@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=3 format=3 uid="uid://bg4bkltdik2mb"]
+
+[ext_resource type="Texture2D" uid="uid://contvr5e7px5t" path="res://Art/GUIArt/icon_ship_selected_empty.png" id="1_5r546"]
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="2_pilrw"]
+
+[resource]
+script = ExtResource("2_pilrw")
+weapon_name = "Empty"
+item_enum = 0
+weapon_size = 0
+image = ExtResource("1_5r546")
+armament_points = 0
+projectile_speed = 10.0
+damage_type = 0
+damage_per_shot = 0
+fire_rate = 1.0
+range = 500.0
+accuracy = 1.0
+turn_rate = 10.0
+flux_per_shot = 0
+dps = 0
+flux_per_second = 0

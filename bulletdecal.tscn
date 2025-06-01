@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://bke8pckuf6pnx"]
+
+[ext_resource type="Texture2D" uid="uid://dxs8b8lsaa57m" path="res://bullet hole3.png" id="1_hp47w"]
+
+[node name="Sprite2D" type="Sprite2D"]
+position = Vector2(0, 5.96046e-08)
+scale = Vector2(-0.00394987, -0.00358384)
+texture = ExtResource("1_hp47w")

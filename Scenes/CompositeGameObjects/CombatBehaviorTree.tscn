@@ -1,0 +1,97 @@
+[gd_scene load_steps=20 format=3 uid="uid://chlj4nfewaemy"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/bt_root.gd" id="1_mg57h"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_sequence.gd" id="2_2na7m"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/Composite/bt_selector.gd" id="3_xtatx"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pathfinding.gd" id="4_fc5pm"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/seek_and_arrive.gd" id="5_0i7tx"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/separation.gd" id="6_5xcad"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/dynamic_avoidance.gd" id="7_xupwl"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/align.gd" id="8_7kf26"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/identify_nearby_units.gd" id="9_yc3wk"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/threat_detection.gd" id="10_kmyj0"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/choose_target.gd" id="11_mi82m"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/flux_management.gd" id="12_xp1xq"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/use_shield.gd" id="13_u5kco"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/chill.gd" id="14_5nrcx"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/pursue.gd" id="15_8qdsp"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/escape.gd" id="17_y4mai"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/find_goal.gd" id="18_cwdh8"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/steering/velocity_matching.gd" id="18_fqgcr"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTree/BehaviorPool/detect_skirmish_units.gd" id="19_37trn"]
+
+[node name="CombatBehaviorTree" type="Node"]
+script = ExtResource("1_mg57h")
+enabled = false
+
+[node name="main" type="Node" parent="."]
+script = ExtResource("2_2na7m")
+
+[node name="navigation" type="Node" parent="main"]
+script = ExtResource("3_xtatx")
+
+[node name="pathfinding" type="Node" parent="main/navigation"]
+script = ExtResource("4_fc5pm")
+
+[node name="seek and arrive" type="Node" parent="main/navigation"]
+script = ExtResource("5_0i7tx")
+
+[node name="separation" type="Node" parent="main/navigation"]
+script = ExtResource("6_5xcad")
+
+[node name="dynamic avoidance" type="Node" parent="main/navigation"]
+script = ExtResource("7_xupwl")
+
+[node name="align" type="Node" parent="main/navigation"]
+script = ExtResource("8_7kf26")
+
+[node name="combat" type="Node" parent="main"]
+script = ExtResource("3_xtatx")
+
+[node name="identify nearby units" type="Node" parent="main/combat"]
+script = ExtResource("9_yc3wk")
+
+[node name="threat detection" type="Node" parent="main/combat"]
+script = ExtResource("10_kmyj0")
+
+[node name="choose target" type="Node" parent="main/combat"]
+script = ExtResource("11_mi82m")
+
+[node name="flux management" type="Node" parent="main/combat"]
+script = ExtResource("12_xp1xq")
+
+[node name="use shield" type="Node" parent="main/combat"]
+script = ExtResource("13_u5kco")
+
+[node name="chill" type="Node" parent="main/combat"]
+script = ExtResource("14_5nrcx")
+
+[node name="combat steering" type="Node" parent="main"]
+script = ExtResource("3_xtatx")
+
+[node name="pursue" type="Node" parent="main/combat steering"]
+script = ExtResource("15_8qdsp")
+
+[node name="escape" type="Node" parent="main/combat steering"]
+script = ExtResource("17_y4mai")
+
+[node name="separation" type="Node" parent="main/combat steering"]
+script = ExtResource("6_5xcad")
+
+[node name="dynamic avoidance" type="Node" parent="main/combat steering"]
+script = ExtResource("7_xupwl")
+
+[node name="velocity matching" type="Node" parent="main/combat steering"]
+script = ExtResource("18_fqgcr")
+
+[node name="align" type="Node" parent="main/combat steering"]
+script = ExtResource("8_7kf26")
+
+[node name="enemy evaluation" type="Node" parent="main"]
+script = ExtResource("3_xtatx")
+
+[node name="find goal" type="Node" parent="main/enemy evaluation"]
+script = ExtResource("18_cwdh8")
+
+[node name="detect skirmish units" type="Node" parent="main/enemy evaluation"]
+script = ExtResource("19_37trn")

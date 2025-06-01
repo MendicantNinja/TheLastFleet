@@ -1,0 +1,27 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=5 format=3 uid="uid://kb67ho6jjonc"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_3gt0s"]
+[ext_resource type="AudioStream" uid="uid://dgqc5w5yvbpj8" path="res://Sounds/Combat/WeaponSounds/railgun/railgun_fire.wav" id="1_oouvh"]
+[ext_resource type="Texture2D" uid="uid://bj6htdy18k40j" path="res://Art/WeaponArt/dual cannon.png" id="2_b8c60"]
+[ext_resource type="PackedScene" uid="uid://clcon1i0p0wi4" path="res://Scenes/CompositeGameObjects/Projectiles/BulletProjectile.tscn" id="3_hb71q"]
+
+[resource]
+script = ExtResource("1_3gt0s")
+weapon_name = "Autocannon"
+item_enum = 5
+weapon_size = 1
+image = ExtResource("2_b8c60")
+armament_points = 0
+firing_sound = ExtResource("1_oouvh")
+projectile_scene = ExtResource("3_hb71q")
+projectile_speed = 1000.0
+damage_type = 0
+damage_per_shot = 25
+fire_rate = 5.0
+range = 600.0
+beam = false
+accuracy = 0.5
+turn_rate = 10.0
+flux_per_shot = 10
+dps = 0
+flux_per_second = 0

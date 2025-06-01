@@ -1,0 +1,105 @@
+[gd_scene load_steps=13 format=3 uid="uid://c2gpnr0o720b0"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_ttka1"]
+[ext_resource type="PackedScene" uid="uid://d0qfp0y2u5fsu" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_8fsu5"]
+[ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_8n4wu"]
+[ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_twxmv"]
+[ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_bgygg"]
+[ext_resource type="Texture2D" uid="uid://do1i0m37jsgct" path="res://Art/ShipArt/Challenger/challenger.png" id="20_ar06l"]
+[ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="22_4sljk"]
+[ext_resource type="PackedScene" uid="uid://bmogmneffwvgs" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/shield_slot.tscn" id="22_tl4ag"]
+[ext_resource type="PackedScene" uid="uid://dyubfoyd4vxyj" path="res://Scenes/GUIScenes/CombatGUIScenes/ShipGUICenterCombatHUD.tscn" id="23_px6v0"]
+[ext_resource type="PackedScene" uid="uid://dmn7p3s6itxxy" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/DetectionArea.tscn" id="24_088hk"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_sohox"]
+radius = 45.0
+height = 92.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_57y0p"]
+size = Vector2(22, 28.5)
+
+[node name="TestShip" type="RigidBody2D"]
+z_as_relative = false
+collision_mask = 31
+input_pickable = true
+gravity_scale = 0.0
+continuous_cd = 1
+contact_monitor = true
+max_contacts_reported = 10
+script = ExtResource("1_ttka1")
+
+[node name="ForceDebug" parent="." instance=ExtResource("2_8n4wu")]
+
+[node name="AvoidanceArea" parent="." instance=ExtResource("2_8fsu5")]
+
+[node name="SeparationArea" parent="." instance=ExtResource("3_bgygg")]
+
+[node name="CombatBehaviorTreeRedux" parent="." instance=ExtResource("2_twxmv")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+z_index = 1
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_sohox")
+
+[node name="CollisionShape2D2" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-25.75, -36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_57y0p")
+
+[node name="CollisionShape2D3" type="CollisionShape2D" parent="."]
+z_index = 1
+position = Vector2(-27.5, 36)
+rotation = 1.5708
+shape = SubResource("RectangleShape2D_57y0p")
+
+[node name="ShipSprite" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = 1.5708
+texture = ExtResource("20_ar06l")
+
+[node name="ShipLivery" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = 1.5708
+
+[node name="WeaponSlot0" parent="." instance=ExtResource("22_4sljk")]
+position = Vector2(11, -1)
+
+[node name="WeaponSlot1" parent="." instance=ExtResource("22_4sljk")]
+position = Vector2(-13, 30)
+
+[node name="WeaponSlot2" parent="." instance=ExtResource("22_4sljk")]
+position = Vector2(-13, -30)
+
+[node name="ShipNavigationAgent" type="NavigationAgent2D" parent="."]
+path_desired_distance = 50.0
+target_desired_distance = 50.0
+path_max_distance = 50.0
+avoidance_enabled = true
+radius = 80.0
+neighbor_distance = 1000.0
+time_horizon_agents = 8.0
+time_horizon_obstacles = 1.0
+max_speed = 1000.0
+debug_use_custom = true
+debug_path_custom_color = Color(0.913757, 0, 0.203475, 1)
+debug_path_custom_point_size = 13.0
+debug_path_custom_line_width = 3.0
+
+[node name="CombatTimer" type="Timer" parent="."]
+process_callback = 0
+wait_time = 4.0
+
+[node name="ShieldSlot" parent="." instance=ExtResource("22_tl4ag")]
+
+[node name="DetectionArea" parent="." instance=ExtResource("24_088hk")]
+
+[node name="CenterCombatHUD" parent="." instance=ExtResource("23_px6v0")]
+
+[node name="OverloadTimer" type="Timer" parent="."]
+
+[node name="RetreatTimer" type="Timer" parent="."]
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="velocity_computed" from="ShipNavigationAgent" to="." method="_on_ShipNavigationAgent_velocity_computed"]
+[connection signal="timeout" from="CombatTimer" to="." method="_on_CombatTimer_timeout"]

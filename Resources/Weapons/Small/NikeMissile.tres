@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Weapon" load_steps=2 format=3 uid="uid://yrg8vb5hjcbp"]
+
+[ext_resource type="Script" path="res://Resources/Weapons/weapon.gd" id="1_4egiu"]
+
+[resource]
+script = ExtResource("1_4egiu")
+weapon_name = "Nike Missile"
+item_enum = 0
+weapon_size = 0
+armament_points = 0
+projectile_speed = 10.0
+damage_type = 1
+damage_per_shot = 0
+fire_rate = 1.0
+range = 600.0
+accuracy = 1.0
+turn_rate = 10.0
+flux_per_shot = 0
+dps = 0
+flux_per_second = 0

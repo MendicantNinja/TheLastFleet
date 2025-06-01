@@ -1,0 +1,29 @@
+[gd_scene load_steps=5 format=3 uid="uid://bmogmneffwvgs"]
+
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/shield_slot.gd" id="1_0lsec"]
+[ext_resource type="Material" uid="uid://frj611bp24hs" path="res://Shaders/CombatShaders/shield_material.tres" id="2_f7132"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_mtinx"]
+resource_local_to_scene = true
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xdox4"]
+
+[node name="Shields" type="RigidBody2D"]
+collision_layer = 16
+collision_mask = 31
+gravity_scale = 0.0
+can_sleep = false
+freeze = true
+freeze_mode = 1
+script = ExtResource("1_0lsec")
+
+[node name="ShieldShape" type="CollisionPolygon2D" parent="."]
+disabled = true
+
+[node name="ShieldVisuals" type="Polygon2D" parent="."]
+material = ExtResource("2_f7132")
+antialiased = true
+texture = SubResource("PlaceholderTexture2D_mtinx")
+
+[node name="ShieldShape2" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_xdox4")
