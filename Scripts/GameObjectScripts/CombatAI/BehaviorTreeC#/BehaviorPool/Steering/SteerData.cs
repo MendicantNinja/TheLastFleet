@@ -5,6 +5,7 @@ using Vector2 = System.Numerics.Vector2;
 public partial class SteerData : Node
 {
     // Core Parameters
+    [Export]
     public RigidBody2D TargetUnit { get; set; } = null;
     public Vector2 TargetPosition { get; set; } = Vector2.Zero;
 
@@ -19,6 +20,7 @@ public partial class SteerData : Node
     public float MinSeparationRadius { get; private set; }
     public float SqSeparationRadius { get; private set; }
     public float OccupancyRadius { get; private set; }
+    [Export]
     public float AvoidRadius { get; set; }
     public float ThreatRadius { get; private set; }
 

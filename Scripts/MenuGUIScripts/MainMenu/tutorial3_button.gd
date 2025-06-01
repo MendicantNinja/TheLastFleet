@@ -20,7 +20,7 @@ func on_button_pressed() -> void:
 	get_tree().root.add_child(instance)
 	get_tree().current_scene.queue_free()
 	get_tree().current_scene = instance
-	instance.setup(Fleet.new(), 3)
+	instance.setup(Fleet.new(), data.tutorial_type_enum.MANUAL)
 	
 
 func on_focus_entered() -> void:

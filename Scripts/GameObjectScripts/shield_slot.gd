@@ -3,6 +3,7 @@ class_name ShieldSlot
 
 @onready var ShieldShape: CollisionPolygon2D = $ShieldShape
 @onready var ShieldVisuals: Polygon2D = $ShieldVisuals
+@onready var ShieldShape2: CollisionShape2D = $ShieldShape2
 var shield_material: Material = load("res://Shaders/CombatShaders/shield_material.tres")
 
 var ship_id: int = 0
@@ -145,6 +146,15 @@ func toggle_shields(value: bool) -> void:
 		ShieldShape.set_polygon(perimeter_points)
 		ShieldVisuals.set_polygon(perimeter_points)
 		ShieldVisuals.visible = value
+	
+	#if value == true:
+		#ShieldShape.disabled = true
+		#var new_shape: CircleShape2D = CircleShape2D.new()
+		#new_shape.radius = shield_radius
+		#ShieldShape2.shape = new_shape
+		#ShieldShape2.disabled = false
+	#elif value == false:
+		#ShieldShape2.set_deferred("disabled", true)
 	# Setup the shields parameters initially.
 func shield_parameters(shield_arc: int, p_collision_layer: int, id: int, ship: Ship) -> void:
 	add_collision_exception_with(ship)

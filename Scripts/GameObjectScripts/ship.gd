@@ -549,7 +549,6 @@ func tutorial_setup() -> void:
 		set_combat_ai(false)
 		for weapon: WeaponSlot in all_weapons:
 			weapon.ai_debug = true
-		
 
 func process_damage(projectile: Projectile) -> void:
 	## Regular damage processing
@@ -1116,7 +1115,7 @@ func set_targets(targets: Array) -> void:
 		if n_target == null:
 			continue
 		if n_target is Ship:
-			recast_targets.append(n_target)
+			recast_targets.append(n_target as RigidBody2D)
 		else:
 			push_error("Expected a RigidBody2D, got: " + str(n_target))
 	targeted_units = recast_targets
@@ -1226,14 +1225,14 @@ func _on_SeparationShape_body_exited(neighbor) -> void:
 	separation_neighbors = tmp_array
 
 func _on_AvoidanceShape_body_entered(body) -> void:
-	if body == self or body is StaticBody2D:
+	if body == self or body is ShieldSlot or body is StaticBody2D:
 		return
 	var tmp_array = neighbor_units
 	tmp_array.append(body)
 	neighbor_units = tmp_array
 
 func _on_AvoidanceShape_body_exited(body) -> void:
-	if body == self or body is StaticBody2D:
+	if body == self or body is StaticBody2D or body is ShieldSlot:
 		return
 	var tmp_array = []
 	for unit in neighbor_units:
