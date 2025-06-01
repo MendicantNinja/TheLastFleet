@@ -116,9 +116,9 @@ func reset_deployment_position() -> void:
 		deployment_row = 0
 
 # Called after ready to import parameters like tutorial mode or the enemy fleet.
-func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = 0) -> void:
+func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = data.tutorial_type_enum.NONE) -> void:
 	var setup_enemy_fleet: Fleet = enemy_fleet
-	if tutorial_enum == 0:
+	if tutorial_enum == data.tutorial_type_enum.NONE:
 		%TutorialWalkthrough.visible = false
 		$TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/FogOfWar.visible = true
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_DISABLED
@@ -128,12 +128,12 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 		%TutorialWalkthrough.visible = true
 		$TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/FogOfWar.visible = false
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_ALWAYS
-		if tutorial_enum == 1: # Basic movement and camera tutorial.
+		if tutorial_enum == data.tutorial_type_enum.BASICS: # Basic movement and camera tutorial.
 			%TutorialWalkthrough.setup(tutorial_enum) # skip deployment, we dont want enemy ships
-		elif tutorial_enum == 2: # Tactics Tutorial.
+		elif tutorial_enum == data.tutorial_type_enum.TACTICS: # Tactics Tutorial.
 			deploy_enemy_fleet(enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
-		elif tutorial_enum == 3: # Manual Control Tutorial
+		elif tutorial_enum == data.tutorial_type_enum.MANUAL: # Manual Control Tutorial
 			setup_enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 			deploy_enemy_fleet(setup_enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
