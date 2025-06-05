@@ -49,7 +49,10 @@ var flux_overload: bool = false:
 var is_friendly: bool = false
 var target_engaged: bool = false
 var manual_camera: bool = false
-var AI_enabled: bool = false
+var AI_enabled: bool = false:
+	set(value):
+		AI_enabled = value
+
 var ai_debug: bool = false
 
 var range_display_color: Color = Color.SNOW
