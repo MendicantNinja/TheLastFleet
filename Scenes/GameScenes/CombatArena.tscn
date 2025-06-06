@@ -1,4 +1,4 @@
-[gd_scene load_steps=63 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=65 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
@@ -36,6 +36,8 @@
 [ext_resource type="Texture2D" uid="uid://bytnv6hooeoqm" path="res://Art/CombatGUIArt/TacticalMapArt/TacticalMapButtonDisabled.png" id="16_dqw4y"]
 [ext_resource type="Texture2D" uid="uid://c4inovfa6os7d" path="res://Art/CombatGUIArt/TacticalMapArt/Camera2D.svg" id="19_1hyx4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/camera_feed_button.gd" id="20_ebklc"]
+[ext_resource type="Script" path="res://Scripts/CombatGUIScripts/TacticalMapScripts/remove_control.gd" id="26_pnk6b"]
+[ext_resource type="Texture2D" uid="uid://c5ctmjr4ddjrd" path="res://Art/CombatGUIArt/TacticalMapArt/breaking-chain.svg" id="27_ryxt4"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/tutorial_walkthrough.gd" id="31_awwt3"]
 [ext_resource type="Texture2D" uid="uid://sx6qwqb84tne" path="res://Art/GUIArt/fast-backward-button.svg" id="32_md01c"]
 [ext_resource type="Texture2D" uid="uid://brjhxirqyou7p" path="res://Art/GUIArt/fast-forward-button.svg" id="33_dc70j"]
@@ -309,7 +311,6 @@ position_smoothing_enabled = true
 [node name="TacticalMapLayer" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
 process_mode = 3
-visible = false
 
 [node name="TutorialText" type="Label" parent="TacticalMapLayer"]
 visible = false
@@ -380,7 +381,7 @@ canvas_item_default_texture_filter = 2
 gui_snap_controls_to_pixels = false
 canvas_cull_mask = 4294967279
 size = Vector2i(9600, 9600)
-render_target_update_mode = 0
+render_target_update_mode = 4
 
 [node name="TacticalMapCamera" type="Camera2D" parent="TacticalMapLayer/TacticalViewportContainer/TacticalViewport"]
 unique_name_in_owner = true
@@ -455,14 +456,15 @@ theme_override_font_sizes/font_size = 32
 text = "TACTICAL DISPLAY"
 metadata/_edit_use_anchors_ = true
 
-[node name="ButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
+[node name="TacticalMapButtonList" type="HBoxContainer" parent="TacticalMapLayer"]
+unique_name_in_owner = true
 offset_left = 1518.0
 offset_top = 971.0
 offset_right = 1664.0
 offset_bottom = 1035.0
 theme_override_constants/separation = 18
 
-[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+[node name="ManualControlButton" type="TextureButton" parent="TacticalMapLayer/TacticalMapButtonList"]
 unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
@@ -476,7 +478,7 @@ texture_hover = ExtResource("14_wbn2k")
 texture_disabled = ExtResource("16_dqw4y")
 script = ExtResource("15_o3rb6")
 
-[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/TacticalMapButtonList/ManualControlButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -492,7 +494,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("16_dosly")
 
-[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/ManualControlButton"]
 layout_mode = 0
 offset_left = 8.0
 offset_top = -1.0
@@ -503,7 +505,7 @@ theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 
-[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/ManualControlButton"]
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/ManualControlButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -519,10 +521,10 @@ grow_vertical = 2
 mouse_filter = 2
 theme = ExtResource("7_u21w5")
 bbcode_enabled = true
-text = "Take 
+text = "Take
 Control"
 
-[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/ButtonList"]
+[node name="CameraFeedButton" type="TextureButton" parent="TacticalMapLayer/TacticalMapButtonList"]
 unique_name_in_owner = true
 self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
 z_index = 1
@@ -536,7 +538,7 @@ texture_hover = ExtResource("14_wbn2k")
 texture_disabled = ExtResource("16_dqw4y")
 script = ExtResource("20_ebklc")
 
-[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/TacticalMapButtonList/CameraFeedButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -552,7 +554,7 @@ grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("19_1hyx4")
 
-[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/CameraFeedButton"]
 layout_mode = 0
 offset_left = 7.0
 offset_top = -1.0
@@ -563,7 +565,7 @@ theme = ExtResource("7_u21w5")
 theme_override_font_sizes/normal_font_size = 16
 bbcode_enabled = true
 
-[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/ButtonList/CameraFeedButton"]
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/CameraFeedButton"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
@@ -580,6 +582,68 @@ mouse_filter = 2
 theme = ExtResource("7_u21w5")
 bbcode_enabled = true
 text = "Camera Feed"
+
+[node name="RemoveControl" type="TextureButton" parent="TacticalMapLayer/TacticalMapButtonList"]
+unique_name_in_owner = true
+self_modulate = Color(0.176471, 0.517647, 0.729412, 1)
+z_index = 1
+z_as_relative = false
+layout_mode = 2
+focus_mode = 0
+action_mode = 0
+texture_normal = ExtResource("13_w2mg8")
+texture_pressed = ExtResource("14_wbn2k")
+texture_hover = ExtResource("14_wbn2k")
+texture_disabled = ExtResource("16_dqw4y")
+script = ExtResource("26_pnk6b")
+
+[node name="TextureRect" type="TextureRect" parent="TacticalMapLayer/TacticalMapButtonList/RemoveControl"]
+self_modulate = Color(0.788235, 0.188235, 0.301961, 1)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -16.0
+offset_top = -25.0
+offset_right = 12.0
+offset_bottom = 24.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("27_ryxt4")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Keybinding" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/RemoveControl"]
+layout_mode = 0
+offset_left = 7.0
+offset_top = -1.0
+offset_right = 24.0
+offset_bottom = 25.0
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+theme_override_font_sizes/normal_font_size = 16
+bbcode_enabled = true
+
+[node name="Label2" type="RichTextLabel" parent="TacticalMapLayer/TacticalMapButtonList/RemoveControl"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -28.0
+offset_top = 37.0
+offset_right = 28.0
+offset_bottom = 75.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("7_u21w5")
+bbcode_enabled = true
+text = "Break Control"
 
 [node name="ManualControlHUD" type="CanvasLayer" parent="."]
 unique_name_in_owner = true
@@ -809,6 +873,7 @@ text = "Camera Feed"
 [node name="TutorialWalkthrough" type="RichTextLabel" parent="VariousCanvasPopups"]
 unique_name_in_owner = true
 process_mode = 3
+visible = false
 top_level = true
 offset_left = 6.0
 offset_top = 66.0

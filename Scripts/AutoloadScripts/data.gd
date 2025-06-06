@@ -335,7 +335,7 @@ var localization_dictionary: Dictionary = {
 	# Relatively unique 1-off buttons "New Game, Load Game"
 	# Event-popups, tutorial walkthroughs, and other unique long texts.
 	&"tutorial_panning": "Let's get started with the basics for any strategy game: camera controls. To zoom the camera on the map, scroll the mouse wheel up and down. To progress the tutorial, hold down the middle mouse button and move to pan the camera.",
-	&"tutorial_deployment": "Press the G key, select some ships to deploy by clicking on their icon, which highlights them, and then press the Deploy button.",
+	&"tutorial_deployment": "Press the G key, select some ships to deploy by clicking on their icon, which highlights them, and then press the Deploy button. You can also press All to prepare to deploy as many ships as possible.",
 	&"tutorial_pause": "Press the spacebar key to pause and unpause the game.",
 	&"tutorial_map": "Press the tab key to toggle the tactical map on and off. Lets try turning it on and then off again",
 	
@@ -344,12 +344,12 @@ var localization_dictionary: Dictionary = {
 	&"tutorial_battle": "Eliminate all enemy ships to progress the tutorial.",
 	&"tutorial_complete": "Looks like you've completed the simulation. Press Escape and click Main Menu to go back to the main menu.",
 	
-	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship",
+	&"tutorial_manual": "With a single friendly unit selected, press T to take manual control of that ship. You can break out of this by selecting another ship and swapping to it with T. You can break out of manual control no matter what ship is selected by pressing U in the tactical map.",
 	&"tutorial_camera": "Let's do a closeup view of your ships. With A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
 	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S. Notice the speed indicator on the bottom right of the screen. Strafing horizontally is done with Q/E and is slower than accelerating. Lastly, you can progress the tutorial by rotating the ship with A/D. Lets try rotating to the right to progress the tutorial.",
 	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
 	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
-	&"tutorial_shields": "Flux is a a measure of heat buildup and how much power your ship's capacitors have. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. Right click while in manual control to gradually raise your shields and stop enemy projectiles.",
+	&"tutorial_shields": "Flux is a dual measure of heat buildup and electrical power. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. You can vent flux quicker in a vulnerable state by pressing V. Right click while in manual control to gradually raise your shields and stop projectiles.",
 	#Tutorial complete
 }
 

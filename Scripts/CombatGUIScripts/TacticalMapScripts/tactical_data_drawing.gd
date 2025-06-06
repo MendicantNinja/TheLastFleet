@@ -73,7 +73,7 @@ func _ready():
 	$FogOfWar.material.set_shader_parameter("visibility_texture", $VisibilityLayerContainer/VisibilityLayer.get_texture())
 	setup()
 	queue_redraw()
-	for child in $"../../../ButtonList".get_children():
+	for child in %TacticalMapButtonList.get_children():
 		if child is TextureButton:
 			child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("confirm"))
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
@@ -115,20 +115,24 @@ func _unhandled_input(event) -> void:
 			#if self.visible:
 			if prev_selected_ship == null:
 				return
-			$"../../../ButtonList/ManualControlButton".emit_signal("pressed")
+			%ManualControlButton.emit_signal("pressed")
 			switch_maps.emit()
 			reset_box_selection()
 			if manually_controlled_ship != null:
 				# Turn off MC for the old ship.
 				manually_controlled_ship.toggle_manual_control()
+				manually_controlled_ship = null
 			manually_controlled_ship = prev_selected_ship
 			%CombatMap.manually_controlled_unit = manually_controlled_ship
 			if manually_controlled_ship != null:
 				# Turn on MC for the new ship.
 				manually_controlled_ship.toggle_manual_control()
+		elif Input.is_action_pressed("exit_manual_control") and TacticalCamera.enabled and manually_controlled_ship != null:
+			%RemoveControl.emit_signal("pressed")
+			manually_controlled_ship.toggle_manual_control()
 		elif Input.is_action_pressed("camera_feed") and prev_selected_ship !=null:
 			#print("Camera feed called")
-			$"../../../ButtonList/CameraFeedButton".emit_signal("pressed")
+			%CameraFeedButton.emit_signal("pressed")
 			switch_maps.emit()
 			reset_box_selection()
 			camera_feed_active = true
@@ -254,11 +258,12 @@ func setup() -> void:
 func update() -> void:
 	#print("update")
 	if prev_selected_ship == null: 
-		$"../../../ButtonList/ManualControlButton".disabled = true
-		$"../../../ButtonList/CameraFeedButton".disabled = true
+		for button in %TacticalMapButtonList.get_children():
+			button.disabled = true
 	else:
-		$"../../../ButtonList/ManualControlButton".disabled = false
-		$"../../../ButtonList/CameraFeedButton".disabled = false
+		for button in %TacticalMapButtonList.get_children():
+			button.disabled = true
+	
 	for i in range(icon_list.size() - 1, -1, -1):
 		if icon_list[i] == null or icon_list[i].assigned_ship == null:
 			icon_list[i].queue_free()

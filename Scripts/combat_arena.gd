@@ -23,9 +23,10 @@ var imap_debug_grid: Array
 var combat_goal: int = globals.GOAL.SKIRMISH
 
 # Enemy Deployment Variables (not actually friendly, I just enjoy reusing code)
-var deployment_position: Vector2
+var starting_deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
+var tutorial: bool = false
 
 signal units_deployed(units)
 
@@ -105,29 +106,34 @@ func reset_deployment_position() -> void:
 	#deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
 	#deployment_position.y = 0 - deployment_spacing * 2# Start at the (bottommost, we're deploying enemies now) row.
 	
-	# For debugging
-	deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
-	deployment_position.y = PlayableAreaBounds.shape.size.y/2 # Deploy at the center
-	deployment_row = 0
+	if tutorial == true:
+		starting_deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+		starting_deployment_position.y = PlayableAreaBounds.shape.size.y/2 # Deploy at the center
+		deployment_row = 0
+	else: 
+		starting_deployment_position.x = PlayableAreaBounds.shape.size.x/2 - deployment_spacing * 3 # 3+1+3 = 7 columns, start leftmost
+		starting_deployment_position.y = 0 - deployment_spacing # Deploy at the top of the map
+		deployment_row = 0
 
 # Called after ready to import parameters like tutorial mode or the enemy fleet.
-func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = 0) -> void:
+func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_enum = data.tutorial_type_enum.NONE) -> void:
 	var setup_enemy_fleet: Fleet = enemy_fleet
-	if tutorial_enum == 0:
+	if tutorial_enum == data.tutorial_type_enum.NONE:
 		%TutorialWalkthrough.visible = false
 		$TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/FogOfWar.visible = true
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_DISABLED
 		deploy_enemy_fleet(setup_enemy_fleet)
 	else:
+		tutorial = true
 		%TutorialWalkthrough.visible = true
 		$TacticalMapLayer/TacticalViewportContainer/TacticalViewport/TacticalDataDrawing/FogOfWar.visible = false
 		%TutorialWalkthrough.process_mode = Node.PROCESS_MODE_ALWAYS
-		if tutorial_enum == 1: # Basic movement and camera tutorial.
+		if tutorial_enum == data.tutorial_type_enum.BASICS: # Basic movement and camera tutorial.
 			%TutorialWalkthrough.setup(tutorial_enum) # skip deployment, we dont want enemy ships
-		elif tutorial_enum == 2: # Tactics Tutorial.
+		elif tutorial_enum == data.tutorial_type_enum.TACTICS: # Tactics Tutorial.
 			deploy_enemy_fleet(enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
-		elif tutorial_enum == 3: # Manual Control Tutorial
+		elif tutorial_enum == data.tutorial_type_enum.MANUAL: # Manual Control Tutorial
 			setup_enemy_fleet.add_ship(ShipStats.new(data.ship_type_enum.CHALLENGER))
 			deploy_enemy_fleet(setup_enemy_fleet)
 			%TutorialWalkthrough.setup(tutorial_enum)
@@ -136,8 +142,8 @@ func setup(enemy_fleet: Fleet = Fleet.new(), tutorial_enum: data.tutorial_type_e
 	
 # Deploys (and potentially, if no fleet parameter is passed in, creates) the enemy fleet.
 func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
-	# Technically the enemy deployment position, row, and spacing. But I enjoy reusing code.
 	reset_deployment_position()
+	var deployment_position = starting_deployment_position
 	var positions: Array = []
 	var ship_positions: Dictionary = {}
 	var instantiated_units: Array[Ship]
