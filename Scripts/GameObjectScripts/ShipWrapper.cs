@@ -262,11 +262,19 @@ public partial class ShipWrapper : Node
 		}
 	}
 
-	public void SetTargetedUnits(Godot.Collections.Array<RigidBody2D> targeted_units, SteerData steer_data)
+	public void SetTargetedUnits(Godot.Collections.Array<RigidBody2D> targeted_units, SteerData steer_data, RigidBody2D agent)
 	{
 		TargetedUnits.Clear();
-		if (targeted_units.Count == 0) return;
-		
+		if (targeted_units.Count == 0 && TargetUnit is not null) 
+		{
+			Godot.Collections.Array<RigidBody2D> target_whatever = (Godot.Collections.Array<RigidBody2D>)TargetUnit.Get("targeted_by");
+			target_whatever.Remove(agent);
+			TargetUnit.Set("targeted_by", target_whatever);
+			agent.Call("set_target_unit", 0);
+			return;
+		}
+		else if (targeted_units.Count == 0) return;
+
 		foreach (RigidBody2D target in targeted_units)
 		{
 			if (!IsInstanceValid(target) || target is null) continue;

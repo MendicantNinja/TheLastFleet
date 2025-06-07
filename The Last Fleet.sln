@@ -1,5 +1,6 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "The Last Fleet", "The Last Fleet.csproj", "{57503B0C-FADE-4E97-831B-B20902EABE4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,17 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{347FCF46-0459-4F48-8A68-4818AAE4CF12}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {DC38BE4C-6460-46F8-BC83-A00A6315BA4B}
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{57503B0C-FADE-4E97-831B-B20902EABE4E}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
