@@ -441,22 +441,34 @@ func process_move(to_position: Vector2) -> void:
 	# else if not already existing: move_new_unit, reset_group_affiliation, move_unit
 	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
 	if highlighted_group.size() == 0:
+		return 
+	
+	var group_leaders: Array = []
+	var double_check: Array = []
+	for unit: Ship in highlighted_group:
+		if unit == null: 
+			continue
+		if unit.combat_flag == true and unit.target_unit != null:
+			unit.remove_from_group(highlight_group_name)
+			unit.highlight_selection(false)
+			continue
+		if unit.group_leader == true:
+			group_leaders.push_back(unit)
+		double_check.push_back(unit)
+	
+	if double_check.size() == 0:
 		return
 	globals.play_gui_audio_string("order")
-	var group_leaders: Array = []
-	for unit in highlighted_group:
-		if unit.group_leader:
-			group_leaders.push_back(unit)
 	
 	# If the group we're selecting is already a group that exists, move it and do not proceed.
 	var group_array: Array = current_groups.values()
 	for group in group_array:
-		if highlighted_group == group and group_leaders.size() == 1:
+		if double_check == group and group_leaders.size() == 1:
 			move_unit(group_leaders[0], to_position)
 			return
 	
-	reset_group_affiliation(highlighted_group)
-	move_new_unit(to_position)
+	reset_group_affiliation(double_check)
+	move_new_unit(to_position, double_check)
 
 # Calls down to an indivdual ship to move it. 
 func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
@@ -466,12 +478,12 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 	unit_leader.set_navigation_position(to_position)
 	get_viewport().set_input_as_handled()
 
-func move_new_unit(to_position: Vector2) -> void:
+func move_new_unit(to_position: Vector2, group) -> void:
 	# 1) Create an array of ships (nodes) from the ships the player currently has selected
-	var highlighted_group: Array = get_tree().get_nodes_in_group(highlight_group_name)
+	var highlighted_group: Array = group
 	var leader_key: StringName = &"leader"
 	# 2) Assign group leader
-	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.
+	# 2a) Arbitrarily assign a group leader to "groups" of 1 or 2 units.g	
 	var new_leader = null
 	if highlighted_group.size() > 0 and highlighted_group.size() <= 2:
 		new_leader = highlighted_group[0]

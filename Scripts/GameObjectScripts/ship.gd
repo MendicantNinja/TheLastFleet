@@ -206,7 +206,7 @@ var target_unit: RigidBody2D = null:
 
 var targeted_units: Array[RigidBody2D] = []:
 	set(value):
-		ShipWrapper.SetTargetedUnits(value, SteerData)
+		ShipWrapper.SetTargetedUnits(value, SteerData, self)
 		targeted_units = value
 
 var neighbor_units: Array = []:
@@ -291,7 +291,7 @@ var match_velocity_flag: bool = false:
 		ShipWrapper.SetMatchVelocityFlag(match_velocity_flag)
 		match_velocity_flag = value
 
-var steer_debug: bool = true
+var steer_debug: bool = false
 
 var separation_force: Vector2 = Vector2.ZERO:
 	set(value):
@@ -331,6 +331,11 @@ var acceleration: Vector2 = Vector2.ZERO:
 
 var target_position: Vector2 = Vector2.ZERO:
 	set(value):
+		#if value != Vector2.ZERO and is_friendly == true and targeted_units.is_empty() == false and group_leader == true:
+			#for unit in get_tree().get_nodes_in_group(group_name):
+				#if unit == null or unit.is_queued_for_deletion(): continue
+				#if unit.combat_flag == true: return
+			#get_tree().call_group(group_name, "set_target_units", [])
 		if is_friendly == true:
 			move_order_updated.emit(value)
 		SteerData.SetTargetPosition(value)

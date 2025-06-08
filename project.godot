@@ -58,7 +58,6 @@ window/vsync/vsync_mode=0
 [dotnet]
 
 project/assembly_name="The Last Fleet"
-project/solution_directory="D:\\Godot_Projects\\TheLastFleet"
 
 [global_group]
 

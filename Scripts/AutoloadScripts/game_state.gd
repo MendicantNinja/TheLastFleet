@@ -7,7 +7,7 @@ var player_fleet: Fleet = Fleet.new()
 func _ready():
 	#for when user names are implemented ResourceLoader.load("user://"+get_child(0, true).text+".res")
 	if player_fleet.fleet_stats.ships.is_empty():
-		for i in range (14):
+		for i in range (10):
 			if i % 100 == 0:
 				player_fleet.add_ship(ShipStats.new(data.ship_type_enum.TRIDENT))
 			elif i % 3 == 0:
