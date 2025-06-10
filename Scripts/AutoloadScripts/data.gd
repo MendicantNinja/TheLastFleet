@@ -115,7 +115,7 @@ enum ship_system_enum {
 	NONE,
 	BURN_DRIVE, # Order AI to turn it on if targeted_enemy_ship.BEHAVIOR_STATE  == FLEE and the local enemy is not superior.
 	STEALTH, # Cuts sensor-profile to 5% for a long duration. Order AI to turn it on when just outside maximum enemy sensor range.
-	PHASE, # Order AI to turn it on when a large amount of damage is incoming and flux is available.
+	PHASE, # Order AI to turn it on when a large amount of damage is incoming and heat is available.
 	
 }
 
@@ -329,9 +329,9 @@ var localization_dictionary: Dictionary = {
 		["Group", "Cluster", "Sector", "Expanse"],
 		sector_type_enum.NEBULA:
 		["Nebula", "Shroud", "Cloud"],
-	# Text/Names of common terms. E.g. "hull", "flux"
+	# Text/Names of common terms. E.g. "hull", "heat"
 		},
-	&"flux": "flux",
+	&"heat": "heat",
 	# Relatively unique 1-off buttons "New Game, Load Game"
 	# Event-popups, tutorial walkthroughs, and other unique long texts.
 	&"tutorial_panning": "Let's get started with the basics for any strategy game: camera controls. To zoom the camera on the map, scroll the mouse wheel up and down. To progress the tutorial, hold down the middle mouse button and move to pan the camera.",
@@ -348,8 +348,8 @@ var localization_dictionary: Dictionary = {
 	&"tutorial_camera": "Let's do a closeup view of your ships. With A SINGLE friendly unit selected, press F to swap to a camera view of the selected ship",
 	&"tutorial_movement": "Now, you can accelerate the ship forward and backwards with W/S. Notice the speed indicator on the bottom right of the screen. Strafing horizontally is done with Q/E and is slower than accelerating. Lastly, you can progress the tutorial by rotating the ship with A/D. Lets try rotating to the right to progress the tutorial.",
 	&"tutorial_weapons": "On the bottom left is the weapon system display. Try pressing 1, 2, 3 and so on to swap between weapon systems to aim and fire. Press ctrl+the corresponding weapon number to toggle autofire of those weapon systems on and off per the rectangle. Lets try selecting weapon system 1.",
-	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled Flux goes up.",
-	&"tutorial_shields": "Flux is a dual measure of heat buildup and electrical power. Both weapons and shields build this meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. You can vent flux quicker in a vulnerable state by pressing V. Right click while in manual control to gradually raise your shields and stop projectiles.",
+	&"tutorial_firing": "With the weapon system selected. Try clicking wherever you want to fire to shoot the weapons. Notice how the bar labeled 'Heat' goes up.",
+	&"tutorial_shields": "Both weapons and shields build the heat meter up, don't let it overflow or your ship will overload, leaving your ship vulnerable and unable to do anything but move. You can remove heat quicker in a vulnerable state by pressing V. Right click while in manual control to gradually raise your shields and stop projectiles.",
 	#Tutorial complete
 }
 

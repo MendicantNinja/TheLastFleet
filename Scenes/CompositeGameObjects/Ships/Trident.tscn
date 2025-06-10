@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/ship.gd" id="1_vx8d1"]
 [ext_resource type="PackedScene" uid="uid://buewiugebpfxq" path="res://Scenes/CompositeGameObjects/CombatBehaviorTreeRedux.tscn" id="2_070pn"]
-[ext_resource type="PackedScene" uid="uid://cjllo8sl6lu3f" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_dvjjp"]
+[ext_resource type="PackedScene" uid="uid://d0qfp0y2u5fsu" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/AvoidanceArea.tscn" id="2_dvjjp"]
 [ext_resource type="PackedScene" uid="uid://37wveyuf0rjm" path="res://Scenes/ForceDebug.tscn" id="2_rt2he"]
 [ext_resource type="PackedScene" uid="uid://crv2lhq0iseu8" path="res://Scenes/CompositeGameObjects/Ships/ShipComponentScenes/SeperationArea.tscn" id="3_yw3tl"]
 [ext_resource type="PackedScene" uid="uid://cydvqlraj4ugp" path="res://Scenes/CompositeGameObjects/WeaponSlot.tscn" id="13_kiy6n"]
