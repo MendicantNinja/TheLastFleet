@@ -39,7 +39,7 @@ offset_right = 1915.0
 offset_bottom = 227.0
 theme_override_colors/default_color = Color(0.780392, 0.490196, 0.0901961, 1)
 theme_override_fonts/normal_font = ExtResource("2_gxqpj")
-theme_override_font_sizes/normal_font_size = 128
+theme_override_font_sizes/normal_font_size = 96
 bbcode_enabled = true
 text = "[center]The Last Fleet"
 
@@ -54,7 +54,7 @@ theme_override_colors/default_color = Color(0.780392, 0.490196, 0.0901961, 1)
 theme_override_fonts/normal_font = ExtResource("2_gxqpj")
 theme_override_font_sizes/normal_font_size = 24
 bbcode_enabled = true
-text = "[center]Playtest Feedback Wanted: Read the roadmap, report bugs, make gameplay suggestions, and more on our Discord server above."
+text = "[center]Playtest Feedback Wanted: Read the roadmap, report bugs, make gameplay suggestions, and more on our Discord server above!"
 
 [node name="Background" type="TextureRect" parent="."]
 layout_mode = 0
