@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://825w50grrkcp"]
+[gd_scene load_steps=21 format=3 uid="uid://825w50grrkcp"]
 
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/main_menu.gd" id="1_a5rc2"]
 [ext_resource type="Texture2D" uid="uid://dgchbl6soktko" path="res://Art/MenuArt/title.png" id="1_k1n24"]
@@ -18,6 +18,8 @@
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/galaxy_button.gd" id="12_mn1n7"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/tutorial3_button.gd" id="13_saknw"]
 [ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/exit_game_button.gd" id="16_2sxot"]
+[ext_resource type="Texture2D" uid="uid://datfagpfov17b" path="res://Art/MenuArt/Discord_Logo_Black/Discord-Logo-Black.svg" id="17_g3ajb"]
+[ext_resource type="Script" path="res://Scripts/MenuGUIScripts/MainMenu/discord_button.gd" id="20_4n5c1"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -29,8 +31,7 @@ grow_vertical = 2
 focus_mode = 2
 script = ExtResource("1_a5rc2")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="."]
-visible = false
+[node name="Title" type="RichTextLabel" parent="."]
 top_level = true
 layout_mode = 0
 offset_left = 3.0
@@ -42,8 +43,20 @@ theme_override_font_sizes/normal_font_size = 128
 bbcode_enabled = true
 text = "[center]The Last Fleet"
 
+[node name="Feedback" type="RichTextLabel" parent="."]
+top_level = true
+layout_mode = 0
+offset_left = 2.0
+offset_top = 763.0
+offset_right = 497.0
+offset_bottom = 1009.0
+theme_override_colors/default_color = Color(0.780392, 0.490196, 0.0901961, 1)
+theme_override_fonts/normal_font = ExtResource("2_gxqpj")
+theme_override_font_sizes/normal_font_size = 24
+bbcode_enabled = true
+text = "[center]Playtest Feedback Wanted: Read the roadmap, report bugs, make gameplay suggestions, and more on our Discord server above."
+
 [node name="Background" type="TextureRect" parent="."]
-self_modulate = Color(1, 1, 1, 0.784314)
 layout_mode = 0
 offset_right = 2144.0
 offset_bottom = 1918.0
@@ -252,6 +265,22 @@ theme = ExtResource("4_dnp8m")
 text = "EXIT GAME"
 scroll_active = false
 
+[node name="DiscordButton" type="TextureButton" parent="ListContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_x54xu")
+texture_hover = ExtResource("6_4abs8")
+script = ExtResource("20_4n5c1")
+
+[node name="DiscordIcon" type="TextureRect" parent="ListContainer/DiscordButton"]
+z_index = 1
+z_as_relative = false
+layout_mode = 0
+offset_right = 496.0
+offset_bottom = 100.0
+mouse_filter = 2
+texture = ExtResource("17_g3ajb")
+expand_mode = 1
+
 [node name="RefitButton" type="TextureButton" parent="ListContainer"]
 unique_name_in_owner = true
 visible = false
@@ -333,17 +362,5 @@ mouse_filter = 1
 theme = ExtResource("4_dnp8m")
 text = "NEW GAME"
 scroll_active = false
-
-[node name="LinksandIcons(Discord, Reddit, etc)" type="HBoxContainer" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-grow_vertical = 0
-
-[node name="IconBackGround" type="TextureRect" parent="LinksandIcons(Discord, Reddit, etc)"]
-layout_mode = 2
-texture = ExtResource("3_x54xu")
 
 [node name="GUINoisePlayer" type="AudioStreamPlayer" parent="."]
