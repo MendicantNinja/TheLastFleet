@@ -11,9 +11,10 @@ config_version=5
 [application]
 
 config/name="The Last Fleet"
+config/version="0.1"
 run/main_scene="res://Scenes/GameScenes/MainMenu.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Art/MenuArt/GalaxyMapNodesCloseup.png"
 
 [autoload]
 
@@ -58,7 +59,6 @@ window/vsync/vsync_mode=0
 [dotnet]
 
 project/assembly_name="The Last Fleet"
-project/solution_directory="D:\\Godot_Projects\\TheLastFleet"
 
 [global_group]
 

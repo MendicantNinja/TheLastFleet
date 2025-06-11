@@ -94,7 +94,7 @@ offset_right = 4.33333
 offset_bottom = 18.3333
 theme = ExtResource("4_88g2j")
 theme_override_font_sizes/font_size = 10
-text = "FLUX"
+text = "HEAT"
 
 [node name="HullIntegrityIndicator" type="TextureProgressBar" parent="ConstantSizedGUI"]
 physics_interpolation_mode = 0

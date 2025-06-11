@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public partial class FindGoal : Action
 {   const int radius = 30;
-	Imap working_map = null;
+	Imap working_map = new Imap(radius, radius);
     public override NodeState Tick(Node agent)
     {
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
@@ -20,17 +20,13 @@ public partial class FindGoal : Action
 
         if (ship_wrapper.GoalFlag == true) return NodeState.SUCCESS;
 
-        if (working_map == null)
-		{
-			working_map = new Imap(radius, radius);
-		}
-
 		ImapManager.Instance.GoalMap.AddIntoMap(working_map, ship_wrapper.ImapCell.X, ship_wrapper.ImapCell.Y);
 		Dictionary<float, Vector2I> local_maximum = new Dictionary<float, Vector2I>();
 		int rows = working_map.Height;
 		int cols = working_map.Width;
+
 		for (int m = 0; m < rows; m++)
-{
+		{
 			float maxVal = 0.0f;
 			int n = -1;
 

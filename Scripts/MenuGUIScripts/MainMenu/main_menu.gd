@@ -21,6 +21,10 @@ func connect_buttons_lazy() -> void:
 			child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 			if child != %Tutorial:
 				child.pressed.connect(func(): %TutorialList.visible = false)
+	#for child in $ExternalLinksList.get_children():
+		#if child is TextureButton:
+			#child.pressed.connect(Callable(globals, "play_gui_audio_string").bind("select"))
+			#child.mouse_entered.connect(Callable(globals, "play_gui_audio_string").bind("hover"))
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):

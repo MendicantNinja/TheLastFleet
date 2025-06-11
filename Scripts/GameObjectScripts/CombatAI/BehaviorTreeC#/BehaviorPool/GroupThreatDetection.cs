@@ -5,7 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Vector2 = System.Numerics.Vector2;
 
-public partial class ThreatDetection : Action
+public partial class GroupThreatDetection : Action
 {
 	string true_name = "";
 	string tmp_name = "threat detect ";
@@ -24,12 +24,12 @@ public partial class ThreatDetection : Action
 			return NodeState.FAILURE;
 		}
 		
-		if (true_name.Length == 0 && ship_wrapper.IsFriendly)
+		if (true_name.Length == 0 && ship_wrapper.IsFriendly == true)
 		{
 			true_name = "Temporary Friendly Group ";
 			tmp_name += "tmp friendly";
 		}
-		else if (true_name.Length == 0 && !ship_wrapper.IsFriendly)
+		else if (true_name.Length == 0 && ship_wrapper.IsFriendly == false)
 		{
 			true_name = "Temporary Enemy Group ";
 			tmp_name += "tmp enemy";
@@ -41,7 +41,6 @@ public partial class ThreatDetection : Action
 		{
 			if (!IsInstanceValid(ship)|| ship.IsQueuedForDeletion()) continue;
 			ShipWrapper unit = (ShipWrapper)ship.Get("ShipWrapper");
-			SteerData unit_steering = (SteerData)ship.Get("SteerData");
 			if (unit.CombatFlag == true) return NodeState.FAILURE;
 		}
 
@@ -54,13 +53,13 @@ public partial class ThreatDetection : Action
 		// that also never received an order
 		if (ship_wrapper.GroupName.Length == 0 && available_neighbor_groups.Count == 0 && idle_neighbors.Count > 0) 
 		{   // I had to use Godot's Vector2/classes to compare to the ships global_position property/pass to the global methods. 
-			Godot.Collections.Dictionary<Godot.Vector2, RigidBody2D> unit_positions = new Godot.Collections.Dictionary<Godot.Vector2, RigidBody2D>();
+			Godot.Collections.Dictionary<Godot.Vector2, RigidBody2D> unit_positions = new();
 			foreach (RigidBody2D ship in idle_neighbors)
 			{
 				ship.AddToGroup(tmp_name);
 				unit_positions[ship.GlobalPosition] = ship;
 			}
-			Godot.Collections.Array<Godot.Vector2> key_array = new Godot.Collections.Array<Godot.Vector2>(unit_positions.Keys);
+			Godot.Collections.Array<Godot.Vector2> key_array = new(unit_positions.Keys);
 			Godot.Vector2 geo_median = (Godot.Vector2)globals.Call("geometric_median_of_objects", key_array);
 			RigidBody2D leader_body = (Godot.RigidBody2D)globals.Call("find_unit_nearest_to_median", geo_median, unit_positions);
 			
@@ -107,7 +106,7 @@ public partial class ThreatDetection : Action
 		}
 
 		// Attackers and their total strength
-		Godot.Collections.Array<RigidBody2D> attackers = new Godot.Collections.Array<RigidBody2D>();
+		Godot.Collections.Array<RigidBody2D> attackers = new();
 		float total_attacker_strength = 0.0f;
 		foreach (string group_name in attacker_groups)
 		{
@@ -128,6 +127,25 @@ public partial class ThreatDetection : Action
 			return NodeState.FAILURE;
 		}
 
+		if (ship_wrapper.IsFriendly == false)
+		{
+			Godot.Collections.Array<RigidBody2D> new_targets = new();
+			foreach (RigidBody2D attacker in attackers)
+			{
+				if (!IsInstanceValid(attacker) || attacker.IsQueuedForDeletion()) continue;
+				new_targets.Add(attacker);
+			}
+			/*
+			foreach (RigidBody2D target in ship_wrapper.TargetedUnits)
+			{
+				if (!IsInstanceValid(target) || target.IsQueuedForDeletion()) continue;
+				new_targets.Add(target);
+			}
+			*/
+			GetTree().CallGroup(ship_wrapper.GroupName, "set_targets", new_targets);
+		}
+
+		/*
 		Godot.Collections.Dictionary<float, string> nearby_group_strength = new Godot.Collections.Dictionary<float, string>();
 		foreach (string group_name in available_neighbor_groups)
 		{
@@ -166,7 +184,7 @@ public partial class ThreatDetection : Action
 				}
 			}
 		}
-		
+		*/
 		return NodeState.FAILURE;
 	}
 
