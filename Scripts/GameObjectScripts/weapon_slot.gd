@@ -31,6 +31,7 @@ class_name WeaponSlot
 		else:
 			return
 
+var projectile_sprite: Texture2D
 
 # Bools and toggles
 @onready var ready_to_fire: bool = true # This is that little green bar in Starsector for missiles and burst weapons that reload. Not important yet.
@@ -198,11 +199,13 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 		ContinuousFluxTimer.timeout.connect(on_continuous_flux_timer_timeout)
 	
 	projectile_inst = weapon.create_projectile().instantiate()
+	add_child(projectile_inst)
+	projectile_sprite = projectile_inst.Sprite.texture
+	pass
 
 func on_continuous_flux_timer_timeout() -> void:
 	emit_signal("weapon_slot_fired", weapon.flux_per_shot*.05) 
 	# Flux per shot == flux per second in the case of continuous beams.
-
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
 	EffectiveRange.collision_mask = mask

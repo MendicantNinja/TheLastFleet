@@ -1,6 +1,8 @@
 extends Area2D
 class_name Projectile
 
+@onready var Sprite: Sprite2D = $Sprite2D
+
 # Stats
 @onready var track_distance: Vector2 = Vector2.ZERO
 var damage: int = 0 
@@ -26,7 +28,6 @@ var is_seeking: bool = false
 # For other stuff:
 var owner_rid: RID
 var ship_id: int
-var is_friendly: bool = false
 
 signal projectile_freed
 
@@ -71,7 +72,6 @@ func assign_stats(weapon: Weapon, rid: RID, shield_rid: RID, friendly_value: boo
 	damage_type = weapon.damage_type
 	owner_rid = rid
 	ship_id = owner_rid.get_id()
-	is_friendly = friendly_value
 	var radian_accuracy = deg_to_rad(weapon.accuracy)
 	var lower_limit = -radian_accuracy
 	var upper_limit = radian_accuracy
