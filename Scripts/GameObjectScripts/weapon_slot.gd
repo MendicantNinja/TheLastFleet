@@ -11,6 +11,8 @@ class_name WeaponSlot
 @onready var ROFTimer: Timer = $ROFTimer
 @onready var SoftlockTimer = $SoftlockTimer
 @onready var ContinuousFluxTimer = $ContinuousFluxTimer
+@onready var SharedArea = $SharedArea
+@onready var BulletManagerNode = $BulletManager
 # Important Stuff
 @export var weapon_system_group: int = -1
 
@@ -87,7 +89,7 @@ signal new_threats(targets)
 signal threat_exited(targets)
 
 # Called to spew forth a --> SINGLE <-- projectile (or beam) scene from the given Weapon in the WeaponSlot.
-func fire(ship_id: int) -> void:
+func fire(ship_id: RID) -> void:
 	if flux_overload == true or timer_fire == false or current_beam != null:
 		return
 	if weapon == data.weapon_dictionary.get(data.weapon_enum.EMPTY):
@@ -99,22 +101,27 @@ func fire(ship_id: int) -> void:
 		if weapon.flux_per_shot > 0.0:
 			weapon_slot_fired.emit(weapon.flux_per_shot)
 	
-	var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
-	projectile.global_transform = WeaponNode.global_transform
-	projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
+	#var projectile: Area2D = weapon.create_projectile().instantiate() # Do not statically type, most projectiles are Area2D's, but beams are Line2D's
+	#projectile.global_transform = WeaponNode.global_transform
+	#projectile.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 	
-	if projectile.is_beam == true:
-		current_beam = projectile
+	if weapon.is_beam == true:
+		current_beam = weapon.create_projectile().instantiate()
+		current_beam.global_transform = WeaponNode.global_transform
+		current_beam.assign_stats(weapon, owner_rid, shield_rid, is_friendly)
 		if current_beam.is_continuous == false:
 			current_beam.projectile_freed.connect(func():
 				current_beam = null  # Clear reference after projectile is freed
 			)
 		else:
 			ContinuousFluxTimer.start() # Flux per second for continuous beams.
-	get_tree().current_scene.add_child(projectile)
+		get_tree().current_scene.add_child(current_beam)
+	else:
+		BulletManagerNode.spawn_bullet(weapon, WeaponNode.position, WeaponNode.transform.x, ship_id)
+	
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	
-	if projectile.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
+	if weapon.is_continuous == false: # We don't want a rate of fire timer for a continuous beam.
 		timer_fire = false
 		ROFTimer.start()
 
@@ -198,10 +205,13 @@ func set_weapon_slot(p_weapon_slot: WeaponSlot) -> void:
 	if weapon.is_continuous == true:
 		ContinuousFluxTimer.timeout.connect(on_continuous_flux_timer_timeout)
 	
-	projectile_inst = weapon.create_projectile().instantiate()
-	add_child(projectile_inst)
-	projectile_sprite = projectile_inst.Sprite.texture
-	pass
+	if weapon.is_beam == false:
+		projectile_inst = weapon.create_projectile().instantiate()
+		add_child(projectile_inst)
+		var sprite: Sprite2D = projectile_inst.find_child("Sprite2D")
+		BulletManagerNode.sprite = sprite.texture
+		BulletManagerNode.SharedArea = SharedArea
+		SharedArea.body_shape_entered.connect(BulletManagerNode._on_SharedArea_body_shape_entered)
 
 func on_continuous_flux_timer_timeout() -> void:
 	emit_signal("weapon_slot_fired", weapon.flux_per_shot*.05) 
@@ -209,8 +219,11 @@ func on_continuous_flux_timer_timeout() -> void:
 
 func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_shield_rid: RID) -> void:
 	EffectiveRange.collision_mask = mask
+	SharedArea.collision_mask = mask
 	is_friendly = friendly_value
 	owner_rid = owner_value
+	BulletManagerNode.owner_rid = owner_rid
+	BulletManagerNode.shield_rid = shield_rid
 	shield_rid = p_shield_rid
 	auto_aim = true
 	auto_fire = true
@@ -365,7 +378,7 @@ func _physics_process(delta) -> void:
 					stop_continuous_beam()
 		
 		if can_look_at and can_fire and timer_fire and auto_fire:
-			fire(owner_rid.get_id())
+			fire(owner_rid)
 			if AI_enabled == true and primary_target != RID() and primary_target == current_target:
 				target_in_range.emit(true)
 		if available_targets.size() >= 1 and can_fire == false and AI_enabled == true:

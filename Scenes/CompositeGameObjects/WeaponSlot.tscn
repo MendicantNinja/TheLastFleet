@@ -1,14 +1,13 @@
-[gd_scene load_steps=5 format=3 uid="uid://cydvqlraj4ugp"]
+[gd_scene load_steps=6 format=3 uid="uid://cydvqlraj4ugp"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/weapon_slot.gd" id="1_j5k8b"]
 [ext_resource type="Resource" uid="uid://bg4bkltdik2mb" path="res://Resources/Weapons/EmptySlot.tres" id="2_yiwyf"]
 [ext_resource type="Resource" uid="uid://bsulm5ksx0f40" path="res://Resources/WeaponMounts/SmallBallistic.tres" id="3_d4mge"]
+[ext_resource type="Script" path="res://Scripts/bullet_manager.gd" id="4_th0ff"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_82o22"]
 
 [node name="WeaponSlot" type="Node2D"]
-z_index = 2
-z_as_relative = false
 script = ExtResource("1_j5k8b")
 weapon = ExtResource("2_yiwyf")
 weapon_mount = ExtResource("3_d4mge")
@@ -42,3 +41,8 @@ wait_time = 0.05
 [node name="SoftlockTimer" type="Timer" parent="."]
 
 [node name="SharedArea" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="BulletManager" type="Node2D" parent="."]
+z_index = 2
+script = ExtResource("4_th0ff")

@@ -555,16 +555,17 @@ func tutorial_setup() -> void:
 		for weapon: WeaponSlot in all_weapons:
 			weapon.ai_debug = true
 
-func process_damage(projectile: Projectile) -> void:
+func process_damage(projectile) -> void:
 	## Regular damage processing
 
 	combat_flag = true
 	CombatTimer.start()
 	# Beam damage logic is a little bit different than normal projectiles
-	if projectile.is_beam == true:
+	if projectile is Projectile:
 		#print("projectile beam process damage was called")
 		# Armor should be done differently with beams. Probably. Playtesting needed.
-		if projectile.is_continuous == false:
+		
+		if projectile.is_beam == true and projectile.is_continuous == false:
 			var beam_projectile_divisor: float = projectile.beam_duration * 20.0
 			var inverse_divisor: float = 1.0 / beam_projectile_divisor
 			var beam_projectile_damage: int = int(projectile.damage * inverse_divisor)
@@ -576,7 +577,7 @@ func process_damage(projectile: Projectile) -> void:
 			#print(hull_damage)
 			hull_integrity -= hull_damage
 			HullIntegrityIndicator.value = hull_integrity
-		else:
+		elif projectile.is_beam == true and projectile.is_continuous == true:
 			#var beam_projectile_divisor: int = 1 / .05
 			var beam_projectile_damage: int = int(projectile.damage * .05 )
 			#print(beam_projectile_damage)
@@ -587,9 +588,7 @@ func process_damage(projectile: Projectile) -> void:
 			#print(hull_damage)
 			hull_integrity -= hull_damage
 			HullIntegrityIndicator.value = hull_integrity
-		
-		
-	elif projectile.is_beam == false:
+	else:
 		var armor_damage_reduction: float = projectile.damage / (projectile.damage + armor)
 		armor -= armor_damage_reduction
 		
@@ -599,8 +598,10 @@ func process_damage(projectile: Projectile) -> void:
 	
 	if hull_integrity <= 0.0:
 		destroy_ship()
-	if projectile.damage_type == data.weapon_damage_enum.KINETIC:
+	if projectile is Projectile and projectile.damage_type == data.weapon_damage_enum.KINETIC:
 		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), projectile.global_position)
+	elif projectile.damage_type == data.weapon_damage_enum.KINETIC:
+		globals.play_audio_pitched(load("res://Sounds/Combat/ProjectileHitSounds/kinetic_hit.wav"), to_global(projectile.current_position))
 
 func destroy_ship() -> void:
 	if manual_control == true:
@@ -874,7 +875,7 @@ func fire_weapon_slot(weapon_slot: WeaponSlot) -> void:
 	var ship_id = get_rid().get_id()
 	if (total_flux - (hard_flux + soft_flux)) < weapon_slot.weapon.flux_per_shot:
 		return 
-	weapon_slot.fire(ship_id)
+	weapon_slot.fire(get_rid())
 
 func toggle_manual_aim(weapon_system: Array[WeaponSlot], manual_aim_value: bool) -> void:
 	if vent_flux_flag == true or flux_overload == true:

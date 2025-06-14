@@ -1,8 +1,5 @@
 extends Area2D
 class_name Projectile
-
-@onready var Sprite: Sprite2D = $Sprite2D
-
 # Stats
 @onready var track_distance: Vector2 = Vector2.ZERO
 var damage: int = 0 
