@@ -75,11 +75,11 @@ public partial class AssessRetreat : Action
         // If the respective strength ratio shows that strength of the opposing size is greater than or equal to a 1 to 2 ratio,
         // it is strike two.
         bool strike_two = false;
-        if (ship_wrapper.IsFriendly == true && (float)player_strength / admiral_strength <= ratio)
+        if (ship_wrapper.IsFriendly == true && ship_wrapper.CombatFlag == true && (float)player_strength / admiral_strength <= ratio)
         {
             strike_two = true;
         }
-        else if (ship_wrapper.IsFriendly == false && (float)admiral_strength / player_strength <= ratio)
+        else if (ship_wrapper.IsFriendly == false && ship_wrapper.CombatFlag == true && (float)admiral_strength / player_strength <= ratio)
         {
             strike_two = true;
         }

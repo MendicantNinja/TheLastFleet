@@ -6,9 +6,7 @@ var SharedArea: Area2D
 var bullets: Array = []
 var owner_rid: RID
 var shield_rid: RID
-
-var debug_iterator: int = 0
-var debug_n_iterator: int = 0
+var is_friendly: bool = false
 
 func _physics_process(delta) -> void:
 	var bullet_transform: Transform2D = Transform2D()
@@ -35,7 +33,8 @@ func _draw() -> void:
 	#var offset = sprite.get_size() / 2.0
 	for bullet: Bullet in bullets:
 		#print("bullet ", debug_iterator, " should render to screen at position ", bullet.current_position)
-		draw_texture(sprite, bullet.current_position)
+		draw_set_transform(bullet.current_position, bullet.direction.angle(), Vector2(1,1))
+		draw_texture(sprite, Vector2.ZERO)
 
 func _exit_tree():
 	for bullet in bullets:
@@ -86,6 +85,12 @@ func _on_SharedArea_body_shape_entered(body_rid, body, body_shape_index, local_s
 			break
 	
 	assert(bullet != null, "Found no bullet matching the local shape index in bullet manager.")
+	
+	if body is ShieldSlot and body.ShieldShape.disabled == true:
+		return
+	
+	if body is ShieldSlot and body.ship_id == owner_rid.get_id():
+		return
 	
 	if body.collision_layer == 2:
 		PhysicsServer2D.free_rid(bullet.shape_rid)

@@ -221,6 +221,7 @@ func detection_parameters(mask: int, friendly_value: bool, owner_value: RID, p_s
 	EffectiveRange.collision_mask = mask
 	SharedArea.collision_mask = mask
 	is_friendly = friendly_value
+	BulletManagerNode.is_friendly = friendly_value
 	owner_rid = owner_value
 	BulletManagerNode.owner_rid = owner_rid
 	BulletManagerNode.shield_rid = shield_rid
