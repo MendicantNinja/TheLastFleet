@@ -117,7 +117,7 @@ func fire(ship_id: RID) -> void:
 			ContinuousFluxTimer.start() # Flux per second for continuous beams.
 		get_tree().current_scene.add_child(current_beam)
 	else:
-		BulletManagerNode.spawn_bullet(weapon, WeaponNode.position, WeaponNode.transform.x, ship_id)
+		BulletManagerNode.spawn_bullet(weapon, WeaponNode.global_position, WeaponNode.global_transform.x, ship_id)
 	
 	globals.play_audio_pitched(weapon.firing_sound, self.global_position)
 	

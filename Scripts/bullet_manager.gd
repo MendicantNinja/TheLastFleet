@@ -44,6 +44,7 @@ func _exit_tree():
 func spawn_bullet(weapon: Weapon, initial_position: Vector2, direction: Vector2, ship_id: RID) -> void:
 	var bullet: Bullet = Bullet.new()
 	bullet.current_position = initial_position  # Use WeaponNode.global_transform
+	print("initial position: ", initial_position)
 	#print("bullet ", debug_iterator, " starting position: ", initial_position)
 	#debug_iterator += 1
 	# Calculate spread based on the weapon's accuracy
@@ -64,7 +65,7 @@ func spawn_bullet(weapon: Weapon, initial_position: Vector2, direction: Vector2,
 # If a projectile requires any other collision shape, then bullet_transform will look like this:
 # bullet_transform = Transform2D(bullet.direction.angle(), bullet.current_position)
 func register_to_physics_space(bullet: Bullet) -> void:
-	var bullet_transform: Transform2D = Transform2D(0, bullet.current_position)
+	var bullet_transform: Transform2D = Transform2D(bullet.direction.angle(), bullet.current_position)
 	
 	var circle_shape = PhysicsServer2D.circle_shape_create()
 	PhysicsServer2D.shape_set_data(circle_shape, 8)
