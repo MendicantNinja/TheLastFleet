@@ -1,9 +1,17 @@
 extends Node
 
-enum Objective{
+enum Objective
+{
 	SKIRMISH,
 	MOTHERSHIP,
 	CONTROL,
+}
+
+enum Goal
+{
+	MOVE_HOLD,
+	ELIMINATE,
+	ESCORT
 }
 
 var gui_sounds: Dictionary = {
