@@ -20,7 +20,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 var debug_imap: bool = false
 var battle_over: bool = false
 var imap_debug_grid: Array
-var combat_goal: int = globals.GOAL.SKIRMISH
+var combat_goal: int = globals.Objective.SKIRMISH
 
 # Enemy Deployment Variables (not actually friendly, I just enjoy reusing code)
 var starting_deployment_position: Vector2
@@ -31,7 +31,7 @@ var tutorial: bool = false
 signal units_deployed(units)
 
 func _ready() -> void:
-	ComputerAdmiral.SetGoal(combat_goal)
+	ComputerAdmiral.SetObjective(combat_goal)
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
@@ -177,7 +177,6 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 		ship_positions[ship_instantiation.global_position] = ship_instantiation
 		var tmp_name: StringName = &"stringbean"
 		ship_instantiation.add_to_group(&"enemy")
-		ship_instantiation.posture = globals.Strategy.NEUTRAL
 		ship_instantiation.group_add(tmp_name)
 		ship_instantiation.ShipWrapper.Deployed.connect(ComputerAdmiral.OnUnitDeployed)
 	

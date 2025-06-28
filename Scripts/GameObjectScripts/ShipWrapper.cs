@@ -12,7 +12,6 @@ public partial class ShipWrapper : Node
 	[Export]
 	public bool GroupLeader { get; private set; }
 	public Goal CombatGoal { get; private set; }
-	public Strategy Posture { get; private set; }
 
 	// Flags and states
 	[Export]
@@ -186,10 +185,10 @@ public partial class ShipWrapper : Node
 
 	public void SetCombatGoal(int value)
 	{
-		Dictionary<int, Goal> MapGoal = new Dictionary<int, Goal>();
-		MapGoal[0] = Goal.SKIRMISH;
-		MapGoal[1] = Goal.MOTHERSHIP;
-		MapGoal[2] = Goal.CONTROL;
+		Dictionary<int, Goal> MapGoal = new();
+		MapGoal[0] = Goal.MOVE_HOLD;
+		MapGoal[1] = Goal.ELIMINATE;
+		MapGoal[2] = Goal.ESCORT;
 		CombatGoal = MapGoal[value];
 	}
 
@@ -247,11 +246,6 @@ public partial class ShipWrapper : Node
 	public void SetApproxInfluence(float value)
 	{
 		ApproxInfluence = value;
-	}
-
-	public void SetPosture(int value)
-	{
-		Posture = (Strategy)value;
 	}
 
 	public void SetAllWeapons(Godot.Collections.Array all_weapons)

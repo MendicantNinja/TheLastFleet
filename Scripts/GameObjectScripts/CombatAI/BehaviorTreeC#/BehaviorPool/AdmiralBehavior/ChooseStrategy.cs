@@ -22,13 +22,7 @@ public partial class ChooseStrategy : Action
 				player_strength += influence;
 		}
 
-		float relative_strength = admiral_strength + player_strength;
-
-		Admiral admiral = agent as Admiral; 
-		if (relative_strength < 0)
-			admiral.Set("heuristic_strat", (int)Globals.Strategy.OFFENSIVE);
-		else if (relative_strength > 0)
-			admiral.Set("heuristic_strat", (int)Globals.Strategy.DEFENSIVE);
+		Admiral admiral = agent as Admiral;
 
 		admiral.AdmiralStrength = admiral_strength;
 		admiral.PlayerStrength = player_strength;

@@ -61,8 +61,7 @@ public partial class DetectSkirmishUnits : Action
 
         ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 
-        if (ship_wrapper.CombatGoal != (int)Goal.SKIRMISH ||
-            string.IsNullOrEmpty(ship_wrapper.GroupName) ||
+        if (string.IsNullOrEmpty(ship_wrapper.GroupName) ||
             (ship_wrapper.RegistryCell.X < 0 && ship_wrapper.RegistryCell.Y < 0))
         {
             return NodeState.SUCCESS;
