@@ -3,9 +3,7 @@ using System;
 using Vector2 = System.Numerics.Vector2;
 public partial class FluxManagement : Action
 {
-	float offense_threshold = 0.8f;
-	float def_neut_threshold = 0.7f;
-	float evasive_threshold = 0.5f;
+	float flux_threshold = 0.75f;
 	bool vent_flux = false;
 
 	public override NodeState Tick(Node agent)
@@ -36,15 +34,7 @@ public partial class FluxManagement : Action
 			vent_flux = false;
 		}
 
-		if ((ship_wrapper.Posture == Globals.Strategy.NEUTRAL | ship_wrapper.Posture == Globals.Strategy.DEFENSIVE) && flux_norm >= def_neut_threshold)
-		{
-			vent_flux = true;
-		}
-		else if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE && flux_norm >= offense_threshold)
-		{
-			vent_flux = true;
-		}
-		else if (ship_wrapper.Posture == Globals.Strategy.EVASIVE && flux_norm >= evasive_threshold)
+		if (flux_norm >= flux_threshold)
 		{
 			vent_flux = true;
 		}

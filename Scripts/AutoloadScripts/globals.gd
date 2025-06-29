@@ -1,16 +1,17 @@
 extends Node
 
-enum Strategy{
-	NEUTRAL,
-	DEFENSIVE,
-	OFFENSIVE,
-	EVASIVE
-}
-
-enum GOAL{
+enum Objective
+{
 	SKIRMISH,
 	MOTHERSHIP,
 	CONTROL,
+}
+
+enum Goal
+{
+	MOVE_HOLD,
+	ELIMINATE,
+	ESCORT
 }
 
 var gui_sounds: Dictionary = {
@@ -210,15 +211,13 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var max_size: int = occupancy_sizes.max()
 	var min_size: int = occupancy_sizes.min()
 	var unit_separation: Vector2 = Vector2.ZERO
-	if (leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL):
-		unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize * 1.5)
+	unit_separation = Vector2(average_size.x, average_size.y) * (imap_manager.DefaultCellSize * 1.5)
 	
 	var geo_mean: Vector2 = Vector2.ZERO
 	var offsets: Array = []
-	if leader.posture == Strategy.DEFENSIVE or leader.posture == Strategy.NEUTRAL:
-		var radius: int = ceil(sqrt(group.size()))
-		offsets = box_formation_offset_positions(leader, radius, unit_separation)
-		geo_mean = geometric_median_of_objects(offsets)
+	var radius: int = ceil(sqrt(group.size()))
+	offsets = box_formation_offset_positions(leader, radius, unit_separation)
+	geo_mean = geometric_median_of_objects(offsets)
 	
 	unit_positions.clear()
 	for unit in group:

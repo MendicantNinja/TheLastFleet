@@ -1,17 +1,16 @@
 namespace Globals
 {
-    public enum Strategy
-	{
-		NEUTRAL,
-		DEFENSIVE,
-		OFFENSIVE,
-		EVASIVE
-	}
-
-	public enum Goal
+	public enum Objective
 	{
 		SKIRMISH,
 		MOTHERSHIP,
 		CONTROL
+	}
+
+	public enum Goal
+	{
+		MOVE_HOLD,
+		ELIMINATE,
+		ESCORT,
 	}
 }

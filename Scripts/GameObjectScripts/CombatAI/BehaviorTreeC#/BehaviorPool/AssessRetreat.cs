@@ -159,7 +159,7 @@ public partial class AssessRetreat : Action
             steer_data.RotateDirection = Vector2.Zero;
         }
         
-        if (IsInstanceValid(ship_wrapper.TargetUnit) || !ship_wrapper.TargetUnit.IsQueuedForDeletion())
+        if (IsInstanceValid(ship_wrapper.TargetUnit))
         {
             RigidBody2D n_agent = agent as RigidBody2D;
             Godot.Collections.Array<RigidBody2D> targeted_by = (Godot.Collections.Array<RigidBody2D>)ship_wrapper.TargetUnit.Get("targeted_by");

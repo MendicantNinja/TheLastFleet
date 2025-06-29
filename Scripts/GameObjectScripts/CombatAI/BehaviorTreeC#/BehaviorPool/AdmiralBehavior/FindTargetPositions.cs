@@ -13,7 +13,7 @@ public partial class FindTargetPositions : Action
 		if (Engine.GetPhysicsFrames() % 240 != 0) return NodeState.FAILURE;
 
 		Admiral admiral = agent as Admiral;
-		if (admiral.HeuristicGoal != Goal.SKIRMISH) return NodeState.FAILURE;
+		if (admiral.HeuristicObjective != Objective.SKIRMISH) return NodeState.FAILURE;
 
 		Godot.Collections.Dictionary<Vector2I, float> player_vulnerability = new Godot.Collections.Dictionary<Vector2I, float>();
 		if (admiral.PlayerVulnerability.Keys.Count > 0)

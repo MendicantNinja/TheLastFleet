@@ -158,11 +158,6 @@ var group_leader: bool = false:
 		ShipWrapper.SetGroupLeader(value)
 		group_leader = value
 
-var posture: globals.Strategy = globals.Strategy.NEUTRAL:
-	set(value):
-		ShipWrapper.SetPosture(value)
-		posture = value
-
 var match_speed: float = 0.0
 
 # Used for combat AI / behavior tree / influence map
@@ -699,9 +694,6 @@ func group_add(n_group_name: StringName) -> void:
 
 func set_group_leader(value: bool) -> void:
 	group_leader = value
-
-func set_posture(value: globals.Strategy) -> void:
-	posture = value
 
 # Temporary workaround for now, not exactly great but whatever
 func weigh_composite_influence(neighborhood_density: Dictionary) -> void:

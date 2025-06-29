@@ -9,11 +9,7 @@ public partial class VelocityMatching : Action
 
 		ShipWrapper ship_wrapper = (ShipWrapper)agent.Get("ShipWrapper");
 
-		if (ship_wrapper.Posture == Globals.Strategy.OFFENSIVE || ship_wrapper.Posture == Globals.Strategy.EVASIVE)
-		{
-			return NodeState.FAILURE;
-		}
-		else if (string.IsNullOrEmpty(ship_wrapper.GroupName) == true)
+		if (string.IsNullOrEmpty(ship_wrapper.GroupName) == true)
 		{
 			return NodeState.FAILURE;
 		}

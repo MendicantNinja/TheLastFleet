@@ -83,7 +83,6 @@ func deploy_ships() -> void:
 		ship_instantiation.global_position.y = deployment_position.y + deployment_spacing * deployment_row # I want to start at the top in terms of y
 		positions.append(Vector2(ship_instantiation.global_position.x, ship_instantiation.global_position.y - deployment_spacing * 6 - deployment_spacing*deployment_row))
 		ship_positions[ship_instantiation.global_position] = ship_instantiation
-		ship_instantiation.posture = globals.Strategy.NEUTRAL
 		ship_instantiation.add_to_group(&"friendly")
 		ship_instantiation.group_add(n_group_name)
 		iterator += 1

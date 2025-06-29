@@ -8,9 +8,8 @@ using System.Numerics;
 public partial class Admiral : Node2D
 {
 	BehaviorTreeRoot AdmiralAI;
-	public Strategy HeuristicStrategy;
 
-	public Goal HeuristicGoal { get; private set; }
+	public Objective HeuristicObjective { get; private set; }
 	public float PlayerStrength { get; set; } = 0.0f;
 	public float AdmiralStrength { get; set; } = 0.0f;
 	public int NumDeployedUnits { get; private set; } = 0;
@@ -22,15 +21,15 @@ public partial class Admiral : Node2D
 	public List<Vector2I> IsolatedCells;
 	public List<Vector2I> ControlPoints;
 	[Export]
-	public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability = new Godot.Collections.Dictionary<Vector2I, float>();
-	public Dictionary<Vector2I, float> GoalValue = new Dictionary<Vector2I, float>();
+	public Godot.Collections.Dictionary<Vector2I, float> PlayerVulnerability = new();
+	public Dictionary<Vector2I, float> GoalValue = new();
 
-	public StringName GroupKeyPrefix = new StringName("Enemy Group ");
-	public StringName AssignNewLeaderGroup = new StringName("");
+	public StringName GroupKeyPrefix = new("Enemy Group ");
+	public StringName AssignNewLeaderGroup = new("");
 	public int Iterator = 0;
 
-	public List<string> AvailableGroups = new List<string>();
-	public List<string> AwaitingOrders = new List<string>();
+	public List<string> AvailableGroups = new();
+	public List<string> AwaitingOrders = new();
 
 	private int n_units_deployed = 0;
 
@@ -40,13 +39,13 @@ public partial class Admiral : Node2D
 		AdmiralAI.ToggleRoot(false);
     }
 
-	public void SetGoal(int value)
+	public void SetObjective(int value)
 	{
-		Dictionary<int, Goal> MapGoal = new Dictionary<int, Goal>();
-		MapGoal[0] = Goal.SKIRMISH;
-		MapGoal[1] = Goal.MOTHERSHIP;
-		MapGoal[2] = Goal.CONTROL;
-		HeuristicGoal = MapGoal[value];
+		Dictionary<int, Objective> MapGoal = new();
+		MapGoal[0] = Objective.SKIRMISH;
+		MapGoal[1] = Objective.MOTHERSHIP;
+		MapGoal[2] = Objective.CONTROL;
+		HeuristicObjective = MapGoal[value];
 	}
 
 	public void SetNumDeployedUnits(int n_units)
