@@ -9,9 +9,10 @@ enum Objective
 
 enum Goal
 {
+	DEFAULT,
 	MOVE_HOLD,
 	ELIMINATE,
-	ESCORT
+	ESCORT,
 }
 
 var gui_sounds: Dictionary = {

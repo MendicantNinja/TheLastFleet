@@ -186,9 +186,10 @@ public partial class ShipWrapper : Node
 	public void SetCombatGoal(int value)
 	{
 		Dictionary<int, Goal> MapGoal = new();
-		MapGoal[0] = Goal.MOVE_HOLD;
-		MapGoal[1] = Goal.ELIMINATE;
-		MapGoal[2] = Goal.ESCORT;
+		MapGoal[0] = Goal.DEFAULT;
+		MapGoal[1] = Goal.MOVE_HOLD;
+		MapGoal[2] = Goal.ELIMINATE;
+		MapGoal[3] = Goal.ESCORT;
 		CombatGoal = MapGoal[value];
 	}
 

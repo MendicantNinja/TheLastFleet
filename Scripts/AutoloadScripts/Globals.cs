@@ -9,6 +9,7 @@ namespace Globals
 
 	public enum Goal
 	{
+		DEFAULT,
 		MOVE_HOLD,
 		ELIMINATE,
 		ESCORT,
