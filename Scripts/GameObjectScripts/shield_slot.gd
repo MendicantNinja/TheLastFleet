@@ -65,14 +65,14 @@ func register_hit(uv_pos: Vector2, radius: float):
 	})
 	set_process(true)
 
-func process_damage(projectile: Projectile) -> void:
-	if not projectile is Projectile:
+func process_damage(projectile) -> void:
+	if not projectile is Projectile or not projectile is Bullet:
 		return
-	if projectile.ship_id == ship_id:
+	if projectile is Projectile and projectile.ship_id == ship_id:
 		return
 	var local_pos: Vector2 # Where has the hit occured, in local coordinates?
 	var hit_radius: float # How large should the hit effect be? It's based on damage.
-	if projectile.is_beam == true:
+	if projectile is Projectile and projectile.is_beam == true:
 		#var test_position = projectile.to_global(projectile.beam_end) 
 		local_pos = to_local(projectile.to_global(projectile.beam_end))
 		
@@ -93,10 +93,9 @@ func process_damage(projectile: Projectile) -> void:
 			hit_radius = projectile.damage/500.0 * .1
 			#var debug =  beam_projectile_damage/500.0 * .3
 			#print("non-continuous beam damage is", debug)
-	elif projectile.is_beam == false:
+	else:
 		local_pos = to_local(projectile.global_position)
 		hit_radius = projectile.damage/500.0 * .2 # 500 damage = full 8 pixels
-		projectile.call_deferred("queue_free")
 		shield_hit.emit(projectile.damage, projectile.damage_type)
 		#var debug =  projectile.damage/500.0 * .5
 		#print("projectile damage is", debug)

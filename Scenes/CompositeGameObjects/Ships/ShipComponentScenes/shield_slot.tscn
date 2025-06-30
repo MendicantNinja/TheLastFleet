@@ -27,3 +27,4 @@ texture = SubResource("PlaceholderTexture2D_mtinx")
 
 [node name="ShieldShape2" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_xdox4")
+disabled = true
