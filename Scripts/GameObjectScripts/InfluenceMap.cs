@@ -9,5 +9,6 @@ namespace InfluenceMap
         VulnerabilityMap,
         InverseOccupancyMap,
         InverseThreatMap,
+        GoalMap,
     }
 }

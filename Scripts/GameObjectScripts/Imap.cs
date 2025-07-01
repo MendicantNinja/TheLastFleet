@@ -1,4 +1,5 @@
 using Godot;
+using Globals;
 using InfluenceMap;
 using System;
 using System.Diagnostics;
@@ -15,6 +16,7 @@ public partial class Imap : GodotObject
 	public readonly ImapType Type;
 	// m = row, n = column (following M x N convention)
 	public float [,] MapGrid;
+	public Goal [,] GoalGrid;
 
 	// Signals
 	[Signal]
@@ -32,12 +34,15 @@ public partial class Imap : GodotObject
 		CellSize = new_cell_size;
 		Type = type;
 
+		if (type == ImapType.GoalMap) GoalGrid = new Goal [Height, Width];
+
 		MapGrid = new float[Height, Width];
 		for (int m = 0; m < Height; m++)
 		{
 			for (int n = 0; n < Width; n++)
 			{
 				MapGrid[m, n] = 0.0f;
+				if (type == ImapType.GoalMap) GoalGrid[m, n] = Goal.DEFAULT;
 			}
 		}
 	}
