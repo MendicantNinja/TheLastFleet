@@ -1,9 +1,6 @@
 using Godot;
 using InfluenceMap;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 public partial class FindEnemyWeakness : Action
 {
@@ -19,7 +16,7 @@ public partial class FindEnemyWeakness : Action
 		Imap tension_map = ImapManager.Instance.TensionMap;
 		Imap vulnerability_map = ImapManager.Instance.VulnerabilityMap;
 
-		Godot.Collections.Dictionary<Vector2I, float> player_vulnerability = new Godot.Collections.Dictionary<Vector2I, float>();
+		Godot.Collections.Dictionary<Vector2I, float> player_vulnerability = new();
 		for (int m = 0; m < vulnerability_map.Height; m++)
 		{
 			for (int n = 0; n < vulnerability_map.Width; n++)

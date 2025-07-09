@@ -6,6 +6,7 @@ public partial class DetectEnemies : Action
 {
     public override NodeState Tick(Node agent)
     {
+        /*
         if (Engine.GetPhysicsFrames() % 120 != 0) return NodeState.FAILURE;
 
         Admiral admiral = agent as Admiral;
@@ -34,7 +35,8 @@ public partial class DetectEnemies : Action
         
         admiral.PlayerClusters = player_clusters;
         admiral.UnitClusters = unit_clusters;
-
+        */
+        
         return NodeState.FAILURE;
     }
 }

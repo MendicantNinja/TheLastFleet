@@ -10,8 +10,12 @@ namespace Globals
 	public enum Goal
 	{
 		DEFAULT,
-		MOVE_HOLD,
-		ELIMINATE,
-		ESCORT,
+		MOVE_HOLD, // comments written
+		ELIMINATE, // useless
+		ESCORT, // useless
+		ATTACK, // comments written
+		HARASS, // comments written
+		REINFORCE, // comments written
+		HUNT, // comments written
 	}
 }
