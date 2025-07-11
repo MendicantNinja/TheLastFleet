@@ -188,7 +188,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.RegisterAgents(instantiated_units, int(combat_objective))
+	imap_manager.RegisterAgents(instantiated_units)
 	%TacticalDataDrawing.delayed_setup_call()
 
 func _unhandled_input(event) -> void:
@@ -197,7 +197,6 @@ func _unhandled_input(event) -> void:
 			toggle_fleet_deployment_panel()
 		elif (event.keycode == KEY_ESCAPE and event.pressed):
 			toggle_options_menu()
-				
 
 func _physics_process(delta):
 	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):

@@ -190,6 +190,7 @@ public partial class ShipWrapper : Node
 		MapGoal[1] = Goal.MOVE_HOLD;
 		MapGoal[2] = Goal.ELIMINATE;
 		MapGoal[3] = Goal.ESCORT;
+		
 		CombatGoal = MapGoal[value];
 	}
 

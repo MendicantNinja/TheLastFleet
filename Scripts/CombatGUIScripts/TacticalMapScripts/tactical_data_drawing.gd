@@ -5,7 +5,6 @@ extends Node2D
 @onready var TacticalMapCamera = %TacticalMapCamera
 @onready var map_bounds: Vector2 = %PlayableAreaBounds.shape.size
 
-
 @onready var ship_list: Array[Ship]
 
 @onready var icon_list: Array
@@ -41,7 +40,7 @@ var camera_feed_ship: Ship = null # For vid feed. There can be only one!
 
 # Group Creation
 var group_iterator: int = 0
-var available_group_names: Array[StringName] = []
+#var available_group_names: Array[StringName] = []
 var taken_group_names: Array[StringName] = []
 var current_groups: Dictionary = {}
 var highlight_group_name: StringName = &"friendly selection"
@@ -476,6 +475,7 @@ func move_unit(unit_leader: Ship, to_position: Vector2) -> void:
 		get_tree().call_group(highlight_enemy_name, "highlight_selection", false)
 		get_tree().call_group(highlight_enemy_name, "group_remove", highlight_enemy_name)
 	unit_leader.set_navigation_position(to_position)
+	get_tree().call_group(unit_leader.group_name, "set_combat_goal", globals.Goal.MOVE_HOLD)
 	get_viewport().set_input_as_handled()
 
 func move_new_unit(to_position: Vector2, group) -> void:
@@ -499,13 +499,13 @@ func move_new_unit(to_position: Vector2, group) -> void:
 		new_leader = globals.find_unit_nearest_to_median(median, unit_positions)
 	
 	# 3) Generate and assign a name. Sort the name arrays.
-	var new_group_name: StringName 
-	if available_group_names.size() > 0:
-		new_group_name = available_group_names.pop_back()
-	elif available_group_names.size() == 0:
-	# iterate a new group name
-		new_group_name = StringName("Group " + str(group_iterator))
-		group_iterator += 1
+	var new_group_name: StringName = StringName("Group " + str(group_iterator)) 
+	#if available_group_names.size() > 0:
+		#new_group_name = available_group_names.pop_back()
+	#elif available_group_names.size() == 0:
+	## iterate a new group name
+	#new_group_name = StringName("Group " + str(group_iterator))
+	group_iterator += 1
 	
 	taken_group_names.push_back(new_group_name)
 	
@@ -515,9 +515,11 @@ func move_new_unit(to_position: Vector2, group) -> void:
 	# ship.group_add() must be called on every individual ship. it does special things like assigning ship.group_name
 	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
 	new_leader.set_group_leader(true)
+	get_tree().call_group(new_group_name, "set_combat_goal", globals.Goal.MOVE_HOLD)
 	#get_tree().call_group(new_group_name, &"set_blackboard_data", leader_key, new_leader)
 	# 5) Call down to an individual ship (new_leader).
 	move_unit(new_leader, to_position)
+
 	  #.o.       ooooooooooooo ooooooooooooo       .o.         .oooooo.   oooo    oooo 
 	 #.888.      8'   888   `8 8'   888   `8      .888.       d8P'  `Y8b  `888   .8P'  
 	#.8"888.          888           888          .8"888.     888           888  d8'    
@@ -572,20 +574,21 @@ func attack_targets() -> void:
 		leader = globals.find_unit_nearest_to_median(median, unit_positions)
 
 	# 3) Generate and assign a name. Sort the name arrays.
-	var new_group_name: StringName 
-	if available_group_names.size() > 0:
-		new_group_name = available_group_names.pop_back()
-	elif available_group_names.size() == 0:
-	# iterate a new group name
-		new_group_name = StringName("Group " + str(group_iterator))
-		group_iterator += 1
+	var new_group_name: StringName = StringName("Group " + str(group_iterator)) 
+	#if available_group_names.size() > 0:
+		#new_group_name = available_group_names.pop_back()
+	#elif available_group_names.size() == 0:
+	## iterate a new group name
+	#new_group_name = StringName("Group " + str(group_iterator))
+	group_iterator += 1
+	
 	
 	taken_group_names.push_back(new_group_name)
 	current_groups[new_group_name] = highlighted_group
-	get_tree().call_group(highlight_group_name, "group_add", new_group_name)
+	get_tree().call_group(highlight_group_name, &"group_add", new_group_name)
 	get_tree().call_group(new_group_name, &"set_targets", targeted_group)
+	get_tree().call_group(new_group_name, &"set_combat_goal", globals.Goal.ELIMINATE)
 	leader.set_group_leader(true)
-
 
 # Takes a group of recently selected ships and creates a new group for them.
 func reset_group_affiliation(group_select: Array) -> void:
@@ -598,13 +601,13 @@ func reset_group_affiliation(group_select: Array) -> void:
 		elif unit.group_leader == true:
 			unit.set_group_leader(false)
 		unit.group_name = &""
-	var count_down: int = taken_group_names.size() - 1
-	for group_idx in range(count_down, -1, -1):
-		var group_name: StringName = taken_group_names[group_idx]
-		var group: Array = get_tree().get_nodes_in_group(group_name)
-		if group.is_empty():
-			taken_group_names.remove_at(group_idx)
-			available_group_names.push_back(group_name)
+	#var count_down: int = taken_group_names.size() - 1
+	#for group_idx in range(count_down, -1, -1):
+		#var group_name: StringName = taken_group_names[group_idx]
+		#var group: Array = get_tree().get_nodes_in_group(group_name)
+		#if group.is_empty():
+			#taken_group_names.remove_at(group_idx)
+			#available_group_names.push_back(group_name)
 	
 func _on_alt_select(ship: Ship) -> void:
 	#print("alt select called")
