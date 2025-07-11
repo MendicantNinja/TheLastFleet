@@ -60,14 +60,13 @@ public partial class ImapManager : Node
 		RegisterMap(InverseTensionMap);
 	}
 
-	public void RegisterAgents(Godot.Collections.Array<RigidBody2D> agents, int goal = 0)
+	public void RegisterAgents(Godot.Collections.Array<RigidBody2D> agents)
 	{
 		foreach (RigidBody2D n_agent in agents)
 		{
 			n_agent.Connect("update_agent_influence", Callable.From(() => OnUpdateAgentInfluence(n_agent)));
 			n_agent.Connect("destroyed", Callable.From(() => OnAgentDestroyed(n_agent)));
 			n_agent.Connect("update_registry_cell", Callable.From(() => OnUpdateRegistryCell(n_agent)));
-			n_agent.Set("combat_goal", goal);
 		}
 	}
 

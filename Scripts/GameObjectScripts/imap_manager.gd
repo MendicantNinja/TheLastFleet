@@ -58,12 +58,11 @@ func _init():
 func register_map(map: GDImap) -> void:
 	agent_maps[map.map_type] = map
 
-func register_agents(agents: Array, goal: int = 0) -> void:
+func register_agents(agents: Array) -> void:
 	for agent: Ship in agents:
 		agent.update_agent_influence.connect(_on_agent_influence_changed.bind(agent))
 		agent.destroyed.connect(_on_agent_destroyed.bind(agent))
 		agent.update_registry_cell.connect(_on_agent_registry_changed.bind(agent))
-		agent.combat_goal = goal
 
 @warning_ignore("narrowing_conversion", "integer_division")
 func _on_agent_influence_changed(registered_cell: Vector2i, current_cell_idx: Vector2i, agent: Ship) -> void:
