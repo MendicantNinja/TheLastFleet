@@ -20,7 +20,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 var debug_imap: bool = false
 var battle_over: bool = false
 var imap_debug_grid: Array
-var combat_goal: int = globals.Objective.SKIRMISH
+var combat_objective: int = globals.Objective.SKIRMISH
 
 # Enemy Deployment Variables (not actually friendly, I just enjoy reusing code)
 var starting_deployment_position: Vector2
@@ -31,11 +31,11 @@ var tutorial: bool = false
 signal units_deployed(units)
 
 func _ready() -> void:
-	ComputerAdmiral.SetObjective(combat_goal)
+	ComputerAdmiral.SetObjective(combat_objective)
 	process_mode = PROCESS_MODE_PAUSABLE
 	TacticalMap.switch_maps.connect(_on_switch_maps)
 	CombatMap.switch_maps.connect(_on_switch_maps)
-	FleetDeploymentList.combat_goal = combat_goal
+	#FleetDeploymentList.combat_objective = combat_objective
 	imap_manager.InitializeArenaMaps()
 	
 	if debug_imap == true:
@@ -188,7 +188,7 @@ func deploy_enemy_fleet(enemy_fleet: Fleet = Fleet.new()) -> void:
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.RegisterAgents(instantiated_units, int(combat_goal))
+	imap_manager.RegisterAgents(instantiated_units, int(combat_objective))
 	%TacticalDataDrawing.delayed_setup_call()
 
 func _unhandled_input(event) -> void:

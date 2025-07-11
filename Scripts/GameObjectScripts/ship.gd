@@ -1093,6 +1093,9 @@ func set_combat_ai(value: bool) -> void:
 		weapon.auto_aim = true
 		weapon.auto_fire = true
 
+func set_combat_goal(value: globals.Goal) -> void:
+	combat_goal = value
+
 func set_blackboard_data(key: Variant, value: Variant) -> void:
 	var blackboard = CombatBehaviorTree.blackboard
 	blackboard.set_data(key, value)

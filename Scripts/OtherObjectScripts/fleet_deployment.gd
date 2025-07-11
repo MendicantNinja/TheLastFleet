@@ -12,7 +12,6 @@ var group_iterator: int = 0
 var deployment_position: Vector2
 var deployment_row: int = 0
 var deployment_spacing: int = 500
-var combat_goal: int = 0
 signal units_deployed(units)
 signal deploy_ship(ship)
 
@@ -95,7 +94,7 @@ func deploy_ships() -> void:
 	new_leader.set_group_leader(true)
 	new_leader.set_navigation_position(geo_median_formation)
 	units_deployed.emit(instantiated_units) # Connects Unit Signals in TacticalMap
-	imap_manager.RegisterAgents(instantiated_units, combat_goal)
+	imap_manager.RegisterAgents(instantiated_units)
 	%TacticalDataDrawing.delayed_setup_call()
 	
 	#var TDD = %TacticalDataDrawing # Used for debugging ship_registry and deployed ships
