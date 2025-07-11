@@ -41,7 +41,9 @@ public partial class EvaluateReinforce : Action
         // Weigh the score based off how feasible reinforcing the units are, distance takes priority
         
         // Common Data Points:
-        // - Status of enemy groups
+        // - RegistryCellsMerit
+        // - DiscreteSample
+        // - GroupData
         
         return NodeState.FAILURE;
     }

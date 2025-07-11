@@ -43,9 +43,9 @@ public partial class EvaluateAttack : Action
         //          - Weigh accordingly
         //
         // Common Data Points:
-        //  - TensionCells and the overlap with the vulnerability map
-        //  - RecentSamples to filter out player groups on offense
-        //  - Polling for nearby enemy forces to get involved in the attack
+        // - DiscreteSample
+        // - GroupData
+        // - (Maybe) RegistryCellsMerit
 
         return NodeState.SUCCESS;
     }

@@ -50,9 +50,8 @@ public partial class EvaluateHarass : Action
         //      - Determine which nearby region to an ongoing winning fight could drag player units towards combat
         //
         // Common Data Points:
-        //  - Player groups and goals (Look to RecentSamples / most recent DiscreteSample container, use current_tick to retrieve the sample)
-        //  - Fight ambiguity (If TensionCells.Count == 0, no combat, and vice versa.)
-        //  - Availability of units (Use ImapManager.Instance.EnemyClusters and use TensionCells for fight sensitive cases)
+        // - DiscreteSample
+        // - GroupData
 
         return NodeState.SUCCESS;
     }

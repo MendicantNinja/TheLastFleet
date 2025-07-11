@@ -29,7 +29,7 @@ public struct DiscreteSample
     public List<Vector2I> TensionCells;
 	public float PlayerStrength;
 	public float AdmiralStrength;
-	public float SomeArbitraryMetric;
+	//public float SomeArbitraryMetric;
     public int SampleTick;
 
     public DiscreteSample(bool initialize)
@@ -43,21 +43,31 @@ public struct DiscreteSample
 		PlayerStrength = 0f;
 		AdmiralStrength = 0.0f;
         SampleTick = 0;
-		SomeArbitraryMetric = 0.0f;
+		//SomeArbitraryMetric = 0.0f;
     }
 }
+
+public struct GoalDescriptor
+{
+    public Goal Type;           // e.g. MoveHold, Harass, Attack, etc.
+    public int CellX, CellY;  	// propagation center
+    public float BaseWeight;    // computed score before propagation
+    public float Radius;        // how far the influence spreads
+    public float ExpirationTime; // timestamp or tick when this goal expires
+	public int SampleTick;
+}
+
 // CellMerit
-// A data container for assessing the significance of areas in the combat map.
-// 
+// A data container for assessing the significance of areas in the combat map using
+// registry cells as the abstract representation of these regions.
 public struct CellMerit
 {
 	public int CellX, CellY;
-	public float FriendlyPresence; // Sum of friendly approximate influence
-	public float EnemyPresence;	// Sum of enemy approximate influence
-	public float StrategicValue; // Strategic importance
-	public float Weight; // Dynamic, computed per objective
+	public float FriendlyPresence; // Average of friendly approx influence over total influence
+	public float EnemyPresence;	// Average of enemy approx influence over total influence
+	public float BaseStrategicValue; // Strategic importance (a flat 1.0 for neutral control points, anything else is assessed on different merits)
+	public float ObjectiveWeight; // Dynamic, computed per objective
 }
-
 
 public partial class Admiral : Node2D
 {
@@ -82,52 +92,16 @@ public partial class Admiral : Node2D
 	[Export]
 	public Godot.Collections.Dictionary<Vector2I, float> EnemyVulnerability = new();
 
-	// Q = Question, A = Answer, O = Observation / Analysis
-	// TensionCells is a list of all grid‐cells where tension is over a threshold.
-	// We can leverage these to drive both global awareness and skirmish tactics.
-	//
-	// -----------------------------------------------------------------------------
-	// Tension Cells – General Use Cases / Observations
-	// -----------------------------------------------------------------------------
-	//
-	// Q1. Is there combat anywhere on the map?
-	//	O1. TensionCells.Count == 0, no significant contest
-	// 		A1. Admiral switches to non‐combat analysis
-	//	O2. TensionCells.Count > 0
-	//		A2. Admiral switches to combat analysis
-	//
-	// Q2. Where is combat happening and how intense is it?
-	//	O1. Partition TensionCells into contiguous clusters (e.g., flood‐fill).
-	//		- For each cluster, compute geometric median → main engagement point.
-	//		- Get rough radius to outermost cell and introduce a buffer value to retrieve more local data.
-	//		- Sum tension values in the cluster → engagement intensity metric.
-	//		- Compare aggregated vulnerability for player vs. enemy in this zone.
-	//
-	// -----------------------------------------------------------------------------
-	// Tension Cells – Skirmish (Objective‐Driven) Use Cases
-	// -----------------------------------------------------------------------------
-	//	Assume combat...
-	//	Q2 → O1.
-	//		O2. If player_vuln > enemy_vuln and desperation low
-	//			A1. Opportunity to direct units here to attack via Move and Hold, Probe, etc.
-	//		O3. If player_vuln < enemy_vuln and desperation high
-	//			A2. Fallback, Reinforce, etc.
-	//
-	// -----------------------------------------------------------------------------
-	// Next Steps / To‐Do:
-	//
-	// 1. Implement clustering of TensionCells into discrete regions as TensionClusters.
-	// 2. Feed Clusters into behavior‐tree nodes as inputs to analyze (Move and Hold, Fallback, Attack, etc.).
-	// 3. Tune thresholds for “significant tension” vs. noise.
-	// 4. Visualize Region data in debug overlay to validate logic.
 	public List<Vector2I> TensionCells = new();
 	public List<DiscreteSample> RecentSamples = new();
+	public List<CellMerit> RegistryCellsMerit = new();
+	public List<GoalDescriptor> GoalHistory = new();
 	public int SampleBuffer = 7;
 	public double SampleCounter = 0;
 	public int CurrentSampleTick = 0;
 	public int sample_limit = 4;
 
-	float SomeArbitraryMetric = 0.0f;
+	//float SomeArbitraryMetric = 0.0f;
 
 	public List<string> AvailableGroups = new();
 
@@ -146,36 +120,25 @@ public partial class Admiral : Node2D
 			GD_global = GetTree().Root.GetNode("globals");
 		}
 
-		// Moving this out of ChooseStrategy
-		// Not going to throw this away until I know it is absolutely useless
-		/*
-		if (Engine.GetPhysicsFrames() % 240 == 0)
-		{
-			PollStrength();
-		}
-		*/
-
 		// Everything after this should only ever happen when enemy units are fully deployed
 		// i.e. when the AdmiralAI is enabled
 		if (AdmiralAI.enabled == false) return;
 
-		/*
-		if (Engine.GetPhysicsFrames() % 240 == 0)
-		{
-			PlayerVulnerability = NormalizeSampleCells(PlayerVulnerability);
-			EnemyVulnerability = NormalizeSampleCells(EnemyVulnerability);
-		}
-		*/
 		if (SampleCounter > SampleBuffer - 3)
 		{
 			UpdateMaps();
 		}
 
-		if (SampleCounter > SampleBuffer - 1)
+		if (SampleCounter > SampleBuffer - 2)
 		{
 			PollStrength();
 			PlayerVulnerability = NormalizeSampleCells(PlayerVulnerability);
             EnemyVulnerability = NormalizeSampleCells(EnemyVulnerability);
+		}
+
+		if (SampleCounter > 2 * (SampleBuffer - 1))
+		{
+			PollRegistryCells();
 		}
 
 		SampleCounter += delta;
@@ -213,9 +176,9 @@ public partial class Admiral : Node2D
 		Imap inverse_tension_map = ImapManager.Instance.AgentMaps[ImapType.TensionMap];
 		Imap tension_map = ImapManager.Instance.TensionMap;
 		Imap vulnerability_map = ImapManager.Instance.VulnerabilityMap;
-		Imap goal_map = ImapManager.Instance.GoalMap;
+		//Imap goal_map = ImapManager.Instance.GoalMap;
 
-		float lambda = -0.16f;
+		//float lambda = -0.16f;
 		Godot.Collections.Dictionary<Vector2I, float> player_vulnerability = new();
 		Godot.Collections.Dictionary<Vector2I, float> enemy_vulnerability = new();
 		List<Vector2I> tension_cells = new();
@@ -227,6 +190,7 @@ public partial class Admiral : Node2D
 				float weighted_imap_value = weighted_imap.MapGrid[m, n];
 				float tension_value = 0.0f;
 				float vuln_value = 0.0f;
+				/*
 				float decay_goal_value = goal_map.MapGrid[m, n] * Mathf.Exp(lambda);
 				if (goal_map.MapGrid[m, n] > 0.0f && decay_goal_value < 0.1f)
 				{
@@ -240,6 +204,7 @@ public partial class Admiral : Node2D
 				{
 					goal_map.MapGrid[m, n] = decay_goal_value;
 				}
+				*/
 
 				if (inverse_tension_map.MapGrid[m, n] == 0.0f && imap_value == 0.0f)
 				{
@@ -393,6 +358,12 @@ public partial class Admiral : Node2D
 				PlayerStrength += influence;
 			}
 		}
+	}
+
+	public List<CellMerit> PollRegistryCells()
+	{
+		List<CellMerit> polled_cells = new();
+		return polled_cells;
 	}
 
 	public void SetObjective(int value)

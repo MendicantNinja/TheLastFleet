@@ -9,6 +9,9 @@ public partial class FillGoalMap : Action
 {
 	public override NodeState Tick(Node agent)
 	{
+		return NodeState.FAILURE;
+	}
+		/*
 		Admiral admiral = agent as Admiral;
 		if (Engine.GetPhysicsFrames() % 720 != 0 | admiral.GoalValue is null) return NodeState.FAILURE;
 
@@ -100,6 +103,6 @@ public partial class FillGoalMap : Action
 		}
 		
 		return goal_map;
+		*/
 	}
 
-}
