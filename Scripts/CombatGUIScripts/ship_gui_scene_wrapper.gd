@@ -7,7 +7,10 @@ extends Control
 @onready var HullIntegrityIndicator = $ConstantSizedGUI/HullIntegrityIndicator
 @onready var ShipTargetIcon = $ShipTargetIcon
 @onready var ManualControlIndicator = $ManualControlIndicator
-@onready var ShipNameDebugText = $ConstantSizedGUI/ShipNameDebugText
+@onready var DebugLabelList = $ConstantSizedGUI/DebugLabelList
+@onready var ShipNameDebugText = $ConstantSizedGUI/DebugLabelList/ShipNameDebugText
+@onready var GroupDebugText = $ConstantSizedGUI/DebugLabelList/GroupDebugText
+@onready var TargetDebugText = $ConstantSizedGUI/DebugLabelList/TargetDebugText
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
