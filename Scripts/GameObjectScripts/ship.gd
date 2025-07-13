@@ -24,6 +24,8 @@ class_name Ship
 @onready var ManualControlIndicator = CenterCombatHUD.ManualControlIndicator
 @onready var ShipTargetIcon = CenterCombatHUD.ShipTargetIcon
 @onready var ShipNameDebugText = CenterCombatHUD.ShipNameDebugText
+@onready var GroupDebugText = CenterCombatHUD.GroupDebugText
+@onready var TargetDebugText = CenterCombatHUD.TargetDebugText
 
 var tactical_map_icon: TacticalMapIcon
 var TacticalMapLayer: CanvasLayer
@@ -148,6 +150,10 @@ var group_name: StringName = &"":
 	set(value):
 		ShipWrapper.SetGroupName(value)
 		group_name = value
+		if group_name == null or group_name == &"":
+			GroupDebugText.text = "No Group"
+			return
+		GroupDebugText.text = value
 
 var group_leader: bool = false:
 	set(value):
@@ -198,6 +204,10 @@ var retreat_time: float = 10.0
 var target_unit: RigidBody2D = null:
 	set(value):
 		target_unit = value
+		if value == null:
+			TargetDebugText.text = "No Target"
+			return
+		TargetDebugText.text = target_unit.ShipNameDebugText.text
 
 var targeted_units: Array[RigidBody2D] = []:
 	set(value):
@@ -286,7 +296,7 @@ var match_velocity_flag: bool = false:
 		ShipWrapper.SetMatchVelocityFlag(match_velocity_flag)
 		match_velocity_flag = value
 
-var steer_debug: bool = false
+var ship_debug: bool = true
 
 var separation_force: Vector2 = Vector2.ZERO:
 	set(value):
@@ -428,9 +438,10 @@ func _ready() -> void:
 		is_friendly = false
 		rotation += PI/2
 	
-	if steer_debug == true:
+	if ship_debug == true:
 		ForceDebug.force_debug = true
-		ShipNameDebugText.add_text(name)
+		ShipNameDebugText.text = name
+		CenterCombatHUD.DebugLabelList.visible = true
 	
 	ShipSprite.z_index = 0
 	$ShipLivery.z_index = 1
