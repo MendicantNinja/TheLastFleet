@@ -4,7 +4,6 @@ var ships_to_deploy: Array[ShipIcon]
 @onready var PlayableAreaBounds = %PlayableAreaBounds
 var fleet_deployment
 
-
 var group_name: StringName = &"tomato"
 var group_iterator: int = 0
 # Deployment starts at the center-left, then walks right, with 300 pixels of space between each deployment position. 

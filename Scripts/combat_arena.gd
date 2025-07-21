@@ -5,7 +5,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var CombatMap = $CombatMap
 @onready var FleetDeploymentPanel = %FleetDeploymentPanel
 @onready var FleetDeploymentList = %FleetDeploymentList
-@onready var OptionsMenuPanel = %OptionsMenuPanel 
+@onready var OptionsMenuPanel = %OptionsMenuPanel
 @onready var ManualControlHUD = %ManualControlHUD
 @onready var TacticalMap = %TacticalDataDrawing
 @onready var All = %All
@@ -17,7 +17,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
 
 # Imap values and goodies
-var debug_imap: bool = false
+var debug_imap: bool = true
 var battle_over: bool = false
 var imap_debug_grid: Array
 var combat_objective: int = globals.Objective.SKIRMISH
@@ -54,11 +54,11 @@ func _ready() -> void:
 		for i in range(grid_row_size):
 			imap_debug_grid.append([])
 			for j in range(grid_column_size):
-				var cell_instance: Container = CELL_CONTAINER_SCENE.instantiate()
-				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.DefaultCellSize
-				cell_instance.get_child(0).text = str(map.GetCellValue(i, j))
-				cell_instance.get_child(0).visible = false
+				var cell_instance: CellContainer = CELL_CONTAINER_SCENE.instantiate()
 				ImapDebugGrid.add_child(cell_instance)
+				cell_instance.custom_minimum_size = Vector2.ONE * imap_manager.DefaultCellSize
+				cell_instance.Value.text = str(map.GetCellValue(i, j))
+				cell_instance.Value.visible = false
 				imap_debug_grid[i].append(cell_instance)
 	
 	FleetDeploymentList.setup_deployment_screen()
@@ -201,8 +201,10 @@ func _unhandled_input(event) -> void:
 func _physics_process(delta):
 	if battle_over == false and (get_tree().get_node_count_in_group(&"friendly") == 0 or get_tree().get_node_count_in_group(&"enemy") == 0):
 		battle_over = true
+		ComputerAdmiral.SetBattleOver(battle_over)
 	elif battle_over == true and (get_tree().get_node_count_in_group(&"friendly") > 0 and get_tree().get_node_count_in_group(&"enemy") > 0):
 		battle_over = false
+		ComputerAdmiral.SetBattleOver(battle_over)
 	
 	if Engine.get_physics_frames() % 60 == 0 and battle_over == false:
 		imap_manager.WeighForceDensity()
@@ -226,22 +228,33 @@ func _on_switch_maps() -> void:
 		TacticalMap.display_map(false)
 	get_viewport().set_input_as_handled()
 
-func _on_grid_value_changed(m: int, n: int, value: float) -> void:
+func _on_grid_value_changed(m: int, n: int, value: float, metadata = -1) -> void:
 	var adj_value: float = snappedf(value, 0.001)
 	if adj_value != 0.0:
-		imap_debug_grid[m][n].get_child(0).visible = true
-		imap_debug_grid[m][n].get_child(0).text = str(adj_value)
+		imap_debug_grid[m][n].Value.visible = true
+		imap_debug_grid[m][n].Value.text = str(adj_value)
+		imap_debug_grid[m][n].GoalMetadata.visible = false
 	else:
-		imap_debug_grid[m][n].get_child(0).visible = false
+		imap_debug_grid[m][n].Value.visible = false
+	
+	if metadata != -1:
+		var meta_2_string: StringName = imap_debug_grid[m][n].goal_strings[metadata]
+		imap_debug_grid[m][n].GoalMetadata.visible = true
+		imap_debug_grid[m][n].GoalMetadata.text = meta_2_string
 
-func _on_grid_row_changed(m: int, value_array: Array) -> void:
+func _on_grid_row_changed(m: int, value_array: Array, metadata = -1) -> void:
 	for n in range(0, value_array.size()):
 		var adj_value: float = snappedf(value_array[n], 0.001)
-		imap_debug_grid[m][n].get_child(0).text = str(adj_value)
+		imap_debug_grid[m][n].Value.text = str(adj_value)
 		if adj_value == 0.0:
-			imap_debug_grid[m][n].get_child(0).visible = false
+			imap_debug_grid[m][n].Value.visible = false
+			imap_debug_grid[m][n].GoalMetadata.visible = false
 		else:
-			imap_debug_grid[m][n].get_child(0).visible = true
+			imap_debug_grid[m][n].Value.visible = true
+		if metadata != -1:
+			var meta_2_string: StringName = imap_debug_grid[m][n].goal_strings[metadata]
+			imap_debug_grid[m][n].GoalMetadata.visible = true
+			imap_debug_grid[m][n].GoalMetadata.text = meta_2_string
 
 # Connect any signals at the start of the scene to ensure that all current friendly and enemy ships
 # are more than capable of signaling to each other changes in combat.

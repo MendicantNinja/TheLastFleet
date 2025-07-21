@@ -219,6 +219,7 @@ func generate_group_target_positions(leader: Ship) -> void:
 	var radius: int = ceil(sqrt(group.size()))
 	offsets = box_formation_offset_positions(leader, radius, unit_separation)
 	geo_mean = geometric_median_of_objects(offsets)
+	get_tree().call_group(leader.group_name, &"set_hold_center", geo_mean)
 	
 	unit_positions.clear()
 	for unit in group:

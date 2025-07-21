@@ -1,8 +1,9 @@
-[gd_scene load_steps=22 format=3 uid="uid://buewiugebpfxq"]
+[gd_scene load_steps=23 format=3 uid="uid://buewiugebpfxq"]
 
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorTreeRoot.cs" id="1_wwtmt"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="2_ft2w7"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="3_5kf7k"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/EnemyExclusive/FindGoals.cs" id="4_nt68y"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/FindGoal.cs" id="4_tsoqx"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/DetectSkirmishUnits.cs" id="5_ddnue"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/Steering/Pathfinding.cs" id="6_2galt"]
@@ -27,6 +28,12 @@ script = ExtResource("1_wwtmt")
 
 [node name="main" type="Node" parent="."]
 script = ExtResource("2_ft2w7")
+
+[node name="enemy only" type="Node" parent="main"]
+script = ExtResource("3_5kf7k")
+
+[node name="detect goal" type="Node" parent="main/enemy only"]
+script = ExtResource("4_nt68y")
 
 [node name="navigation" type="Node" parent="main"]
 script = ExtResource("3_5kf7k")

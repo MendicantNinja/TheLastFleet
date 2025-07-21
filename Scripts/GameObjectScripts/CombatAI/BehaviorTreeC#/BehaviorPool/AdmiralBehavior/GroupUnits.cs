@@ -8,6 +8,7 @@ public partial class GroupUnits : Action
 	public StringName tmp_name = new StringName("tmp");
 	public override NodeState Tick(Node agent)
 	{
+		/*
 		// Cast the agent to your Admiral class
 		Admiral admiral = agent as Admiral;
 		if (admiral == null)
@@ -143,6 +144,8 @@ public partial class GroupUnits : Action
 
 		admiral.AvailableGroups.Add(leftover_group);
 		admiral.AwaitingOrders.Add(leftover_group);
+		
+		*/
 		
 		return NodeState.FAILURE;
 	}

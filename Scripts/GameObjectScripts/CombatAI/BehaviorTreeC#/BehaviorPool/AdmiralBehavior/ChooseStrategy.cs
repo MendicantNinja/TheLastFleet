@@ -5,6 +5,7 @@ public partial class ChooseStrategy : Action
 {
 	public override NodeState Tick(Node agent)
 	{
+		/*
 		if (Engine.GetPhysicsFrames() % 240 != 0)
 			return NodeState.FAILURE;
         
@@ -26,7 +27,7 @@ public partial class ChooseStrategy : Action
 
 		admiral.AdmiralStrength = admiral_strength;
 		admiral.PlayerStrength = player_strength;
-
+		*/
 		return NodeState.FAILURE;
 	}
 }

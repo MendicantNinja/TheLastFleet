@@ -52,7 +52,11 @@ public partial class Imap : GodotObject
 		// Create a single-dimensional array representing a row, initialized with zeros.
 		float[] reset_row = new float[Width];
 		Array.Fill<float>(reset_row, 0.0f); // Fill the entire array with 0.0 (default value for clearing).
-
+		Godot.Collections.Array<float> gd_reset = new();
+		gd_reset.Resize(Width);
+		gd_reset.Fill(0.0f);
+		Goal[] reset_row_goal = new Goal[Width];
+		Array.Fill<Goal>(reset_row_goal, Goal.DEFAULT);
 		// Iterate through each row index in the 2D MapGrid.
 		for (int m = 0; m < Height; m++) // Changed to < Height to avoid out-of-range issues.
 		{
@@ -63,7 +67,15 @@ public partial class Imap : GodotObject
 			// - MapGrid: The destination array (the 2D grid where the row is being set).
 			// - m * Width * sizeof(float): The byte offset in MapGrid where row m begins.
 			// - Width * sizeof(float): The number of bytes to copy (entire width of the row).
-			Buffer.BlockCopy(reset_row, 0, MapGrid, m * Width * sizeof(float), Width * sizeof(float));
+			if (Type == ImapType.GoalMap)
+			{
+				Buffer.BlockCopy(reset_row_goal, 0, MapGrid, m * Width * sizeof(Goal), Width * sizeof(Goal));
+			}
+			else
+			{
+				Buffer.BlockCopy(reset_row, 0, MapGrid, m * Width * sizeof(float), Width * sizeof(float));
+			}
+			EmitSignal(SignalName.UpdateRowValue, m, gd_reset, -1);
 		}
 	}
 
@@ -178,6 +190,8 @@ public partial class Imap : GodotObject
 		int max_n = Math.Min(target_map.Width, Width - start_column + neg_adj_col);
 		int max_m = Math.Min(target_map.Height, Height - start_row + neg_adj_row);
 
+		Goal[] default_goal_row = new Goal[target_map.Width];
+		Array.Fill<Goal>(default_goal_row, Goal.DEFAULT);
 		float[] zero_fill_row = new float[target_map.Width];
 		Array.Fill<float>(zero_fill_row, 0.0f);
 
@@ -197,7 +211,12 @@ public partial class Imap : GodotObject
 			}
 
 			// If the entire row is zero, fill the target row with zeros
-			if (source_min == 0.0f && source_max == 0.0f)
+			if (source_min == 0.0f && source_max == 0.0f && target_map.Type == ImapType.GoalMap)
+			{
+				Buffer.BlockCopy(default_goal_row, 0, target_map.GoalGrid, m * target_map.Width * sizeof(Goal),  target_map.Width * sizeof(Goal));
+				continue;
+			}
+			else if (source_min == 0.0f && source_max == 0.0f)
 			{
 				Buffer.BlockCopy(zero_fill_row, 0, target_map.MapGrid, m * target_map.Width * sizeof(float), target_map.Width * sizeof(float));
 				continue;
@@ -207,6 +226,10 @@ public partial class Imap : GodotObject
 			{
 				int source_col = n + start_column - neg_adj_col;
 				target_map.MapGrid[m, n] = MapGrid[source_row, source_col] * magnitude;
+				if (Type == ImapType.GoalMap)
+				{
+					target_map.GoalGrid[m, n] = GoalGrid[source_row, source_col];
+				}
 			}
 		}
 	}

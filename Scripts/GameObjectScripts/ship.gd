@@ -1143,6 +1143,9 @@ func set_deploy_flag(value) -> void:
 func set_fallback_flag(value) -> void:
 	fallback_flag = value
 
+func set_hold_center(value) -> void:
+	ShipWrapper.SetHoldCenter(value)
+
 func generate_combat_probability(enemy: Ship) -> float:
 	var agent_inf: float = abs(approx_influence)
 	var target_inf: float = abs(enemy.approx_influence)

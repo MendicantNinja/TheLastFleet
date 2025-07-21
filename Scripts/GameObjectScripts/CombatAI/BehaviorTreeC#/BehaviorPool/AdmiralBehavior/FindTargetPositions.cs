@@ -10,6 +10,7 @@ public partial class FindTargetPositions : Action
 {
 	public override NodeState Tick(Node agent)
 	{
+		/*
 		if (Engine.GetPhysicsFrames() % 240 != 0) return NodeState.FAILURE;
 
 		Admiral admiral = agent as Admiral;
@@ -123,7 +124,7 @@ public partial class FindTargetPositions : Action
 				admiral.GoalValue[goal_cell] = -1.0f;
 			}
 		}
-		
+		*/
 		return NodeState.SUCCESS;
 	}
 

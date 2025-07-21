@@ -8,10 +8,16 @@ using Vector2 = System.Numerics.Vector2;
 public partial class ShipWrapper : Node
 {
 	[Export]
-	public string GroupName { get; private set; }
+	public string GroupName { get; private set; } = "";
 	[Export]
-	public bool GroupLeader { get; private set; }
+	public bool GroupLeader { get; private set; } = false;
 	public Goal CombatGoal { get; private set; }
+	public Imap GoalSample  { get; set; }
+	public RigidBody2D EliminateUnit { get; set; } = null;
+	public RigidBody2D EscortUnit { get; set; } = null;
+	public bool EscortFlag { get; set; } = false;
+	public Vector2 HoldCenter { get; set; } = Vector2.Zero;
+	public RigidBody2D TargetUnit { get; set; } = null;
 
 	// Flags and states
 	[Export]
@@ -53,7 +59,7 @@ public partial class ShipWrapper : Node
 	// Combat and influence map data
 	public List<RigidBody2D> TargetedUnits { get; private set; } = new List<RigidBody2D>();
 	[Export]
-	public RigidBody2D TargetUnit { get; set; } = null;
+	
 	public Godot.Collections.Array<RigidBody2D> NeighborUnits { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Godot.Collections.Array<RigidBody2D> SeparationNeighbors { get; private set; } = new Godot.Collections.Array<RigidBody2D>();
 	public Vector2I ImapCell { get; private set; }
@@ -125,6 +131,11 @@ public partial class ShipWrapper : Node
 		}
 		
 		WeighInfluence = new Imap(composite_influence.Width, composite_influence.Height);
+		if (IsFriendly == false)
+		{
+			GoalSample = new Imap(9, 9, 0f, 0f, 1, ImapType.GoalMap);
+		}
+		
 	}
 
 	public void WeighCompositeInfluence(Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> neighborhood_density)
@@ -382,5 +393,10 @@ public partial class ShipWrapper : Node
 	public void SetTargetUnit(GodotObject target)
 	{
 		TargetUnit = target as RigidBody2D;
+	}
+
+	public void SetHoldCenter(Godot.Vector2 position)
+	{
+		HoldCenter = new Vector2(position.X, position.Y);
 	}
 }
