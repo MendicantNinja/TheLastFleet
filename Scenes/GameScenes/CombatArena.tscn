@@ -1,4 +1,4 @@
-[gd_scene load_steps=59 format=3 uid="uid://cuocntda0dllh"]
+[gd_scene load_steps=61 format=3 uid="uid://cuocntda0dllh"]
 
 [ext_resource type="Script" path="res://Scripts/combat_arena.gd" id="1_fx56v"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/Admiral.cs" id="2_2u0vw"]
@@ -7,13 +7,15 @@
 [ext_resource type="FontFile" uid="uid://cxbtadyvd264f" path="res://ThemesandFonts/Fonts/Michroma-Regular.ttf" id="3_urh14"]
 [ext_resource type="Theme" uid="uid://b7xdeawffwjdn" path="res://ThemesandFonts/Themes/FleetDeploymentTheme.tres" id="4_hilki"]
 [ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Sequence.cs" id="4_qi217"]
-[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/Composite/Selector.cs" id="5_ckuvt"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/EvaluateMoveHold.cs" id="5_a45tc"]
 [ext_resource type="Script" path="res://Scripts/OtherObjectScripts/fleet_deployment.gd" id="5_mfr8c"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/ManualControlHUDScripts/manual_control_hud.gd" id="5_ojmr4"]
 [ext_resource type="Texture2D" uid="uid://btjg68do6pthc" path="res://Art/CombatGUIArt/ManualControlHUDArt/bar_starsector.png" id="5_wtw0b"]
 [ext_resource type="Script" path="res://Scripts/CombatGUIScripts/options_menu.gd" id="6_5ty2s"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/EvaluateGoals.cs" id="6_finrh"]
 [ext_resource type="Texture2D" uid="uid://bw66f1712lt43" path="res://Art/CombatGUIArt/ManualControlHUDArt/flux_pip.png" id="6_ftacq"]
 [ext_resource type="Texture2D" uid="uid://df1bsmf81s6nu" path="res://Art/MenuArt/button.png" id="6_kf7d4"]
+[ext_resource type="Script" path="res://Scripts/GameObjectScripts/CombatAI/BehaviorTreeC#/BehaviorPool/AdmiralBehavior/FillGoalMap.cs" id="7_mm0o0"]
 [ext_resource type="Texture2D" uid="uid://dv4hdo5ecw4e5" path="res://Art/MenuArt/hoverbutton.png" id="7_qn7ha"]
 [ext_resource type="Theme" uid="uid://bka1x3hcxtfcg" path="res://ThemesandFonts/Themes/CombatGUITheme.tres" id="7_u21w5"]
 [ext_resource type="Texture2D" uid="uid://dbbeuyeghpl8e" path="res://Art/CombatGUIArt/ManualControlHUDArt/indicator_upscale.png" id="9_lucm6"]
@@ -163,8 +165,17 @@ enabled = true
 [node name="main" type="Node" parent="Admiral/AdmiralAI"]
 script = ExtResource("4_qi217")
 
-[node name="utility selector" type="Node" parent="Admiral/AdmiralAI/main"]
-script = ExtResource("5_ckuvt")
+[node name="goal evaluation" type="Node" parent="Admiral/AdmiralAI/main"]
+script = ExtResource("4_qi217")
+
+[node name="Evaluate MoveAndHold" type="Node" parent="Admiral/AdmiralAI/main/goal evaluation"]
+script = ExtResource("5_a45tc")
+
+[node name="Evaluate Goals" type="Node" parent="Admiral/AdmiralAI/main/goal evaluation"]
+script = ExtResource("6_finrh")
+
+[node name="Fill Goal Map" type="Node" parent="Admiral/AdmiralAI/main/goal evaluation"]
+script = ExtResource("7_mm0o0")
 
 [node name="ImapDebug" type="Control" parent="."]
 layout_mode = 3

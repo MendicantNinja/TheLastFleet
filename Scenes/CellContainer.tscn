@@ -1,4 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://c60tcqjeqli07"]
+[gd_scene load_steps=3 format=3 uid="uid://c60tcqjeqli07"]
+
+[ext_resource type="Script" path="res://Scripts/cell_container.gd" id="1_vkiqu"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_50v8t"]
 
@@ -12,9 +14,17 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxEmpty_50v8t")
+script = ExtResource("1_vkiqu")
 
-[node name="Value" type="Label" parent="."]
+[node name="BoxContainer" type="BoxContainer" parent="."]
+layout_mode = 2
+vertical = true
+
+[node name="Value" type="Label" parent="BoxContainer"]
 texture_filter = 3
 layout_mode = 2
-size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 32
+
+[node name="GoalMetadata" type="Label" parent="BoxContainer"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 32

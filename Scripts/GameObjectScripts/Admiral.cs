@@ -4,7 +4,8 @@ using Globals;
 using System.Collections.Generic;
 using System.Linq;
 using Vector2 = System.Numerics.Vector2;
-using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 // We need to remove friendly reuse of group names for the sake of simplicity gathering sample data 
 public struct GroupData
@@ -50,10 +51,10 @@ public struct DiscreteSample
 public struct GoalDescriptor
 {
     public Goal Type;           // e.g. MoveHold, Harass, Attack, etc.
-    public int CellX, CellY;  	// propagation center
+    public Vector2I CenterCell;  	// propagation center
     public float BaseWeight;    // computed score before propagation
-    public float Radius;        // how far the influence spreads
-    public float ExpirationTime; // timestamp or tick when this goal expires
+    public int Radius;        // how far the influence spreads
+    //public float ExpirationTime; // timestamp or tick when this goal expires
 	public int SampleTick;
 }
 
@@ -62,11 +63,22 @@ public struct GoalDescriptor
 // registry cells as the abstract representation of these regions.
 public struct CellMerit
 {
-	public int CellX, CellY;
+	public Vector2I CellIndex;
 	public float FriendlyPresence; // Average of friendly approx influence over total influence
 	public float EnemyPresence;	// Average of enemy approx influence over total influence
-	public float BaseStrategicValue; // Strategic importance (a flat 1.0 for neutral control points, anything else is assessed on different merits)
-	public float ObjectiveWeight; // Dynamic, computed per objective
+	public float BaseStrategicValue; // Strategic importance (a flat 1.0 for neutral control points, an_idxthing else is assessed on different merits)
+	public float ObjectiveWeight; // computed per objective
+	public List<Vector2I> AdjacentCells;
+	public CellMerit(bool initialize)
+    {
+		CellIndex.X = 0;
+		CellIndex.Y = 0;
+        FriendlyPresence = 0.0f;
+		EnemyPresence = 0.0f;
+		BaseStrategicValue = 0.0f;
+		ObjectiveWeight = 0.0f;
+		AdjacentCells = new();
+    }
 }
 
 public partial class Admiral : Node2D
@@ -78,6 +90,7 @@ public partial class Admiral : Node2D
 	public float PlayerStrength { get; set; } = 0.0f;
 	public float AdmiralStrength { get; set; } = 0.0f;
 	public int NumDeployedUnits { get; private set; } = 0;
+	public bool BattleOver {get; private set; } = true;
 	public int GoalRadius = 0;
 
 	public List<Godot.Collections.Array<Vector2I>> UnitClusters; // RegistryMap cell
@@ -94,16 +107,14 @@ public partial class Admiral : Node2D
 
 	public List<Vector2I> TensionCells = new();
 	public List<DiscreteSample> RecentSamples = new();
-	public List<CellMerit> RegistryCellsMerit = new();
+	public Dictionary<Vector2I, CellMerit> RegistryCellsMerit = new();
+	public List<GoalDescriptor> CurrentGoalEvaluation = new();
 	public List<GoalDescriptor> GoalHistory = new();
-	public int SampleBuffer = 7;
-	public double SampleCounter = 0;
+	public ulong SampleBuffer = 10;
 	public int CurrentSampleTick = 0;
 	public int sample_limit = 4;
 
 	//float SomeArbitraryMetric = 0.0f;
-
-	public List<string> AvailableGroups = new();
 
 	private int n_units_deployed = 0;
 
@@ -111,6 +122,49 @@ public partial class Admiral : Node2D
     {
         AdmiralAI = (BehaviorTreeRoot)GetNode("AdmiralAI");
 		AdmiralAI.ToggleRoot(false);
+
+		//List<CellMerit> polled_cells = new();
+		int columns = ImapManager.Instance.ArenaWidth / ImapManager.Instance.MaxCellSize;
+		int rows = ImapManager.Instance.ArenaHeight / ImapManager.Instance.MaxCellSize;
+		for (int m = 0; m < rows; m++)
+		{
+			for (int n = 0; n < columns; n++)
+			{
+                CellMerit cell = new(true){};
+				cell.CellIndex.X = m;
+				cell.CellIndex.Y = n;
+				RegistryCellsMerit[cell.CellIndex] = cell;
+			}
+			
+		}
+
+		// assume: rows = # of rows, columns = # of columns
+		foreach (Vector2I cell_idx in RegistryCellsMerit.Keys)
+		{
+			var cell = RegistryCellsMerit[cell_idx];
+
+			// offset loops [-1..+1]
+			for (int m = -1; m <= 1; m++)
+			{
+				int m_idx = cell.CellIndex.X + m;
+				if (m_idx < 0 || m_idx >= rows) continue;
+
+				for (int n = -1; n <= 1; n++)
+				{
+					int n_idx = cell.CellIndex.Y + n;
+					if (n_idx < 0 || n_idx >= columns) continue;
+
+					// skip the cell itself
+					if (m == 0 && n == 0) continue;
+
+					cell.AdjacentCells.Add(new Vector2I(m_idx, n_idx));
+				}
+			}
+
+			RegistryCellsMerit[cell.CellIndex] = cell;
+		}
+
+		//RegistryCellsMerit = polled_cells;
     }
 
     public override void _PhysicsProcess(double delta)
@@ -122,29 +176,26 @@ public partial class Admiral : Node2D
 
 		// Everything after this should only ever happen when enemy units are fully deployed
 		// i.e. when the AdmiralAI is enabled
-		if (AdmiralAI.enabled == false) return;
+		if (AdmiralAI.enabled == false || BattleOver == true) return;
 
-		if (SampleCounter > SampleBuffer - 3)
+		if (Engine.GetPhysicsFrames() % (30 * SampleBuffer) == 0)
 		{
 			UpdateMaps();
 		}
 
-		if (SampleCounter > SampleBuffer - 2)
+		if (Engine.GetPhysicsFrames() % (60 * (SampleBuffer - 5)) == 0)
 		{
-			PollStrength();
 			PlayerVulnerability = NormalizeSampleCells(PlayerVulnerability);
             EnemyVulnerability = NormalizeSampleCells(EnemyVulnerability);
 		}
 
-		if (SampleCounter > 2 * (SampleBuffer - 1))
+		if (Engine.GetPhysicsFrames() % (60 * (SampleBuffer - 2)) == 0)
 		{
 			PollRegistryCells();
 		}
-
-		SampleCounter += delta;
-		if (SampleCounter > SampleBuffer)
+	
+		if (Engine.GetPhysicsFrames() % (60 * SampleBuffer) == 0)
 		{
-			SampleCounter = 0.0;
 			CurrentSampleTick++;
 
             DiscreteSample CurrentSample = new(true)
@@ -166,6 +217,7 @@ public partial class Admiral : Node2D
 		if (RecentSamples.Count > sample_limit)
 		{
 			RecentSamples.RemoveAt(0);
+			PollStrength();
 		}
     }
 
@@ -250,6 +302,7 @@ public partial class Admiral : Node2D
 
 	public static Godot.Collections.Dictionary<Vector2I, float> NormalizeSampleCells(Godot.Collections.Dictionary<Vector2I, float> sample_cells)
 	{
+		if (sample_cells.Count == 0) return sample_cells;
 		float min_value = sample_cells.Values.Min();
 		float max_value = sample_cells.Values.Max();
 		Godot.Collections.Dictionary<Vector2I, float> normalized_cells = new(); 
@@ -265,7 +318,7 @@ public partial class Admiral : Node2D
 		float norm_min = normalized_cells.Values.Min();
 		foreach (Vector2I cell in sample_cells.Keys)
 		{
-			if (target_cells[cell] == norm_max || target_cells[cell] == norm_min)
+			if (normalized_cells[cell] == norm_max || normalized_cells[cell] == norm_min)
 			{
 				target_cells[cell] = normalized_cells[cell];
 			}
@@ -360,10 +413,54 @@ public partial class Admiral : Node2D
 		}
 	}
 
-	public List<CellMerit> PollRegistryCells()
+	public void PollRegistryCells()
 	{
-		List<CellMerit> polled_cells = new();
-		return polled_cells;
+		foreach (Vector2I cell_index in RegistryCellsMerit.Keys)
+		{
+			ref CellMerit cell = ref CollectionsMarshal.GetValueRefOrNullRef(RegistryCellsMerit, cell_index);
+			if (Unsafe.IsNullRef(ref cell)) continue;
+			
+			float enemy_influence = 0.0f;
+			float player_influence = 0.0f;
+			if (ImapManager.Instance.RegistryMap.ContainsKey(cell.CellIndex))
+			{
+				List<RigidBody2D> registered_units = ImapManager.Instance.RegistryMap[cell.CellIndex];
+				foreach (RigidBody2D unit in registered_units)
+				{
+					float approx_influence = (float)unit.Get("approx_influence");
+
+					if (approx_influence < 0.0f) enemy_influence += Mathf.Abs(approx_influence);
+					else if (approx_influence > 0.0f) player_influence += approx_influence;
+				}
+			}
+			cell.BaseStrategicValue = 0.0f;
+			cell.ObjectiveWeight = 0.0f;
+			if (enemy_influence < 0.0f && player_influence == 0 && HeuristicObjective == Objective.SKIRMISH)
+			{
+				cell.BaseStrategicValue = 1.0f;
+			}
+			else if (enemy_influence == 0.0f && player_influence > 0 && HeuristicObjective == Objective.SKIRMISH)
+			{
+				cell.BaseStrategicValue = -1.0f;
+			}
+			// if cell index contains a neutral control point, change its base strategic value to 1.0f
+			/*
+			else if (HeuristicObjective == Objective.CONTROL)
+			{
+			}
+			*/
+			float total_influence = enemy_influence + player_influence;
+			if (total_influence == 0.0f)
+			{
+				cell.EnemyPresence = 0.0f;
+				cell.FriendlyPresence = 0.0f;
+			}
+			else
+			{
+				cell.EnemyPresence = enemy_influence / total_influence;
+				cell.FriendlyPresence = player_influence / total_influence;
+			}
+		}
 	}
 
 	public void SetObjective(int value)
@@ -380,6 +477,11 @@ public partial class Admiral : Node2D
 	public void SetNumDeployedUnits(int n_units)
 	{
 		NumDeployedUnits = n_units;
+	}
+
+	public void SetBattleOver(bool value)
+	{
+		BattleOver = value;
 	}
 
 	public void OnUnitDeployed()

@@ -14,8 +14,8 @@ public partial class ImapManager : Node
 	private List<ImapTemplate> InverseOccupancyTemplates;
 	private List<ImapTemplate> InverseThreatTemplates;
 
-	public Dictionary<ImapType, Imap> AgentMaps = new Dictionary<ImapType, Imap>();
-	public Dictionary<Vector2I, List<RigidBody2D>> RegistryMap = new Dictionary<Vector2I, List<RigidBody2D>>();
+	public Dictionary<ImapType, Imap> AgentMaps = new();
+	public Dictionary<Vector2I, List<RigidBody2D>> RegistryMap = new();
 	//public Imap ArenaInfluenceMap;
 	public Imap VulnerabilityMap;
 	//public Imap InverseTensionMap;
@@ -23,16 +23,15 @@ public partial class ImapManager : Node
 	public Imap WeightedImap;
 	public Imap GoalMap;
 
-	public List<Godot.Collections.Array<Vector2I>> FriendlyClusters = new List<Godot.Collections.Array<Vector2I>>();
-	public List<Godot.Collections.Array<Vector2I>> EnemyClusters = new List<Godot.Collections.Array<Vector2I>>();
-	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedEnemy = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
-	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedFriendly = new Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float>();
+	public List<Godot.Collections.Array<Vector2I>> FriendlyClusters = new();
+	public List<Godot.Collections.Array<Vector2I>> EnemyClusters = new();
+	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedEnemy = new();
+	public Godot.Collections.Dictionary<Godot.Collections.Array<Vector2I>, float> WeightedFriendly = new();
 	public int DefaultRadius = 5;
 	public int ArenaWidth = 13500;
 	public int ArenaHeight = 15000;
 	public int DefaultCellSize = 250;
 	public int MaxCellSize = 1250;
-
 	public override void _Ready()
 	{
 		int longest_range = 2500 / DefaultCellSize;
@@ -55,7 +54,7 @@ public partial class ImapManager : Node
 		Imap InverseTensionMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.TensionMap);
 		TensionMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.TensionMap);
 		WeightedImap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.InfluenceMap);
-		GoalMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.InfluenceMap);
+		GoalMap = new Imap(ArenaWidth, ArenaHeight, 0.0f, 0.0f, DefaultCellSize, ImapType.GoalMap);
 		RegisterMap(ArenaInfluenceMap);
 		RegisterMap(InverseTensionMap);
 	}
