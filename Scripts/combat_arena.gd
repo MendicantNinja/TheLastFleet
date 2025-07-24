@@ -15,6 +15,7 @@ const CELL_CONTAINER_SCENE = preload("res://Scenes/CellContainer.tscn")
 @onready var ComputerAdmiral = $Admiral
 @onready var ImapDebug = $ImapDebug
 @onready var ImapDebugGrid = $ImapDebug/ImapGridContainer
+@onready var RegistryGridContainer = $ImapDebug/RegistryGridContainer
 
 # Imap values and goodies
 var debug_imap: bool = true

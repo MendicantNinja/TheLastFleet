@@ -15,10 +15,14 @@ public partial class FillGoalMap : Action
 		if (current_tick == admiral.CurrentSampleTick || admiral.CurrentSampleTick == 0) return NodeState.FAILURE;
 		current_tick = admiral.CurrentSampleTick;
 
+		
 		Imap goal_map = ImapManager.Instance.GoalMap;
 		goal_map.ClearMap();
 		foreach (GoalDescriptor goal in admiral.CurrentGoalEvaluation)
 		{
+			GD.Print(goal.Type);
+			GD.Print(goal.CenterCell);
+			GD.Print(goal.BaseWeight);
 			goal_map = PropagateGoalValues(goal_map, goal.Radius, goal.CenterCell, goal.Type, goal.BaseWeight);
 		}
 		
@@ -27,7 +31,7 @@ public partial class FillGoalMap : Action
 		return NodeState.SUCCESS;
 	}
 
-	public Imap PropagateGoalValues(Imap goal_map, int radius, Vector2I center, Goal type, float magnitude = 1.0f)
+	public static Imap PropagateGoalValues(Imap goal_map, int radius, Vector2I center, Goal type, float magnitude = 1.0f)
 	{
 		int start_col = Math.Max(0, center.Y - radius);
 		int end_col = Math.Min(center.Y + radius, goal_map.Width);
@@ -60,71 +64,3 @@ public partial class FillGoalMap : Action
 		return goal_map;
 	}
 }
-		/*
-		Admiral admiral = agent as Admiral;
-		if (Engine.GetPhysicsFrames() % 720 != 0 | admiral.GoalValue is null) return NodeState.FAILURE;
-
-		if (admiral.AvailableGroups.Count == 0) 
-		{
-			return NodeState.FAILURE;
-		}
-		
-		Imap goal_map = ImapManager.Instance.GoalMap;
-		Dictionary<Vector2I, float> goal_value = admiral.GoalValue;
-		
-		float norm_val = 0.0f;
-		foreach (Vector2I cell in goal_value.Keys)
-		{
-			if (goal_value[cell] < 0.0f) continue;
-			norm_val += 1.0f;
-		}
-		
-		//if (norm_val == 0.0f && goal_value.Keys.Count > 0) norm_val = 1.0f;
-
-		if (norm_val == 0.0f) return NodeState.FAILURE;
-		
-		goal_map.ClearMap();
-		List<Vector2I> geo_mean_cell = new List<Vector2I>();
-		Node globals = GetTree().Root.GetNode("globals");
-		foreach (string group_name in admiral.AvailableGroups)
-		{
-			Godot.Collections.Array<Node> group = GetTree().GetNodesInGroup(group_name);
-			Godot.Collections.Array<Godot.Vector2> positions = new Godot.Collections.Array<Godot.Vector2>();
-			foreach (RigidBody2D unit in group)
-			{
-				positions.Add(new Godot.Vector2(unit.GlobalPosition.X, unit.GlobalPosition.Y));
-			}
-			Godot.Vector2 geo_median = (Godot.Vector2)globals.Call("geometric_median_of_objects", positions);
-			Vector2I cell = new Vector2I((int)geo_median.Y / ImapManager.Instance.DefaultCellSize, (int)geo_median.X / ImapManager.Instance.DefaultCellSize);
-			geo_mean_cell.Add(cell);
-		}
-
-		foreach (Vector2I goal_cell in goal_value.Keys)
-		{
-			Godot.Collections.Array<Vector2I> dist_to_goal_cell = new Godot.Collections.Array<Vector2I>();
-			List<Vector2I> geo_mean_dist = new List<Vector2I>();
-			float max_dist = 0.0f;
-			int max_idx = 0;
-			int idx = 0;
-			foreach (Vector2I cell in geo_mean_cell)
-			{
-				float dist = cell.DistanceSquaredTo(goal_cell);
-				if (dist > max_dist)
-				{
-					max_dist = dist;
-					max_idx = idx;
-				}
-				idx++;
-			}
-			
-			Vector2I max_cell = geo_mean_cell[max_idx];
-			int radius = (int)max_cell.DistanceTo(goal_cell);
-			GD.Print(goal_cell, " : ", goal_value[goal_cell]);
-			goal_map = PropagateGoalValues(goal_map, radius, goal_cell, goal_value[goal_cell], norm_val);
-		}
-
-		ImapManager.Instance.GoalMap = goal_map;
-		return NodeState.FAILURE;
-	}
-	*/
-

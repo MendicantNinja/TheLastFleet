@@ -16,6 +16,10 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class EvaluateMoveHold : Action
 {
+    int radius_min = 10;
+    int radius_max = 40;
+    int radius_dec = 5;
+    int contender_limit = 3;
     int current_tick = 0;
     public override NodeState Tick(Node agent)
     {
@@ -95,7 +99,10 @@ public partial class EvaluateMoveHold : Action
             ref CellMerit right_cell = ref CollectionsMarshal.GetValueRefOrNullRef(admiral.RegistryCellsMerit, new Vector2I(cell_idx.X, cell_idx.Y + 1));
             ref CellMerit up_cell = ref CollectionsMarshal.GetValueRefOrNullRef(admiral.RegistryCellsMerit, new Vector2I(cell_idx.X - 1, cell_idx.Y));
             ref CellMerit down_cell = ref CollectionsMarshal.GetValueRefOrNullRef(admiral.RegistryCellsMerit, new Vector2I(cell_idx.X + 1, cell_idx.Y));
-            
+
+            if (Unsafe.IsNullRef(ref left_cell) || Unsafe.IsNullRef(ref right_cell) || Unsafe.IsNullRef(ref up_cell)
+            || Unsafe.IsNullRef(ref down_cell)) continue;
+
             bool vertical_alignment = false;
             bool horizontal_alignment = false;
             if(left_cell.BaseStrategicValue > 0.0 && right_cell.BaseStrategicValue > 0.0)
@@ -159,9 +166,17 @@ public partial class EvaluateMoveHold : Action
         // This is not an end-all be-all implementation for how these goals are later evaluated before goal propagation.
         // However, this will serve as an off the cuff baseline that requires refinement to achieve desirable results.
         eval_contenders = eval_contenders.OrderByDescending(cell => cell.ObjectiveWeight).ToList();
-        int goal_limit = 3;
+        int goal_limit;
         
-        if (eval_contenders.Count < goal_limit) goal_limit = eval_contenders.Count;
+        if (eval_contenders.Count < contender_limit)
+        {
+            goal_limit = eval_contenders.Count;
+        }
+        else
+        {
+            goal_limit = contender_limit;
+        }
+        
         for (int i = 0; i < goal_limit; i++)
         {
             CellMerit cell = eval_contenders[i];
@@ -169,7 +184,7 @@ public partial class EvaluateMoveHold : Action
             {
                 Type = Goal.MOVE_HOLD,
                 BaseWeight = cell.ObjectiveWeight,
-                Radius = 15,
+                Radius = radius_max,
                 SampleTick = current_tick
             };
             Vector2 cell_pos = new(cell.CellIndex.Y * ImapManager.Instance.MaxCellSize, cell.CellIndex.X * ImapManager.Instance.MaxCellSize);
@@ -177,6 +192,23 @@ public partial class EvaluateMoveHold : Action
             cell_pos.Y += ImapManager.Instance.MaxCellSize / 2f;
             Vector2I cell_idx = new((int)cell_pos.Y / ImapManager.Instance.DefaultCellSize, (int)cell_pos.X / ImapManager.Instance.DefaultCellSize);
             goal.CenterCell = cell_idx;
+            List<GoalDescriptor> n_hist_goal = admiral.GoalHistory.Where(g => g.Type == Goal.MOVE_HOLD).ToList();
+            foreach (GoalDescriptor n_goal in n_hist_goal)
+            {
+                if (n_goal.CenterCell != goal.CenterCell) continue;
+                //if (n_goal.SampleTick < current_tick - admiral.sample_limit) continue;
+                GoalDescriptor goal_copy = n_goal;
+                if (n_goal.Radius > radius_min)
+                {
+                    goal_copy.Radius -= radius_dec;
+                    admiral.GoalHistory[goal_copy.Index] = goal_copy;
+                }
+
+                goal.BaseWeight += n_goal.BaseWeight;
+                if (goal.BaseWeight > 1.0f) goal.BaseWeight = 1.0f;
+
+                if (goal.Radius > radius_min) goal.Radius = goal_copy.Radius;
+            }
             admiral.CurrentGoalEvaluation.Add(goal);
         }
 

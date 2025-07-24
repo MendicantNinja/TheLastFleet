@@ -193,6 +193,11 @@ offset_bottom = 40.0
 theme_override_constants/h_separation = -1
 theme_override_constants/v_separation = -1
 
+[node name="RegistryGridContainer" type="GridContainer" parent="ImapDebug"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
 [node name="Music" type="AudioStreamPlayer2D" parent="."]
 bus = &"Music"
 playback_type = 1

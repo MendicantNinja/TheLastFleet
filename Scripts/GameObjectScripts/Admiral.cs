@@ -56,6 +56,7 @@ public struct GoalDescriptor
     public int Radius;        // how far the influence spreads
     //public float ExpirationTime; // timestamp or tick when this goal expires
 	public int SampleTick;
+	public int Index;
 }
 
 // CellMerit

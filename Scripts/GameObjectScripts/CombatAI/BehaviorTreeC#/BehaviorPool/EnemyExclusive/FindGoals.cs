@@ -6,11 +6,14 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class FindGoals : Action
 {
+    bool is_friendly = false;
     public override NodeState Tick(Node agent)
     {
-        if (Engine.GetPhysicsFrames() % 120 != 0) return NodeState.SUCCESS;
+        if (is_friendly == true || Engine.GetPhysicsFrames() % 120 != 0) return NodeState.SUCCESS;
 
         ShipWrapper ship_wrapper = (ShipWrapper) agent.Get("ShipWrapper");
+        
+        if (is_friendly != ship_wrapper.IsFriendly) is_friendly = ship_wrapper.IsFriendly;
 
         if (ship_wrapper.DeployFlag == false) return NodeState.SUCCESS;
         
@@ -21,25 +24,25 @@ public partial class FindGoals : Action
         List<Vector2I> local_maximum_idx = new();
         for (int m = 0; m < ship_wrapper.GoalSample.Width; m++)
         {
-            float max_val = float.MinValue;
+            float rel_max_val = float.MinValue;
             int col = 0;
             for (int n = 0; n < ship_wrapper.GoalSample.Height; n++)
             {
                 float val = ship_wrapper.GoalSample.MapGrid[m, n];
-                if (val > max_val)
+                if (val > rel_max_val)
                 {
-                    max_val = val;
+                    rel_max_val = val;
                     col = n;
                 }
             }
             local_maximum_idx.Add(new Vector2I(m, col));
-            local_maximum_val.Add(max_val);
+            local_maximum_val.Add(rel_max_val);
         }
 
         Godot.Vector2I max_cell = new(0, 0);
+        float max_val = float.MinValue;
         for (int i = 0; i < local_maximum_idx.Count; i++)
         {
-            float max_val = float.MinValue;
             if (local_maximum_val[i] > max_val)
             {
                 max_val = local_maximum_val[i];

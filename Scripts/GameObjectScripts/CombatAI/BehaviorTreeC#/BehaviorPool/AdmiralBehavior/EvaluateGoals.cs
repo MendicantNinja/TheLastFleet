@@ -1,5 +1,6 @@
 using Globals;
 using Godot;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -19,13 +20,27 @@ public partial class EvaluateGoals : Action
         List<Goal> visited_goals = new();
         foreach (GoalDescriptor goal_eval in admiral.CurrentGoalEvaluation)
         {
-            
             if (visited_goals.Contains(goal_eval.Type)) continue;
             
+            GoalDescriptor goal_copy = goal_eval;
+            top_goals.Add(goal_copy);
+            visited_goals.Add(goal_copy.Type);
 
-            top_goals.Add(goal_eval);
-            visited_goals.Add(goal_eval.Type);
-            admiral.GoalHistory.Add(goal_eval);
+            List<GoalDescriptor> cross_ref = admiral.GoalHistory.Where(g => g.CenterCell == goal_copy.CenterCell).ToList();
+            bool already_exists = false;
+            foreach (GoalDescriptor goal_ref in cross_ref)
+            {
+                if (goal_ref.Type != goal_copy.Type) continue;
+                else if (goal_ref.Type == goal_copy.Type) already_exists = true;
+            }
+
+            if (already_exists == false)
+            {
+                int goal_idx = admiral.GoalHistory.Count;
+                goal_copy.Index = goal_idx;
+                admiral.GoalHistory.Add(goal_copy);
+            }
+            
         }
 
         admiral.CurrentGoalEvaluation = top_goals;
