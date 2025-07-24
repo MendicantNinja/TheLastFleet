@@ -111,7 +111,7 @@ public partial class Admiral : Node2D
 	public Dictionary<Vector2I, CellMerit> RegistryCellsMerit = new();
 	public List<GoalDescriptor> CurrentGoalEvaluation = new();
 	public List<GoalDescriptor> GoalHistory = new();
-	public ulong SampleBuffer = 10;
+	public ulong SampleBuffer = 15;
 	public int CurrentSampleTick = 0;
 	public int sample_limit = 4;
 

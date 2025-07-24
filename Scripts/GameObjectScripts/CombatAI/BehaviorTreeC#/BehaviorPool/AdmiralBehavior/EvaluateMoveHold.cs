@@ -41,7 +41,7 @@ public partial class EvaluateMoveHold : Action
             Vector2I cell_idx = new((int)data.TargetPosition.Y / ImapManager.Instance.MaxCellSize, (int)data.TargetPosition.X / ImapManager.Instance.MaxCellSize);
             // Get registry cell data from RCM
             ref CellMerit center_merit = ref CollectionsMarshal.GetValueRefOrNullRef(admiral.RegistryCellsMerit, cell_idx);
-            if (Unsafe.IsNullRef(ref center_merit) || center_merit.AdjacentCells.Count < 8) continue;
+            if (Unsafe.IsNullRef(ref center_merit)) continue;
 
             // If player affiliated units are there and no enemy units are, set its base strategic value to -1.0
             // else move on (for now)

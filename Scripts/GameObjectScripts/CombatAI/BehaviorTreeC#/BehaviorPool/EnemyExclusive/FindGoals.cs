@@ -6,6 +6,7 @@ using Vector2 = System.Numerics.Vector2;
 
 public partial class FindGoals : Action
 {
+    Vector2 prev_direction = Vector2.Zero;
     bool is_friendly = false;
     public override NodeState Tick(Node agent)
     {
